@@ -1,0 +1,30 @@
+.section-slider{
+    max-width: 100vw;
+    width: 100%;
+    background: #121212;
+}
+.section-slider h3 {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #00d4ff;
+    font-size: 80px;
+    line-height: 200px;
+    padding: 2%;
+    position: relative;
+    text-align: center;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.slick-prev:before, .slick-next:before {
+    color: #00d4ff !important;
+    font-size: 30px;
+}
+.slick-prev {
+    left: 30px;
+    z-index: 10;
+}
+
+.slick-next {
+    right: 30px;
+}

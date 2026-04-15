@@ -1,9 +1,12 @@
-import "./styles/Header.components.css"
+import Navbar from "./Navbar";
+import "./styles/Header.components.css";
 
 export default function Header(){
     return(
         <header className="header">
-            <h3>Header</h3>
+            <div className="flex">
+                <Navbar/>
+            </div>
         </header>
     )
 }

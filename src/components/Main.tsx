@@ -1,9 +1,10 @@
-import "./styles/Main.components.css"
+import "./styles/Main.components.css";
+import Carroussel from "./Slider";
 
 export default function Main(){
     return(
         <main className="main">
-            <h3>Main</h3>
+            <Carroussel/>
         </main>
     )
 }

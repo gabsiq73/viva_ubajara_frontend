@@ -3,4 +3,7 @@
     grid-row: 1;
     min-height: 100px;
     background-color: #c0c0c0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
