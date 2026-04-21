@@ -7,7 +7,35 @@ export default function Navbar(){
             <div className="menu">
                 <ul>
                     <li>
-                        <Link to="/">Home</Link>
+                        <Link to="/">Atrativos</Link>
+                    </li>
+                    <li>
+                        <Link to="/">Alimentação</Link>
+                    </li>
+                    <li>
+                        <Link to="/">Hospedagem</Link>
+                    </li>
+                    <li>
+                        <Link to="/">Condutores</Link>
+                    </li>
+                    <li>
+                        <Link to="/">Como Chegar</Link>
+                    </li>
+                    <li id="contact">
+                        <Link to="/">Contato</Link>
+                    </li>
+                    <li id="icons">
+                        <ul id="list-icons">
+                            <li>
+                                icon1
+                            </li>
+                            <li>
+                                icon2
+                            </li>
+                            <li>
+                                icon3
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </div>

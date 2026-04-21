@@ -1,9 +1,18 @@
 .header{
     grid-column: 1/-1;
     grid-row: 1;
-    min-height: 100px;
-    background-color: #c0c0c0;
+    max-height: 120px;
     display: flex;
     justify-content: center;
     align-items: center;
+    background: rgba(255, 255, 255, 0.0); 
+    backdrop-filter: blur(3px); 
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    /*position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 999;
+    padding: 15px 5%;*/
+    transition: background 0.3s ease;   
 }

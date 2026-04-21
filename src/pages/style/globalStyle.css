@@ -1,16 +1,21 @@
-*{
+* {
     box-sizing: border-box;
     padding: 0;
     margin: 0;
 }
+
 :root {
-    --bg-container: aquamarine;
+    --bg-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url('https://darkorchid-wallaby-929740.hostingersite.com/wp-content/uploads/2025/08/furnas.png');
 }
 
 .container {
     display: grid;
-    background-color: var(--bg-container);
     grid-template-columns: 1fr repeat(3, 2fr);
     grid-template-rows: repeat(8, 1fr);
     min-height: 100vh;
+
+    background: var(--bg-image);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
