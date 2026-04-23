@@ -5,9 +5,12 @@ export default function Main(){
     return(
         <main className="main">
             <section className="welcome">
-                <h3>Venha para Ubajara e</h3>
-                <h1>Tenha uma experiência</h1>
-                <h1 id="gold">Inesquecível</h1>
+                <div id="center">
+                    <h3>Venha para Ubajara</h3>
+                    <h1>Tenha uma experiência</h1>
+                    <h1 id="gold">Inesquecível</h1>
+                </div>
+                
             </section>
             <Content/>
         </main>

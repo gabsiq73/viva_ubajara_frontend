@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Satisfy&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+
 section.section{
     background-color: #ffffff;
     grid-row: 3;
@@ -36,4 +38,50 @@ ul.list-cards li#dormir{
 }
 ul.list-cards li#chegar{
     background-color: #006600;
+}
+div.point fieldset.box{
+    border: none;
+    padding-top: 10px;
+}
+div.point fieldset.box div.position{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+div.point fieldset.box h1{
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    color: #0d2b1a;
+    letter-spacing: -0.5px;
+    margin-left: 8%;
+    font-size: 4rem;
+    grid-column: 1;
+}
+div.point fieldset.box legend.legend{
+    font-family: "Satisfy", sans-serif;
+    color: #1a472a;
+    font-size: 3rem;
+    width: 20%;
+    margin-left: 4%;
+}
+
+div.point fieldset.box div.position div#more{
+    display: flex;
+    grid-column: 2;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 2rem;
+    margin-right: 50px;
+}
+div.point fieldset.box div.position div#more a{
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #1a472a;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+
+}
+div.point fieldset.box div.position div#more a i{
+    font-size: 3rem;
+    margin-left: 3px;
 }

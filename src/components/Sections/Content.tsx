@@ -1,4 +1,5 @@
 import "./style/Content.components.css"
+import { Link } from "react-router-dom"
 
 export default function Content(){
     return(
@@ -9,7 +10,7 @@ export default function Content(){
                         fazer
                     </li>
                     <li id="comer">
-                        comer
+                       comer
                     </li>
                     <li id="dormir">
                         dormir
@@ -21,7 +22,21 @@ export default function Content(){
             </div>
             <div className="point">
                 <fieldset className="box">
-                    
+                    <legend className="legend">
+                        Esperiências Únicas
+                    </legend>
+                    <div className="position">
+                        <h1>Pontos Turísticos</h1>
+
+                        <div id="more">
+                            <Link to="/">
+                                Ver Todos
+                                <i className="material-symbols-outlined">
+                                    trending_flat
+                                </i>
+                            </Link>
+                        </div>
+                    </div>
                 </fieldset>
             </div>
         </section>

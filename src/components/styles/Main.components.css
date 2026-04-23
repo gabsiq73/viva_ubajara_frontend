@@ -2,8 +2,7 @@
     grid-column: 1 / -1;
     grid-row: 1 / 8;
     display: grid;
-    grid-template-rows: 110px repeat(2, 1fr);
-    flex-direction: column;
+    grid-template-rows: 110px 700px 1fr;
     justify-content: center;
     align-items: center;
     color: white;
@@ -14,15 +13,18 @@ section.welcome{
     text-align: center;
     padding: 40px 0px 40px 0px;
     height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 section.welcome h3{
     margin-top: 30px;
-    font-size: 2rem;
+    font-size: 3rem;
     color: #ffffffc5;
     font-family: 'Courier New', Courier, monospace;
 }
 section.welcome h1{
-    font-size: 4rem;
+    font-size: 5rem;
     font-family: Times, serif;
 }
 section.welcome h1#gold{
