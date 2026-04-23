@@ -10,7 +10,7 @@ export default function Header(){
                     <img src={logo} alt="logo" />
                 </div>
             </div>
-
+            
             <div className="nav">
                 <Navbar/>
             </div>
