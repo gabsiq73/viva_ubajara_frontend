@@ -24,19 +24,6 @@ export default function Navbar(){
                     <li id="contact">
                         <Link to="/">Contato</Link>
                     </li>
-                    <li id="icons">
-                        <ul id="list-icons">
-                            <li>
-                                icon1
-                            </li>
-                            <li>
-                                icon2
-                            </li>
-                            <li>
-                                icon3
-                            </li>
-                        </ul>
-                    </li>
                 </ul>
             </div>
         </nav>
