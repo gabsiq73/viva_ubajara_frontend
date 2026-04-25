@@ -1,12 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
-
 * {
     box-sizing: border-box;
 }
 body {
     margin: 0;
     overflow-x: hidden;
-    background-color: #4D6AE7;
 }
 section.section{
     grid-row: 3;
@@ -26,6 +23,7 @@ div.paper img {
 div.fundo{
     width: 100vw;
     background: url("./../../../assets/images/fundo.png");
+    background-clip: content-box;
     position: relative;
     bottom: -10px;
     left: -10px;
@@ -137,7 +135,7 @@ div.point fieldset.box div.position div#more a i{
 }
 
 /*Responsive*/
-@media screen and (max-width: 480px) {
+@media (max-width: 480px) {
     ul.list-cards li{
         color: #ebebeb;
         width: 45%;

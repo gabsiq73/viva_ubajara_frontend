@@ -48,30 +48,25 @@ div.img img{
 
 /*Responsive*/
 @media screen and (max-width: 480px) {
-    .header {
-        display: flex; /* Flex costuma ser mais fácil para headers simples em mobile */
-        justify-content: space-between; 
-        align-items: center;
-        height: 70px; /* Evite max-height se quiser altura fixa */
-        padding: 0 20px;
-        width: 100%;
+    .header{
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        max-height: 100px;
+        padding: 10px;
         box-sizing: border-box;
     }
-
-    /* Esconde o que não precisa */
-    div.nav, 
-    div.icon-position {
+    div.nav, div.icon-position{
         display: none;
     }
-
-    div.logo.grid-l {
+    div.logo.grid-l{
+        grid-column: 2;
         display: flex;
-        width: 100%; 
-        justify-content: center;
+        justify-content: end;
+        position: relative;
+        right: 10px;
     }
-
-    div.img {
+    div.img{
         width: 80px;
-        margin: 0;
+        margin: 0px;
     }
 }
