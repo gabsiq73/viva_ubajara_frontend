@@ -45,3 +45,29 @@ div.img img{
     height: auto;
     display: block;
 }
+
+/*Responsive*/
+@media screen and (max-width: 480px) {
+    .header{
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        max-height: 100px;
+        padding: 10px;
+    }
+    div.nav{
+        display: none;
+    }
+    div.logo.grid-l{
+        grid-column: 2;
+        max-height: 50px;
+        display: flex;
+        justify-content: end;
+    }
+    div.icon-position{
+        display: none;
+    }
+    div.img{
+        width: 100px;
+        margin-right: 10px;
+    }
+}

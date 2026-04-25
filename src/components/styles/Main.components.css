@@ -29,3 +29,17 @@ section.welcome h1#gold{
     font-style: italic;
     color: #DAA520;
 }
+
+/*REsponsive*/
+@media screen and (max-width: 480px) {
+    .main{
+        grid-template-rows: 110px 150px 1fr;
+    }
+    section.welcome h3{
+        font-size: 20px;
+    }
+    section.welcome h1{
+        font-size: 30px;
+        font-family: Times, serif;
+    }
+}

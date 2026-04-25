@@ -10,7 +10,6 @@ export default function Main(){
                     <h1>Tenha uma experiência</h1>
                     <h1 id="gold">Inesquecível</h1>
                 </div>
-                
             </section>
             <Content/>
         </main>

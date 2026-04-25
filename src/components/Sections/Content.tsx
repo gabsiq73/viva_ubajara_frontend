@@ -59,6 +59,8 @@ export default function Content(){
                                 </Link>
                             </div>
                         </div>
+
+            <hr />
                         <div className="cards-points">
                             <ul className="list-points">
                                 <li>
@@ -68,7 +70,7 @@ export default function Content(){
                             </ul>
                         </div>
                     </fieldset>
-                </div>  
+                </div> 
             </div>
         </section>
         </>
