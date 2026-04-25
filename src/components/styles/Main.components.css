@@ -2,7 +2,7 @@
     grid-column: 1 / -1;
     grid-row: 1 / 8;
     display: grid;
-    grid-template-rows: 110px 700px 1fr;
+    grid-template-rows: 110px 400px 1fr;
     justify-content: center;
     align-items: center;
     color: white;
@@ -11,14 +11,12 @@
 section.welcome{
     grid-row: 2;
     text-align: center;
-    padding: 40px 0px 40px 0px;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 section.welcome h3{
-    margin-top: 30px;
     font-size: 3rem;
     color: #ffffffc5;
     font-family: 'Courier New', Courier, monospace;

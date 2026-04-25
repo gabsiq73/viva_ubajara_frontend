@@ -1,7 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Satisfy&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    overflow-x: hidden;
+}
 section.section{
-    background-color: #ffffff;
     grid-row: 3;
     width: 100vw;
     height: 100%;
@@ -9,77 +15,120 @@ section.section{
     color: #000;
     position: relative;
 }
-
+div.paper img {
+    position: relative;
+    width: 100vw;
+    height: 121px;
+    top: 48px;
+    left: -10px;
+}
+div.fundo{
+    width: 100vw;
+    background: url("./../../../assets/images/fundo.png");
+    position: relative;
+    left: -10px;
+    bottom: -10px;
+}
 ul.list-cards{
     display: flex;
-    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    gap: 60px;
+    grid-template-columns: repeat(4, 1fr);
     list-style: none;
+    max-width: 100vw; 
+    width: 85%;
+    min-height: 318px;
+    margin: 0 auto;
 }
 ul.list-cards li{
-    margin-left: 60px;
-    margin-right: 60px;
     color: #ebebeb;
-    width: 20%;
-    height: 350px;
-    padding: 10px;
-    border-radius: 25px;
+    width: 268px;
+    height: 292.25px;
+    padding: 32px;
+    border-radius: 24px;
     position: relative;
-    top: -70px;
+    margin-left: 24px;
+    top: -130px;
     box-shadow: 0px 0px 2px #000000db;
 }
+ul.list-cards li div#icon{
+    width: 21.74px;
+    height: 32.25px;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    z-index: 1;
+}
 ul.list-cards li#fazer{
-    background-color: #1d40bf;
+    background-color: #4D6AE7;
 }
 ul.list-cards li#comer{
     background-color: #008e45;
 }
 ul.list-cards li#dormir{
-    background-color: #f09e00;
+    background-color: #CD8700;
 }
 ul.list-cards li#chegar{
-    background-color: #006600;
+    background-color: #005225;
 }
 div.point fieldset.box{
     border: none;
     padding-top: 10px;
+    position: relative;
+    top: -100px;
 }
 div.point fieldset.box div.position{
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    margin: 0px auto 0px;
 }
 div.point fieldset.box h1{
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
-    color: #0d2b1a;
+    font-family: "Nunito";
+    font-weight: 900;
+    width: 399.86;
+    height: 60px;
+    color: #00210C;
     letter-spacing: -0.5px;
-    margin-left: 8%;
-    font-size: 4rem;
+    margin-left: 200px;
+    font-size: 48px;
     grid-column: 1;
+    line-height: 60px;
+    vertical-align: middle;
+    font-style: black;
 }
 div.point fieldset.box legend.legend{
-    font-family: "Satisfy", sans-serif;
-    color: #1a472a;
-    font-size: 3rem;
-    width: 20%;
-    margin-left: 4%;
+    font-family: "Caveat", sans-serif;
+    font-style: bold;
+    font-weight: 700;
+    color: #006B32;
+    line-height: 16px;
+    letter-spacing: 1.2px;
+    vertical-align: middle;
+    text-transform: capitalize;
+    font-size: 24px;
+    width: 200px;
+    height: 16px;
+    margin-left: 200px;
 }
-
 div.point fieldset.box div.position div#more{
+    grid-column: 3;
     display: flex;
-    grid-column: 2;
-    align-items: center;
-    justify-content: flex-end;
-    font-size: 2rem;
-    margin-right: 50px;
+    justify-content: center;
+    align-items: flex-end;
+    margin-right: -100px;
 }
 div.point fieldset.box div.position div#more a{
-    display: flex;
-    align-items: center;
     text-decoration: none;
     color: #1a472a;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-
+    font-family: "Inter";
+    font-weight: 700;
+    font-style: bold;
+    font-size: 16px;
+    line-height: 24px;
+    align-items: center;
+    vertical-align: middle;
 }
 div.point fieldset.box div.position div#more a i{
     font-size: 3rem;
