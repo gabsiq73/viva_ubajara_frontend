@@ -21,14 +21,14 @@ div.paper img {
     width: 100vw;
     height: 121px;
     top: 48px;
-    left: 10px;
+    left: -10px;
 }
 div.fundo{
     width: 100vw;
     background: url("./../../../assets/images/fundo.png");
     position: relative;
     bottom: -10px;
-    left: 10px;
+    left: -10px;
 }
 ul.list-cards{
     display: flex;
@@ -140,9 +140,15 @@ div.point fieldset.box div.position div#more a i{
 @media screen and (max-width: 480px) {
     ul.list-cards li{
         color: #ebebeb;
-        width: 180px;
+        width: 45%;
         height: 250px;
         margin-left: 0px;
+    }
+    div.paper img {
+        left: 10px;
+    }
+    div.fundo{
+        left: 10px;
     }
     ul.list-cards{
         width: 100%;
@@ -152,19 +158,20 @@ div.point fieldset.box div.position div#more a i{
     }
     div.point fieldset.box div.position{
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr 1fr;
     }
     div.point fieldset.box div.position div#more{
         grid-column: 2;
         width: 150px;
         height: 40px;
-        position: relative;
-        top: -10px;
-        right: -60px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: end;
+        margin-left: 24px;
     }
     div.point fieldset.box h1{
         width: 150px;
-        margin-left: 10px;
+        margin-left: 24px;
         position: relative;
         top: -10px;
         font-size: 14px;
@@ -175,7 +182,7 @@ div.point fieldset.box div.position div#more a i{
         font-size: 14px;
         width: 150px;
         height: 6px;
-        margin-left: 10px;
+        margin-left: 24px;
     }
     div.point fieldset.box div.position div#more a{
         font-size: 10px;
