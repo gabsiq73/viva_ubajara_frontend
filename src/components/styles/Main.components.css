@@ -6,6 +6,8 @@
     justify-content: center;
     align-items: center;
     color: white;
+    max-width: 100vw;
+    width: 100%;
     padding-bottom: 0px;
 }
 section.welcome{
@@ -34,6 +36,7 @@ section.welcome h1#gold{
 @media screen and (max-width: 480px) {
     .main{
         grid-template-rows: 110px 150px 1fr;
+        width: 90%;
     }
     section.welcome h3{
         font-size: 20px;

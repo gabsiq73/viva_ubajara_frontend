@@ -59,8 +59,6 @@ export default function Content(){
                                 </Link>
                             </div>
                         </div>
-
-            <hr />
                         <div className="cards-points">
                             <ul className="list-points">
                                 <li>

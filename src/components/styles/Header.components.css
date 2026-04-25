@@ -48,26 +48,30 @@ div.img img{
 
 /*Responsive*/
 @media screen and (max-width: 480px) {
-    .header{
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        max-height: 100px;
-        padding: 10px;
+    .header {
+        display: flex; /* Flex costuma ser mais fácil para headers simples em mobile */
+        justify-content: space-between; 
+        align-items: center;
+        height: 70px; /* Evite max-height se quiser altura fixa */
+        padding: 0 20px;
+        width: 100%;
+        box-sizing: border-box;
     }
-    div.nav{
+
+    /* Esconde o que não precisa */
+    div.nav, 
+    div.icon-position {
         display: none;
     }
-    div.logo.grid-l{
-        grid-column: 2;
-        max-height: 50px;
+
+    div.logo.grid-l {
         display: flex;
-        justify-content: end;
+        width: 100%; 
+        justify-content: center;
     }
-    div.icon-position{
-        display: none;
-    }
-    div.img{
-        width: 100px;
-        margin-right: 10px;
+
+    div.img {
+        width: 80px;
+        margin: 0;
     }
 }

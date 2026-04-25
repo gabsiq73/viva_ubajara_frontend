@@ -6,6 +6,7 @@
 body {
     margin: 0;
     overflow-x: hidden;
+    background-color: #4D6AE7;
 }
 section.section{
     grid-row: 3;
@@ -20,14 +21,14 @@ div.paper img {
     width: 100vw;
     height: 121px;
     top: 48px;
-    left: -10px;
+    left: 10px;
 }
 div.fundo{
     width: 100vw;
     background: url("./../../../assets/images/fundo.png");
     position: relative;
-    left: -10px;
     bottom: -10px;
+    left: 10px;
 }
 ul.list-cards{
     display: flex;
