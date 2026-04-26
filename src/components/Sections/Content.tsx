@@ -2,6 +2,10 @@ import "./style/Content.components.css"
 import { Link } from "react-router-dom"
 import paper from "./../../assets/images/paper.png"
 import cac from "./../../assets/images/cachoeira.png";
+import farm from "./../../assets/images/fazenda.png";
+import mercado from "./../../assets/images/mercado.png";
+import museum from "./../../assets/images/museu.png";
+import park from "./../../assets/images/parque.png";
 
 export default function Content(){
     return(
@@ -147,10 +151,15 @@ export default function Content(){
                                         <span>Natureza</span>
                                     </div>
                                     <div className="imagem-tour">
-                                        <img src={cac} alt="" />
+                                        <img src={cac} alt="Cachoeira do Frade" />
                                     </div>
                                     <div className="info-tour">
-
+                                        <h2>
+                                            Cachoeira do Frade
+                                        </h2>
+                                        <p>
+                                            Uma queda d'água refrescante escondida entre paredões de rocha e mata atlântica.
+                                        </p>
                                     </div>
                                 </li>
                                 <li>
@@ -158,40 +167,55 @@ export default function Content(){
                                         <span>Natureza</span>
                                     </div>
                                     <div className="imagem-tour">
-                                        <img src={cac} alt="" />
+                                        <img src={farm} alt="Fazendoa Santo Expedito" />
                                     </div>
                                     <div className="info-tour">
-                                        
+                                        <h2>
+                                            Fazenda Santo Expedito
+                                        </h2>
+                                        <p>
+                                            Um dos maiores polos de produção de rosas híbridas do Brasil e referência em turismo rural sustentável.
+                                        </p>
                                     </div>
                                 </li>
                                 <li>
                                     <div className="type">
-                                        <span>Natureza</span>
+                                        <span style={{color: "#304FCD"}}>cultura</span>
                                     </div>
                                     <div className="imagem-tour">
-                                        <img src={cac} alt="" />
+                                        <img src={mercado} alt="Mercado Público" />
                                     </div>
                                     <div className="info-tour">
-                                        
+                                        <h2>
+                                            Mercado Público
+                                        </h2>
+                                        <p>
+                                            O coração pulsante da cidade, onde você encontra o melhor artesanato e produtos locais.
+                                        </p>
                                     </div>
                                 </li>
                                 <li>
                                     <div className="type">
-                                        <span>Natureza</span>
+                                        <span style={{color: "#304FCD"}}>História</span>
                                     </div>
                                     <div className="imagem-tour">
-                                        <img src={cac} alt="" />
+                                        <img src={museum} alt="Museu JK" />
                                     </div>
                                     <div className="info-tour">
-                                        
+                                        <h2>
+                                            Museu JK
+                                        </h2>
+                                        <p>
+                                            Um mergulho na história e memórias preservadas em um casarão de época restaurado.
+                                        </p>
                                     </div>
                                 </li>
                                 <li>
                                     <div className="type">
-                                        <span>Natureza</span>
+                                        <span style={{color: "#006B32"}}>Destaque</span>
                                     </div>
                                     <div className="imagem-tour">
-                                        <img src={cac} alt="" />
+                                        <img src={park} alt="Parque Nacional" />
                                     </div>
                                     <div className="info-tour">
                                         
