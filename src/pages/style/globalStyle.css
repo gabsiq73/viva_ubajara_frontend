@@ -5,11 +5,10 @@
     box-sizing: border-box;
     padding: 0;
     margin: 0;
-    font-family: 'Roboto', sans-serif;
 }
 
 :root {
-    --bg-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url('https://darkorchid-wallaby-929740.hostingersite.com/wp-content/uploads/2025/08/furnas.png');
+    --bg-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url('./../../assets/images/Capa29.png');
 }
 
 .container {
@@ -22,7 +21,6 @@
     background: var(--bg-image);
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
 }
 
 /*Responsive*/
