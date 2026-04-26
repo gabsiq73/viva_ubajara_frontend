@@ -1,6 +1,7 @@
 import "./style/Content.components.css"
 import { Link } from "react-router-dom"
 import paper from "./../../assets/images/paper.png"
+import cac from "./../../assets/images/cachoeira.png";
 
 export default function Content(){
     return(
@@ -142,13 +143,75 @@ export default function Content(){
                         <div className="cards-points">
                             <ul className="list-points">
                                 <li>
-                                    <Link to="/">
-                                    </Link>
+                                    <div className="type">
+                                        <span>Natureza</span>
+                                    </div>
+                                    <div className="imagem-tour">
+                                        <img src={cac} alt="" />
+                                    </div>
+                                    <div className="info-tour">
+
+                                    </div>
+                                </li>
+                                <li>
+                                    <div className="type">
+                                        <span>Natureza</span>
+                                    </div>
+                                    <div className="imagem-tour">
+                                        <img src={cac} alt="" />
+                                    </div>
+                                    <div className="info-tour">
+                                        
+                                    </div>
+                                </li>
+                                <li>
+                                    <div className="type">
+                                        <span>Natureza</span>
+                                    </div>
+                                    <div className="imagem-tour">
+                                        <img src={cac} alt="" />
+                                    </div>
+                                    <div className="info-tour">
+                                        
+                                    </div>
+                                </li>
+                                <li>
+                                    <div className="type">
+                                        <span>Natureza</span>
+                                    </div>
+                                    <div className="imagem-tour">
+                                        <img src={cac} alt="" />
+                                    </div>
+                                    <div className="info-tour">
+                                        
+                                    </div>
+                                </li>
+                                <li>
+                                    <div className="type">
+                                        <span>Natureza</span>
+                                    </div>
+                                    <div className="imagem-tour">
+                                        <img src={cac} alt="" />
+                                    </div>
+                                    <div className="info-tour">
+                                        
+                                    </div>
+                                </li>
+                                <li>
+                                    <div className="type">
+                                        <span>Natureza</span>
+                                    </div>
+                                    <div className="imagem-tour">
+                                        <img src={cac} alt="" />
+                                    </div>
+                                    <div className="info-tour">
+                                        
+                                    </div>
                                 </li>
                             </ul>
                         </div>
                     </fieldset>
-                </div> 
+                </div>
             </div>
         </section>
         </>
