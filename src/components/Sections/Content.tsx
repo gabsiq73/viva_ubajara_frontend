@@ -10,7 +10,6 @@ import route from "./../../assets/images/route.png";
 
 export default function Content(){
     return(
-        <>
         <section className="section">
             <div className="paper">
                 <img src={paper}/>
@@ -247,8 +246,29 @@ export default function Content(){
                         </div>
                     </fieldset>
                 </div>
+                <div className="top-n">
+                    <div className="papel">
+                        <div className="paper1">
+                            <img src={paper} alt="papel" />
+                        </div>
+                        <div className="paper2">
+                            <img src={paper} alt="papel" />
+                        </div>
+                    </div>
+                    <div className="news">
+                        
+                    </div>
+                    <div className="papel ptop">
+                        <div className="paper1">
+                            <img src={paper} alt="papel" />
+                        </div>
+                        <div className="paper2">
+                            <img src={paper} alt="papel" />
+                        </div>
+                    </div>
+                </div>
+    
             </div>
         </section>
-        </>
     )
 }

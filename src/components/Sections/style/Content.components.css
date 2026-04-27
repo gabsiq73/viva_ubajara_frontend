@@ -20,6 +20,20 @@ div.paper img {
     top: 48px;
     left: -10px;
 }
+div.papel{
+    display: flex;
+    position: relative;
+    top: 90px;
+}
+div.papel.ptop{
+    top: -90px;
+}
+div.paper1 img, div.paper2 img{
+    filter: brightness(0) saturate(100%) invert(52%) sepia(94%) saturate(398%) hue-rotate(360deg) brightness(92%) contrast(85%);
+    height: 115px;
+    width: 50vw;
+    position: relative;
+}
 div.fundo{
     width: 100vw;
     background: url("./../../../assets/images/fundo.png");
@@ -311,6 +325,19 @@ div.point fieldset.box div.cards-points ul li div.info-tour p{
     vertical-align: middle;
     color: #3E4A3F;
 }
+div.news{
+    width: 100%;
+    height: 576px;
+    margin-top: 50px;
+    background-color: #C58B24;
+    border: solid 2px;
+    padding: 50px;
+    margin-bottom: 65px;
+}
+div.top-n{
+    position: relative;
+    top: -100px;
+}
 
 /*Responsive*/
 @media (max-width: 480px) {
@@ -396,14 +423,17 @@ div.point fieldset.box div.cards-points ul li div.info-tour p{
     div.point fieldset.box div.cards-points ul {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        width: 98%; 
+        width: 100%;
+        gap: 10px;
+        margin-left: auto;
         margin: 0 auto;
         padding: 10px;
-        margin-top: -100px;
+        margin-top: -150px;
     }
     div.point fieldset.box div.cards-points ul li {
-        width: 100%;
-        margin-top: 50px;
+        width: 170px;
+        margin-top: 100px;
+        position: relative;
         height: 200px;
     }
     div.point fieldset.box div.cards-points ul li div.imagem-tour img {
@@ -442,5 +472,9 @@ div.point fieldset.box div.cards-points ul li div.info-tour p{
         display: -webkit-box;
         -webkit-box-orient: vertical;
         overflow: hidden;
+    }
+    div.top-n{
+        position: relative;
+        top: -60px;
     }
 }
