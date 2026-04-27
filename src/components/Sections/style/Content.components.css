@@ -35,7 +35,7 @@ ul.list-cards{
     gap: 60px;
     list-style: none;
     max-width: 100vw; 
-    width: 85%;
+    width: 95%;
     min-height: 318px;
     margin: 0 auto;
 }
@@ -217,16 +217,14 @@ div.point fieldset.box div.cards-points{
     margin-top: 40px;
 }
 div.point fieldset.box div.cards-points ul{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 60px;
     list-style: none;
-    max-width: 100vw; 
+    max-width: 100vw;
     width: 85%;
     min-height: 318px;
-    margin: 0 auto;
+    margin-left: 10%;
 }
 div.point fieldset.box div.cards-points ul li{
     width: 355px;
@@ -234,6 +232,7 @@ div.point fieldset.box div.cards-points ul li{
     border-radius: 16px;
     border: solid 1px #E2E2E2;
     color:  #EDEDED;
+    margin: 0 auto;
 }
 div.point fieldset.box div.cards-points ul li div.imagem-tour img{
     width: 355px;
@@ -273,7 +272,7 @@ div.point fieldset.box div.cards-points ul li div.type span{
 }
 div.point fieldset.box div.cards-points ul li div.info-tour{
     width: 353px;
-    height: 186.5px;
+    height: 195px;
     padding: 32px;
     gap: 12px;
     display: flex;
@@ -285,7 +284,8 @@ div.point fieldset.box div.cards-points ul li div.info-tour{
     align-self: stretch;
     flex-grow: 0;
     z-index: 0;
-    border-radius: 16px;
+    border-radius: 0px 0px 10px 16px;
+    margin-top: -10px;
 }
 div.point fieldset.box div.cards-points ul li div.info-tour h2{
     width: 291px;
@@ -297,7 +297,7 @@ div.point fieldset.box div.cards-points ul li div.info-tour h2{
     line-height: 32px;
     vertical-align: middle;
     color: #00210C;
-    /*margin: -10px 0 -10px 0px;*/
+    margin: -10px 0 -10px 0px;
 }
 div.point fieldset.box div.cards-points ul li div.info-tour p{
     width: 291px;
@@ -371,9 +371,9 @@ div.point fieldset.box div.cards-points ul li div.info-tour p{
     ul.list-cards li div.text p{
         width: 120px;
         height: 69px;
+        text-align: justify;
         font-size: 12px;
         line-height: 14px;
-        text-align: left;
     }
     ul.list-cards li div.knowmore a span{
         max-width: 80px;
@@ -392,5 +392,55 @@ div.point fieldset.box div.cards-points ul li div.info-tour p{
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+    div.point fieldset.box div.cards-points ul {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        width: 98%; 
+        margin: 0 auto;
+        padding: 10px;
+        margin-top: -100px;
+    }
+    div.point fieldset.box div.cards-points ul li {
+        width: 100%;
+        margin-top: 50px;
+        height: 200px;
+    }
+    div.point fieldset.box div.cards-points ul li div.imagem-tour img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+    div.point fieldset.box div.cards-points ul li div.type {
+        width: auto;
+        padding: 2px 8px;
+        margin-top: 5px;
+        margin-left: 5px;
+    }
+    div.point fieldset.box div.cards-points ul li div.type span {
+        font-size: 9px;
+    }
+    div.point fieldset.box div.cards-points ul li div.info-tour {
+        width: 100%;
+        height: 150px;
+        padding: 12px;
+        gap: 5px;
+    }
+
+    div.point fieldset.box div.cards-points ul li div.info-tour h2 {
+        width: 100%;
+        font-size: 10px;
+        line-height: 20px;
+        margin: 0;
+    }
+
+    div.point fieldset.box div.cards-points ul li div.info-tour p {
+        width: 100%;
+        height: auto;
+        font-size: 10px;
+        line-height: 16px;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 }

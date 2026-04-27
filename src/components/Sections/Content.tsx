@@ -6,6 +6,7 @@ import farm from "./../../assets/images/fazenda.png";
 import mercado from "./../../assets/images/mercado.png";
 import museum from "./../../assets/images/museu.png";
 import park from "./../../assets/images/parque.png";
+import route from "./../../assets/images/route.png";
 
 export default function Content(){
     return(
@@ -218,18 +219,28 @@ export default function Content(){
                                         <img src={park} alt="Parque Nacional" />
                                     </div>
                                     <div className="info-tour">
-                                        
+                                        <h2>
+                                            Parque Nacional
+                                        </h2>
+                                        <p>
+                                            Explore grutas milenares e vistas épicas em um passeio de bondinho inesquecível.
+                                        </p>
                                     </div>
                                 </li>
                                 <li>
                                     <div className="type">
-                                        <span>Natureza</span>
+                                        <span style={{color: "#805200"}}>Aventura</span>
                                     </div>
                                     <div className="imagem-tour">
-                                        <img src={cac} alt="" />
+                                        <img src={route} alt="Rota de Quadriciclo" />
                                     </div>
                                     <div className="info-tour">
-                                        
+                                        <h2>
+                                            Rota de Quadriciclo
+                                        </h2>
+                                        <p>
+                                            Adrenalina pura desbravando trilhas off-road entre mirantes e matas nativas da região.
+                                        </p>
                                     </div>
                                 </li>
                             </ul>
