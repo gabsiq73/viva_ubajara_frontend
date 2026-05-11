@@ -14,7 +14,14 @@ export default function Header(){
             <div className="nav">
                 <Navbar/>
             </div>
-
+            <label htmlFor="menu-mobile" id="check">
+                <input type="checkbox" name="menu-mobile" id="menu-mobile" />
+                <div className="menu-hamburguer">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </label>
             <div className="icon-position">
                 <ul id="list-icons" style={{ display: 'flex', listStyle: 'none', gap: '15px' }}>
                     <li>

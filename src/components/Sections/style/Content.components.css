@@ -241,21 +241,21 @@ div.point fieldset.box div.cards-points ul{
     margin-left: 10%;
 }
 div.point fieldset.box div.cards-points ul li{
-    width: 355px;
-    height: 480px;
-    border-radius: 16px;
+    width: 356px;
+    height: 343px;
+    border-radius: 24px;
     border: solid 1px #E2E2E2;
     color:  #EDEDED;
     margin: 0 auto;
 }
 div.point fieldset.box div.cards-points ul li div.imagem-tour img{
-    width: 355px;
-    height: 288px;
-    border-radius: 10px 10px 00px 0px;
+    width: 356px;
+    height: 343px;
+    border-radius: 24px;
 }
 div.point fieldset.box div.cards-points ul li div.type{
-    width: 105px;
-    height: 29px;
+    width: 92px;
+    height: 26px;
     padding: 4px 16px 4px 16px;
     color: #FFFFFFCC;
     position: absolute;
@@ -264,11 +264,10 @@ div.point fieldset.box div.cards-points ul li div.type{
     align-items: center;
     flex-direction: column;
     padding: 4px 16px;
-    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(4px);
     margin-top: 10px;
     margin-left: 13px;
-    border-radius: 9999px;
+    border-radius: 6px;
     flex: none;
     order: 1;
     flex-grow: 0;
@@ -281,28 +280,40 @@ div.point fieldset.box div.cards-points ul li div.type span{
     font-size: 12px;
     line-height: 16px;
     vertical-align: middle;
-    color: #006B32;
+    color: #FFFFFF;
     text-transform: uppercase;
 }
 div.point fieldset.box div.cards-points ul li div.info-tour{
-    width: 353px;
-    height: 195px;
+    width: 356px;
+    height: 141px;
     padding: 32px;
     gap: 12px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    background-color: #f6f6f6;
+    background-color: #006B32B8;
     flex: none;
     order: 1;
     align-self: stretch;
     flex-grow: 0;
     z-index: 0;
-    border-radius: 0px 0px 10px 16px;
-    margin-top: -10px;
+    border-radius: 0px 0px 24px 24px;
+    position: relative;
+    top: -145px;
+    overflow: hidden;
+}
+div.point fieldset.box div.cards-points ul li div.info-tour::before {
+    content: "";
+    position: absolute;
+    top: 0; 
+    left: 0;
+    right: 0; 
+    bottom: 0;
+    filter: blur(4px);
+    z-index: -1;    
 }
 div.point fieldset.box div.cards-points ul li div.info-tour h2{
-    width: 291px;
+    width: 270px;
     height: 32px;
     font-family: 'Inter';
     font-weight: 600;
@@ -310,12 +321,12 @@ div.point fieldset.box div.cards-points ul li div.info-tour h2{
     font-size: 24px;
     line-height: 32px;
     vertical-align: middle;
-    color: #00210C;
+    color: #FFFFFFE0;
     margin: -10px 0 -10px 0px;
 }
 div.point fieldset.box div.cards-points ul li div.info-tour p{
-    width: 291px;
-    height: 78px;
+    width: 273px;
+    height: 57px;
     font-family: 'Inter';
     text-align: justify;
     font-weight: 400;
@@ -323,21 +334,138 @@ div.point fieldset.box div.cards-points ul li div.info-tour p{
     font-size: 16px;
     line-height: 26px;
     vertical-align: middle;
-    color: #3E4A3F;
+    color: #FFFFFFCC;
 }
 div.news{
     width: 100%;
     height: 576px;
     margin-top: 50px;
     background-color: #C58B24;
-    border: solid 2px;
     padding: 50px;
     margin-bottom: 65px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
 }
 div.top-n{
     position: relative;
     top: -100px;
 }
+div.caixa{
+    grid-column: 1;
+    width: 561px;
+    height: 482px;
+    border-radius: 48px;
+    border: solid #FFFFFF33 4px;
+    margin-top: -20px
+}
+div.imagem-caixa img{
+    width: 561px;
+    margin-left: 20px;
+    margin-top: 20px;
+    height: 482px;
+    border-radius: 48px;
+}
+div.text-n{
+    grid-column: 2;
+}
+div.text-n h2{
+    font-family: "Caveat", sans-serif;
+    font-weight: 700;
+    font-style: bold;
+    font-size: 24px;
+    line-height: 20px;
+    letter-spacing: 1.4px;
+    vertical-align: middle;
+    color: #fff;
+}
+div.text-n h1{
+    font-family: "Nunito", sans-serif;
+    width: 530px;
+    height: 60px;
+    font-weight: 900;
+    font-style: Black;
+    font-size: 48px;
+    line-height: 60px;
+    letter-spacing: 0px;
+    vertical-align: middle;
+    color: #FFFFFF;
+}
+div.protect ul{
+    display: flex;
+    list-style: none;
+    width: 530px;
+    height: 104px;
+    flex-wrap: wrap;
+}
+div.protect ul > li{
+    width: 168.4px;
+    height: 38px;
+    margin-top: 16px;
+    border-radius: 9999px;
+    border: solid 1px #FFFFFF33;
+    padding: 8px 20px 8px 20px;
+    font-size: 14px;
+    line-height: 20px;
+    font-family: "Inter", sans-serif;
+    color: #FFFFFF;
+    font-weight: 500;
+    font-style: normal;
+    margin-left: 5px;
+    text-align: center;
+    background: #FFFFFF33;
+}
+div.desc p{
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 18px;
+    line-height: 29.25px;
+    vertical-align: middle;
+    color: #EDFFF2;
+}
+div.desc{
+    width: 530px;
+    height: 165px;
+    padding: 24px 0px 24px 0px;
+}
+div.restaurant{
+    width: 231px;
+    height: 68px;
+    border-radius: 24px;
+    padding: 20px 40px 20px 40px;
+    background-color: #FFFFFF;
+}
+div.restaurant a{
+    display: flex;
+    width: 231.28px;
+    height: 68px;
+    margin-left: -40px;
+    position: relative;
+    top: -35px;
+    /*padding-top: 25px;*/
+    align-items: center;
+    justify-content: center;
+    border-radius: 24px;
+    background-color: #FFFFFF01;
+    box-shadow: 0px 8px 10px -6px #0000001A;
+    box-shadow: 0px 20px 25px -5px #0000001A;
+    text-decoration: none;
+}
+div.restaurant a > p{
+    width: 151px;
+    height: 28px;
+    font-family: "Inter";
+    font-weight: 600;
+    font-style: Bold;
+    font-size: 18px;
+    line-height: 28px;
+    letter-spacing: 0px;
+    text-align: center;
+    vertical-align: middle;
+    margin-top: 20px;
+    color: #000502;
+}
+
 
 /*Responsive*/
 @media (max-width: 480px) {
@@ -422,52 +550,55 @@ div.top-n{
     }
     div.point fieldset.box div.cards-points ul {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(1, 1fr);
         width: 100%;
         gap: 10px;
         margin-left: auto;
         margin: 0 auto;
         padding: 10px;
-        margin-top: -150px;
+        margin-top: -50px;
     }
     div.point fieldset.box div.cards-points ul li {
-        width: 170px;
-        margin-top: 100px;
+        width: 325px;
+        margin-top: 10px;
         position: relative;
-        height: 200px;
+        height: 273px;
     }
     div.point fieldset.box div.cards-points ul li div.imagem-tour img {
-        width: 100%;
-        height: 150px;
+        width: 325px;
+        height: 273px;
         object-fit: cover;
     }
     div.point fieldset.box div.cards-points ul li div.type {
-        width: auto;
+        width: 77px;
+        height: 23px;
         padding: 2px 8px;
-        margin-top: 5px;
-        margin-left: 5px;
+        margin-top: 20px;
+        margin-left: 20px;
     }
     div.point fieldset.box div.cards-points ul li div.type span {
         font-size: 9px;
     }
     div.point fieldset.box div.cards-points ul li div.info-tour {
-        width: 100%;
-        height: 150px;
+        width: 325px;
+        height: 113px;
         padding: 12px;
+        margin-top: 27px;
         gap: 5px;
     }
 
     div.point fieldset.box div.cards-points ul li div.info-tour h2 {
         width: 100%;
-        font-size: 10px;
+        font-size: 20px;
         line-height: 20px;
         margin: 0;
     }
 
     div.point fieldset.box div.cards-points ul li div.info-tour p {
-        width: 100%;
-        height: auto;
-        font-size: 10px;
+        width: 238px;
+        height: 45px;
+        line-height: 15px;
+        font-size: 14px;
         line-height: 16px;
         display: -webkit-box;
         -webkit-box-orient: vertical;
@@ -477,4 +608,93 @@ div.top-n{
         position: relative;
         top: -60px;
     }
+    div.news{
+        grid-template-columns: 1fr;
+        height: 950px;
+    }
+    div.text-n{
+        grid-column: 1;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-left: -50px;
+        width: 393px;
+        margin-top: 40px;
+    }
+    div.text-n h2{
+        width: 331px;
+        height: 20px;
+        text-align: center;
+    }
+    div.text-n h1{
+        width: 330px;
+        height: 64px;
+        text-align: center;
+        margin-bottom: 70px;
+    }
+    div.caixa{
+        grid-column: 1;
+        width: 299px;
+        height: 265px;
+        margin-left: -20px;
+    }
+    div.imagem-caixa img{
+        width: 303px;
+        height: 270px;
+    }
+    div.protect ul > li{
+        width: 170px;
+        height: 38px;
+        margin-top: 22px;
+        margin-left: 12px;
+        padding: 8px 20px 8px 20px;
+        font-size: 14px;
+    }
+    div.protect{
+        display: flex;
+        width: 400px;
+        justify-content: center;
+    }
+    div.protect ul{
+        width: 370px;
+        height: 104px;
+        display: flex;
+        justify-content: center;
+    }
+    div.desc{
+        width: 323px;
+        height: 144px;
+        padding: 24px 0px 24px 0px;
+    }
+    div.desc p{
+        font-size: 14px;
+        text-align: center;
+    }
+    div.restaurant{
+        width: 110px;
+        height: 36px;
+        margin-top: 30px;
+        border-radius: 9px;
+        padding: 20px;
+    }
+    div.restaurant a{
+        width: 104px;
+        height: 31px;
+        border-radius: 24px;
+        margin-top: 15px;
+        margin-left: -17px;
+    }
+    div.restaurant a > p{
+        width: 84px;
+        height: 28px;
+        font-size: 10px;
+        margin-top: 10px;
+    }
+}
+
+@media only screen and (max-width: 768px){
+    
+}
+@media only screen and (max-width: 1024px){
+    
 }

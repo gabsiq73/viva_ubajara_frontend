@@ -7,6 +7,7 @@ import mercado from "./../../assets/images/mercado.png";
 import museum from "./../../assets/images/museu.png";
 import park from "./../../assets/images/parque.png";
 import route from "./../../assets/images/route.png";
+import food from "./../../assets/images/food.png";
 
 export default function Content(){
     return(
@@ -147,8 +148,8 @@ export default function Content(){
                         <div className="cards-points">
                             <ul className="list-points">
                                 <li>
-                                    <div className="type">
-                                        <span>Natureza</span>
+                                    <div className="type" style={{background: "#006B32"}}>
+                                        <span >Natureza</span>
                                     </div>
                                     <div className="imagem-tour">
                                         <img src={cac} alt="Cachoeira do Frade" />
@@ -163,7 +164,7 @@ export default function Content(){
                                     </div>
                                 </li>
                                 <li>
-                                    <div className="type">
+                                    <div className="type" style={{background: "#006B32"}}>
                                         <span>Natureza</span>
                                     </div>
                                     <div className="imagem-tour">
@@ -179,8 +180,8 @@ export default function Content(){
                                     </div>
                                 </li>
                                 <li>
-                                    <div className="type">
-                                        <span style={{color: "#304FCD"}}>cultura</span>
+                                    <div className="type" style={{background: "#C58B24"}}>
+                                        <span >cultura</span>
                                     </div>
                                     <div className="imagem-tour">
                                         <img src={mercado} alt="Mercado Público" />
@@ -195,8 +196,8 @@ export default function Content(){
                                     </div>
                                 </li>
                                 <li>
-                                    <div className="type">
-                                        <span style={{color: "#304FCD"}}>História</span>
+                                    <div className="type" style={{background: "#304FCD"}}>
+                                        <span>História</span>
                                     </div>
                                     <div className="imagem-tour">
                                         <img src={museum} alt="Museu JK" />
@@ -211,8 +212,8 @@ export default function Content(){
                                     </div>
                                 </li>
                                 <li>
-                                    <div className="type">
-                                        <span style={{color: "#006B32"}}>Destaque</span>
+                                    <div className="type" style={{background: "#006B32"}}>
+                                        <span>Natureza</span>
                                     </div>
                                     <div className="imagem-tour">
                                         <img src={park} alt="Parque Nacional" />
@@ -227,8 +228,8 @@ export default function Content(){
                                     </div>
                                 </li>
                                 <li>
-                                    <div className="type">
-                                        <span style={{color: "#805200"}}>Aventura</span>
+                                    <div className="type" style={{background: "#CD3636"}}>
+                                        <span >Aventura</span>
                                     </div>
                                     <div className="imagem-tour">
                                         <img src={route} alt="Rota de Quadriciclo" />
@@ -256,7 +257,36 @@ export default function Content(){
                         </div>
                     </div>
                     <div className="news">
-                        
+                        <div className="caixa">
+                            <div className="imagem-caixa">
+                                <img src={food} alt="food" />
+                            </div>
+                        </div>
+                        <div className="text-n">
+                            <h2>Sabores da Ibiapaba</h2>
+                            <h1>Gastronomia Regional</h1>
+
+                            <div className="protect">
+                                <ul>
+                                    <li>Cachaça Artesanal</li>
+                                    <li>Café de Sombra</li>
+                                    <li>Comida Caipira</li>
+                                    <li>Doces Caseiros</li>
+                                </ul>
+                            </div>
+
+                            <div className="desc">
+                                <p>
+                                    A altitude de Ubajara proporciona um clima perfeito para o cultivo de cafés especiais e a produção de iguarias únicas que você só encontra aqui. Delicie-se com o melhor tempero da serra.
+                                </p>
+                            </div>
+
+                            <div className="restaurant">
+                                <Link to="/">
+                                 <p>Ver Restaurantes</p>
+                                </Link>
+                            </div>
+                        </div>
                     </div>
                     <div className="papel ptop">
                         <div className="paper1">
