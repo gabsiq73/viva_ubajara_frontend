@@ -181,7 +181,7 @@ div.point fieldset.box h1{
     height: 60px;
     color: #00210C;
     letter-spacing: -0.5px;
-    margin-left: 340px;
+    margin-left: 53%;
     font-size: 48px;
     grid-column: 1;
     line-height: 60px;
@@ -200,14 +200,14 @@ div.point fieldset.box legend.legend{
     font-size: 24px;
     width: 200px;
     height: 16px;
-    margin-left: 340px;
+    margin-left: 18%;
 }
 div.point fieldset.box div.position div#more{
     grid-column: 3;
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    margin-right: 200px;
+    margin-right: 22%;
 }
 div.point fieldset.box div.position div#more a{
     text-decoration: none;
