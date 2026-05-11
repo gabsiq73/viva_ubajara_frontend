@@ -636,6 +636,7 @@ div.restaurant a > p{
         grid-column: 1;
         width: 299px;
         height: 265px;
+        margin-top: 1px;
         margin-left: -20px;
     }
     div.imagem-caixa img{
