@@ -54,6 +54,7 @@
         width: 73px;
         height: 25px;
         border-radius: 9999px;
+        background-color: #006B32;
         display: flex;
     }
     .navbar ul li#contact a{
@@ -66,6 +67,5 @@
         justify-content: center;
         line-height: 16px;
         letter-spacing: 0.6px;
-
     }
 }

@@ -83,7 +83,8 @@ label input[type=checkbox]{
         /*position: sticky;*/
     }
     div.nav{
-        grid-column:3;
+        grid-column: 3;
+        width: 100px;
     }
     div.icon-position{
         display: none;
@@ -99,6 +100,7 @@ label input[type=checkbox]{
     }
     div.menu-hamburguer{
         grid-column: 1;
+        grid-row: 1;
         display: block;
     }
     label#check{
