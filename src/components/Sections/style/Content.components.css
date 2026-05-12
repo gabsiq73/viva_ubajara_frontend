@@ -44,27 +44,29 @@ div.fundo{
 ul.list-cards{
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
+    flex-wrap: nowrap;
+    justify-content: center;
     list-style: none;
-    max-width: 70vw; 
+    max-width: 90vw; 
     width: 100%;
     min-height: 318px;
     margin: 0 auto;
+    gap: 20px;
 }
 ul.list-cards li{
     color: #ebebeb;
-    width: 268px;
+    flex: 1 1 268px;
+    max-width: 268px;
+    min-width: 200px;
     height: 292.25px;
     padding: 32px;
     border-radius: 24px;
     position: relative;
-    margin-left: 24px;
     top: -130px;
     box-shadow: 0px 0px 2px #000000db;
 }
 ul.list-cards li div.title h3{
-    width: 203px;
+    width: 100%;
     height: 32px;
     display: flex;
     align-items: center;
@@ -72,7 +74,7 @@ ul.list-cards li div.title h3{
     font-size: 24px;
     line-height: 32px;
     vertical-align: middle;
-    margin-top: 10px;
+    margin: 20px 0px 8px 0px;
     color: #ffffff;
 }
 ul.list-cards li div.knowmore{
@@ -99,12 +101,11 @@ ul.list-cards li div.knowmore a span{
     width: 97px;
     height: 33px;
     font-size: 12px;
-    font-weight: 700;
-    font-style: bold;
+    font-weight: 600;
     text-transform: uppercase;
     align-items: center;
     justify-content: center;
-    color: #00210C;
+    color: #00210ca6;
     background-color: #ffffff;
     padding: 10px;
     border-radius: 50px;
@@ -116,7 +117,7 @@ ul.list-cards li div.knowmore a i{
     font-weight: 600;
     vertical-align: middle;
     text-align: center;
-    color: #00210C;
+    color: #00210ca6;
     background-color: #ffffff;
     padding: 10px;
     width: 28px;
@@ -127,7 +128,7 @@ ul.list-cards li div.knowmore a i{
     align-items: center;
 }
 ul.list-cards li div.text p{
-    width: 204px;
+    width: 100%;
     height: 69px;
     font-family: 'Inter';
     font-style: normal;
@@ -136,11 +137,9 @@ ul.list-cards li div.text p{
     line-height: 23px;
     display: flex;
     align-items: center;
-    color: #DDE1FF;
+    color: #ffffffa8;
     flex: none;
     order: 0;
-    text-align: justify;
-    align-self: stretch;
     flex-grow: 0;
 }
 ul.list-cards li div#icon{
@@ -694,9 +693,20 @@ div.restaurant a > p{
     }
 }
 
-@media only screen and (max-width: 768px){
-    
-}
 @media only screen and (max-width: 1024px){
-    
+    ul.list-cards {
+        flex-wrap: wrap;
+        max-width: 95vw;
+        gap: 40px 20px;
+    }
+    ul.list-cards li {
+        flex: 1 1 300px;
+        max-width: 45%;
+    }
+}
+@media only screen and (max-width: 768px){
+    ul.list-cards li {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
 }
