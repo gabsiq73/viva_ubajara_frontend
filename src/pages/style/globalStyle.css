@@ -37,7 +37,7 @@
 }
 
 /* Garante que o conteúdo fique na frente do pseudo-elemento */
-.container > * {
+.container > *:not(header) {
     position: relative;
     z-index: 1;
 }

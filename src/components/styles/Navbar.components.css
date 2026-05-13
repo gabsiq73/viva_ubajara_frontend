@@ -15,6 +15,28 @@
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     font-family: 'Inter';
     font-size: 14px;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.navbar ul li:not(#contact) a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -4px;
+    left: 50%;
+    background-color: #FFB527; /* Dourado */
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.navbar ul li:not(#contact) a:hover {
+    color: #FFB527; /* Dourado */
+}
+
+.navbar ul li:not(#contact) a:hover::after {
+    width: 100%;
 }
 .navbar ul li#contact{
     margin-left: 30px;
