@@ -105,6 +105,7 @@ ul.list-cards li div.title h3{
     color: #ffffff;
 }
 ul.list-cards li div.knowmore{
+    display: flex;
     align-items: center;
     justify-content: center;
     width: 130px;
@@ -191,8 +192,9 @@ div.point {
     position: relative;
     top: -100px;
     box-sizing: border-box;
-}@media only screen and (max-width: 400px) {
-    
+}
+
+@media only screen and (max-width: 400px) {
     div.point {
         padding: 16px 0;
     }
