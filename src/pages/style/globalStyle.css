@@ -8,7 +8,8 @@
 }
 
 :root {
-    --bg-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url('./../../assets/images/Capa29.png');
+    /* Foto do hero: troca no mobile; posição sempre centralizada para evitar tiling/vazamento */
+    --hero-photo: url('./../../assets/images/foto-capa-parque-ubajara (1).png');
 }
 
 .container {
@@ -18,9 +19,41 @@
     min-height: 100vh;
     max-width: 100vw;
     width: 100%;
-    background: var(--bg-image);
+    background-color: #fcfcfc; /* Fundo base para o resto do site */
+    position: relative;
+    overflow-x: hidden; /* Previne qualquer vazamento horizontal */
+}
+
+.container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 115vh; /* Delimita a capa apenas na parte superior */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)), var(--hero-photo);
     background-size: cover;
-    background-position: center;
+    background-position: center center;
+    background-repeat: no-repeat;
+    z-index: 0;
+}
+
+
+@media screen and (max-width: 480px) {
+    :root {
+        --hero-photo: url('./../../assets/images/foto-capa-parque-ubajara(mobile).png');
+    }
+    .container::before {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), var(--hero-photo);
+        background-position: center center;
+        background-repeat: no-repeat;
+    }
+}
+
+/* Garante que o conteúdo fique na frente do pseudo-elemento */
+.container > *:not(header) {
+    position: relative;
+    z-index: 1;
 }
 
 /*Responsive*/

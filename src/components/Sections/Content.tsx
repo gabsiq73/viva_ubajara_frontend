@@ -1,5 +1,6 @@
 import "./style/Content.components.css"
 import { Link } from "react-router-dom"
+import { useEffect, useState } from "react"
 import paper from "./../../assets/images/paper.png"
 import cac from "./../../assets/images/cachoeira.png";
 import farm from "./../../assets/images/fazenda.png";
@@ -8,8 +9,26 @@ import museum from "./../../assets/images/museu.png";
 import park from "./../../assets/images/parque.png";
 import route from "./../../assets/images/route.png";
 import food from "./../../assets/images/food.png";
+import { GastronomyCarousel, type GastronomySlide } from "./GastronomyCarousel";
+
+const GASTRO_SLIDES: GastronomySlide[] = [
+    { tag: "Cachaça Artesanal", src: food, alt: "Cachaça artesanal e produtos da roça" },
+    { tag: "Café de Sombra", src: farm, alt: "Cultivo de café em altitude" },
+    { tag: "Comida Caipira", src: mercado, alt: "Mercado e sabores da cozinha regional" },
+    { tag: "Doces Caseiros", src: museum, alt: "Doces e iguarias típicas da região" },
+];
 
 export default function Content(){
+    const [gastroIndex, setGastroIndex] = useState(0);
+
+    useEffect(() => {
+        if (GASTRO_SLIDES.length <= 1) return;
+        const id = window.setInterval(() => {
+            setGastroIndex((i) => (i + 1) % GASTRO_SLIDES.length);
+        }, 4500);
+        return () => window.clearInterval(id);
+    }, []);
+
     return(
         <section className="section">
             <div className="paper">
@@ -129,12 +148,12 @@ export default function Content(){
                     </ul>
                 </div>
                 <div className="point">
-                    <fieldset className="box">
-                        <legend className="legend">
-                            Esperiências Únicas
-                        </legend>
-                        <div className="position">
-                            <h1>Pontos Turísticos</h1>
+                    <div className="point-container">
+                        <div className="section-header">
+                            <div className="title-group">
+                                <span className="subtitle">Experiências Únicas</span>
+                                <h1>Pontos Turísticos</h1>
+                            </div>
 
                             <div id="more">
                                 <Link to="/">
@@ -148,54 +167,54 @@ export default function Content(){
                         <div className="cards-points">
                             <ul className="list-points">
                                 <li>
+                                    <div className="hover-overlay">
+                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                    </div>
                                     <div className="type" style={{background: "#006B32"}}>
-                                        <span >Natureza</span>
+                                        <span>Natureza</span>
                                     </div>
                                     <div className="imagem-tour">
                                         <img src={cac} alt="Cachoeira do Frade" />
                                     </div>
                                     <div className="info-tour">
-                                        <h2>
-                                            Cachoeira do Frade
-                                        </h2>
-                                        <p>
-                                            Uma queda d'água refrescante escondida entre paredões de rocha e mata atlântica.
-                                        </p>
+                                        <h2>Cachoeira do Frade</h2>
+                                        <p>Uma queda d'água refrescante escondida entre paredões de rocha e mata atlântica.</p>
                                     </div>
                                 </li>
                                 <li>
+                                    <div className="hover-overlay">
+                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                    </div>
                                     <div className="type" style={{background: "#006B32"}}>
                                         <span>Natureza</span>
                                     </div>
                                     <div className="imagem-tour">
-                                        <img src={farm} alt="Fazendoa Santo Expedito" />
+                                        <img src={farm} alt="Fazenda Santo Expedito" />
                                     </div>
                                     <div className="info-tour">
-                                        <h2>
-                                            Fazenda Santo Expedito
-                                        </h2>
-                                        <p>
-                                            Um dos maiores polos de produção de rosas híbridas do Brasil e referência em turismo rural sustentável.
-                                        </p>
+                                        <h2>Fazenda Santo Expedito</h2>
+                                        <p>Um dos maiores polos de produção de rosas híbridas do Brasil e referência em turismo rural sustentável.</p>
                                     </div>
                                 </li>
                                 <li>
+                                    <div className="hover-overlay">
+                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                    </div>
                                     <div className="type" style={{background: "#C58B24"}}>
-                                        <span >cultura</span>
+                                        <span>Cultura</span>
                                     </div>
                                     <div className="imagem-tour">
                                         <img src={mercado} alt="Mercado Público" />
                                     </div>
                                     <div className="info-tour">
-                                        <h2>
-                                            Mercado Público
-                                        </h2>
-                                        <p>
-                                            O coração pulsante da cidade, onde você encontra o melhor artesanato e produtos locais.
-                                        </p>
+                                        <h2>Mercado Público</h2>
+                                        <p>O coração pulsante da cidade, onde você encontra o melhor artesanato e produtos locais.</p>
                                     </div>
                                 </li>
                                 <li>
+                                    <div className="hover-overlay">
+                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                    </div>
                                     <div className="type" style={{background: "#304FCD"}}>
                                         <span>História</span>
                                     </div>
@@ -203,15 +222,14 @@ export default function Content(){
                                         <img src={museum} alt="Museu JK" />
                                     </div>
                                     <div className="info-tour">
-                                        <h2>
-                                            Museu JK
-                                        </h2>
-                                        <p>
-                                            Um mergulho na história e memórias preservadas em um casarão de época restaurado.
-                                        </p>
+                                        <h2>Museu JK</h2>
+                                        <p>Um mergulho na história e memórias preservadas em um casarão de época restaurado.</p>
                                     </div>
                                 </li>
                                 <li>
+                                    <div className="hover-overlay">
+                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                    </div>
                                     <div className="type" style={{background: "#006B32"}}>
                                         <span>Natureza</span>
                                     </div>
@@ -219,33 +237,28 @@ export default function Content(){
                                         <img src={park} alt="Parque Nacional" />
                                     </div>
                                     <div className="info-tour">
-                                        <h2>
-                                            Parque Nacional
-                                        </h2>
-                                        <p>
-                                            Explore grutas milenares e vistas épicas em um passeio de bondinho inesquecível.
-                                        </p>
+                                        <h2>Parque Nacional</h2>
+                                        <p>Explore grutas milenares e vistas épicas em um passeio de bondinho inesquecível.</p>
                                     </div>
                                 </li>
                                 <li>
+                                    <div className="hover-overlay">
+                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                    </div>
                                     <div className="type" style={{background: "#CD3636"}}>
-                                        <span >Aventura</span>
+                                        <span>Aventura</span>
                                     </div>
                                     <div className="imagem-tour">
                                         <img src={route} alt="Rota de Quadriciclo" />
                                     </div>
                                     <div className="info-tour">
-                                        <h2>
-                                            Rota de Quadriciclo
-                                        </h2>
-                                        <p>
-                                            Adrenalina pura desbravando trilhas off-road entre mirantes e matas nativas da região.
-                                        </p>
+                                        <h2>Rota de Quadriciclo</h2>
+                                        <p>Adrenalina pura desbravando trilhas off-road entre mirantes e matas nativas da região.</p>
                                     </div>
                                 </li>
                             </ul>
                         </div>
-                    </fieldset>
+                    </div>
                 </div>
                 <div className="top-n">
                     <div className="papel">
@@ -257,10 +270,13 @@ export default function Content(){
                         </div>
                     </div>
                     <div className="news">
+                        <div className="news-inner">
                         <div className="caixa">
-                            <div className="imagem-caixa">
-                                <img src={food} alt="food" />
-                            </div>
+                            <GastronomyCarousel
+                                slides={GASTRO_SLIDES}
+                                activeIndex={gastroIndex}
+                                onActiveChange={setGastroIndex}
+                            />
                         </div>
                         <div className="text-n">
                             <h2>Sabores da Ibiapaba</h2>
@@ -268,10 +284,18 @@ export default function Content(){
 
                             <div className="protect">
                                 <ul>
-                                    <li>Cachaça Artesanal</li>
-                                    <li>Café de Sombra</li>
-                                    <li>Comida Caipira</li>
-                                    <li>Doces Caseiros</li>
+                                    {GASTRO_SLIDES.map((slide, i) => (
+                                        <li key={slide.tag}>
+                                            <button
+                                                type="button"
+                                                className={`protect-chip${i === gastroIndex ? " is-active" : ""}`}
+                                                onClick={() => setGastroIndex(i)}
+                                                aria-pressed={i === gastroIndex}
+                                            >
+                                                {slide.tag}
+                                            </button>
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
 
@@ -282,10 +306,9 @@ export default function Content(){
                             </div>
 
                             <div className="restaurant">
-                                <Link to="/">
-                                 <p>Ver Restaurantes</p>
-                                </Link>
+                                <Link to="/">Ver Restaurantes</Link>
                             </div>
+                        </div>
                         </div>
                     </div>
                     <div className="papel ptop">

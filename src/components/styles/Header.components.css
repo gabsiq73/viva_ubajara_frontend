@@ -11,19 +11,19 @@
     position: fixed;
     top: 0;
     width: 100%;
-    height: 80px;
+    height: 110px;
     z-index: 999;
     transition: background 0.3s ease, height 0.3s ease;  
     box-sizing: border-box; 
 }
 .header.scrolled {
-    background: rgba(0, 0, 0, 0.363) !important; /* Verde escuro sólido no scroll */
-    height: 70px;
+    background: rgba(0, 0, 0, 0.527) !important; /* Verde escuro sólido no scroll */
+    height: 90px;
     box-shadow: 0 2px 15px rgba(0,0,0,0.4);
     backdrop-filter: blur(10px);
 }
 .header.scrolled .header-container {
-    padding: 0 15px; /* Ajuste fino no scroll */
+    padding: 0; /* Ajuste fino no scroll */
 }
 /* Individual max-widths removed to let the container handle it */
 .header-container {
@@ -45,6 +45,11 @@
     height: 1px;
 }
 input#menu-mobile {
+    display: none;
+}
+
+/* Camada escura atrás do drawer; clicar fecha o menu (label for=menu-mobile) */
+.menu-backdrop {
     display: none;
 }
 div.logo.grid-l{
@@ -107,23 +112,55 @@ label input[type=checkbox]{
         padding: 0 5%;
         justify-content: space-between;
         background: rgba(0, 0, 0, 0.4); /* Fundo mais escuro para contraste */
+        z-index: 10002; /* Acima do drawer e do backdrop — hambúrguer sempre clicável */
     }
+
+    .menu-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        background: rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.35s ease;
+        cursor: pointer;
+    }
+
+    input#menu-mobile:checked ~ .menu-backdrop {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* Barra lateral à esquerda, por cima de todo o site; sem scroll interno */
     div.nav {
         position: fixed;
         top: 0;
-        left: -100%;
-        width: 80%;
+        left: 0;
         height: 100vh;
+        height: 100dvh;
+        width: min(280px, 88vw);
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+        padding: 110px 20px 28px;
         background: #003016;
         flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        transition: left 0.4s ease-in-out;
-        z-index: 1000;
+        justify-content: flex-start;
+        align-items: stretch;
+        transform: translateX(-100%);
+        transition: transform 0.35s ease-out;
+        z-index: 10001;
         display: flex;
+        box-shadow: 6px 0 32px rgba(0, 0, 0, 0.4);
     }
+
+    .header.scrolled div.nav {
+        padding-top: 90px;
+    }
+
     input#menu-mobile:checked ~ .header-container div.nav {
-        left: 0;
+        transform: translateX(0);
     }
     div.menu-hamburguer {
         display: flex;
@@ -132,7 +169,7 @@ label input[type=checkbox]{
         align-items: flex-start; /* Alinha barras à esquerda */
         gap: 6px;
         cursor: pointer;
-        z-index: 1001;
+        z-index: 10003;
         width: 35px;
         height: 35px;
         background: transparent;
@@ -178,33 +215,48 @@ label input[type=checkbox]{
         order: -1;
         display: block;
         cursor: pointer;
-        z-index: 1001;
+        z-index: 10003;
         position: relative;
     }
     
-    div.logo.grid-l {
-        order: 0;
-        flex: 1;
-        display: flex;
-        justify-content: center;
+    .header-container {
+        padding: 0 15px; /* Alinhamento exato com os containers do corpo da página no mobile */
+        position: relative;
+        z-index: 10003; /* Barra (logo, toggle, contato) acima do backdrop */
     }
-    
+
+    body:has(#menu-mobile:checked) {
+        overflow: hidden;
+    }
+
+    /* Centraliza a logo de forma absoluta para alinhar perfeitamente independente da largura do menu/botão */
+    div.logo.grid-l {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
     .mobile-contact-btn {
         display: block;
         order: 1;
+        margin-left: auto; /* Empurra o botão de contato para a direita */
     }
     .mobile-contact-btn a {
         background-color: transparent;
         color: #ffffff;
-        padding: 6px 14px;
+        padding: 8px 14px;
         border: 1.5px solid #ffffff; /* Ghost button style */
         border-radius: 50px;
         text-decoration: none;
         font-weight: 600;
-        font-size: 12px;
+        font-size: 13px;
+        font-family: 'Poppins', sans-serif;
         letter-spacing: 0.5px;
         white-space: nowrap;
         transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
     .mobile-contact-btn a:active {
         background-color: #ffffff;
@@ -220,6 +272,14 @@ label input[type=checkbox]{
 
 @media screen and (max-width: 480px) {
     div.img {
-        width: 85px;
+        width: 95px;
+    }
+    .mobile-contact-btn a {
+        font-size: 10px;
+        padding: 8px 12px;
+    }
+
+    .header-container{
+        padding: 0;
     }
 }
