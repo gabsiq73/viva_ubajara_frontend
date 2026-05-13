@@ -1,6 +1,6 @@
 import React, { createContext, useState, useCallback, useEffect } from 'react';
 import { authService } from '../services/authService';
-import { TOKEN_KEY, USER_KEY, FORBIDDEN_EVENT } from '../services/api';
+import { TOKEN_KEY, USER_KEY, FORBIDDEN_EVENT, UNAUTHORIZED_EVENT } from '../services/api';
 import type { AuthResponse, LoginRequest, UserRequest } from '../types';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ function isAdminRole(role: any): boolean {
 
   // Caso 3: String simples
   const r = String(role).toUpperCase();
-  return r === 'ADMIN' || r === 'ROLE_ADMIN';
+  return r === 'ADMIN' || r === 'ROLE_ADMIN' || r === 'ROOT' || r === 'ROLE_ROOT' || r.includes('ADMIN');
 }
 
 
@@ -169,18 +169,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const handle401 = () => {
-      console.warn('[Auth] Recebido 401 Unauthorized. Fazendo logout suave...');
+      console.warn('[Auth] Recebido 401 Unauthorized. O token foi rejeitado pelo servidor ou expirou.');
       clearStorage();
       setToken(null);
       setUser(null);
     };
 
     window.addEventListener(FORBIDDEN_EVENT, handle403);
-    window.addEventListener('adm:unauthorized', handle401);
+    window.addEventListener(UNAUTHORIZED_EVENT, handle401);
     
     return () => {
       window.removeEventListener(FORBIDDEN_EVENT, handle403);
-      window.removeEventListener('adm:unauthorized', handle401);
+      window.removeEventListener(UNAUTHORIZED_EVENT, handle401);
     };
   }, []);
 

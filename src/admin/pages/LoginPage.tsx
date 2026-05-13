@@ -2,7 +2,7 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { UnauthorizedRoleError } from '../contexts/AuthContext';
-import { BASE_URL } from '../services/api';
+import { Leaf } from 'lucide-react';
 import '../styles/admin.css';
 
 type ErrorType = 'credentials' | 'role' | 'unknown' | null;
@@ -14,7 +14,7 @@ const ERROR_MESSAGES: Record<NonNullable<ErrorType>, string> = {
 };
 
 export function LoginPage() {
-  const { login, isLoading, isAuthenticated, isAdmin, applyAuthResponse } = useAuth();
+  const { login, isLoading, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/admin/dashboard';
@@ -23,39 +23,12 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [errorType, setErrorType] = useState<ErrorType>(null);
 
-  // 1. Escuta as mudanças no contexto e navega quando logado
+  // Escuta as mudanças no contexto e navega quando logado
   useEffect(() => {
     if (isAuthenticated && isAdmin) {
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, isAdmin, navigate, from]);
-
-  // 2. Captura Token vindo do redirecionamento do Google (OAuth2)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const urlToken = params.get('token');
-    
-    if (urlToken) {
-      // Se a API retornar apenas o token na URL, extraímos o payload para pegar a role/email
-      try {
-        const payloadBase64 = urlToken.split('.')[1];
-        const payload = JSON.parse(atob(payloadBase64));
-        
-        // Simula o formato de resposta da API para usar o AuthContext existente
-        applyAuthResponse({
-          token: urlToken,
-          email: payload.sub || payload.email || 'admin@google.com',
-          role: payload.role || payload.authorities || 'ADMIN' // Assume formato comum
-        });
-        
-        // Limpa a URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-      } catch (err) {
-        console.error('Erro ao processar token do Google:', err);
-        setErrorType('unknown');
-      }
-    }
-  }, [applyAuthResponse]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -72,16 +45,12 @@ export function LoginPage() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    // Redireciona para o fluxo OAuth2 padrão do Spring Security
-    const oauthUrl = BASE_URL.replace('/api/v1', '') + '/oauth2/authorization/google';
-    window.location.href = oauthUrl;
-  };
-
   return (
     <div className="adm-login">
       <div className="adm-login__header">
-        <div className="adm-login__logo-icon">🌿</div>
+        <div className="adm-login__logo-icon">
+          <Leaf size={24} fill="currentColor" />
+        </div>
         <h1 className="adm-login__title">Viva Ubajara</h1>
         <p className="adm-login__sub">Painel Administrativo</p>
       </div>
@@ -110,7 +79,7 @@ export function LoginPage() {
               autoComplete="username"
             />
           </div>
-          
+
           <div className="adm-field">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <label>Senha</label>
@@ -140,29 +109,11 @@ export function LoginPage() {
             disabled={isLoading}
             style={{ width: '100%', justifyContent: 'center', padding: '14px', fontSize: '15px' }}
           >
-            {isLoading ? 'Verificando…' : 'Entrar no Painel →'}
+            {isLoading ? 'Verificando…' : 'Entrar no Painel'}
           </button>
         </form>
-
-        <div className="adm-login__divider">Ou</div>
-
-        <button 
-          type="button" 
-          className="adm-btn-google"
-          onClick={handleGoogleLogin}
-        >
-          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" />
-          Entrar com Google
-        </button>
-
       </div>
-      
-      <div style={{ position: 'absolute', bottom: 30, textAlign: 'center', fontSize: 12, color: 'var(--adm-text-dim)', zIndex: 1 }}>
-        © 2024 Viva Ubajara Turismo. Todos os direitos reservados.
-        <div style={{ marginTop: 8, display: 'flex', gap: 16, justifyContent: 'center', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 10 }}>
-          <span>Suporte Técnico</span> • <span>Privacidade</span>
-        </div>
-      </div>
+
     </div>
   );
 }

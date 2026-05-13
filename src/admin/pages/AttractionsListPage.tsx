@@ -6,6 +6,7 @@ import { DataTable, Pagination } from '../components/DataTable';
 import { ConfirmModal } from '../components/Modal';
 import type { AttractionResponse } from '../types';
 import type { ReactNode } from 'react';
+import { Pencil, Trash2, Search, Plus } from 'lucide-react';
 
 export function AttractionsListPage() {
   const navigate = useNavigate();
@@ -42,8 +43,12 @@ export function AttractionsListPage() {
       header: 'Ações', width: '130px',
       accessor: (r: AttractionResponse): ReactNode => (
         <div className="adm-table__actions">
-          <button className="adm-btn adm-btn--ghost adm-btn--sm" onClick={() => navigate(`/admin/attractions/${r.id}/edit`)}>✏️</button>
-          <button className="adm-btn adm-btn--danger adm-btn--sm" onClick={() => confirmDelete(r.id)}>🗑️</button>
+          <button className="adm-btn adm-btn--ghost adm-btn--sm" onClick={() => navigate(`/admin/attractions/${r.id}/edit`)}>
+            <Pencil size={14} />
+          </button>
+          <button className="adm-btn adm-btn--danger adm-btn--sm" onClick={() => confirmDelete(r.id)}>
+            <Trash2 size={14} />
+          </button>
         </div>
       ),
     },
@@ -54,13 +59,13 @@ export function AttractionsListPage() {
       <div className="adm-page-header">
         <h2 className="adm-page-title">Atrações <span>{totalElements} registros</span></h2>
         <button className="adm-btn adm-btn--primary" onClick={() => navigate('/admin/attractions/new')}>
-          + Nova Atração
+          <Plus size={16} /> Nova Atração
         </button>
       </div>
 
       <div className="adm-card">
         <div className="adm-search">
-          <span className="adm-search__icon">🔍</span>
+          <span className="adm-search__icon"><Search size={18} /></span>
           <input placeholder="Buscar atrações…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
 
