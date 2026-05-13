@@ -22,7 +22,12 @@ export default function Header(){
     return(
         <header className={`header ${scrolled ? 'scrolled' : ''}`}>
             <input type="checkbox" name="menu-mobile" id="menu-mobile" />
-            
+            <label
+                htmlFor="menu-mobile"
+                className="menu-backdrop"
+                aria-label="Fechar menu"
+            />
+
             <div className="header-container">
                 <label htmlFor="menu-mobile" id="check">
                     <div className="menu-hamburguer">

@@ -1,5 +1,6 @@
 import "./style/Content.components.css"
 import { Link } from "react-router-dom"
+import { useEffect, useState } from "react"
 import paper from "./../../assets/images/paper.png"
 import cac from "./../../assets/images/cachoeira.png";
 import farm from "./../../assets/images/fazenda.png";
@@ -8,8 +9,26 @@ import museum from "./../../assets/images/museu.png";
 import park from "./../../assets/images/parque.png";
 import route from "./../../assets/images/route.png";
 import food from "./../../assets/images/food.png";
+import { GastronomyCarousel, type GastronomySlide } from "./GastronomyCarousel";
+
+const GASTRO_SLIDES: GastronomySlide[] = [
+    { tag: "Cachaça Artesanal", src: food, alt: "Cachaça artesanal e produtos da roça" },
+    { tag: "Café de Sombra", src: farm, alt: "Cultivo de café em altitude" },
+    { tag: "Comida Caipira", src: mercado, alt: "Mercado e sabores da cozinha regional" },
+    { tag: "Doces Caseiros", src: museum, alt: "Doces e iguarias típicas da região" },
+];
 
 export default function Content(){
+    const [gastroIndex, setGastroIndex] = useState(0);
+
+    useEffect(() => {
+        if (GASTRO_SLIDES.length <= 1) return;
+        const id = window.setInterval(() => {
+            setGastroIndex((i) => (i + 1) % GASTRO_SLIDES.length);
+        }, 4500);
+        return () => window.clearInterval(id);
+    }, []);
+
     return(
         <section className="section">
             <div className="paper">
@@ -251,10 +270,13 @@ export default function Content(){
                         </div>
                     </div>
                     <div className="news">
+                        <div className="news-inner">
                         <div className="caixa">
-                            <div className="imagem-caixa">
-                                <img src={food} alt="food" />
-                            </div>
+                            <GastronomyCarousel
+                                slides={GASTRO_SLIDES}
+                                activeIndex={gastroIndex}
+                                onActiveChange={setGastroIndex}
+                            />
                         </div>
                         <div className="text-n">
                             <h2>Sabores da Ibiapaba</h2>
@@ -262,10 +284,18 @@ export default function Content(){
 
                             <div className="protect">
                                 <ul>
-                                    <li>Cachaça Artesanal</li>
-                                    <li>Café de Sombra</li>
-                                    <li>Comida Caipira</li>
-                                    <li>Doces Caseiros</li>
+                                    {GASTRO_SLIDES.map((slide, i) => (
+                                        <li key={slide.tag}>
+                                            <button
+                                                type="button"
+                                                className={`protect-chip${i === gastroIndex ? " is-active" : ""}`}
+                                                onClick={() => setGastroIndex(i)}
+                                                aria-pressed={i === gastroIndex}
+                                            >
+                                                {slide.tag}
+                                            </button>
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
 
@@ -276,10 +306,9 @@ export default function Content(){
                             </div>
 
                             <div className="restaurant">
-                                <Link to="/">
-                                 <p>Ver Restaurantes</p>
-                                </Link>
+                                <Link to="/">Ver Restaurantes</Link>
                             </div>
+                        </div>
                         </div>
                     </div>
                     <div className="papel ptop">
