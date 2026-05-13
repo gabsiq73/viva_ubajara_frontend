@@ -45,24 +45,35 @@ section.welcome h1#gold{
 /*Responsive*/
 @media screen and (max-width: 480px) {
     .main{
-        grid-template-rows: 110px 150px 1fr;
-        width: 90%;
+        grid-template-rows: 110px auto 1fr;
+        width: 100%;
+        padding: 0 12px;
     }
     section.welcome{
         flex-direction: column;
-        width: 100vw;
+        width: 100%;
         position: relative;
-        left: 20px;
-        height: 100%;
+        left: 0;
+        min-height: 320px;
+        padding: 42px 0 32px;
         justify-content: center;
         align-items: center;
     }
     section.welcome h3{
-        font-size: 16px;
+        font-size: 13px;
+        letter-spacing: 1px;
+        margin-bottom: 0;
+        height: 25px;
     }
     section.welcome h1{
-        line-height: 52px;
-        font-size: 48px;
-        font-family: Times, serif;
+        line-height: 1.1;
+        font-size: 56px;
+        font-family: 'Playfair Display', serif;
+        max-width: 92%;
+        margin: 0 auto;
+        word-break: break-word;
+    }
+    section.welcome h1#gold {
+        font-size: 56px;
     }
 }

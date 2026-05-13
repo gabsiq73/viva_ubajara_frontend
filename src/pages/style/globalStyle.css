@@ -8,8 +8,9 @@
 }
 
 :root {
-    --bg-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url('./../../assets/images/Capa29.png');
-}
+    --bg-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.5)), url('./../../assets/images/foto-capa-parque-ubajara (1).png');
+    --bg-position-desktop: 2200px 920px;
+    --bg-position-mobile: 1000px 980px;}
 
 .container {
     display: grid;
@@ -32,8 +33,18 @@
     height: 115vh; /* Delimita a capa apenas na parte superior */
     background: var(--bg-image);
     background-size: cover;
-    background-position: center;
+    background-position: var(--bg-position-desktop);
     z-index: 0;
+}
+
+
+@media screen and (max-width: 480px) {
+    :root {
+        --bg-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url('./../../assets/images/foto-capa-parque-ubajara(mobile).png');
+    }
+    .container::before {
+        background-position: var(--bg-position-mobile);
+    }
 }
 
 /* Garante que o conteúdo fique na frente do pseudo-elemento */

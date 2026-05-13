@@ -109,14 +109,16 @@ label input[type=checkbox]{
         background: rgba(0, 0, 0, 0.4); /* Fundo mais escuro para contraste */
     }
     div.nav {
-        position: fixed;
-        top: 0;
+        position: absolute;
+        top: 100%;
         left: -100%;
-        width: 80%;
-        height: 100vh;
+        width: 100%;
+        max-height: calc(100vh - 110px);
+        overflow-y: auto;
+        padding: 16px 0 32px;
         background: #003016;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
         transition: left 0.4s ease-in-out;
         z-index: 1000;
@@ -201,15 +203,19 @@ label input[type=checkbox]{
     .mobile-contact-btn a {
         background-color: transparent;
         color: #ffffff;
-        padding: 6px 14px;
+        padding: 8px 14px;
         border: 1.5px solid #ffffff; /* Ghost button style */
         border-radius: 50px;
         text-decoration: none;
         font-weight: 600;
-        font-size: 11px; /* Fonte levemente menor para evitar quebra em telas muito finas */
+        font-size: 13px;
+        font-family: 'Poppins', sans-serif;
         letter-spacing: 0.5px;
         white-space: nowrap;
         transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
     .mobile-contact-btn a:active {
         background-color: #ffffff;
@@ -225,6 +231,14 @@ label input[type=checkbox]{
 
 @media screen and (max-width: 480px) {
     div.img {
-        width: 85px;
+        width: 95px;
+    }
+    .mobile-contact-btn a {
+        font-size: 10px;
+        padding: 8px 12px;
+    }
+
+    .header-container{
+        padding: 0;
     }
 }
