@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://parque-ubajara-api.onrender.com/api/v1';
+export const BASE_URL = 'https://parque-ubajara-api.onrender.com/api/v1';
 
 /** Chaves do localStorage — centralizadas para evitar typos */
 export const TOKEN_KEY = 'ubajara_admin_token';

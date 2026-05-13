@@ -31,6 +31,7 @@ interface AuthContextData {
   login: (data: LoginRequest) => Promise<void>;
   register: (data: UserRequest) => Promise<void>;
   logout: () => void;
+  applyAuthResponse: (response: AuthResponse) => void;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -216,6 +217,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         register,
         logout,
+        applyAuthResponse,
       }}
     >
       {children}
