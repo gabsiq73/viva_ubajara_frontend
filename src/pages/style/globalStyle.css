@@ -8,8 +8,10 @@
 }
 
 :root {
-    /* Foto do hero: troca no mobile; posição sempre centralizada para evitar tiling/vazamento */
+    /* Foto do hero: troca no mobile; posição ajustável por variável */
     --hero-photo: url('./../../assets/images/foto-capa-parque-ubajara (1).png');
+    --hero-position-desktop: 30% 40%;
+    --hero-position-mobile: center center;
 }
 
 .container {
@@ -21,7 +23,6 @@
     width: 100%;
     background-color: #fcfcfc; /* Fundo base para o resto do site */
     position: relative;
-    overflow-x: hidden; /* Previne qualquer vazamento horizontal */
 }
 
 .container::before {
@@ -33,7 +34,7 @@
     height: 115vh; /* Delimita a capa apenas na parte superior */
     background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)), var(--hero-photo);
     background-size: cover;
-    background-position: center center;
+    background-position: var(--hero-position-desktop);
     background-repeat: no-repeat;
     z-index: 0;
 }
@@ -45,7 +46,7 @@
     }
     .container::before {
         background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), var(--hero-photo);
-        background-position: center center;
+        background-position: var(--hero-position-mobile);
         background-repeat: no-repeat;
     }
 }
@@ -57,3 +58,9 @@
 }
 
 /*Responsive*/
+@media screen and (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+}

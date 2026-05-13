@@ -18,8 +18,136 @@ const GASTRO_SLIDES: GastronomySlide[] = [
     { tag: "Doces Caseiros", src: museum, alt: "Doces e iguarias típicas da região" },
 ];
 
+const PUB_GUIDE_FILTERS = [
+    "Todos",
+    "Restaurantes",
+    "Pousadas",
+    "Lanchonetes",
+    "Açaiterias",
+    "Mercantis",
+    "Artesanato",
+] as const;
+
+const PUB_GUIDE_TAG_COLORS: Record<string, string> = {
+    Restaurantes: "#006B32",
+    Pousadas: "#304FCD",
+    Lanchonetes: "#8B4513",
+    Açaiterias: "#0d7a6f",
+    Mercantis: "#5c4d7a",
+    Artesanato: "#C58B24",
+};
+
+const PUB_GUIDE_ITEMS = [
+    {
+        id: 1,
+        category: "Restaurantes",
+        title: "Varanda da Serra",
+        rating: 4.9,
+        desc: "Culinária regional com vista panorâmica da Chapada e temperos da horta local.",
+        img: food,
+    },
+    {
+        id: 2,
+        category: "Pousadas",
+        title: "Pousada Verde Vale",
+        rating: 4.8,
+        desc: "Aconchego rústico entre jardins e café da manhã com produtos da região.",
+        img: farm,
+    },
+    {
+        id: 3,
+        category: "Artesanato",
+        title: "Casa do Artesanato",
+        rating: 4.7,
+        desc: "Peças únicas de cerâmica e tecelagem feitas por artesãos de Ubajara.",
+        img: museum,
+    },
+    {
+        id: 4,
+        category: "Açaiterias",
+        title: "Açaí da Ibiapaba",
+        rating: 4.9,
+        desc: "Polpas cremosas e combinações frescas para refrescar após um passeio.",
+        img: mercado,
+    },
+];
+
+const PUB_EVENTS = [
+    {
+        id: 1,
+        day: "12",
+        month: "AGO",
+        title: "Festival de Jazz na Serra",
+        desc: "Noites de música ao ar livre com artistas regionais e gastronomia local.",
+        place: "Praça da Matriz",
+        img: park,
+    },
+    {
+        id: 2,
+        day: "25",
+        month: "SET",
+        title: "Feira de Sabores da Ibiapaba",
+        desc: "Degustação de doces, cafés e cachaças artesanais com oficinas culturais.",
+        place: "Mercado Público",
+        img: mercado,
+    },
+    {
+        id: 3,
+        day: "10",
+        month: "OUT",
+        title: "Trilha do Nascer da Lua",
+        desc: "Caminhada guiada ao amanhecer com vistas do vale e contação de histórias.",
+        place: "Parque Nacional",
+        img: route,
+    },
+    {
+        id: 4,
+        day: "05",
+        month: "NOV",
+        title: "Noite de Forró na Serra",
+        desc: "Ritmos e comidas típicas em uma noite animada de festa regional.",
+        place: "Praça do Forró",
+        img: food,
+    },
+];
+
+const AIRPORTS = [
+    { code: "JJD", name: "Aeroporto de Jericoacoara", dist: "165 km de distância" },
+    { code: "THE", name: "Aeroporto de Teresina", dist: "280 km de distância" },
+    { code: "FOR", name: "Aeroporto de Fortaleza", dist: "320 km de distância" },
+    { code: "PHB", name: "Aeroporto de Parnaíba", dist: "190 km de distância" },
+];
+
+const REVIEWS = [
+    {
+        id: 1,
+        stars: 5,
+        text: "O teleférico é uma experiência única! Ver a mata lá de cima e depois entrar na gruta foi um dos momentos mais incríveis da minha vida.",
+        name: "Mariana Silva",
+        location: "Fortaleza, CE",
+        avatar: cac,
+    },
+    {
+        id: 2,
+        stars: 5,
+        text: "Cidade acolhedora, povo simpático e a comida de tirar o fôlego. As trilhas são muito bem cuidadas. Recomendo demais!",
+        name: "Ricardo Goulart",
+        location: "São Paulo, SP",
+        avatar: farm,
+    },
+    {
+        id: 3,
+        stars: 4,
+        text: "O Parque Nacional é um tesouro. A estrutura para os turistas é ótima e os condutores são muito bem preparados. Ubajara é mágica.",
+        name: "Juliana Mendes",
+        location: "Teresina, PI",
+        avatar: mercado,
+    },
+];
+
 export default function Content(){
     const [gastroIndex, setGastroIndex] = useState(0);
+    const [pubGuideFilter, setPubGuideFilter] = useState<string>("Todos");
 
     useEffect(() => {
         if (GASTRO_SLIDES.length <= 1) return;
@@ -53,16 +181,6 @@ export default function Content(){
                                     Trilhas ecológicas, mirantes de tirar o fôlego e o famoso teleférico
                                 </p>
                             </div>
-                            <div className="knowmore">
-                                <Link to="/">
-                                    <span>Saiba Mais</span>
-                                    <div className="arrow">
-                                        <i className="material-symbols-outlined">
-                                            arrow_forward
-                                        </i>
-                                    </div>
-                                </Link>
-                            </div>
                         </li>
                         <li id="comer">
                             <div id="icon">
@@ -79,16 +197,6 @@ export default function Content(){
                                 <p>
                                     A melhor gastronomia da Ibiapaba, com temperos regionais e requinte.
                                 </p>
-                            </div>
-                            <div className="knowmore">
-                                <Link to="/">
-                                    <span>Saiba Mais</span>
-                                    <div className="arrow">
-                                        <i className="material-symbols-outlined">
-                                            arrow_forward
-                                        </i>
-                                    </div>
-                                </Link>
                             </div>
                         </li>
                         <li id="dormir">
@@ -107,16 +215,6 @@ export default function Content(){
                                     Pousadas charmosas e hotéis integrados à natureza para seu descanso.
                                 </p>
                             </div>
-                            <div className="knowmore">
-                                <Link to="/">
-                                    <span>Saiba Mais</span>
-                                    <div className="arrow">
-                                        <i className="material-symbols-outlined">
-                                            arrow_forward
-                                        </i>
-                                    </div>
-                                </Link>
-                            </div>
                         </li>
                         <li id="chegar">
                             <div id="icon">
@@ -134,16 +232,6 @@ export default function Content(){
                                     Rotas aéreas e terrestres para chegar ao paraíso serrano com segurança.
                                 </p>
                             </div>
-                            <div className="knowmore">
-                                <Link to="/">
-                                    <span>Saiba Mais</span>
-                                    <div className="arrow">
-                                        <i className="material-symbols-outlined">
-                                            arrow_forward
-                                        </i>
-                                    </div>
-                                </Link>
-                            </div>
                         </li>
                     </ul>
                 </div>
@@ -158,9 +246,7 @@ export default function Content(){
                             <div id="more">
                                 <Link to="/">
                                     Ver Todos
-                                    <svg width="19" height="9" viewBox="0 0 19 9" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M14.5 9L13.075 7.6L15.175 5.5H0V3.5H15.175L13.1 1.4L14.525 0L19 4.5L14.5 9Z" fill="#006B32"/>
-                                    </svg>
+                                
                                 </Link>
                             </div>
                         </div>
@@ -168,7 +254,7 @@ export default function Content(){
                             <ul className="list-points">
                                 <li>
                                     <div className="hover-overlay">
-                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                        <Link to="/" className="saiba-mais-btn">Ver mais</Link>
                                     </div>
                                     <div className="type" style={{background: "#006B32"}}>
                                         <span>Natureza</span>
@@ -183,7 +269,7 @@ export default function Content(){
                                 </li>
                                 <li>
                                     <div className="hover-overlay">
-                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                        <Link to="/" className="saiba-mais-btn">Ver mais</Link>
                                     </div>
                                     <div className="type" style={{background: "#006B32"}}>
                                         <span>Natureza</span>
@@ -198,7 +284,7 @@ export default function Content(){
                                 </li>
                                 <li>
                                     <div className="hover-overlay">
-                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                        <Link to="/" className="saiba-mais-btn">Ver mais</Link>
                                     </div>
                                     <div className="type" style={{background: "#C58B24"}}>
                                         <span>Cultura</span>
@@ -213,7 +299,7 @@ export default function Content(){
                                 </li>
                                 <li>
                                     <div className="hover-overlay">
-                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                        <Link to="/" className="saiba-mais-btn">Ver mais</Link>
                                     </div>
                                     <div className="type" style={{background: "#304FCD"}}>
                                         <span>História</span>
@@ -226,37 +312,8 @@ export default function Content(){
                                         <p>Um mergulho na história e memórias preservadas em um casarão de época restaurado.</p>
                                     </div>
                                 </li>
-                                <li>
-                                    <div className="hover-overlay">
-                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
-                                    </div>
-                                    <div className="type" style={{background: "#006B32"}}>
-                                        <span>Natureza</span>
-                                    </div>
-                                    <div className="imagem-tour">
-                                        <img src={park} alt="Parque Nacional" />
-                                    </div>
-                                    <div className="info-tour">
-                                        <h2>Parque Nacional</h2>
-                                        <p>Explore grutas milenares e vistas épicas em um passeio de bondinho inesquecível.</p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div className="hover-overlay">
-                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
-                                    </div>
-                                    <div className="type" style={{background: "#CD3636"}}>
-                                        <span>Aventura</span>
-                                    </div>
-                                    <div className="imagem-tour">
-                                        <img src={route} alt="Rota de Quadriciclo" />
-                                    </div>
-                                    <div className="info-tour">
-                                        <h2>Rota de Quadriciclo</h2>
-                                        <p>Adrenalina pura desbravando trilhas off-road entre mirantes e matas nativas da região.</p>
-                                    </div>
-                                </li>
                             </ul>
+                        
                         </div>
                     </div>
                 </div>
@@ -320,7 +377,209 @@ export default function Content(){
                         </div>
                     </div>
                 </div>
-    
+
+                <div className="pub-landing-blocks">
+                    <section className="pub-guide" aria-labelledby="pub-guide-title">
+                        <header className="pub-guide__header">
+                            <h2 id="pub-guide-title" className="pub-guide__title">
+                                Guia de Estabelecimentos
+                            </h2>
+                            <p className="pub-guide__subtitle">
+                                Os melhores lugares para comer, dormir e viver momentos inesquecíveis em nossa cidade.
+                            </p>
+                        </header>
+                        <div className="pub-guide__filters" role="toolbar" aria-label="Filtrar por tipo">
+                            {PUB_GUIDE_FILTERS.map((label) => (
+                                <button
+                                    key={label}
+                                    type="button"
+                                    className={
+                                        pubGuideFilter === label
+                                            ? "pub-guide__filter pub-guide__filter--active"
+                                            : "pub-guide__filter"
+                                    }
+                                    onClick={() => setPubGuideFilter(label)}
+                                    aria-pressed={pubGuideFilter === label}
+                                >
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="pub-guide__grid">
+                            {PUB_GUIDE_ITEMS.filter(
+                                (it) => pubGuideFilter === "Todos" || it.category === pubGuideFilter
+                            ).map((item) => (
+                                <article key={item.id} className="pub-guide-card">
+                                    <div className="pub-guide-card__media">
+                                        <img src={item.img} alt={item.title} />
+                                        <span
+                                            className="pub-guide-card__tag"
+                                            style={{
+                                                background:
+                                                    PUB_GUIDE_TAG_COLORS[item.category] ?? "#006B32",
+                                            }}
+                                        >
+                                            {item.category.toUpperCase()}
+                                        </span>
+                                    </div>
+                                    <div className="pub-guide-card__body">
+                                        <div className="pub-guide-card__row">
+                                            <h3 className="pub-guide-card__name">{item.title}</h3>
+                                            <span className="pub-guide-card__rating" aria-label={`Nota ${item.rating}`}>
+                                                <span className="pub-guide-card__star" aria-hidden>
+                                                    ★
+                                                </span>
+                                                {item.rating.toFixed(1)}
+                                            </span>
+                                        </div>
+                                        <p className="pub-guide-card__desc">{item.desc}</p>
+                                        <Link to="/" className="pub-guide-card__cta">
+                                            <span className="material-symbols-outlined" aria-hidden>
+                                                visibility
+                                            </span>
+                                            Ver mais
+                                        </Link>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                        <div className="pub-guide__footer">
+                            <Link to="/" className="pub-guide__all">
+                                Ver todos os Estabelecimentos
+                            </Link>
+                        </div>
+                        {PUB_GUIDE_ITEMS.filter(
+                            (it) => pubGuideFilter === "Todos" || it.category === pubGuideFilter
+                        ).length === 0 && (
+                            <p className="pub-guide__empty">Nenhum estabelecimento nesta categoria por enquanto.</p>
+                        )}
+                    </section>
+
+                    <section className="pub-events" aria-labelledby="pub-events-title">
+                        <header className="pub-events__header">
+                            <div className="pub-events__head-left">
+                                <span className="pub-events__kicker">Experiências Inesquecíveis</span>
+                                <h2 id="pub-events-title" className="pub-events__title">
+                                    Próximos Eventos
+                                </h2>
+                            </div>
+                            <p className="pub-events__lede">
+                                Fique por dentro da programação cultural e festivais que movimentam a nossa serra.
+                            </p>
+                        </header>
+                        <div className="pub-events__grid">
+                            {PUB_EVENTS.map((ev) => (
+                                <article key={ev.id} className="pub-event-card">
+                                    <div className="pub-event-card__media">
+                                        <img src={ev.img} alt={ev.title} />
+                                        <div className="pub-event-card__date" aria-label={`${ev.day} de ${ev.month}`}>
+                                            <strong>{ev.day}</strong>
+                                            <span>{ev.month}</span>
+                                        </div>
+                                    </div>
+                                    <div className="pub-event-card__body">
+                                        <h3 className="pub-event-card__title">{ev.title}</h3>
+                                        <p className="pub-event-card__desc">{ev.desc}</p>
+                                        <div className="pub-event-card__loc">
+                                            <span className="material-symbols-outlined" aria-hidden>
+                                                location_on
+                                            </span>
+                                            {ev.place}
+                                        </div>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                        <div className="pub-events__footer">
+                            <Link to="/" className="pub-events__all">
+                                Ver todos os Eventos
+                            </Link>
+                        </div>
+                    </section>
+                </div>
+
+                {/* Como Chegar */}
+                <section className="como-chegar" aria-labelledby="como-chegar-title">
+                    <div className="como-chegar__inner">
+                        <div className="como-chegar__left">
+                            <span className="como-chegar__kicker">Planejando sua visita</span>
+                            <h2 id="como-chegar-title" className="como-chegar__title">Como Chegar</h2>
+                            <p className="como-chegar__desc">
+                                Ubajara está estrategicamente localizada na Serra da Ibiapaba, acessível por diversas rotas aéreas e terrestres. Escolha o seu ponto de partida e venha viver essa experiência.
+                            </p>
+                            <ul className="como-chegar__list">
+                                <li className="como-chegar__item">
+                                    <div className="como-chegar__item-icon">
+                                        <span className="material-symbols-outlined" aria-hidden="true">directions_bus</span>
+                                    </div>
+                                    <div className="como-chegar__item-text">
+                                        <strong>Via Rodoviária</strong>
+                                        <span>Acesso principal pela BR-222, com estradas asfaltadas e sinalizadas.</span>
+                                    </div>
+                                </li>
+                                <li className="como-chegar__item">
+                                    <div className="como-chegar__item-icon">
+                                        <span className="material-symbols-outlined" aria-hidden="true">map</span>
+                                    </div>
+                                    <div className="como-chegar__item-text">
+                                        <strong>Localização Digital</strong>
+                                        <span>Encontre-nos facilmente em todos os aplicativos de navegação.</span>
+                                    </div>
+                                </li>
+                            </ul>
+                            <Link to="/" className="como-chegar__cta">Encontrar Rotas</Link>
+                        </div>
+                        <div className="como-chegar__airports">
+                            {AIRPORTS.map((ap) => (
+                                <div key={ap.code} className="airport-card">
+                                    <span className="airport-card__code">{ap.code}</span>
+                                    <p className="airport-card__name">{ap.name}</p>
+                                    <p className="airport-card__dist">{ap.dist}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* O que dizem os visitantes */}
+                <div className="reviews-block">
+                    <div className="papel">
+                        <div className="paper1"><img src={paper} alt="" /></div>
+                        <div className="paper2"><img src={paper} alt="" /></div>
+                    </div>
+                    <section className="reviews" aria-labelledby="reviews-title">
+                        <div className="reviews__inner">
+                            <span className="reviews__kicker">Quem já visitou recomenda</span>
+                            <h2 id="reviews-title" className="reviews__title">O que dizem os visitantes</h2>
+                            <p className="reviews__subtitle">Experiências reais de quem já se encantou com as belezas de Ubajara.</p>
+                            <div className="reviews__grid">
+                                {REVIEWS.map((r) => (
+                                    <article key={r.id} className="review-card">
+                                        <div className="review-card__stars" aria-label={`${r.stars} de 5 estrelas`}>
+                                            {'★'.repeat(r.stars)}{'☆'.repeat(5 - r.stars)}
+                                        </div>
+                                        <p className="review-card__text">"{r.text}"</p>
+                                        <div className="review-card__author">
+                                            <img src={r.avatar} alt={r.name} className="review-card__avatar" />
+                                            <div className="review-card__info">
+                                                <strong className="review-card__name">{r.name}</strong>
+                                                <span className="review-card__location">{r.location}</span>
+                                            </div>
+                                        </div>
+                                    </article>
+                                ))}
+                            </div>
+                            <div className="reviews__footer">
+                                <Link to="/" className="reviews__all">Ver todos os depoimentos</Link>
+                            </div>
+                        </div>
+                    </section>
+                    <div className="papel ptop">
+                        <div className="paper1"><img src={paper} alt="" /></div>
+                        <div className="paper2"><img src={paper} alt="" /></div>
+                    </div>
+                </div>
+
             </div>
         </section>
     )

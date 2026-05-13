@@ -44,6 +44,19 @@ section.welcome h1#gold{
 }
 
 /*Responsive*/
+@media screen and (max-width: 768px) {
+    section.welcome h1 {
+        font-size: 64px;
+        line-height: 1.1;
+    }
+    section.welcome h1#gold {
+        font-size: 64px;
+    }
+    section.welcome h3 {
+        font-size: 17px;
+    }
+}
+
 @media screen and (max-width: 480px) {
     .main{
         grid-template-rows: 110px auto 1fr;
