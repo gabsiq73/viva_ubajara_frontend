@@ -145,9 +145,68 @@ const REVIEWS = [
     },
 ];
 
+const TOUR_GUIDES = [
+    {
+        id: 1,
+        name: "Carlos Mendes",
+        specialty: "Trilhas e Ecoturismo",
+        desc: "Condutor credenciado pelo ICMBio com 12 anos de experiência nas trilhas do Parque Nacional de Ubajara.",
+        img: park,
+        lang: "PT / EN",
+    },
+    {
+        id: 2,
+        name: "Ana Florinda",
+        specialty: "Gruta e Espeleologia",
+        desc: "Especialista em visitas à Gruta de Ubajara, com domínio de técnicas de espeleologia e interpretação ambiental.",
+        img: cac,
+        lang: "PT / ES",
+    },
+    {
+        id: 3,
+        name: "Roberto Neto",
+        specialty: "Cultura e História",
+        desc: "Historiador local apaixonado pela cultura da Serra da Ibiapaba. Conduz tours culturais e visitas ao Museu JK.",
+        img: mercado,
+        lang: "PT",
+    },
+    {
+        id: 4,
+        name: "Isabela Rocha",
+        specialty: "Teleférico e Mirantes",
+        desc: "Guia experiente focada nas belezas cênicas de Ubajara, incluindo o famoso teleférico e os mirantes da serra.",
+        img: farm,
+        lang: "PT / EN / FR",
+    },
+];
+
+const FAQ_ITEMS = [
+    {
+        id: 1,
+        q: "Onde fica o Parque Nacional de Ubajara?",
+        a: "O Parque está localizado na Serra da Ibiapaba, a cerca de 320 km de Fortaleza. A entrada principal fica no município de Ubajara, no estado do Ceará.",
+    },
+    {
+        id: 2,
+        q: "Qual o horário de funcionamento do teleférico?",
+        a: "O teleférico opera de terça a domingo, das 8h às 17h. Às segundas-feiras o Parque permanece fechado para manutenção. Recomendamos chegar cedo para garantir sua entrada.",
+    },
+    {
+        id: 3,
+        q: "É necessário guia para visitar a gruta?",
+        a: "Sim, a visita à Gruta de Ubajara é obrigatoriamente acompanhada por condutores locais credenciados pelo ICMBio, garantindo sua segurança e a preservação do ambiente.",
+    },
+    {
+        id: 4,
+        q: "É possível acampar dentro do Parque?",
+        a: "O camping é permitido em áreas específicas e requer agendamento prévio junto ao ICMBio. Consulte o site oficial do parque ou entre em contato com nossa secretaria de turismo.",
+    },
+];
+
 export default function Content(){
     const [gastroIndex, setGastroIndex] = useState(0);
     const [pubGuideFilter, setPubGuideFilter] = useState<string>("Todos");
+    const [faqOpen, setFaqOpen] = useState<number | null>(1);
 
     useEffect(() => {
         if (GASTRO_SLIDES.length <= 1) return;
@@ -496,6 +555,33 @@ export default function Content(){
                             </Link>
                         </div>
                     </section>
+                    {/* Guias Turísticos */}
+                    <section className="tour-guides" aria-labelledby="tour-guides-title">
+                        <div className="tour-guides__inner">
+                            <header className="tour-guides__header">
+                                <span className="tour-guides__kicker">Seu passeio em boas mãos</span>
+                                <h2 id="tour-guides-title" className="tour-guides__title">Nossos Guias Turísticos</h2>
+                                <p className="tour-guides__subtitle">
+                                    Conheça os profissionais credenciados que vão transformar sua visita em uma experiência inesquecível.
+                                </p>
+                            </header>
+                            <div className="tour-guides__grid">
+                                {TOUR_GUIDES.map((guide) => (
+                                    <article key={guide.id} className="guide-card">
+                                        <div className="guide-card__photo">
+                                            <img src={guide.img} alt={guide.name} />
+                                            <span className="guide-card__lang">{guide.lang}</span>
+                                        </div>
+                                        <div className="guide-card__body">
+                                            <h3 className="guide-card__name">{guide.name}</h3>
+                                            <span className="guide-card__specialty">{guide.specialty}</span>
+                                            <p className="guide-card__desc">{guide.desc}</p>
+                                        </div>
+                                    </article>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
                 {/* Como Chegar */}
@@ -579,6 +665,105 @@ export default function Content(){
                         <div className="paper2"><img src={paper} alt="" /></div>
                     </div>
                 </div>
+
+                {/* Dúvidas Frequentes */}
+                <section className="faq" aria-labelledby="faq-title">
+                    <div className="faq__inner">
+                        <h2 id="faq-title" className="faq__title">Dúvidas Frequentes</h2>
+                        <div className="faq__list">
+                            {FAQ_ITEMS.map((item) => (
+                                <div
+                                    key={item.id}
+                                    className={`faq__item${faqOpen === item.id ? " faq__item--open" : ""}`}
+                                >
+                                    <button
+                                        type="button"
+                                        className="faq__question"
+                                        onClick={() => setFaqOpen(faqOpen === item.id ? null : item.id)}
+                                        aria-expanded={faqOpen === item.id}
+                                        aria-controls={`faq-answer-${item.id}`}
+                                    >
+                                        {item.q}
+                                        <span className="material-symbols-outlined faq__chevron" aria-hidden="true">
+                                            expand_more
+                                        </span>
+                                    </button>
+                                    <div
+                                        id={`faq-answer-${item.id}`}
+                                        className="faq__answer"
+                                    >
+                                        <div className="faq__answer-inner">
+                                            <p>{item.a}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* Fale Conosco */}
+                <section className="contact-section" aria-labelledby="contact-title">
+                    <div className="contact-section__inner">
+                        <div className="contact-section__left">
+                            <span className="contact-section__kicker">Fale com a gente</span>
+                            <h2 id="contact-title" className="contact-section__title">Fale Conosco</h2>
+                            <p className="contact-section__desc">
+                                Planejando sua visita ou tem alguma dúvida específica? Nossa equipe da Secretaria de Turismo está pronta para ajudar você a ter a melhor experiência em Ubajara.
+                            </p>
+                            <ul className="contact-section__info">
+                                <li className="contact-section__info-item">
+                                    <span className="contact-section__info-icon material-symbols-outlined" aria-hidden="true">location_on</span>
+                                    <div className="contact-section__info-text">
+                                        <strong>Endereço</strong>
+                                        <span>Centro Administrativo Municipal, Ubajara - CE</span>
+                                    </div>
+                                </li>
+                                <li className="contact-section__info-item">
+                                    <span className="contact-section__info-icon material-symbols-outlined" aria-hidden="true">mail</span>
+                                    <div className="contact-section__info-text">
+                                        <strong>E-mail</strong>
+                                        <span>contato@vivaubajara.com.br</span>
+                                    </div>
+                                </li>
+                                <li className="contact-section__info-item">
+                                    <span className="contact-section__info-icon material-symbols-outlined" aria-hidden="true">call</span>
+                                    <div className="contact-section__info-text">
+                                        <strong>Telefone</strong>
+                                        <span>(88) 3634-1234</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div className="contact-section__form-wrap">
+                            <form className="contact-section__form" onSubmit={(e) => e.preventDefault()}>
+                                <div className="contact-section__field">
+                                    <label htmlFor="cf-name" className="contact-section__label">Nome Completo</label>
+                                    <input id="cf-name" type="text" className="contact-section__input" placeholder="Como podemos te chamar?" />
+                                </div>
+                                <div className="contact-section__field">
+                                    <label htmlFor="cf-email" className="contact-section__label">E-mail</label>
+                                    <input id="cf-email" type="email" className="contact-section__input" placeholder="seu@email.com" />
+                                </div>
+                                <div className="contact-section__field">
+                                    <label htmlFor="cf-subject" className="contact-section__label">Assunto</label>
+                                    <select id="cf-subject" className="contact-section__select">
+                                        <option>Informações sobre o Parque</option>
+                                        <option>Teleférico e Trilhas</option>
+                                        <option>Hospedagem e Pousadas</option>
+                                        <option>Eventos e Programação</option>
+                                        <option>Outros</option>
+                                    </select>
+                                </div>
+                                <div className="contact-section__field">
+                                    <label htmlFor="cf-msg" className="contact-section__label">Mensagem</label>
+                                    <textarea id="cf-msg" className="contact-section__textarea" placeholder="Em que podemos te ajudar?" rows={4} />
+                                </div>
+                                <button type="submit" className="contact-section__submit">Enviar Mensagem</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
 
             </div>
         </section>
