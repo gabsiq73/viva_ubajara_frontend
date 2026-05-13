@@ -34,15 +34,8 @@ export function AdminRouter() {
           {/* Rota de login (pública dentro do admin) */}
           <Route path="login" element={<LoginPage />} />
 
-          {/* Rotas protegidas — usam o AdminLayout com Sidebar/TopBar */}
-          <Route
-            path="*"
-            element={
-              <PrivateRoute>
-                <AdminLayout />
-              </PrivateRoute>
-            }
-          >
+          {/* Rotas protegidas — usam o AdminLayout com Sidebar/TopBar como Layout Route */}
+          <Route element={<PrivateRoute><AdminLayout /></PrivateRoute>}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
 
