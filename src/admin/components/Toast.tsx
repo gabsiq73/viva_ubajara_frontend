@@ -1,5 +1,6 @@
 import { useState, useCallback, createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
+import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 
 interface Toast {
   id: number;
@@ -28,7 +29,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const remove = (id: number) =>
     setToasts((prev) => prev.filter((t) => t.id !== id));
 
-  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  const icons = { 
+    success: <CheckCircle size={20} />, 
+    error: <XCircle size={20} />, 
+    info: <Info size={20} /> 
+  };
 
   return (
     <ToastContext.Provider value={{ showToast }}>
@@ -38,7 +43,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div key={t.id} className={`adm-toast adm-toast--${t.type}`}>
             <span className="adm-toast__icon">{icons[t.type]}</span>
             <span>{t.message}</span>
-            <button className="adm-toast__close" onClick={() => remove(t.id)}>×</button>
+            <button className="adm-toast__close" onClick={() => remove(t.id)}>
+              <X size={16} />
+            </button>
           </div>
         ))}
       </div>

@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { 
+  Mountain, 
+  Calendar, 
+  Utensils, 
+  Hotel, 
+  MapPin, 
+  Compass, 
+  Phone, 
+  Image 
+} from 'lucide-react';
 import { attractionsService } from '../services/attractionsService';
 import { eventsService } from '../services/eventsService';
 import { restaurantsService } from '../services/restaurantsService';
@@ -8,7 +18,7 @@ import { touristSpotsService } from '../services/touristSpotsService';
 import { tourGuidesService } from '../services/tourGuidesService';
 import { contactsService } from '../services/contactsService';
 
-interface StatCard { label: string; value: number | string; icon: string; to: string; color: string; }
+interface StatCard { label: string; value: number | string; icon: React.ReactNode; to: string; color: string; }
 
 export function DashboardPage() {
   const [stats, setStats] = useState<StatCard[]>([]);
@@ -31,13 +41,13 @@ export function DashboardPage() {
           r.status === 'fulfilled' ? r.value.totalElements : '—';
 
         setStats([
-          { label: 'Atrações', value: get(att), icon: '🏞️', to: '/admin/attractions', color: 'var(--adm-green)' },
-          { label: 'Eventos', value: get(ev), icon: '🎉', to: '/admin/events', color: '#4a90d9' },
-          { label: 'Restaurantes', value: get(rest), icon: '🍽️', to: '/admin/restaurants', color: 'var(--adm-gold)' },
-          { label: 'Hospedagem', value: get(host), icon: '🏨', to: '/admin/host-points', color: '#8b5cf6' },
-          { label: 'Pontos Turísticos', value: get(spots), icon: '📍', to: '/admin/tourist-spots', color: 'var(--adm-red)' },
-          { label: 'Guias', value: get(guides), icon: '🧭', to: '/admin/tour-guides', color: '#0ea5e9' },
-          { label: 'Contatos', value: get(contacts), icon: '📞', to: '/admin/contacts', color: '#10b981' },
+          { label: 'Atrações', value: get(att), icon: <Mountain size={24} />, to: '/admin/attractions', color: 'var(--adm-green)' },
+          { label: 'Eventos', value: get(ev), icon: <Calendar size={24} />, to: '/admin/events', color: '#4a90d9' },
+          { label: 'Restaurantes', value: get(rest), icon: <Utensils size={24} />, to: '/admin/restaurants', color: 'var(--adm-gold)' },
+          { label: 'Hospedagem', value: get(host), icon: <Hotel size={24} />, to: '/admin/host-points', color: '#8b5cf6' },
+          { label: 'Pontos Turísticos', value: get(spots), icon: <MapPin size={24} />, to: '/admin/tourist-spots', color: 'var(--adm-red)' },
+          { label: 'Guias', value: get(guides), icon: <Compass size={24} />, to: '/admin/tour-guides', color: '#0ea5e9' },
+          { label: 'Contatos', value: get(contacts), icon: <Phone size={24} />, to: '/admin/contacts', color: '#10b981' },
         ]);
       } finally {
         setLoading(false);
@@ -63,8 +73,6 @@ export function DashboardPage() {
             <Link to={s.to} key={s.label} style={{ textDecoration: 'none' }}>
               <div 
                 className="adm-stat-card" 
-                // Injeta a cor da borda inline dinamicamente (precisamos do CSS ::before para capturar isso, 
-                // mas como pseudo-elementos não pegam style inline sem CSS variables, usamos uma var)
                 style={{ '--card-color': s.color } as React.CSSProperties}
               >
                 <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: s.color }} />
@@ -87,9 +95,16 @@ export function DashboardPage() {
             { to: '/admin/attractions/new', label: '+ Nova Atração' },
             { to: '/admin/events/new', label: '+ Novo Evento' },
             { to: '/admin/restaurants/new', label: '+ Novo Restaurante' },
-            { to: '/admin/photos', label: '📸 Gerenciar Fotos', icon: true },
+            { 
+              to: '/admin/photos', 
+              label: (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Image size={16} /> Gerenciar Fotos
+                </span>
+              ) 
+            },
           ].map((a) => (
-            <Link key={a.to} to={a.to} className="adm-btn adm-btn--ghost">
+            <Link key={a.to as string} to={a.to as string} className="adm-btn adm-btn--ghost">
               {a.label}
             </Link>
           ))}
