@@ -129,12 +129,12 @@ export default function Content(){
                     </ul>
                 </div>
                 <div className="point">
-                    <fieldset className="box">
-                        <legend className="legend">
-                            Esperiências Únicas
-                        </legend>
-                        <div className="position">
-                            <h1>Pontos Turísticos</h1>
+                    <div className="point-container">
+                        <div className="section-header">
+                            <div className="title-group">
+                                <span className="subtitle">Experiências Únicas</span>
+                                <h1>Pontos Turísticos</h1>
+                            </div>
 
                             <div id="more">
                                 <Link to="/">
@@ -148,54 +148,54 @@ export default function Content(){
                         <div className="cards-points">
                             <ul className="list-points">
                                 <li>
+                                    <div className="hover-overlay">
+                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                    </div>
                                     <div className="type" style={{background: "#006B32"}}>
-                                        <span >Natureza</span>
+                                        <span>Natureza</span>
                                     </div>
                                     <div className="imagem-tour">
                                         <img src={cac} alt="Cachoeira do Frade" />
                                     </div>
                                     <div className="info-tour">
-                                        <h2>
-                                            Cachoeira do Frade
-                                        </h2>
-                                        <p>
-                                            Uma queda d'água refrescante escondida entre paredões de rocha e mata atlântica.
-                                        </p>
+                                        <h2>Cachoeira do Frade</h2>
+                                        <p>Uma queda d'água refrescante escondida entre paredões de rocha e mata atlântica.</p>
                                     </div>
                                 </li>
                                 <li>
+                                    <div className="hover-overlay">
+                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                    </div>
                                     <div className="type" style={{background: "#006B32"}}>
                                         <span>Natureza</span>
                                     </div>
                                     <div className="imagem-tour">
-                                        <img src={farm} alt="Fazendoa Santo Expedito" />
+                                        <img src={farm} alt="Fazenda Santo Expedito" />
                                     </div>
                                     <div className="info-tour">
-                                        <h2>
-                                            Fazenda Santo Expedito
-                                        </h2>
-                                        <p>
-                                            Um dos maiores polos de produção de rosas híbridas do Brasil e referência em turismo rural sustentável.
-                                        </p>
+                                        <h2>Fazenda Santo Expedito</h2>
+                                        <p>Um dos maiores polos de produção de rosas híbridas do Brasil e referência em turismo rural sustentável.</p>
                                     </div>
                                 </li>
                                 <li>
+                                    <div className="hover-overlay">
+                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                    </div>
                                     <div className="type" style={{background: "#C58B24"}}>
-                                        <span >cultura</span>
+                                        <span>Cultura</span>
                                     </div>
                                     <div className="imagem-tour">
                                         <img src={mercado} alt="Mercado Público" />
                                     </div>
                                     <div className="info-tour">
-                                        <h2>
-                                            Mercado Público
-                                        </h2>
-                                        <p>
-                                            O coração pulsante da cidade, onde você encontra o melhor artesanato e produtos locais.
-                                        </p>
+                                        <h2>Mercado Público</h2>
+                                        <p>O coração pulsante da cidade, onde você encontra o melhor artesanato e produtos locais.</p>
                                     </div>
                                 </li>
                                 <li>
+                                    <div className="hover-overlay">
+                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                    </div>
                                     <div className="type" style={{background: "#304FCD"}}>
                                         <span>História</span>
                                     </div>
@@ -203,15 +203,14 @@ export default function Content(){
                                         <img src={museum} alt="Museu JK" />
                                     </div>
                                     <div className="info-tour">
-                                        <h2>
-                                            Museu JK
-                                        </h2>
-                                        <p>
-                                            Um mergulho na história e memórias preservadas em um casarão de época restaurado.
-                                        </p>
+                                        <h2>Museu JK</h2>
+                                        <p>Um mergulho na história e memórias preservadas em um casarão de época restaurado.</p>
                                     </div>
                                 </li>
                                 <li>
+                                    <div className="hover-overlay">
+                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                    </div>
                                     <div className="type" style={{background: "#006B32"}}>
                                         <span>Natureza</span>
                                     </div>
@@ -219,33 +218,28 @@ export default function Content(){
                                         <img src={park} alt="Parque Nacional" />
                                     </div>
                                     <div className="info-tour">
-                                        <h2>
-                                            Parque Nacional
-                                        </h2>
-                                        <p>
-                                            Explore grutas milenares e vistas épicas em um passeio de bondinho inesquecível.
-                                        </p>
+                                        <h2>Parque Nacional</h2>
+                                        <p>Explore grutas milenares e vistas épicas em um passeio de bondinho inesquecível.</p>
                                     </div>
                                 </li>
                                 <li>
+                                    <div className="hover-overlay">
+                                        <Link to="/" className="saiba-mais-btn">Saiba Mais</Link>
+                                    </div>
                                     <div className="type" style={{background: "#CD3636"}}>
-                                        <span >Aventura</span>
+                                        <span>Aventura</span>
                                     </div>
                                     <div className="imagem-tour">
                                         <img src={route} alt="Rota de Quadriciclo" />
                                     </div>
                                     <div className="info-tour">
-                                        <h2>
-                                            Rota de Quadriciclo
-                                        </h2>
-                                        <p>
-                                            Adrenalina pura desbravando trilhas off-road entre mirantes e matas nativas da região.
-                                        </p>
+                                        <h2>Rota de Quadriciclo</h2>
+                                        <p>Adrenalina pura desbravando trilhas off-road entre mirantes e matas nativas da região.</p>
                                     </div>
                                 </li>
                             </ul>
                         </div>
-                    </fieldset>
+                    </div>
                 </div>
                 <div className="top-n">
                     <div className="papel">

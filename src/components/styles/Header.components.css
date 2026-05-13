@@ -17,7 +17,7 @@
     box-sizing: border-box; 
 }
 .header.scrolled {
-    background: rgba(0, 0, 0, 0.363) !important; /* Verde escuro sólido no scroll */
+    background: rgba(0, 0, 0, 0.527) !important; /* Verde escuro sólido no scroll */
     height: 70px;
     box-shadow: 0 2px 15px rgba(0,0,0,0.4);
     backdrop-filter: blur(10px);
@@ -182,16 +182,21 @@ label input[type=checkbox]{
         position: relative;
     }
     
-    div.logo.grid-l {
-        order: 0;
-        flex: 1;
-        display: flex;
-        justify-content: center;
+    .header-container {
+        padding: 0 15px; /* Alinhamento exato com os containers do corpo da página no mobile */
     }
-    
+
+    /* Centraliza a logo de forma absoluta para alinhar perfeitamente independente da largura do menu/botão */
+    div.logo.grid-l {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
     .mobile-contact-btn {
         display: block;
         order: 1;
+        margin-left: auto; /* Empurra o botão de contato para a direita */
     }
     .mobile-contact-btn a {
         background-color: transparent;
@@ -201,7 +206,7 @@ label input[type=checkbox]{
         border-radius: 50px;
         text-decoration: none;
         font-weight: 600;
-        font-size: 12px;
+        font-size: 11px; /* Fonte levemente menor para evitar quebra em telas muito finas */
         letter-spacing: 0.5px;
         white-space: nowrap;
         transition: all 0.3s ease;
