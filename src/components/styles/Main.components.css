@@ -20,11 +20,12 @@ section.welcome{
     width: 100%;
 }
 section.welcome h3{
-    font-size: 32px;
+    font-size: 24px;
     height: 41px;
     color: #FFFFFFB8;
     text-transform: uppercase;
     font-family: 'Poppins';
+    font-weight: 300;
 }
 section.welcome h1{
     font-size: 80px;
@@ -57,11 +58,11 @@ section.welcome h1#gold{
         align-items: center;
     }
     section.welcome h3{
-        font-size: 20px;
+        font-size: 16px;
     }
     section.welcome h1{
-        line-height: 30px;
-        font-size: 20px;
+        line-height: 52px;
+        font-size: 48px;
         font-family: Times, serif;
     }
 }
