@@ -1,6 +1,7 @@
 * {
     box-sizing: border-box;
 }
+
 body {
     margin: 0;
     overflow-x: hidden;
@@ -12,13 +13,14 @@ body {
         opacity: 0;
         transform: translateY(40px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-section.section{
+section.section {
     grid-row: 3;
     width: 100vw;
     height: 100%;
@@ -26,6 +28,7 @@ section.section{
     color: #000;
     position: relative;
 }
+
 div.paper img {
     position: relative;
     width: 100vw;
@@ -33,28 +36,34 @@ div.paper img {
     top: 48px;
     left: -10px;
 }
-div.papel{
+
+div.papel {
     display: flex;
     position: relative;
     top: 90px;
 }
-div.papel.ptop{
+
+div.papel.ptop {
     top: -90px;
 }
-div.paper1 img, div.paper2 img{
+
+div.paper1 img,
+div.paper2 img {
     filter: brightness(0) saturate(100%) invert(52%) sepia(94%) saturate(398%) hue-rotate(360deg) brightness(92%) contrast(85%);
     height: 115px;
     width: 50vw;
     position: relative;
 }
-div.fundo{
+
+div.fundo {
     width: 100vw;
     background: url("./../../../assets/images/fundo.png");
     position: relative;
     bottom: -10px;
     left: -10px;
 }
-ul.list-cards{
+
+ul.list-cards {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -68,7 +77,8 @@ ul.list-cards{
     padding: 0 20px;
     box-sizing: border-box;
 }
-ul.list-cards li{
+
+ul.list-cards li {
     color: #ebebeb;
     flex: 1 1 240px;
     max-width: 280px;
@@ -78,22 +88,35 @@ ul.list-cards li{
     border-radius: 24px;
     position: relative;
     top: -130px;
-    box-shadow: 0px 4px 20px rgba(0,0,0,0.25);
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
     /* Animação de entrada */
     animation: slideUpFade 0.6s ease both;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
 ul.list-cards li:hover {
     transform: translateY(-8px);
-    box-shadow: 0px 16px 32px rgba(0,0,0,0.35);
+    box-shadow: 0px 16px 32px rgba(0, 0, 0, 0.35);
 }
-/* Delays escalonados por card */
-ul.list-cards li:nth-child(1) { animation-delay: 0.1s; }
-ul.list-cards li:nth-child(2) { animation-delay: 0.2s; }
-ul.list-cards li:nth-child(3) { animation-delay: 0.3s; }
-ul.list-cards li:nth-child(4) { animation-delay: 0.4s; }
 
-ul.list-cards li div.title h3{
+/* Delays escalonados por card */
+ul.list-cards li:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+ul.list-cards li:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+ul.list-cards li:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+ul.list-cards li:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+ul.list-cards li div.title h3 {
     width: 100%;
     display: flex;
     align-items: center;
@@ -104,14 +127,15 @@ ul.list-cards li div.title h3{
     margin: 16px 0px 8px 0px;
     color: #ffffff;
 }
-ul.list-cards li div.knowmore{
-    display: flex;
+
+ul.list-cards li div.knowmore {
     align-items: center;
     justify-content: center;
     width: 130px;
     height: 33px;
 }
-ul.list-cards li div.knowmore a{
+
+ul.list-cards li div.knowmore a {
     display: flex;
     text-decoration: none;
     gap: 10px;
@@ -123,7 +147,8 @@ ul.list-cards li div.knowmore a{
     display: flex;
     align-items: center;
 }
-ul.list-cards li div.knowmore a span{
+
+ul.list-cards li div.knowmore a span {
     line-height: 23px;
     width: 97px;
     height: 33px;
@@ -138,7 +163,8 @@ ul.list-cards li div.knowmore a span{
     border-radius: 50px;
     display: flex;
 }
-ul.list-cards li div.knowmore a i{
+
+ul.list-cards li div.knowmore a i {
     line-height: 23px;
     font-size: 25px;
     font-weight: 600;
@@ -154,7 +180,8 @@ ul.list-cards li div.knowmore a i{
     justify-content: center;
     align-items: center;
 }
-ul.list-cards li div.text p{
+
+ul.list-cards li div.text p {
     width: 100%;
     font-family: 'Inter', sans-serif;
     font-style: normal;
@@ -164,7 +191,8 @@ ul.list-cards li div.text p{
     color: rgba(255, 255, 255, 0.7);
     margin: 0;
 }
-ul.list-cards li div#icon{
+
+ul.list-cards li div#icon {
     width: 21.74px;
     height: 32.25px;
     flex: none;
@@ -172,18 +200,23 @@ ul.list-cards li div#icon{
     flex-grow: 0;
     z-index: 1;
 }
-ul.list-cards li#fazer{
+
+ul.list-cards li#fazer {
     background-color: #4D6AE7;
 }
-ul.list-cards li#comer{
+
+ul.list-cards li#comer {
     background-color: #008e45;
 }
-ul.list-cards li#dormir{
+
+ul.list-cards li#dormir {
     background-color: #CD8700;
 }
-ul.list-cards li#chegar{
+
+ul.list-cards li#chegar {
     background-color: #005225;
 }
+
 div.point {
     padding: 30px;
     width: 100%;
@@ -195,6 +228,7 @@ div.point {
 }
 
 @media only screen and (max-width: 400px) {
+
     div.point {
         padding: 16px 0;
     }
@@ -247,6 +281,7 @@ div.point div#more a {
 div.point div#more a:hover {
     transform: translateX(5px);
 }
+
 .cards-points ul {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -261,23 +296,40 @@ div.point div#more a:hover {
     height: 400px;
     border-radius: 24px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     animation: slideUpFade 0.6s ease both;
 }
 
 .cards-points ul li:hover {
     transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
 /* Delays escalonados por card turístico */
-.cards-points ul li:nth-child(1) { animation-delay: 0.15s; }
-.cards-points ul li:nth-child(2) { animation-delay: 0.25s; }
-.cards-points ul li:nth-child(3) { animation-delay: 0.35s; }
-.cards-points ul li:nth-child(4) { animation-delay: 0.45s; }
-.cards-points ul li:nth-child(5) { animation-delay: 0.55s; }
-.cards-points ul li:nth-child(6) { animation-delay: 0.65s; }
+.cards-points ul li:nth-child(1) {
+    animation-delay: 0.15s;
+}
+
+.cards-points ul li:nth-child(2) {
+    animation-delay: 0.25s;
+}
+
+.cards-points ul li:nth-child(3) {
+    animation-delay: 0.35s;
+}
+
+.cards-points ul li:nth-child(4) {
+    animation-delay: 0.45s;
+}
+
+.cards-points ul li:nth-child(5) {
+    animation-delay: 0.55s;
+}
+
+.cards-points ul li:nth-child(6) {
+    animation-delay: 0.65s;
+}
 
 .cards-points ul li div.imagem-tour {
     width: 100%;
@@ -321,7 +373,8 @@ div.point div#more a:hover {
     bottom: 0;
     left: 0;
     width: 100%;
-    padding: 30px 30px 40px 30px; /* padding-bottom maior */
+    padding: 30px 30px 40px 30px;
+    /* padding-bottom maior */
     background: linear-gradient(to top, rgba(0, 48, 22, 0.95) 0%, rgba(0, 48, 22, 0.4) 70%, transparent 100%);
     box-sizing: border-box;
     display: flex;
@@ -379,7 +432,8 @@ div.point div#more a:hover {
 }
 
 .cards-points ul li div.info-tour h2 {
-    font-family: 'Nunito', sans-serif; /* Padronizado com os cards informativos */
+    font-family: 'Nunito', sans-serif;
+    /* Padronizado com os cards informativos */
     font-weight: 700;
     font-size: 22px;
     color: #fff;
@@ -388,7 +442,8 @@ div.point div#more a:hover {
 }
 
 .cards-points ul li div.info-tour p {
-    font-family: 'Inter', sans-serif; /* Padronizado com os cards informativos */
+    font-family: 'Inter', sans-serif;
+    /* Padronizado com os cards informativos */
     font-size: 14px;
     line-height: 1.6;
     color: rgba(255, 255, 255, 0.7);
@@ -398,7 +453,8 @@ div.point div#more a:hover {
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
-div.news{
+
+div.news {
     width: 100%;
     height: 576px;
     margin-top: 50px;
@@ -408,11 +464,13 @@ div.news{
     display: grid;
     grid-template-columns: repeat(2, 1fr);
 }
-div.top-n{
+
+div.top-n {
     position: relative;
     top: -100px;
 }
-div.caixa{
+
+div.caixa {
     grid-column: 1;
     width: 561px;
     height: 482px;
@@ -420,17 +478,20 @@ div.caixa{
     border: solid #FFFFFF33 4px;
     margin-top: -20px
 }
-div.imagem-caixa img{
+
+div.imagem-caixa img {
     width: 561px;
     margin-left: 20px;
     margin-top: 20px;
     height: 482px;
     border-radius: 48px;
 }
-div.text-n{
+
+div.text-n {
     grid-column: 2;
 }
-div.text-n h2{
+
+div.text-n h2 {
     font-family: "Caveat", sans-serif;
     font-weight: 700;
     font-style: bold;
@@ -440,7 +501,8 @@ div.text-n h2{
     vertical-align: middle;
     color: #fff;
 }
-div.text-n h1{
+
+div.text-n h1 {
     font-family: "Nunito", sans-serif;
     width: 530px;
     height: 60px;
@@ -452,14 +514,16 @@ div.text-n h1{
     vertical-align: middle;
     color: #FFFFFF;
 }
-div.protect ul{
+
+div.protect ul {
     display: flex;
     list-style: none;
     width: 530px;
     height: 104px;
     flex-wrap: wrap;
 }
-div.protect ul > li{
+
+div.protect ul>li {
     width: 168.4px;
     height: 38px;
     margin-top: 16px;
@@ -476,7 +540,8 @@ div.protect ul > li{
     text-align: center;
     background: #FFFFFF33;
 }
-div.desc p{
+
+div.desc p {
     font-family: "Inter", sans-serif;
     font-weight: 400;
     font-style: normal;
@@ -485,19 +550,22 @@ div.desc p{
     vertical-align: middle;
     color: #EDFFF2;
 }
-div.desc{
+
+div.desc {
     width: 530px;
     height: 165px;
     padding: 24px 0px 24px 0px;
 }
-div.restaurant{
+
+div.restaurant {
     width: 231px;
     height: 68px;
     border-radius: 24px;
     padding: 20px 40px 20px 40px;
     background-color: #FFFFFF;
 }
-div.restaurant a{
+
+div.restaurant a {
     display: flex;
     width: 231.28px;
     height: 68px;
@@ -513,7 +581,8 @@ div.restaurant a{
     box-shadow: 0px 20px 25px -5px #0000001A;
     text-decoration: none;
 }
-div.restaurant a > p{
+
+div.restaurant a>p {
     width: 151px;
     height: 28px;
     font-family: "Inter";
@@ -536,6 +605,7 @@ div.restaurant a > p{
         max-width: 95vw;
         gap: 20px;
     }
+
     ul.list-cards li {
         flex: 1 1 240px;
         max-width: 45%;
@@ -547,10 +617,12 @@ div.restaurant a > p{
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 20px;
     }
+
     .cards-points ul li {
         height: 320px;
         border-radius: 18px;
     }
+
     .cards-points ul li div.info-tour h2 {
         font-size: 20px;
     }
@@ -558,14 +630,18 @@ div.restaurant a > p{
 
 /*=== RESPONSIVO: Mobile (até 768px) ===*/
 @media only screen and (max-width: 768px) {
+
     /* Cards informativos: 2 por linha */
     ul.list-cards {
         flex-wrap: wrap;
         max-width: 95vw;
         gap: 15px;
-        padding: 0 15px; /* Alinhado com o header */
-        margin-bottom: 40px; /* Previne os cards da segunda linha de baterem na próxima seção */
+        padding: 0 15px;
+        /* Alinhado com o header */
+        margin-bottom: 40px;
+        /* Previne os cards da segunda linha de baterem na próxima seção */
     }
+
     ul.list-cards li {
         flex: 1 1 45%;
         max-width: 48%;
@@ -576,19 +652,25 @@ div.restaurant a > p{
         padding: 20px;
         border-radius: 14px;
     }
+
     ul.list-cards li div.title h3 {
         font-size: 16px;
         margin: 10px 0 5px;
     }
+
     ul.list-cards li div.text p {
         font-size: 12px;
         line-height: 1.4;
     }
+
     ul.list-cards li div.knowmore a span {
-        font-size: 9px; /* Reduzido para não quebrar linha */
+        font-size: 9px;
+        /* Reduzido para não quebrar linha */
         padding: 6px 10px;
-        width: auto; /* Remove width fixo que causava a quebra */
+        width: auto;
+        /* Remove width fixo que causava a quebra */
     }
+
     ul.list-cards li div.knowmore a i {
         font-size: 16px;
         width: 20px;
@@ -598,62 +680,83 @@ div.restaurant a > p{
 
     /* Pontos turísticos: 2 colunas */
     .point {
-        padding: 30px 15px; /* Adicionado respiro para o mobile */
-        top: -40px; /* Reduzido o top negativo para não encavalar com os cards de cima */
+        padding: 30px 15px;
+        /* Adicionado respiro para o mobile */
+        top: -40px;
+        /* Reduzido o top negativo para não encavalar com os cards de cima */
         box-sizing: border-box;
     }
+
     .point-container {
-        padding: 0 15px; /* Alinhado com header e cards de cima */
+        padding: 0 15px;
+        /* Alinhado com header e cards de cima */
     }
+
     .section-header {
-        flex-direction: column; /* Coloca o título e link em coluna para não expremer em telas pequenas */
+        flex-direction: column;
+        /* Coloca o título e link em coluna para não expremer em telas pequenas */
         align-items: flex-start;
         gap: 8px;
         margin-bottom: 20px;
     }
+
     .title-group .subtitle {
-        font-size: 16px; /* Ajustado para mobile */
+        font-size: 16px;
+        /* Ajustado para mobile */
     }
+
     .title-group h1 {
-        font-size: 24px; /* Ajustado para caber sem quebrar estranho */
+        font-size: 24px;
+        /* Ajustado para caber sem quebrar estranho */
         line-height: 1.2;
     }
+
     div.point div#more {
-        align-self: flex-start; /* Alinha o link Ver Todos à esquerda logo abaixo do título */
+        align-self: flex-start;
+        /* Alinha o link Ver Todos à esquerda logo abaixo do título */
     }
+
     div.point div#more a {
         font-size: 12px;
         display: flex;
         align-items: center;
         gap: 6px;
     }
+
     div.point div#more a svg {
         width: 14px;
     }
+
     .cards-points ul {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 12px;
     }
+
     .cards-points ul li {
         height: 220px;
         border-radius: 14px;
     }
+
     .cards-points ul li div.type {
         top: 8px;
         left: 8px;
         padding: 4px 8px;
     }
+
     .cards-points ul li div.type span {
         font-size: 9px;
         letter-spacing: 0.3px;
     }
+
     .cards-points ul li div.info-tour {
         padding: 10px 12px 18px;
     }
+
     .cards-points ul li div.info-tour h2 {
         font-size: 16px;
         line-height: 1.2;
     }
+
     .cards-points ul li div.info-tour p {
         font-size: 12px;
         line-height: 1.3;
@@ -665,11 +768,13 @@ div.restaurant a > p{
         position: relative;
         top: -60px;
     }
+
     div.news {
         grid-template-columns: 1fr;
         height: auto;
         padding: 30px 20px;
     }
+
     div.text-n {
         grid-column: 1;
         display: flex;
@@ -678,16 +783,19 @@ div.restaurant a > p{
         width: 100%;
         margin: 20px 0 0;
     }
+
     div.text-n h2 {
         width: 100%;
         text-align: center;
     }
+
     div.text-n h1 {
         width: 100%;
         font-size: 32px;
         text-align: center;
         margin-bottom: 20px;
     }
+
     div.caixa {
         grid-column: 1;
         width: 100%;
@@ -695,40 +803,48 @@ div.restaurant a > p{
         height: auto;
         margin: 0 auto;
     }
+
     div.imagem-caixa img {
         width: 100%;
         height: auto;
         margin: 0;
     }
+
     div.protect {
         width: 100%;
         justify-content: center;
     }
+
     div.protect ul {
         width: 100%;
         height: auto;
         justify-content: center;
     }
-    div.protect ul > li {
+
+    div.protect ul>li {
         font-size: 12px;
         padding: 6px 12px;
         margin: 8px 4px;
     }
+
     div.desc {
         width: 100%;
         height: auto;
         padding: 16px 0;
     }
+
     div.desc p {
         font-size: 14px;
         text-align: center;
     }
+
     div.restaurant {
         width: auto;
         height: auto;
         border-radius: 50px;
         padding: 12px 24px;
     }
+
     div.restaurant a {
         width: auto;
         height: auto;
@@ -737,7 +853,8 @@ div.restaurant a > p{
         border-radius: 50px;
         padding: 0;
     }
-    div.restaurant a > p {
+
+    div.restaurant a>p {
         width: auto;
         font-size: 14px;
         margin: 0;
@@ -747,6 +864,7 @@ div.restaurant a > p{
     div.fundo {
         left: 0;
     }
+
     div.paper img {
         left: 0;
     }
@@ -757,23 +875,29 @@ div.restaurant a > p{
     ul.list-cards {
         gap: 10px;
         padding: 0 5px;
-        margin-bottom: 50px; /* Mais espaço para evitar sobreposição */
+        margin-bottom: 50px;
+        /* Mais espaço para evitar sobreposição */
     }
+
     ul.list-cards li {
         flex: 1 1 45%;
         max-width: 48%;
         top: -60px;
         min-height: 250px;
     }
+
     ul.list-cards li div.title h3 {
         font-size: 14px;
     }
+
     ul.list-cards li div.text p {
         font-size: 11px;
     }
+
     .cards-points ul li {
         height: 200px;
     }
+
     .title-group h1 {
         font-size: 22px;
     }
