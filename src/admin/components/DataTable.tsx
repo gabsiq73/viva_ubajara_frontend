@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Inbox } from 'lucide-react';
 
 interface Column<T> {
   header: string;
@@ -26,7 +27,7 @@ export function DataTable<T>({ columns, data, keyField, loading, emptyMessage = 
   if (data.length === 0) {
     return (
       <div className="adm-empty">
-        <span className="adm-empty__icon">📭</span>
+        <span className="adm-empty__icon"><Inbox size={48} /></span>
         <p className="adm-empty__text">{emptyMessage}</p>
       </div>
     );

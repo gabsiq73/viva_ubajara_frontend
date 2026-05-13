@@ -1,7 +1,13 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://parque-ubajara-api.onrender.com/api/v1';
-const TOKEN_KEY = 'ubajara_admin_token';
+export const BASE_URL = 'https://parque-ubajara-api.onrender.com/api/v1';
+
+/** Chaves do localStorage — centralizadas para evitar typos */
+export const TOKEN_KEY = 'ubajara_admin_token';
+export const USER_KEY = 'ubajara_admin_user';
+
+export const FORBIDDEN_EVENT = 'adm:forbidden';
+export const UNAUTHORIZED_EVENT = 'adm:unauthorized';
 
 // Instância Axios configurada para a API do parque
 const api = axios.create({
@@ -15,7 +21,11 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(TOKEN_KEY);
-    if (token) {
+    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
+      hasToken: !!token,
+      tokenPreview: token ? `${token.substring(0, 10)}...` : 'NONE'
+    });
+    if (token && token !== 'undefined' && token !== 'null') {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -23,18 +33,28 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor de response: trata 401 (token expirado/inválido)
+// Interceptor de response: trata 401 e 403
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem(TOKEN_KEY);
-      // Redireciona para login sem recarregar a página
-      window.location.href = '/admin/login';
+    const status = error.response?.status;
+    const isLoginRequest = error.config?.url?.includes('/auth/login');
+
+    if (status === 401 && !isLoginRequest) {
+      // Token expirado ou inválido — emite evento em vez de forçar refresh
+      window.dispatchEvent(new CustomEvent(UNAUTHORIZED_EVENT));
     }
+
+    if (status === 403) {
+      // Permissão insuficiente — notifica via evento customizado
+      window.dispatchEvent(new CustomEvent(FORBIDDEN_EVENT, {
+        detail: 'Acesso negado. Você não tem permissão para realizar esta operação.',
+      }));
+    }
+
     return Promise.reject(error);
   }
 );
 
-export { TOKEN_KEY };
 export default api;
+

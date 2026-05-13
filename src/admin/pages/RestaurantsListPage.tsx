@@ -6,6 +6,7 @@ import { DataTable, Pagination } from '../components/DataTable';
 import { ConfirmModal } from '../components/Modal';
 import type { RestaurantResponse } from '../types';
 import type { ReactNode } from 'react';
+import { Pencil, Trash2, Search, Plus } from 'lucide-react';
 
 export function RestaurantsListPage() {
   const navigate = useNavigate();
@@ -21,8 +22,8 @@ export function RestaurantsListPage() {
     { header: 'Status', width: '90px', accessor: (r: RestaurantResponse): ReactNode => <span className={`adm-badge adm-badge--${r.active ? 'green' : 'red'}`}>{r.active ? 'Ativo' : 'Inativo'}</span> },
     { header: 'Ações', width: '130px', accessor: (r: RestaurantResponse): ReactNode => (
       <div className="adm-table__actions">
-        <button className="adm-btn adm-btn--ghost adm-btn--sm" onClick={() => navigate(`/admin/restaurants/${r.id}/edit`)}>✏️</button>
-        <button className="adm-btn adm-btn--danger adm-btn--sm" onClick={() => confirmDelete(r.id)}>🗑️</button>
+        <button className="adm-btn adm-btn--ghost adm-btn--sm" onClick={() => navigate(`/admin/restaurants/${r.id}/edit`)}><Pencil size={14} /></button>
+        <button className="adm-btn adm-btn--danger adm-btn--sm" onClick={() => confirmDelete(r.id)}><Trash2 size={14} /></button>
       </div>
     )},
   ];
@@ -31,10 +32,10 @@ export function RestaurantsListPage() {
     <div>
       <div className="adm-page-header">
         <h2 className="adm-page-title">Restaurantes <span>{totalElements} registros</span></h2>
-        <button className="adm-btn adm-btn--primary" onClick={() => navigate('/admin/restaurants/new')}>+ Novo Restaurante</button>
+        <button className="adm-btn adm-btn--primary" onClick={() => navigate('/admin/restaurants/new')}><Plus size={16} /> Novo Restaurante</button>
       </div>
       <div className="adm-card">
-        <div className="adm-search"><span className="adm-search__icon">🔍</span><input placeholder="Buscar restaurantes…" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
+        <div className="adm-search"><span className="adm-search__icon"><Search size={18} /></span><input placeholder="Buscar restaurantes…" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
         <DataTable columns={columns} data={data} keyField="id" loading={loading} emptyMessage="Nenhum restaurante cadastrado." />
         <Pagination page={page} totalPages={totalPages} totalElements={totalElements} onPageChange={setPage} />
       </div>

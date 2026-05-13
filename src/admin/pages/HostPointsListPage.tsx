@@ -6,6 +6,7 @@ import { DataTable, Pagination } from '../components/DataTable';
 import { ConfirmModal } from '../components/Modal';
 import type { HostPointResponse } from '../types';
 import type { ReactNode } from 'react';
+import { Pencil, Trash2, Search, Plus } from 'lucide-react';
 
 const TYPE_LABELS: Record<string, string> = { HOTEL: 'Hotel', ROOST: 'Pousada', HOSTEL: 'Hostel' };
 
@@ -23,8 +24,8 @@ export function HostPointsListPage() {
     { header: 'Status', width: '90px', accessor: (r: HostPointResponse): ReactNode => <span className={`adm-badge adm-badge--${r.active ? 'green' : 'red'}`}>{r.active ? 'Ativo' : 'Inativo'}</span> },
     { header: 'Ações', width: '130px', accessor: (r: HostPointResponse): ReactNode => (
       <div className="adm-table__actions">
-        <button className="adm-btn adm-btn--ghost adm-btn--sm" onClick={() => navigate(`/admin/host-points/${r.id}/edit`)}>✏️</button>
-        <button className="adm-btn adm-btn--danger adm-btn--sm" onClick={() => confirmDelete(r.id)}>🗑️</button>
+        <button className="adm-btn adm-btn--ghost adm-btn--sm" onClick={() => navigate(`/admin/host-points/${r.id}/edit`)}><Pencil size={14} /></button>
+        <button className="adm-btn adm-btn--danger adm-btn--sm" onClick={() => confirmDelete(r.id)}><Trash2 size={14} /></button>
       </div>
     )},
   ];
@@ -33,10 +34,10 @@ export function HostPointsListPage() {
     <div>
       <div className="adm-page-header">
         <h2 className="adm-page-title">Hospedagem <span>{totalElements} registros</span></h2>
-        <button className="adm-btn adm-btn--primary" onClick={() => navigate('/admin/host-points/new')}>+ Nova Hospedagem</button>
+        <button className="adm-btn adm-btn--primary" onClick={() => navigate('/admin/host-points/new')}><Plus size={16} /> Nova Hospedagem</button>
       </div>
       <div className="adm-card">
-        <div className="adm-search"><span className="adm-search__icon">🔍</span><input placeholder="Buscar hospedagens…" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
+        <div className="adm-search"><span className="adm-search__icon"><Search size={18} /></span><input placeholder="Buscar hospedagens…" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
         <DataTable columns={columns} data={data} keyField="id" loading={loading} emptyMessage="Nenhuma hospedagem cadastrada." />
         <Pagination page={page} totalPages={totalPages} totalElements={totalElements} onPageChange={setPage} />
       </div>
