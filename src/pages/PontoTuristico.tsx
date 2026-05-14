@@ -2,11 +2,13 @@ import { useParams, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { TOURIST_POINTS } from "../data/touristPoints";
+import "../components/Sections/style/Content.components.css";
 import "./style/PontoTuristico.css";
 
 export default function PontoTuristico() {
     const { id } = useParams<{ id: string }>();
     const point = TOURIST_POINTS.find((p) => p.id === Number(id)) ?? TOURIST_POINTS[0];
+    const related = TOURIST_POINTS.filter((p) => p.id !== point.id).slice(0, 3);
 
     return (
         <div className="pt-page">
@@ -18,6 +20,16 @@ export default function PontoTuristico() {
                 <section className="pt-hero" aria-labelledby="pt-hero-title">
                     <img src={point.img} alt={point.alt} className="pt-hero__bg" />
                     <div className="pt-hero__overlay" aria-hidden="true" />
+
+                    <nav className="pt-breadcrumb" aria-label="Navegação">
+                        <div className="pt-breadcrumb__inner">
+                            <Link to="/" className="pt-breadcrumb__link">Início</Link>
+                            <span className="pt-breadcrumb__sep" aria-hidden="true">›</span>
+                            <Link to="/pontos-turisticos" className="pt-breadcrumb__link">Pontos Turísticos</Link>
+                            <span className="pt-breadcrumb__sep" aria-hidden="true">›</span>
+                            <span className="pt-breadcrumb__current">{point.heroTitle}</span>
+                        </div>
+                    </nav>
 
                     <div className="pt-hero__content">
                         <div className="pt-hero__inner">
@@ -152,6 +164,57 @@ export default function PontoTuristico() {
                         </div>
                     </div>
                 </section>
+
+                {/* ── Pontos Recomendados ── */}
+                {related.length > 0 && (
+                    <section className="pt-related" aria-labelledby="pt-related-title">
+                        <div className="pt-related__inner">
+                            <h2 id="pt-related-title" className="pt-related__title">Pontos Recomendados</h2>
+                            <p className="pt-related__subtitle">Continue explorando o Parque Nacional de Ubajara</p>
+                            <div className="cards-points pt-related__grid">
+                                <ul>
+                                    {related.map((pt) => (
+                                        <li key={pt.id}>
+                                            <Link
+                                                to={`/pontos/${pt.id}`}
+                                                className="point-card__link"
+                                                aria-label={`Ver detalhes de ${pt.title}`}
+                                            >
+                                                <img src={pt.img} alt={pt.alt} className="point-card__img" loading="lazy" />
+                                                <div className="point-card__gradient" />
+                                                <span className="point-card__tag" aria-hidden="true">{pt.category}</span>
+                                                <div className="point-card__body">
+                                                    <h3 className="point-card__title">{pt.title}</h3>
+                                                    <p className="point-card__desc">{pt.desc}</p>
+                                                    <div className="point-card__meta">
+                                                        <span className="point-card__meta-item">
+                                                            <span className="material-symbols-outlined" aria-hidden="true">directions_walk</span>
+                                                            {pt.difficulty}
+                                                        </span>
+                                                        <span className="point-card__meta-item">
+                                                            <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
+                                                            {pt.duration}
+                                                        </span>
+                                                    </div>
+                                                    <span className="point-card__cta" aria-hidden="true">
+                                                        <span className="material-symbols-outlined" aria-hidden="true">visibility</span>
+                                                        Saiba mais
+                                                    </span>
+                                                </div>
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div className="pt-related__footer">
+                                <Link to="/pontos-turisticos" className="pt-related__all">
+                                    Ver todos os pontos turísticos
+                                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                                </Link>
+                            </div>
+                        </div>
+                    </section>
+                )}
 
             </main>
 

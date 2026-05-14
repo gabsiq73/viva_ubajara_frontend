@@ -1,90 +1,96 @@
 .gastro-carousel {
-  position: relative;
   width: 100%;
-  padding-bottom: 36px;
   box-sizing: border-box;
 }
 
 .gastro-viewport {
+  position: relative;
   width: 100%;
+  border-radius: 24px;
   overflow: hidden;
-  border-radius: 32px;
+  aspect-ratio: 4 / 3;
+  box-shadow:
+    0 32px 72px rgba(0, 0, 0, 0.40),
+    0 8px 24px rgba(0, 0, 0, 0.20);
 }
 
-.gastro-track {
-  display: flex;
-  width: 100%;
-  transition: transform 0.55s ease-out;
-  will-change: transform;
+/* Gradient vignette at bottom so dots are legible over any image */
+.gastro-viewport::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.52) 0%,
+    rgba(0, 0, 0, 0.10) 38%,
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 1;
 }
 
+/* ─── Slides ─── */
 .gastro-slide {
-  flex: 0 0 100%;
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.85s ease;
 }
 
-.gastro-slide-frame {
-  border-radius: 32px;
-  overflow: hidden;
-  border: 4px solid rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.06);
-  box-sizing: border-box;
-  transition: border-color 0.35s ease, box-shadow 0.35s ease, background 0.35s ease;
-}
-
-.gastro-slide.is-active .gastro-slide-frame {
-  border-color: #ffffff;
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+.gastro-slide.is-active {
+  opacity: 1;
 }
 
 .gastro-slide-img {
   display: block;
   width: 100%;
-  height: clamp(220px, 42vw, 480px);
+  height: 100%;
   object-fit: cover;
 }
 
+/* ─── Dots ─── */
 .gastro-dots {
   position: absolute;
+  bottom: 18px;
   left: 0;
   right: 0;
-  bottom: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
-  height: 28px;
-  margin: 0;
-  padding: 0;
+  gap: 6px;
+  z-index: 2;
 }
 
 .gastro-dots button {
-  width: 10px;
-  height: 10px;
+  height: 6px;
+  width: 6px;
   padding: 0;
   border-radius: 9999px;
-  border: 2px solid rgba(255, 255, 255, 0.55);
-  background: transparent;
+  border: none;
+  background: rgba(255, 255, 255, 0.45);
   cursor: pointer;
-  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+  transition: background 0.3s ease, width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  flex-shrink: 0;
 }
 
 .gastro-dots button.is-active {
   background: #ffffff;
-  border-color: #ffffff;
-  transform: scale(1.15);
+  width: 24px;
+}
+
+.gastro-dots button:hover:not(.is-active) {
+  background: rgba(255, 255, 255, 0.75);
 }
 
 @media only screen and (max-width: 768px) {
-  .gastro-slide-img {
-    height: clamp(240px, 58vw, 360px);
-  }
-
-  .gastro-slide-frame,
   .gastro-viewport {
-    border-radius: 24px;
+    border-radius: 20px;
+    aspect-ratio: 16 / 10;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .gastro-viewport {
+    aspect-ratio: 4 / 3;
   }
 }

@@ -7,13 +7,13 @@ export default function Navbar(){
             <div className="menu">
                 <ul>
                     <li>
-                        <Link to="/">Atrativos</Link>
+                        <Link to="/pontos-turisticos">Atrativos</Link>
                     </li>
                     <li>
-                        <Link to="/">Alimentação</Link>
+                        <Link to="/estabelecimentos">Alimentação</Link>
                     </li>
                     <li>
-                        <Link to="/">Hospedagem</Link>
+                        <Link to="/estabelecimentos">Hospedagem</Link>
                     </li>
                     <li>
                         <Link to="/">Condutores</Link>

@@ -7,6 +7,7 @@ import route from "./../../assets/images/route.png";
 import food from "./../../assets/images/food.png";
 import { GastronomyCarousel, type GastronomySlide } from "./GastronomyCarousel";
 import { TOURIST_POINTS } from "../../data/touristPoints";
+import { EVENTS } from "../../data/events";
 
 // Re-import images still needed locally
 import cac from "./../../assets/images/cachoeira.png";
@@ -43,6 +44,7 @@ const PUB_GUIDE_TAG_COLORS: Record<string, string> = {
 const PUB_GUIDE_ITEMS = [
     {
         id: 1,
+        estabId: 1,
         category: "Restaurantes",
         title: "Varanda da Serra",
         rating: 4.9,
@@ -51,6 +53,7 @@ const PUB_GUIDE_ITEMS = [
     },
     {
         id: 2,
+        estabId: 2,
         category: "Pousadas",
         title: "Pousada Verde Vale",
         rating: 4.8,
@@ -59,6 +62,7 @@ const PUB_GUIDE_ITEMS = [
     },
     {
         id: 3,
+        estabId: 5,
         category: "Artesanato",
         title: "Casa do Artesanato",
         rating: 4.7,
@@ -67,6 +71,7 @@ const PUB_GUIDE_ITEMS = [
     },
     {
         id: 4,
+        estabId: 3,
         category: "Açaiterias",
         title: "Açaí da Ibiapaba",
         rating: 4.9,
@@ -75,44 +80,7 @@ const PUB_GUIDE_ITEMS = [
     },
 ];
 
-const PUB_EVENTS = [
-    {
-        id: 1,
-        day: "12",
-        month: "AGO",
-        title: "Festival de Jazz na Serra",
-        desc: "Noites de música ao ar livre com artistas regionais e gastronomia local.",
-        place: "Praça da Matriz",
-        img: park,
-    },
-    {
-        id: 2,
-        day: "25",
-        month: "SET",
-        title: "Feira de Sabores da Ibiapaba",
-        desc: "Degustação de doces, cafés e cachaças artesanais com oficinas culturais.",
-        place: "Mercado Público",
-        img: mercado,
-    },
-    {
-        id: 3,
-        day: "10",
-        month: "OUT",
-        title: "Trilha do Nascer da Lua",
-        desc: "Caminhada guiada ao amanhecer com vistas do vale e contação de histórias.",
-        place: "Parque Nacional",
-        img: route,
-    },
-    {
-        id: 4,
-        day: "05",
-        month: "NOV",
-        title: "Noite de Forró na Serra",
-        desc: "Ritmos e comidas típicas em uma noite animada de festa regional.",
-        place: "Praça do Forró",
-        img: food,
-    },
-];
+const HOME_EVENTS = EVENTS.slice(0, 4);
 
 const AIRPORTS = [
     { code: "JJD", name: "Aeroporto de Jericoacoara", dist: "165 km de distância" },
@@ -322,9 +290,9 @@ export default function Content(){
                             </div>
 
                             <div id="more">
-                                <Link to="/">
+                                <Link to="/pontos-turisticos">
                                     Ver Todos
-                                
+
                                 </Link>
                             </div>
                         </div>
@@ -407,7 +375,7 @@ export default function Content(){
                             </div>
 
                             <div className="restaurant">
-                                <Link to="/">Ver Restaurantes</Link>
+                                <Link to="/estabelecimentos">Ver Restaurantes</Link>
                             </div>
                         </div>
                         </div>
@@ -467,28 +435,33 @@ export default function Content(){
                                         </span>
                                     </div>
                                     <div className="pub-guide-card__body">
-                                        <div className="pub-guide-card__row">
-                                            <h3 className="pub-guide-card__name">{item.title}</h3>
-                                            <span className="pub-guide-card__rating" aria-label={`Nota ${item.rating}`}>
-                                                <span className="pub-guide-card__star" aria-hidden>
-                                                    ★
-                                                </span>
-                                                {item.rating.toFixed(1)}
-                                            </span>
+                                        <div className="pub-guide-card__rating-row" aria-label={`Nota ${item.rating}`}>
+                                            <div className="pub-guide-card__stars">
+                                                {[1, 2, 3, 4, 5].map((i) => (
+                                                    <span
+                                                        key={i}
+                                                        className="material-symbols-outlined pub-guide-card__star-icon"
+                                                        aria-hidden="true"
+                                                        style={{ fontVariationSettings: `"FILL" ${i <= Math.round(item.rating) ? 1 : 0}, "wght" 400, "GRAD" 0, "opsz" 20` }}
+                                                    >
+                                                        star
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <span className="pub-guide-card__rating-num">{item.rating.toFixed(1)}</span>
                                         </div>
+                                        <h3 className="pub-guide-card__name">{item.title}</h3>
                                         <p className="pub-guide-card__desc">{item.desc}</p>
-                                        <Link to="/" className="pub-guide-card__cta">
-                                            <span className="material-symbols-outlined" aria-hidden>
-                                                visibility
-                                            </span>
-                                            Ver mais
+                                        <Link to={`/estabelecimentos/${item.estabId}`} className="pub-guide-card__cta">
+                                            Ver Detalhes
+                                            <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
                                         </Link>
                                     </div>
                                 </article>
                             ))}
                         </div>
                         <div className="pub-guide__footer reveal">
-                            <Link to="/" className="pub-guide__all">
+                            <Link to="/estabelecimentos" className="pub-guide__all">
                                 Ver todos os Estabelecimentos
                             </Link>
                         </div>
@@ -512,7 +485,7 @@ export default function Content(){
                             </p>
                         </header>
                         <div className="pub-events__grid reveal grid-reveal">
-                            {PUB_EVENTS.map((ev) => (
+                            {HOME_EVENTS.map((ev) => (
                                 <article key={ev.id} className="pub-event-card">
                                     <div className="pub-event-card__media">
                                         <img src={ev.img} alt={ev.title} />
@@ -530,7 +503,7 @@ export default function Content(){
                                             </span>
                                             {ev.place}
                                         </div>
-                                        <Link to="/" className="pub-event-card__cta">
+                                        <Link to={`/eventos/${ev.id}`} className="pub-event-card__cta">
                                             <span className="material-symbols-outlined" aria-hidden>calendar_month</span>
                                             Ver evento
                                         </Link>
@@ -539,7 +512,7 @@ export default function Content(){
                             ))}
                         </div>
                         <div className="pub-events__footer reveal">
-                            <Link to="/" className="pub-events__all">
+                            <Link to="/eventos" className="pub-events__all">
                                 Ver todos os Eventos
                             </Link>
                         </div>

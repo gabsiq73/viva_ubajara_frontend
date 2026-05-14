@@ -389,6 +389,7 @@ div.point div#more a:hover {
     box-shadow: 0 10px 32px rgba(0, 0, 0, 0.15);
     transition: transform 0.35s ease, box-shadow 0.35s ease;
     cursor: pointer;
+    z-index: 1;
 }
 
 .cards-points ul li:hover {
@@ -543,19 +544,36 @@ div.news {
     margin-right: -10px;
     margin-top: 35px;
     margin-bottom: 50px;
-    background-color: #C58B24;
+    background: #C58B24;
+    background: linear-gradient(to bottom, #c58b24 0%, #a97318 40%, #9e6c14 60%, #c58b24 100%);
     padding: 0;
     box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+
+div.news::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 70% 55%, rgba(255, 210, 100, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+div.news > * {
+    position: relative;
+    z-index: 1;
 }
 
 div.news-inner {
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
-    padding: clamp(32px, 5vw, 50px) 20px;
+    padding: clamp(36px, 5vw, 60px) clamp(24px, 4vw, 48px);
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: clamp(24px, 4vw, 48px);
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: clamp(32px, 5vw, 64px);
     align-items: center;
     box-sizing: border-box;
 }
@@ -587,11 +605,11 @@ div.text-n {
 div.text-n h2 {
     font-family: "Caveat", sans-serif;
     font-weight: 700;
-    font-size: 24px;
+    font-size: clamp(20px, 2.2vw, 26px);
     line-height: 1.2;
-    letter-spacing: 1.4px;
-    vertical-align: middle;
-    color: #fff;
+    letter-spacing: 1.2px;
+    color: rgba(255, 235, 160, 0.92);
+    margin: 0;
 }
 
 div.text-n h1 {
@@ -601,12 +619,12 @@ div.text-n h1 {
     height: auto;
     font-weight: 900;
     font-style: normal;
-    font-size: clamp(28px, 3.2vw, 48px);
-    line-height: 1.15;
-    letter-spacing: 0px;
-    vertical-align: middle;
+    font-size: clamp(30px, 3.4vw, 52px);
+    line-height: 1.1;
+    letter-spacing: -0.5px;
     color: #FFFFFF;
-    margin: 8px 0 0;
+    margin: 6px 0 0;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.25);
 }
 
 div.protect ul {
@@ -757,6 +775,20 @@ div.restaurant a:active {
 /*=== RESPONSIVO: Mobile (até 768px) ===*/
 @media only screen and (max-width: 768px) {
 
+    /* Gastronomia: cancela o bleed de desktop */
+    div.news {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    div.news-inner {
+        grid-template-columns: 1fr;
+        height: auto;
+        padding: 32px 20px 44px;
+        gap: 28px;
+    }
+
     /* Cards informativos: 2 por linha */
     ul.list-cards {
         flex-wrap: wrap;
@@ -872,13 +904,6 @@ div.restaurant a:active {
         position: relative;
         top: -60px;
         margin-bottom: -150px;
-    }
-
-    div.news-inner {
-        grid-template-columns: 1fr;
-        height: auto;
-        padding: 28px 0px 40px;
-        gap: 28px;
     }
 
     div.text-n {
@@ -1092,18 +1117,25 @@ div.restaurant a:active {
 
 .pub-guide-card {
     background: #ffffff;
-    border-radius: 20px;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 33, 12, 0.08);
+    border: 1px solid #e4ede8;
     display: flex;
     flex-direction: column;
     min-width: 0;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.pub-guide-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0, 48, 22, 0.11);
 }
 
 .pub-guide-card__media {
     position: relative;
-    aspect-ratio: 4 / 3;
+    height: 180px;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .pub-guide-card__media img {
@@ -1111,6 +1143,11 @@ div.restaurant a:active {
     height: 100%;
     object-fit: cover;
     display: block;
+    transition: transform 0.4s ease;
+}
+
+.pub-guide-card:hover .pub-guide-card__media img {
+    transform: scale(1.05);
 }
 
 .pub-guide-card__tag {
@@ -1120,59 +1157,61 @@ div.restaurant a:active {
     font-family: "Inter", sans-serif;
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     color: #ffffff;
-    padding: 6px 10px;
-    border-radius: 8px;
+    padding: 4px 10px;
+    border-radius: 50px;
     line-height: 1;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 .pub-guide-card__body {
-    padding: 16px 16px 18px;
+    padding: 14px 16px 16px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
     flex: 1;
 }
 
-.pub-guide-card__row {
+.pub-guide-card__rating-row {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 10px;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 2px;
+}
+
+.pub-guide-card__stars {
+    display: flex;
+    gap: 1px;
+}
+
+.pub-guide-card__star-icon {
+    font-size: 14px;
+    color: #e8a020;
+}
+
+.pub-guide-card__rating-num {
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #7a9080;
 }
 
 .pub-guide-card__name {
     font-family: "Nunito", sans-serif;
     font-weight: 800;
-    font-size: 17px;
-    color: #00210c;
+    font-size: 16px;
+    color: #003016;
     margin: 0;
-    line-height: 1.25;
-}
-
-.pub-guide-card__rating {
-    font-family: "Inter", sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: #00210c;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.pub-guide-card__star {
-    color: #e58a2a;
-    font-size: 15px;
-    line-height: 1;
+    line-height: 1.3;
 }
 
 .pub-guide-card__desc {
     font-family: "Inter", sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #5c6670;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #4a5c51;
     margin: 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -1182,31 +1221,33 @@ div.restaurant a:active {
 }
 
 .pub-guide-card__cta {
-    margin-top: 4px;
-    align-self: flex-start;
+    margin-top: 8px;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    font-family: "Inter", sans-serif;
-    font-size: 14px;
-    font-weight: 600;
+    gap: 4px;
+    font-family: "Nunito", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
     color: #006b32;
     text-decoration: none;
-    padding: 8px 14px;
-    border-radius: 12px;
-    border: 1px solid #b8dcc8;
-    background: #f6fbf8;
-    transition: background 0.2s ease, border-color 0.2s ease;
+    padding-top: 10px;
+    border-top: 1px solid #f0f4f2;
+    width: 100%;
+    transition: gap 0.2s ease;
 }
 
 .pub-guide-card__cta .material-symbols-outlined {
-    font-size: 18px;
-    font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
+    font-size: 15px;
+    font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 20;
+    transition: transform 0.2s ease;
 }
 
-.pub-guide-card__cta:hover {
-    background: #e8f5ee;
-    border-color: #8fc4a6;
+.pub-guide-card:hover .pub-guide-card__cta {
+    gap: 7px;
+}
+
+.pub-guide-card:hover .pub-guide-card__cta .material-symbols-outlined {
+    transform: translateX(3px);
 }
 
 /* —— Próximos Eventos —— */

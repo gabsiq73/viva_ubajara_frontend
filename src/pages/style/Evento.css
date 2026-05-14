@@ -1,0 +1,668 @@
+/* ===== PÁGINA EVENTO INDIVIDUAL ===== */
+
+.evd-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #f7faf8;
+}
+
+.evd-main {
+    flex: 1;
+}
+
+.evd-page > footer {
+    align-self: stretch;
+    width: 100%;
+}
+
+/* ── Hero ── */
+.evd-hero {
+    position: relative;
+    min-height: 65vh;
+    padding-top: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+}
+
+.evd-hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 45%;
+    z-index: 0;
+}
+
+.evd-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.30) 0%,
+        rgba(0, 0, 0, 0.55) 55%,
+        rgba(0, 0, 0, 0.82) 100%
+    );
+    z-index: 1;
+}
+
+/* ── Breadcrumb ── */
+.evd-breadcrumb {
+    position: absolute;
+    top: 118px;
+    left: 0;
+    right: 0;
+    z-index: 3;
+}
+
+.evd-breadcrumb__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.evd-breadcrumb__link {
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.evd-breadcrumb__link:hover {
+    color: #ffffff;
+}
+
+.evd-breadcrumb__sep {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.evd-breadcrumb__current {
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.90);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 260px;
+}
+
+/* ── Hero content ── */
+.evd-hero__content {
+    position: relative;
+    z-index: 2;
+    padding: 0 20px 56px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.evd-hero__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.evd-hero__cat {
+    display: inline-block;
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: #ffffff;
+    padding: 5px 14px;
+    border-radius: 50px;
+    margin-bottom: 14px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    background: rgba(0, 48, 22, 0.84);
+}
+
+.evd-hero__cat--Festival    { background: rgba(176, 68, 0, 0.90); }
+.evd-hero__cat--Cultura     { background: rgba(112, 32, 72, 0.90); }
+.evd-hero__cat--Esporte     { background: rgba(20, 72, 120, 0.90); }
+.evd-hero__cat--Gastronomia { background: rgba(96, 52, 16, 0.90); }
+.evd-hero__cat--Natureza    { background: rgba(0, 107, 50, 0.90); }
+
+.evd-hero__title {
+    font-family: "Nunito", sans-serif;
+    font-weight: 900;
+    font-size: clamp(32px, 5vw, 60px);
+    color: #ffffff;
+    line-height: 1.1;
+    margin: 0 0 14px;
+}
+
+.evd-hero__date-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255, 220, 140, 0.95);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.evd-hero__date-row .material-symbols-outlined {
+    font-size: 18px;
+    font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
+}
+
+/* ── Info bar ── */
+.evd-hero__infobar {
+    position: relative;
+    z-index: 2;
+    background: rgba(20, 10, 0, 0.82);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.evd-hero__infobar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.evd-info-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 210, 140, 0.90);
+}
+
+.evd-info-item .material-symbols-outlined {
+    font-size: 17px;
+    font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
+    color: #ffb840;
+}
+
+.evd-info-sep {
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 16px;
+}
+
+/* ── Content section ── */
+.evd-content {
+    padding: clamp(36px, 5vw, 64px) 0 clamp(24px, 3vw, 48px);
+}
+
+.evd-content__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: clamp(32px, 5vw, 64px);
+    align-items: start;
+    box-sizing: border-box;
+}
+
+/* Left column */
+.evd-content__left {
+    min-width: 0;
+}
+
+.evd-content__kicker {
+    display: inline-block;
+    font-family: "Inter", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #a66b1f;
+    margin-bottom: 10px;
+}
+
+.evd-content__title {
+    font-family: "Nunito", sans-serif;
+    font-weight: 900;
+    font-size: clamp(22px, 3vw, 34px);
+    color: #00210c;
+    margin: 0 0 20px;
+    line-height: 1.2;
+}
+
+.evd-content__desc {
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #3c4a42;
+    margin: 0 0 16px;
+}
+
+.evd-tags-title {
+    font-family: "Nunito", sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    color: #00210c;
+    margin: 28px 0 12px;
+}
+
+.evd-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.evd-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b3200;
+    background: #fdf0e2;
+    border: 1px solid #e8c890;
+    padding: 5px 12px;
+    border-radius: 50px;
+}
+
+.evd-tag .material-symbols-outlined {
+    font-size: 13px;
+    color: #a66b1f;
+}
+
+/* ── Info card ── */
+.evd-info-card {
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid #e4ede8;
+    box-shadow: 0 4px 24px rgba(0, 33, 12, 0.07);
+    position: sticky;
+    top: 108px;
+}
+
+.evd-info-card__header {
+    background: #3d1a00;
+    padding: 20px 24px;
+}
+
+.evd-info-card__title {
+    font-family: "Nunito", sans-serif;
+    font-weight: 800;
+    font-size: 17px;
+    color: #ffffff;
+    margin: 0;
+}
+
+.evd-info-card__body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.evd-info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.evd-info-list__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.evd-info-list__icon {
+    font-size: 20px;
+    color: #a66b1f;
+    font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.evd-info-list__label {
+    display: block;
+    font-family: "Inter", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9a7a60;
+    margin-bottom: 3px;
+}
+
+.evd-info-list__value {
+    display: block;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #00210c;
+    line-height: 1.4;
+}
+
+.evd-info-card__maps-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: "Nunito", sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: #ffffff;
+    background: #6b3200;
+    text-decoration: none;
+    padding: 13px 20px;
+    border-radius: 12px;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.evd-info-card__maps-btn .material-symbols-outlined {
+    font-size: 18px;
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+.evd-info-card__maps-btn:hover {
+    background: #a66b1f;
+    transform: translateY(-1px);
+}
+
+/* ── Related ── */
+.evd-related {
+    background: #f0f7f3;
+    padding: clamp(40px, 5vw, 64px) 0;
+}
+
+.evd-related__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.evd-related__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: clamp(24px, 3.5vw, 36px);
+    flex-wrap: wrap;
+}
+
+.evd-related__title {
+    font-family: "Nunito", sans-serif;
+    font-weight: 900;
+    font-size: clamp(22px, 3vw, 32px);
+    color: #00210c;
+    margin: 0 0 6px;
+    line-height: 1.2;
+}
+
+.evd-related__subtitle {
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    color: #5c6670;
+    margin: 0;
+}
+
+.evd-related__all {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "Nunito", sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: #6b3200;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: gap 0.2s ease;
+}
+
+.evd-related__all:hover { gap: 9px; }
+
+.evd-related__all .material-symbols-outlined {
+    font-size: 16px;
+    font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 20;
+}
+
+.evd-related__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+/* Related card */
+.evd-rel-card {
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #e4ede8;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.evd-rel-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0, 48, 22, 0.11);
+}
+
+.evd-rel-card__img-wrap {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.evd-rel-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.evd-rel-card:hover .evd-rel-card__img {
+    transform: scale(1.05);
+}
+
+.evd-rel-card__cat {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-family: "Inter", sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ffffff;
+    padding: 3px 9px;
+    border-radius: 50px;
+    background: rgba(0, 48, 22, 0.84);
+    backdrop-filter: blur(4px);
+}
+
+.evd-rel-card__cat[data-cat="Festival"]    { background: rgba(176, 68, 0, 0.88); }
+.evd-rel-card__cat[data-cat="Cultura"]     { background: rgba(112, 32, 72, 0.88); }
+.evd-rel-card__cat[data-cat="Esporte"]     { background: rgba(20, 72, 120, 0.88); }
+.evd-rel-card__cat[data-cat="Gastronomia"] { background: rgba(96, 52, 16, 0.88); }
+.evd-rel-card__cat[data-cat="Natureza"]    { background: rgba(0, 107, 50, 0.88); }
+
+.evd-rel-card__date-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 10px;
+    padding: 5px 9px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    backdrop-filter: blur(4px);
+}
+
+.evd-rel-card__date-badge strong {
+    display: block;
+    font-family: "Nunito", sans-serif;
+    font-size: 16px;
+    font-weight: 900;
+    color: #a66b1f;
+    line-height: 1;
+}
+
+.evd-rel-card__date-badge span {
+    font-family: "Inter", sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    color: #5c3000;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.evd-rel-card__body {
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+}
+
+.evd-rel-card__title {
+    font-family: "Nunito", sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    color: #003016;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.evd-rel-card__place {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    color: #7a9080;
+    margin: 0;
+}
+
+.evd-rel-card__place .material-symbols-outlined {
+    font-size: 13px;
+    font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
+    color: #a66b1f;
+}
+
+.evd-rel-card__desc {
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #4a5c51;
+    margin: 0;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.evd-rel-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: "Nunito", sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: #6b3200;
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f4f2;
+    width: 100%;
+    transition: gap 0.2s ease;
+}
+
+.evd-rel-card__cta .material-symbols-outlined {
+    font-size: 13px;
+    font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 20;
+    transition: transform 0.2s ease;
+}
+
+.evd-rel-card:hover .evd-rel-card__cta { gap: 7px; }
+.evd-rel-card:hover .evd-rel-card__cta .material-symbols-outlined { transform: translateX(3px); }
+
+/* ── Responsive ── */
+@media only screen and (max-width: 960px) {
+    .evd-content__inner {
+        grid-template-columns: 1fr;
+    }
+
+    .evd-info-card {
+        position: static;
+    }
+
+    .evd-related__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .evd-hero {
+        min-height: 55vh;
+        padding-top: 70px;
+    }
+
+    .evd-breadcrumb {
+        top: 76px;
+    }
+
+    .evd-hero__infobar-inner {
+        gap: 12px;
+    }
+
+    .evd-info-sep {
+        display: none;
+    }
+
+    .evd-info-item {
+        font-size: 13px;
+    }
+
+    .evd-content {
+        padding: 28px 0 20px;
+    }
+
+    .evd-content__inner {
+        padding: 0 16px;
+    }
+
+    .evd-related__inner {
+        padding: 0 16px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .evd-related__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .evd-related__header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

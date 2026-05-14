@@ -1,0 +1,428 @@
+/* ===== PÁGINA LISTA DE PONTOS TURÍSTICOS ===== */
+
+.ptl-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+
+.ptl-main {
+  flex: 1;
+}
+
+.ptl-page > footer {
+  align-self: stretch;
+  width: 100%;
+}
+
+/* ── Hero ── */
+.ptl-hero {
+  position: relative;
+  min-height: 52vh;
+  padding-top: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+
+.ptl-hero__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  z-index: 0;
+}
+
+.ptl-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.28) 0%,
+    rgba(0, 0, 0, 0.48) 55%,
+    rgba(0, 0, 0, 0.74) 100%
+  );
+  z-index: 1;
+}
+
+.ptl-hero__content {
+  position: relative;
+  z-index: 2;
+  padding: 0 20px 56px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ptl-hero__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.ptl-hero__kicker {
+  display: inline-block;
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: rgba(0, 107, 50, 0.78);
+  padding: 5px 14px;
+  border-radius: 50px;
+  margin-bottom: 18px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(107, 207, 145, 0.3);
+}
+
+.ptl-hero__title {
+  font-family: "Nunito", sans-serif;
+  font-weight: 900;
+  font-size: clamp(38px, 6vw, 72px);
+  color: #ffffff;
+  line-height: 1.05;
+  margin: 0 0 16px;
+}
+
+.ptl-hero__subtitle {
+  font-family: "Inter", sans-serif;
+  font-size: clamp(14px, 1.8vw, 17px);
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.80);
+  margin: 0;
+  max-width: 540px;
+}
+
+/* ── Toolbar ── */
+.ptl-toolbar {
+  background: #ffffff;
+  border-bottom: 1px solid #e4ede8;
+  padding: 16px 20px;
+}
+
+.ptl-toolbar__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.ptl-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.ptl-filter-btn {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 18px;
+  border-radius: 50px;
+  border: 1.5px solid #c8ddd0;
+  background: #ffffff;
+  color: #4a5c51;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.ptl-filter-btn:hover:not(.is-active) {
+  background: #f0f7f3;
+  border-color: #006b32;
+  color: #006b32;
+}
+
+.ptl-filter-btn.is-active {
+  background: #003016;
+  border-color: #003016;
+  color: #ffffff;
+}
+
+/* Search */
+.ptl-search {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.ptl-search__label {
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a9080;
+}
+
+.ptl-search__wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ptl-search__icon {
+  position: absolute;
+  left: 12px;
+  font-size: 18px;
+  color: #7a9080;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 20;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ptl-search__input {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  color: #00210c;
+  background: #f4f9f6;
+  border: 1.5px solid #d4eadb;
+  border-radius: 50px;
+  padding: 8px 16px 8px 40px;
+  width: 220px;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.ptl-search__input:focus {
+  border-color: #006b32;
+  background: #ffffff;
+}
+
+.ptl-search__input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+/* ── Cards section ── */
+.ptl-section {
+  background: #f0f7f3;
+  padding: clamp(32px, 4vw, 56px) 20px;
+}
+
+.ptl-section__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Override 4-col to 3-col for the listing page */
+.ptl-cards-override ul {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+/* ── Empty state ── */
+.ptl-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 72px 20px;
+  text-align: center;
+}
+
+.ptl-empty__icon {
+  font-size: 56px;
+  color: #c8ddd0;
+  font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 48;
+}
+
+.ptl-empty__msg {
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  color: #7a9080;
+  margin: 0;
+}
+
+.ptl-empty__reset {
+  font-family: "Nunito", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 28px;
+  background: #003016;
+  color: #ffffff;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.ptl-empty__reset:hover {
+  background: #006b32;
+}
+
+/* ── CTA section ── */
+.ptl-cta {
+  background: #003016;
+  padding: clamp(48px, 6vw, 80px) 20px;
+}
+
+.ptl-cta__inner {
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.ptl-cta__title {
+  font-family: "Nunito", sans-serif;
+  font-weight: 900;
+  font-size: clamp(26px, 3.5vw, 42px);
+  color: #ffffff;
+  margin: 0 0 14px;
+  line-height: 1.15;
+}
+
+.ptl-cta__desc {
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.70);
+  margin: 0 0 32px;
+}
+
+.ptl-cta__btns {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ptl-cta__btn {
+  display: inline-flex;
+  align-items: center;
+  font-family: "Nunito", sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 13px 32px;
+  border-radius: 50px;
+  text-decoration: none;
+  border: 2px solid #ffffff;
+  background: #ffffff;
+  color: #003016;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.ptl-cta__btn:hover {
+  background: #d4eadb;
+  border-color: #d4eadb;
+  transform: translateY(-2px);
+}
+
+.ptl-cta__btn--outline {
+  background: transparent;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.ptl-cta__btn--outline:hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.80);
+  color: #ffffff;
+}
+
+/* ── Stats section ── */
+.ptl-stats {
+  background: #ffffff;
+  padding: clamp(36px, 4vw, 60px) 20px;
+  border-top: 1px solid #e4ede8;
+}
+
+.ptl-stats__inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  text-align: center;
+}
+
+.ptl-stat__value {
+  display: block;
+  font-family: "Nunito", sans-serif;
+  font-weight: 900;
+  font-size: clamp(34px, 4vw, 52px);
+  color: #006b32;
+  line-height: 1;
+}
+
+.ptl-stat__label {
+  display: block;
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #7a9080;
+  margin-top: 8px;
+}
+
+/* ── Responsive ── */
+@media only screen and (max-width: 1024px) {
+  .ptl-hero {
+    min-height: 56vh;
+    padding-top: 80px;
+  }
+
+  .ptl-cards-override ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .ptl-hero {
+    min-height: 50vh;
+    padding-top: 70px;
+  }
+
+  .ptl-toolbar__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .ptl-search {
+    width: 100%;
+  }
+
+  .ptl-search__wrap {
+    width: 100%;
+  }
+
+  .ptl-search__input {
+    width: 100%;
+  }
+
+  .ptl-cards-override ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px;
+  }
+
+  .ptl-stats__inner {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 16px;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .ptl-cards-override ul {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  .ptl-filters {
+    gap: 6px;
+  }
+
+  .ptl-filter-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+}

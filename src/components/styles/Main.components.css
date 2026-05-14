@@ -61,7 +61,7 @@ section.welcome h1#gold{
 
 @media screen and (max-width: 480px) {
     .main{
-        grid-template-rows: 110px auto 1fr;
+        grid-template-rows: 70px auto 1fr;
         width: 100%;
         padding: 0 0px;
     }
