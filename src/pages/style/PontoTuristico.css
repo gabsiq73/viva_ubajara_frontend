@@ -1,0 +1,538 @@
+/* ===== PÁGINA PONTO TURÍSTICO ===== */
+
+.pt-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+}
+
+.pt-main {
+    flex: 1;
+}
+
+/* O footer tem align-self:start no contexto do grid da Home.
+   Aqui (flex-column) isso o colapsaria para metade da largura. */
+.pt-page > footer {
+    align-self: stretch;
+    width: 100%;
+}
+
+/* ─── Hero ─── */
+.pt-hero {
+    position: relative;
+    min-height: 68vh;
+    padding-top: 110px; /* compensate fixed header height */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+}
+
+.pt-hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+}
+
+.pt-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.08) 0%,
+        rgba(0, 0, 0, 0.22) 38%,
+        rgba(0, 0, 0, 0.68) 75%,
+        rgba(0, 0, 0, 0.84) 100%
+    );
+    z-index: 1;
+}
+
+.pt-hero__content {
+    position: relative;
+    z-index: 2;
+    padding: 0 20px 72px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.pt-hero__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.pt-hero__tag {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(0, 107, 50, 0.82);
+    color: #ffffff;
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 50px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(107, 207, 145, 0.3);
+}
+
+.pt-hero__title {
+    font-family: "Nunito", sans-serif;
+    font-weight: 900;
+    font-size: clamp(34px, 5.5vw, 68px);
+    color: #ffffff;
+    line-height: 1.08;
+    margin: 0 0 18px;
+    max-width: 700px;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.pt-hero__subtitle {
+    font-family: "Inter", sans-serif;
+    font-size: clamp(14px, 1.8vw, 18px);
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    max-width: 560px;
+}
+
+/* Info bar */
+.pt-hero__infobar {
+    position: relative;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.48);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 16px 20px;
+}
+
+.pt-hero__infobar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.pt-hero__info-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.pt-hero__info-item .material-symbols-outlined {
+    font-size: 16px;
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 20;
+}
+
+.pt-hero__info-item--status {
+    color: #6bcf91;
+}
+
+.pt-hero__info-sep {
+    color: rgba(255, 255, 255, 0.22);
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+/* ─── Gallery ─── */
+.pt-gallery {
+    background: #f0f7f3;
+    padding: clamp(20px, 3vw, 36px) 20px;
+}
+
+.pt-gallery__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 16px;
+    /* no fixed height — aspect-ratio on main drives the row height */
+}
+
+.pt-gallery__main {
+    border-radius: 20px;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+}
+
+.pt-gallery__main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.55s ease;
+}
+
+.pt-gallery__main:hover img {
+    transform: scale(1.05);
+}
+
+/* secondary stretches to match main height via grid align-items:stretch */
+.pt-gallery__secondary {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pt-gallery__thumb {
+    flex: 1;
+    border-radius: 20px;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.pt-gallery__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.55s ease;
+}
+
+.pt-gallery__thumb:hover img {
+    transform: scale(1.06);
+}
+
+/* ─── Content + Planeje sua Visita ─── */
+.pt-content {
+    padding: clamp(36px, 5vw, 68px) 20px;
+    background: #ffffff;
+}
+
+.pt-content__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: clamp(40px, 5vw, 80px);
+    align-items: start;
+}
+
+.pt-content__kicker {
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #006b32;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.pt-content__title {
+    font-family: "Nunito", sans-serif;
+    font-weight: 900;
+    font-size: clamp(26px, 3vw, 40px);
+    color: #00210c;
+    line-height: 1.15;
+    margin: 0 0 28px;
+}
+
+.pt-content__p {
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #4a5c51;
+    margin: 0 0 16px;
+}
+
+.pt-content__p:last-of-type {
+    margin-bottom: 0;
+}
+
+.pt-content__stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid #e4ede8;
+    flex-wrap: wrap;
+}
+
+.pt-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.pt-stat__icon {
+    font-size: 26px;
+    color: #006b32;
+    font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24;
+    margin-bottom: 6px;
+}
+
+.pt-stat__value {
+    font-family: "Nunito", sans-serif;
+    font-weight: 900;
+    font-size: 30px;
+    color: #00210c;
+    line-height: 1;
+}
+
+.pt-stat__label {
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    color: #7a9080;
+    line-height: 1.3;
+    margin-top: 4px;
+}
+
+/* Visit card */
+.pt-visit-card {
+    background: #f0f7f3;
+    border-radius: 20px;
+    padding: clamp(24px, 3vw, 36px);
+    border: 1px solid #d4eadb;
+    position: sticky;
+    top: 120px;
+}
+
+.pt-visit-card__title {
+    font-family: "Nunito", sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: #00210c;
+    margin: 0 0 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #c8e2d0;
+}
+
+.pt-visit-card__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.pt-visit-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+}
+
+.pt-visit-item__icon {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #d4eadb;
+    color: #006b32;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+.pt-visit-item strong {
+    font-family: "Nunito", sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: #00210c;
+    display: block;
+    margin-bottom: 3px;
+    line-height: 1.3;
+}
+
+.pt-visit-item p {
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #5c6670;
+    margin: 0;
+}
+
+.pt-visit-card__cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 14px 28px;
+    margin-top: 28px;
+    background: #003016;
+    color: #ffffff;
+    font-family: "Nunito", sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    border-radius: 50px;
+    transition: background 0.2s ease, transform 0.2s ease;
+    box-sizing: border-box;
+}
+
+.pt-visit-card__cta:hover {
+    background: #006b32;
+    transform: translateY(-2px);
+}
+
+/* ─── Como Chegar ─── */
+.pt-how {
+    background: #f4f9f6;
+    padding: clamp(36px, 5vw, 68px) 20px;
+}
+
+.pt-how__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(40px, 5vw, 72px);
+    align-items: center;
+}
+
+.pt-how__title {
+    font-family: "Nunito", sans-serif;
+    font-weight: 900;
+    font-size: clamp(28px, 3.5vw, 44px);
+    color: #00210c;
+    margin: 0 0 16px;
+    line-height: 1.1;
+}
+
+.pt-how__desc {
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #4a5c51;
+    margin: 0 0 28px;
+}
+
+.pt-how__routes {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.pt-how__route-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    color: #3c4a42;
+}
+
+.pt-how__route-item .material-symbols-outlined {
+    font-size: 20px;
+    color: #006b32;
+    flex-shrink: 0;
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+.pt-how__maps-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #003016;
+    color: #ffffff;
+    font-family: "Nunito", sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 13px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.pt-how__maps-btn .material-symbols-outlined {
+    font-size: 18px;
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+.pt-how__maps-btn:hover {
+    background: #006b32;
+    transform: translateY(-2px);
+}
+
+.pt-how__right {
+    border-radius: 24px;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    box-shadow: 0 20px 60px rgba(0, 33, 12, 0.15);
+}
+
+.pt-how__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ─── Responsive ─── */
+@media only screen and (max-width: 1024px) {
+    .pt-content__inner {
+        grid-template-columns: 1fr;
+    }
+    .pt-visit-card {
+        position: static;
+        max-width: 560px;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .pt-hero {
+        padding-top: 90px; /* scrolled header height on mobile */
+    }
+    .pt-gallery__inner {
+        grid-template-columns: 1fr;
+    }
+    .pt-gallery__main {
+        aspect-ratio: 16 / 9;
+    }
+    .pt-gallery__secondary {
+        flex-direction: row;
+        height: 180px;
+    }
+    .pt-how__inner {
+        grid-template-columns: 1fr;
+    }
+    .pt-how__right {
+        aspect-ratio: 16 / 9;
+    }
+    .pt-hero__info-sep {
+        display: none;
+    }
+    .pt-hero__infobar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .pt-content__stats {
+        gap: 28px;
+    }
+    .pt-gallery__secondary {
+        flex-direction: column;
+        height: auto;
+    }
+    .pt-gallery__secondary .pt-gallery__thumb {
+        height: 160px;
+        flex: none;
+    }
+    .pt-hero__title {
+        font-size: clamp(28px, 8vw, 48px);
+    }
+}

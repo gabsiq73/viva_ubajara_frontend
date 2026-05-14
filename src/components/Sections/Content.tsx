@@ -2,14 +2,17 @@ import "./style/Content.components.css"
 import { Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 import paper from "./../../assets/images/paper.png"
-import cac from "./../../assets/images/cachoeira.png";
-import farm from "./../../assets/images/fazenda.png";
-import mercado from "./../../assets/images/mercado.png";
-import museum from "./../../assets/images/museu.png";
 import park from "./../../assets/images/parque.png";
 import route from "./../../assets/images/route.png";
 import food from "./../../assets/images/food.png";
 import { GastronomyCarousel, type GastronomySlide } from "./GastronomyCarousel";
+import { TOURIST_POINTS } from "../../data/touristPoints";
+
+// Re-import images still needed locally
+import cac from "./../../assets/images/cachoeira.png";
+import farm from "./../../assets/images/fazenda.png";
+import mercado from "./../../assets/images/mercado.png";
+import museum from "./../../assets/images/museu.png";
 
 const GASTRO_SLIDES: GastronomySlide[] = [
     { tag: "Cachaça Artesanal", src: food, alt: "Cachaça artesanal e produtos da roça" },
@@ -216,6 +219,22 @@ export default function Content(){
         return () => window.clearInterval(id);
     }, []);
 
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(({ target, isIntersecting }) => {
+                    if (isIntersecting) {
+                        target.classList.add("is-visible");
+                        observer.unobserve(target);
+                    }
+                });
+            },
+            { threshold: 0.1, rootMargin: "0px 0px -48px 0px" }
+        );
+        document.querySelectorAll(".reveal, .grid-reveal").forEach((el) => observer.observe(el));
+        return () => observer.disconnect();
+    }, []);
+
     return(
         <section className="section">
             <div className="paper">
@@ -296,7 +315,7 @@ export default function Content(){
                 </div>
                 <div className="point">
                     <div className="point-container">
-                        <div className="section-header">
+                        <div className="section-header reveal">
                             <div className="title-group">
                                 <span className="subtitle">Experiências Únicas</span>
                                 <h1>Pontos Turísticos</h1>
@@ -310,69 +329,35 @@ export default function Content(){
                             </div>
                         </div>
                         <div className="cards-points">
-                            <ul className="list-points">
-                                <li>
-                                    <div className="hover-overlay">
-                                        <Link to="/" className="saiba-mais-btn">Ver mais</Link>
-                                    </div>
-                                    <div className="type" style={{background: "#006B32"}}>
-                                        <span>Natureza</span>
-                                    </div>
-                                    <div className="imagem-tour">
-                                        <img src={cac} alt="Cachoeira do Frade" />
-                                    </div>
-                                    <div className="info-tour">
-                                        <h2>Cachoeira do Frade</h2>
-                                        <p>Uma queda d'água refrescante escondida entre paredões de rocha e mata atlântica.</p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div className="hover-overlay">
-                                        <Link to="/" className="saiba-mais-btn">Ver mais</Link>
-                                    </div>
-                                    <div className="type" style={{background: "#006B32"}}>
-                                        <span>Natureza</span>
-                                    </div>
-                                    <div className="imagem-tour">
-                                        <img src={farm} alt="Fazenda Santo Expedito" />
-                                    </div>
-                                    <div className="info-tour">
-                                        <h2>Fazenda Santo Expedito</h2>
-                                        <p>Um dos maiores polos de produção de rosas híbridas do Brasil e referência em turismo rural sustentável.</p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div className="hover-overlay">
-                                        <Link to="/" className="saiba-mais-btn">Ver mais</Link>
-                                    </div>
-                                    <div className="type" style={{background: "#C58B24"}}>
-                                        <span>Cultura</span>
-                                    </div>
-                                    <div className="imagem-tour">
-                                        <img src={mercado} alt="Mercado Público" />
-                                    </div>
-                                    <div className="info-tour">
-                                        <h2>Mercado Público</h2>
-                                        <p>O coração pulsante da cidade, onde você encontra o melhor artesanato e produtos locais.</p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div className="hover-overlay">
-                                        <Link to="/" className="saiba-mais-btn">Ver mais</Link>
-                                    </div>
-                                    <div className="type" style={{background: "#304FCD"}}>
-                                        <span>História</span>
-                                    </div>
-                                    <div className="imagem-tour">
-                                        <img src={museum} alt="Museu JK" />
-                                    </div>
-                                    <div className="info-tour">
-                                        <h2>Museu JK</h2>
-                                        <p>Um mergulho na história e memórias preservadas em um casarão de época restaurado.</p>
-                                    </div>
-                                </li>
+                            <ul className="list-points grid-reveal">
+                                {TOURIST_POINTS.map((pt) => (
+                                    <li key={pt.id}>
+                                        <Link to={`/pontos/${pt.id}`} className="point-card__link" aria-label={pt.title}>
+                                            <img src={pt.img} alt={pt.alt} className="point-card__img" />
+                                            <div className="point-card__gradient" />
+                                            <span className="point-card__tag" aria-hidden="true">{pt.category}</span>
+                                            <div className="point-card__body">
+                                                <h3 className="point-card__title">{pt.title}</h3>
+                                                <p className="point-card__desc">{pt.desc}</p>
+                                                <div className="point-card__meta">
+                                                    <span className="point-card__meta-item">
+                                                        <span className="material-symbols-outlined" aria-hidden="true">directions_walk</span>
+                                                        {pt.difficulty}
+                                                    </span>
+                                                    <span className="point-card__meta-item">
+                                                        <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
+                                                        {pt.duration}
+                                                    </span>
+                                                </div>
+                                                <span className="point-card__cta" aria-hidden="true">
+                                                    <span className="material-symbols-outlined" aria-hidden="true">visibility</span>
+                                                    Saiba mais
+                                                </span>
+                                            </div>
+                                        </Link>
+                                    </li>
+                                ))}
                             </ul>
-                        
                         </div>
                     </div>
                 </div>
@@ -439,7 +424,7 @@ export default function Content(){
 
                 <div className="pub-landing-blocks">
                     <section className="pub-guide" aria-labelledby="pub-guide-title">
-                        <header className="pub-guide__header">
+                        <header className="pub-guide__header reveal">
                             <h2 id="pub-guide-title" className="pub-guide__title">
                                 Guia de Estabelecimentos
                             </h2>
@@ -464,7 +449,7 @@ export default function Content(){
                                 </button>
                             ))}
                         </div>
-                        <div className="pub-guide__grid">
+                        <div className="pub-guide__grid reveal grid-reveal">
                             {PUB_GUIDE_ITEMS.filter(
                                 (it) => pubGuideFilter === "Todos" || it.category === pubGuideFilter
                             ).map((item) => (
@@ -502,7 +487,7 @@ export default function Content(){
                                 </article>
                             ))}
                         </div>
-                        <div className="pub-guide__footer">
+                        <div className="pub-guide__footer reveal">
                             <Link to="/" className="pub-guide__all">
                                 Ver todos os Estabelecimentos
                             </Link>
@@ -515,7 +500,7 @@ export default function Content(){
                     </section>
 
                     <section className="pub-events" aria-labelledby="pub-events-title">
-                        <header className="pub-events__header">
+                        <header className="pub-events__header reveal">
                             <div className="pub-events__head-left">
                                 <span className="pub-events__kicker">Experiências Inesquecíveis</span>
                                 <h2 id="pub-events-title" className="pub-events__title">
@@ -526,7 +511,7 @@ export default function Content(){
                                 Fique por dentro da programação cultural e festivais que movimentam a nossa serra.
                             </p>
                         </header>
-                        <div className="pub-events__grid">
+                        <div className="pub-events__grid reveal grid-reveal">
                             {PUB_EVENTS.map((ev) => (
                                 <article key={ev.id} className="pub-event-card">
                                     <div className="pub-event-card__media">
@@ -545,11 +530,15 @@ export default function Content(){
                                             </span>
                                             {ev.place}
                                         </div>
+                                        <Link to="/" className="pub-event-card__cta">
+                                            <span className="material-symbols-outlined" aria-hidden>calendar_month</span>
+                                            Ver evento
+                                        </Link>
                                     </div>
                                 </article>
                             ))}
                         </div>
-                        <div className="pub-events__footer">
+                        <div className="pub-events__footer reveal">
                             <Link to="/" className="pub-events__all">
                                 Ver todos os Eventos
                             </Link>
@@ -558,14 +547,14 @@ export default function Content(){
                     {/* Guias Turísticos */}
                     <section className="tour-guides" aria-labelledby="tour-guides-title">
                         <div className="tour-guides__inner">
-                            <header className="tour-guides__header">
+                            <header className="tour-guides__header reveal">
                                 <span className="tour-guides__kicker">Seu passeio em boas mãos</span>
                                 <h2 id="tour-guides-title" className="tour-guides__title">Nossos Guias Turísticos</h2>
                                 <p className="tour-guides__subtitle">
                                     Conheça os profissionais credenciados que vão transformar sua visita em uma experiência inesquecível.
                                 </p>
                             </header>
-                            <div className="tour-guides__grid">
+                            <div className="tour-guides__grid reveal grid-reveal">
                                 {TOUR_GUIDES.map((guide) => (
                                     <article key={guide.id} className="guide-card">
                                         <div className="guide-card__photo">
@@ -586,43 +575,68 @@ export default function Content(){
 
                 {/* Como Chegar */}
                 <section className="como-chegar" aria-labelledby="como-chegar-title">
-                    <div className="como-chegar__inner">
-                        <div className="como-chegar__left">
+                    <div className="como-chegar__banner" style={{ backgroundImage: `url(${park})` }}>
+                        <div className="como-chegar__banner-inner">
                             <span className="como-chegar__kicker">Planejando sua visita</span>
                             <h2 id="como-chegar-title" className="como-chegar__title">Como Chegar</h2>
                             <p className="como-chegar__desc">
-                                Ubajara está estrategicamente localizada na Serra da Ibiapaba, acessível por diversas rotas aéreas e terrestres. Escolha o seu ponto de partida e venha viver essa experiência.
+                                Ubajara fica na Serra da Ibiapaba, acessível por diversas rotas aéreas e terrestres.
+                                Escolha seu ponto de partida e venha viver essa experiência única.
                             </p>
-                            <ul className="como-chegar__list">
-                                <li className="como-chegar__item">
-                                    <div className="como-chegar__item-icon">
+                        </div>
+                    </div>
+                    <div className="como-chegar__body">
+                        <div className="como-chegar__body-inner">
+                            <div className="como-chegar__transport reveal grid-reveal">
+                                <div className="transport-card transport-card--air">
+                                    <div className="transport-card__icon-wrap">
+                                        <span className="material-symbols-outlined" aria-hidden="true">flight</span>
+                                    </div>
+                                    <div className="transport-card__content">
+                                        <h3 className="transport-card__title">De Avião</h3>
+                                        <p className="transport-card__desc">Voe para os aeroportos mais próximos e complete a viagem por terra em menos de 3 horas de carro.</p>
+                                    </div>
+                                    <span className="transport-card__badge">A partir de 165 km</span>
+                                </div>
+                                <div className="transport-card transport-card--bus">
+                                    <div className="transport-card__icon-wrap">
                                         <span className="material-symbols-outlined" aria-hidden="true">directions_bus</span>
                                     </div>
-                                    <div className="como-chegar__item-text">
-                                        <strong>Via Rodoviária</strong>
-                                        <span>Acesso principal pela BR-222, com estradas asfaltadas e sinalizadas.</span>
+                                    <div className="transport-card__content">
+                                        <h3 className="transport-card__title">De Ônibus</h3>
+                                        <p className="transport-card__desc">Linhas regulares com saída de Fortaleza, Teresina e outras cidades da região.</p>
                                     </div>
-                                </li>
-                                <li className="como-chegar__item">
-                                    <div className="como-chegar__item-icon">
-                                        <span className="material-symbols-outlined" aria-hidden="true">map</span>
-                                    </div>
-                                    <div className="como-chegar__item-text">
-                                        <strong>Localização Digital</strong>
-                                        <span>Encontre-nos facilmente em todos os aplicativos de navegação.</span>
-                                    </div>
-                                </li>
-                            </ul>
-                            <Link to="/" className="como-chegar__cta">Encontrar Rotas</Link>
-                        </div>
-                        <div className="como-chegar__airports">
-                            {AIRPORTS.map((ap) => (
-                                <div key={ap.code} className="airport-card">
-                                    <span className="airport-card__code">{ap.code}</span>
-                                    <p className="airport-card__name">{ap.name}</p>
-                                    <p className="airport-card__dist">{ap.dist}</p>
+                                    <span className="transport-card__badge">~6h de Fortaleza</span>
                                 </div>
-                            ))}
+                                <div className="transport-card transport-card--car">
+                                    <div className="transport-card__icon-wrap">
+                                        <span className="material-symbols-outlined" aria-hidden="true">directions_car</span>
+                                    </div>
+                                    <div className="transport-card__content">
+                                        <h3 className="transport-card__title">De Carro</h3>
+                                        <p className="transport-card__desc">Pela BR-222 e CE-187. Estrada totalmente asfaltada, sinalizada e com belas paisagens da serra.</p>
+                                    </div>
+                                    <span className="transport-card__badge">~5h de Fortaleza</span>
+                                </div>
+                            </div>
+                            <div className="como-chegar__airports-section">
+                                <h3 className="como-chegar__airports-title reveal">Aeroportos mais próximos</h3>
+                                <div className="como-chegar__airports reveal grid-reveal">
+                                    {AIRPORTS.map((ap) => (
+                                        <div key={ap.code} className="airport-card">
+                                            <span className="airport-card__code">{ap.code}</span>
+                                            <p className="airport-card__name">{ap.name}</p>
+                                            <p className="airport-card__dist">{ap.dist}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="como-chegar__cta-row reveal">
+                                <Link to="/" className="como-chegar__cta">
+                                    <span className="material-symbols-outlined" aria-hidden="true">map</span>
+                                    Encontrar Rotas
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -635,10 +649,10 @@ export default function Content(){
                     </div>
                     <section className="reviews" aria-labelledby="reviews-title">
                         <div className="reviews__inner">
-                            <span className="reviews__kicker">Quem já visitou recomenda</span>
-                            <h2 id="reviews-title" className="reviews__title">O que dizem os visitantes</h2>
-                            <p className="reviews__subtitle">Experiências reais de quem já se encantou com as belezas de Ubajara.</p>
-                            <div className="reviews__grid">
+                            <span className="reviews__kicker reveal">Quem já visitou recomenda</span>
+                            <h2 id="reviews-title" className="reviews__title reveal">O que dizem os visitantes</h2>
+                            <p className="reviews__subtitle reveal">Experiências reais de quem já se encantou com as belezas de Ubajara.</p>
+                            <div className="reviews__grid reveal grid-reveal">
                                 {REVIEWS.map((r) => (
                                     <article key={r.id} className="review-card">
                                         <div className="review-card__stars" aria-label={`${r.stars} de 5 estrelas`}>
@@ -655,7 +669,7 @@ export default function Content(){
                                     </article>
                                 ))}
                             </div>
-                            <div className="reviews__footer">
+                            <div className="reviews__footer reveal">
                                 <Link to="/" className="reviews__all">Ver todos os depoimentos</Link>
                             </div>
                         </div>
@@ -669,8 +683,8 @@ export default function Content(){
                 {/* Dúvidas Frequentes */}
                 <section className="faq" aria-labelledby="faq-title">
                     <div className="faq__inner">
-                        <h2 id="faq-title" className="faq__title">Dúvidas Frequentes</h2>
-                        <div className="faq__list">
+                        <h2 id="faq-title" className="faq__title reveal">Dúvidas Frequentes</h2>
+                        <div className="faq__list reveal grid-reveal">
                             {FAQ_ITEMS.map((item) => (
                                 <div
                                     key={item.id}
@@ -705,7 +719,7 @@ export default function Content(){
                 {/* Fale Conosco */}
                 <section className="contact-section" aria-labelledby="contact-title">
                     <div className="contact-section__inner">
-                        <div className="contact-section__left">
+                        <div className="contact-section__left reveal">
                             <span className="contact-section__kicker">Fale com a gente</span>
                             <h2 id="contact-title" className="contact-section__title">Fale Conosco</h2>
                             <p className="contact-section__desc">
@@ -735,7 +749,7 @@ export default function Content(){
                                 </li>
                             </ul>
                         </div>
-                        <div className="contact-section__form-wrap">
+                        <div className="contact-section__form-wrap reveal">
                             <form className="contact-section__form" onSubmit={(e) => e.preventDefault()}>
                                 <div className="contact-section__field">
                                     <label htmlFor="cf-name" className="contact-section__label">Nome Completo</label>

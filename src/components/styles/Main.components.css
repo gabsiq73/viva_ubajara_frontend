@@ -19,6 +19,8 @@ section.welcome{
     justify-content: center;
     align-items: center;
     width: 100%;
+    user-select: none;
+    -webkit-user-select: none;
 }
 section.welcome h3{
     font-size: 24px;
