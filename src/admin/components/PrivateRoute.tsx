@@ -7,26 +7,21 @@ interface PrivateRouteProps {
 }
 
 /**
- * Protege rotas admin.
- * Exige simultaneamente:
- *  1. usuário autenticado (token válido)
- *  2. role ADMIN
- *
- * Qualquer falha redireciona para /admin/login.
+ * Protege rotas do painel admin.
+ * - Não autenticado → /admin/login
+ * - Autenticado mas sem role ADMIN → /dashboard
+ * - ADMIN → renderiza normalmente
  */
 export function PrivateRoute({ children }: PrivateRouteProps) {
-  const { isAuthenticated, isAdmin, user, token } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
   const location = useLocation();
 
-  if (!isAuthenticated || !isAdmin) {
-    console.warn('[PrivateRoute] Acesso negado! Bloqueando entrada e enviando para o Login.', {
-      isAuthenticated,
-      isAdmin,
-      roleLocal: user?.role,
-      hasToken: !!token,
-      path: location.pathname
-    });
+  if (!isAuthenticated) {
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;

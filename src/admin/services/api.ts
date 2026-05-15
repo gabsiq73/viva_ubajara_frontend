@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { isTokenExpired } from './jwtUtils';
 
 export const BASE_URL = 'https://parque-ubajara-api.onrender.com/api/v1';
 
@@ -17,15 +18,11 @@ const api = axios.create({
   },
 });
 
-// Interceptor de request: injeta o token JWT automaticamente
+// Interceptor de request: injeta o token JWT se válido
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(TOKEN_KEY);
-    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
-      hasToken: !!token,
-      tokenPreview: token ? `${token.substring(0, 10)}...` : 'NONE'
-    });
-    if (token && token !== 'undefined' && token !== 'null') {
+    if (token && !isTokenExpired(token)) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;

@@ -1,4 +1,5 @@
 import { useState, useRef, type DragEvent, type ChangeEvent } from 'react';
+import { ImagePlus } from 'lucide-react';
 import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
 import { Spinner } from '../components/Spinner';
@@ -75,15 +76,21 @@ export function PhotosPage() {
           onDrop={handleDrop}
           onClick={() => inputRef.current?.click()}
         >
-          <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={(e: ChangeEvent<HTMLInputElement>) => handleFiles(e.target.files)} />
-          {uploading
-            ? <><Spinner size="lg" /><p style={{ marginTop: 12 }}>Enviando…</p></>
-            : <>
-                <span className="adm-upload-zone__icon">☁️</span>
-                <p>Arraste imagens aqui ou clique para selecionar</p>
-                <p style={{ fontSize: 12, marginTop: 6, color: 'var(--adm-text-dim)' }}>JPEG, PNG, WEBP — máximo 5MB por arquivo</p>
-              </>
-          }
+          <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple style={{ display: 'none' }} onChange={(e: ChangeEvent<HTMLInputElement>) => handleFiles(e.target.files)} />
+          {uploading ? (
+            <>
+              <Spinner size="lg" />
+              <p>Enviando…</p>
+            </>
+          ) : (
+            <>
+              <div className="adm-upload-zone__icon-wrap">
+                <ImagePlus size={28} />
+              </div>
+              <p>Arraste imagens aqui ou clique para selecionar</p>
+              <p className="adm-upload-zone__hint">JPEG, PNG, WEBP — máximo 5MB por arquivo</p>
+            </>
+          )}
         </div>
       </div>
 

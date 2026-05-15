@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from '../components/Sidebar';
 import { TopBar } from '../components/TopBar';
@@ -19,11 +20,13 @@ export function AdminLayout() {
   const base = '/' + pathname.split('/').slice(1, 3).join('/');
   const title = PAGE_TITLES[base] ?? 'Admin';
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
-    <div className="adm-root">
-      <Sidebar />
-      <TopBar title={title} />
-      <main className="adm-main">
+    <div className={`adm-root${sidebarOpen ? ' sidebar-open' : ''}`}>
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <TopBar title={title} onMenuToggle={() => setSidebarOpen((v) => !v)} />
+      <main className="adm-main" onClick={() => sidebarOpen && setSidebarOpen(false)}>
         <Outlet />
       </main>
     </div>

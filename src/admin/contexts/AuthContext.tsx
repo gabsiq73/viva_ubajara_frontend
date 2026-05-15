@@ -1,20 +1,22 @@
 import React, { createContext, useState, useCallback, useEffect } from 'react';
 import { authService } from '../services/authService';
+import { socialAuthService } from '../services/socialAuthService';
 import { TOKEN_KEY, USER_KEY, FORBIDDEN_EVENT, UNAUTHORIZED_EVENT } from '../services/api';
+import { isTokenExpired, secondsUntilExpiry } from '../services/jwtUtils';
 import type { AuthResponse, LoginRequest, UserRequest } from '../types';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-type AdminRole = 'ADMIN';
-type UserRole = 'USER';
-type Role = AdminRole | UserRole;
+type Role = 'ADMIN' | 'USER' | 'GUIDE';
 
 interface StoredUser {
   email: string;
   role: Role;
+  name?: string;
+  photo?: string;
 }
 
-/** Erro lançado quando usuário autenticado não é ADMIN */
+/** Mantido para compatibilidade — não é mais lançado internamente */
 export class UnauthorizedRoleError extends Error {
   constructor() {
     super('Acesso restrito a administradores.');
@@ -30,34 +32,21 @@ interface AuthContextData {
   isLoading: boolean;
   login: (data: LoginRequest) => Promise<void>;
   register: (data: UserRequest) => Promise<void>;
+  loginWithGoogle: (accessToken: string) => Promise<void>;
+  loginWithGitHub: (code: string) => Promise<void>;
   logout: () => void;
   applyAuthResponse: (response: AuthResponse) => void;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/**
- * Verifica se a role retornada pela API é de administrador.
- * Lida com String, Array de roles ou Objeto de autoridade do Spring.
- */
 function isAdminRole(role: any): boolean {
   if (!role) return false;
-
-  // Caso 1: Array de roles (comum no Spring)
-  if (Array.isArray(role)) {
-    return role.some((r) => isAdminRole(r));
-  }
-
-  // Caso 2: Objeto de autoridade { authority: 'ROLE_...' }
-  if (typeof role === 'object' && role.authority) {
-    return isAdminRole(role.authority);
-  }
-
-  // Caso 3: String simples
+  if (Array.isArray(role)) return role.some((r) => isAdminRole(r));
+  if (typeof role === 'object' && role.authority) return isAdminRole(role.authority);
   const r = String(role).toUpperCase();
   return r === 'ADMIN' || r === 'ROLE_ADMIN' || r === 'ROOT' || r === 'ROLE_ROOT' || r.includes('ADMIN');
 }
-
 
 function clearStorage() {
   localStorage.removeItem(TOKEN_KEY);
@@ -86,65 +75,71 @@ function loadUserFromStorage(): StoredUser | null {
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
+  const [token, setToken] = useState<string | null>(() => {
+    const t = localStorage.getItem(TOKEN_KEY);
+    if (isTokenExpired(t)) { clearStorage(); return null; }
+    return t;
+  });
   const [user, setUser] = useState<StoredUser | null>(() => {
-    const stored = loadUserFromStorage();
-    if (stored && !isAdminRole(stored.role)) {
-      console.warn('[Auth] Usuário no storage não é ADMIN, limpando...');
-      clearStorage();
-      return null;
-    }
-    return stored;
+    const t = localStorage.getItem(TOKEN_KEY);
+    if (isTokenExpired(t)) return null;
+    return loadUserFromStorage();
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  // ─── Ação privada: aplica o resultado de autenticação com validação de role ──
+  // ─── Aplica a resposta da API (aceita qualquer role) ──────────────────────
   const applyAuthResponse = useCallback((response: AuthResponse) => {
-    console.log('[Auth] Validando resposta da API:', {
+    const r = String(response.role ?? '').toUpperCase();
+    const resolvedRole: Role = isAdminRole(response.role) ? 'ADMIN' : r === 'GUIDE' ? 'GUIDE' : 'USER';
+    const userInfo: StoredUser = {
       email: response.email,
-      role: response.role,
-      tokenPresent: !!response.token
-    });
-
-    if (!isAdminRole(response.role)) {
-      console.error('[Auth] Acesso negado: Role insuficiente.', response.role);
-      clearStorage();
-      throw new UnauthorizedRoleError();
-    }
-
-    // Padroniza a role para 'ADMIN' no estado interno
-    const userInfo: StoredUser = { 
-      email: response.email, 
-      role: 'ADMIN' 
+      role: resolvedRole,
+      name: response.name,
+      photo: response.photo,
     };
-
     saveToStorage(response.token, userInfo);
     setToken(response.token);
     setUser(userInfo);
-    console.log('[Auth] Login realizado com sucesso como ADMIN.');
   }, []);
 
-  // ─── Login ────────────────────────────────────────────────────────────────
+  // ─── Login com email/senha ────────────────────────────────────────────────
   const login = useCallback(async (data: LoginRequest) => {
     setIsLoading(true);
-    console.log('[Auth] Tentando login para:', data.email);
     try {
       const response = await authService.login(data);
       applyAuthResponse(response);
-    } catch (err) {
-      console.error('[Auth] Erro na requisição de login:', err);
-      throw err;
     } finally {
       setIsLoading(false);
     }
   }, [applyAuthResponse]);
 
-
-  // ─── Register (cria conta e loga) ────────────────────────────────────────
+  // ─── Registro ────────────────────────────────────────────────────────────
   const register = useCallback(async (data: UserRequest) => {
     setIsLoading(true);
     try {
       const response = await authService.register(data);
+      applyAuthResponse(response);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [applyAuthResponse]);
+
+  // ─── Login com Google ─────────────────────────────────────────────────────
+  const loginWithGoogle = useCallback(async (accessToken: string) => {
+    setIsLoading(true);
+    try {
+      const response = await socialAuthService.loginWithGoogle(accessToken);
+      applyAuthResponse(response);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [applyAuthResponse]);
+
+  // ─── Login com GitHub ─────────────────────────────────────────────────────
+  const loginWithGitHub = useCallback(async (code: string) => {
+    setIsLoading(true);
+    try {
+      const response = await socialAuthService.loginWithGitHub(code);
       applyAuthResponse(response);
     } finally {
       setIsLoading(false);
@@ -158,18 +153,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   }, []);
 
-  // ─── Escuta eventos 403 e 401 do interceptor Axios ───────────────────────
+  // ─── Intercepta 401 e 403 do Axios ───────────────────────────────────────
   useEffect(() => {
     const handle403 = (e: Event) => {
       const msg = (e as CustomEvent<string>).detail;
-      // Re-emite como evento de toast para o ToastProvider capturar
       window.dispatchEvent(new CustomEvent('adm:toast', {
         detail: { message: msg, type: 'error' },
       }));
     };
 
     const handle401 = () => {
-      console.warn('[Auth] Recebido 401 Unauthorized. O token foi rejeitado pelo servidor ou expirou.');
       clearStorage();
       setToken(null);
       setUser(null);
@@ -177,22 +170,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener(FORBIDDEN_EVENT, handle403);
     window.addEventListener(UNAUTHORIZED_EVENT, handle401);
-    
+
     return () => {
       window.removeEventListener(FORBIDDEN_EVENT, handle403);
       window.removeEventListener(UNAUTHORIZED_EVENT, handle401);
     };
   }, []);
 
+  // ─── Auto-logout quando o JWT expirar ────────────────────────────────────
+  useEffect(() => {
+    if (!token) return;
+    const secs = secondsUntilExpiry(token);
+    if (secs <= 0) { logout(); return; }
+    const timer = setTimeout(() => {
+      clearStorage();
+      setToken(null);
+      setUser(null);
+    }, secs * 1000);
+    return () => clearTimeout(timer);
+  }, [token, logout]);
+
   // ─── Sincronização entre abas ─────────────────────────────────────────────
   useEffect(() => {
     const handler = () => {
       const t = localStorage.getItem(TOKEN_KEY);
       const u = loadUserFromStorage();
-
-      // Se o token sumiu ou o user não é mais ADMIN em outra aba → desloga aqui também
-      if (!t || !u || !isAdminRole(u.role)) {
-        clearStorage();
+      if (!t || !u) {
         setToken(null);
         setUser(null);
       } else {
@@ -205,17 +208,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const isAdmin = !!user && isAdminRole(user.role);
+  const isAuthenticated = !!token && !!user;
 
   return (
     <AuthContext.Provider
       value={{
         token,
         user,
-        isAuthenticated: !!token && isAdmin, // token sozinho não basta
+        isAuthenticated,
         isAdmin,
         isLoading,
         login,
         register,
+        loginWithGoogle,
+        loginWithGitHub,
         logout,
         applyAuthResponse,
       }}

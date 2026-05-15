@@ -1,0 +1,127 @@
+/* ── Dashboard placeholder page ── */
+
+.dash-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-page > footer {
+  align-self: stretch;
+  width: 100%;
+  margin-top: auto;
+}
+
+.dash-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  background: #f5f7f6;
+}
+
+.dash-hero {
+  text-align: center;
+  max-width: 640px;
+  width: 100%;
+}
+
+.dash-badge {
+  display: inline-block;
+  background: #eef5f1;
+  color: #153a27;
+  border: 1px solid #b8d8c4;
+  border-radius: 24px;
+  padding: 6px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 28px;
+}
+
+.dash-title {
+  font-family: 'Merriweather', serif;
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 700;
+  color: #153a27;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.dash-desc {
+  font-size: 17px;
+  color: #64748b;
+  line-height: 1.75;
+  margin-bottom: 48px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dash-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 48px;
+}
+
+.dash-feature {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.dash-feature .material-symbols-outlined {
+  font-size: 32px;
+  color: #153a27;
+  font-variation-settings: 'FILL' 1;
+}
+
+.dash-feature strong {
+  font-size: 15px;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.dash-feature p {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.dash-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #153a27;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.dash-cta:hover {
+  background: #1e5237;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .dash-features {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-main {
+    padding: 60px 20px;
+  }
+}

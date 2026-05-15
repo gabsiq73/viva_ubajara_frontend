@@ -29,10 +29,14 @@ export interface UserRequest {
   password: string;
 }
 
+export type UserRole = 'ADMIN' | 'USER' | 'GUIDE';
+
 export interface AuthResponse {
   token: string;
   email: string;
-  role: 'ADMIN' | 'USER';
+  role: UserRole;
+  name?: string;
+  photo?: string;
 }
 
 export interface UserResponse {
@@ -41,7 +45,7 @@ export interface UserResponse {
   lastName: string;
   username: string;
   email: string;
-  role: 'ADMIN' | 'USER';
+  role: UserRole;
 }
 
 // ============================================================

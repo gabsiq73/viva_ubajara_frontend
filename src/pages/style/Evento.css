@@ -101,7 +101,7 @@
 .evd-hero__content {
     position: relative;
     z-index: 2;
-    padding: 0 20px 56px;
+    padding-bottom: 56px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -109,6 +109,7 @@
 .evd-hero__inner {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
 }
 
 .evd-hero__cat {

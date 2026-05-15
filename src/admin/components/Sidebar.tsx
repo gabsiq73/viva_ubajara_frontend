@@ -10,35 +10,35 @@ import {
   Phone,
   Image,
   LogOut,
-  Leaf
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import logo from '../../assets/images/logo.webp';
 
 const NAV_ITEMS = [
-  { to: '/admin/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} />, section: 'Geral' },
-  { to: '/admin/attractions', label: 'Atrações', icon: <Mountain size={18} />, section: 'Conteúdo' },
-  { to: '/admin/tourist-spots', label: 'Pontos Turísticos', icon: <MapPin size={18} />, section: null },
-  { to: '/admin/events', label: 'Eventos', icon: <Calendar size={18} />, section: null },
-  { to: '/admin/restaurants', label: 'Restaurantes', icon: <Utensils size={18} />, section: null },
-  { to: '/admin/host-points', label: 'Hospedagem', icon: <Hotel size={18} />, section: null },
-  { to: '/admin/tour-guides', label: 'Guias Turísticos', icon: <Compass size={18} />, section: null },
-  { to: '/admin/contacts', label: 'Contatos', icon: <Phone size={18} />, section: null },
-  { to: '/admin/photos', label: 'Fotos', icon: <Image size={18} />, section: 'Mídia' },
+  { to: '/admin/dashboard',    label: 'Dashboard',          icon: <LayoutDashboard size={18} />, section: 'Geral' },
+  { to: '/admin/attractions',  label: 'Atrações',           icon: <Mountain size={18} />,        section: 'Conteúdo' },
+  { to: '/admin/tourist-spots',label: 'Pontos Turísticos',  icon: <MapPin size={18} />,          section: null },
+  { to: '/admin/events',       label: 'Eventos',            icon: <Calendar size={18} />,        section: null },
+  { to: '/admin/restaurants',  label: 'Restaurantes',       icon: <Utensils size={18} />,        section: null },
+  { to: '/admin/host-points',  label: 'Hospedagem',         icon: <Hotel size={18} />,           section: null },
+  { to: '/admin/tour-guides',  label: 'Guias Turísticos',   icon: <Compass size={18} />,         section: null },
+  { to: '/admin/contacts',     label: 'Contatos',           icon: <Phone size={18} />,           section: null },
+  { to: '/admin/photos',       label: 'Fotos',              icon: <Image size={18} />,           section: 'Mídia' },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { user, logout } = useAuth();
 
   return (
-    <aside className="adm-sidebar">
+    <aside className={`adm-sidebar${isOpen ? ' open' : ''}`}>
       <div className="adm-sidebar__logo">
-        <div className="adm-sidebar__logo-icon">
-          <Leaf size={20} fill="currentColor" />
-        </div>
-        <div>
-          <div className="adm-sidebar__logo-text">Parque Ubajara</div>
-          <div className="adm-sidebar__logo-sub">Painel Administrativo</div>
-        </div>
+        <img src={logo} alt="Parque Nacional de Ubajara" className="adm-sidebar__logo-img" />
+        <div className="adm-sidebar__logo-sub">Painel Administrativo</div>
       </div>
 
       <nav className="adm-sidebar__nav">
@@ -52,6 +52,7 @@ export function Sidebar() {
               className={({ isActive }) =>
                 `adm-sidebar__link${isActive ? ' active' : ''}`
               }
+              onClick={onClose}
             >
               <span className="icon">{item.icon}</span>
               {item.label}
@@ -70,7 +71,7 @@ export function Sidebar() {
           Sair do Sistema
         </button>
         {user && (
-          <div style={{ padding: '8px 24px', fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>
+          <div style={{ padding: '8px 24px', fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
             {user.email}
           </div>
         )}

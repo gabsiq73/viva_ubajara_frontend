@@ -55,7 +55,7 @@
 .pt-hero__content {
     position: relative;
     z-index: 2;
-    padding: 0 20px 72px;
+    padding-bottom: 72px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -63,6 +63,7 @@
 .pt-hero__inner {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
 }
 
 .pt-hero__tag {

@@ -22,9 +22,6 @@
     box-shadow: 0 2px 15px rgba(0,0,0,0.4);
     backdrop-filter: blur(10px);
 }
-.header.scrolled .header-container {
-    padding: 0; /* Ajuste fino no scroll */
-}
 /* Individual max-widths removed to let the container handle it */
 .header-container {
     display: flex;
@@ -269,6 +266,197 @@ label input[type=checkbox]{
     .mobile-contact-btn, label#check {
         display: none;
     }
+}
+
+/* ── Auth widget (desktop) ── */
+
+/* Botão LOGIN (deslogado) */
+.header-login-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #ffffff;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 0;
+    background: none;
+    border: none;
+    letter-spacing: 0.8px;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.header-login-btn:hover {
+    opacity: 0.75;
+}
+
+/* Container logado */
+.header-auth {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Botão coração — favoritos */
+.header-favorites {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s;
+    padding: 0;
+}
+.header-favorites:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #FFB527;
+}
+
+/* Botão avatar */
+.header-user-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.header-user-btn__avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #FFB527;
+    color: #153a27;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    transition: border-color 0.2s;
+    flex-shrink: 0;
+}
+.header-user-btn__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.header-user-btn:hover .header-user-btn__avatar {
+    border-color: #ffffff;
+}
+
+/* Ponto verde online */
+.header-user-btn__dot {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    width: 10px;
+    height: 10px;
+    background: #22c55e;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+}
+
+/* Dropdown */
+.header-user__dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+    min-width: 220px;
+    padding: 12px;
+    z-index: 10010;
+    animation: dropdown-in 0.15s ease;
+}
+@keyframes dropdown-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.header-user__dropdown-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 4px 12px;
+}
+.header-user__dropdown-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #FFB527;
+    color: #153a27;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.header-user__dropdown-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.header-user__dropdown-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+}
+.header-user__dropdown-info strong {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.header-user__dropdown-info span {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #6b7280;
+}
+.header-user__dropdown-divider {
+    height: 1px;
+    background: #f3f4f6;
+    margin: 0 -12px;
+}
+.header-user__dropdown-logout {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px 8px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #ef4444;
+    transition: background 0.15s;
+}
+.header-user__dropdown-logout:hover {
+    background: #fef2f2;
 }
 
 @media screen and (max-width: 480px) {

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 import paper from "./../../assets/images/paper.png"
 import park from "./../../assets/images/parque.png";
-import route from "./../../assets/images/route.png";
 import food from "./../../assets/images/food.png";
 import { GastronomyCarousel, type GastronomySlide } from "./GastronomyCarousel";
 import { TOURIST_POINTS } from "../../data/touristPoints";
@@ -375,7 +374,7 @@ export default function Content(){
                             </div>
 
                             <div className="restaurant">
-                                <Link to="/estabelecimentos">Ver Restaurantes</Link>
+                                <Link to="/estabelecimentos?tipo=Restaurante">Ver Restaurantes</Link>
                             </div>
                         </div>
                         </div>
@@ -605,7 +604,7 @@ export default function Content(){
                                 </div>
                             </div>
                             <div className="como-chegar__cta-row reveal">
-                                <Link to="/" className="como-chegar__cta">
+                                <Link to="/como-chegar" className="como-chegar__cta">
                                     <span className="material-symbols-outlined" aria-hidden="true">map</span>
                                     Encontrar Rotas
                                 </Link>
@@ -643,7 +642,7 @@ export default function Content(){
                                 ))}
                             </div>
                             <div className="reviews__footer reveal">
-                                <Link to="/" className="reviews__all">Ver todos os depoimentos</Link>
+                                <Link to="/depoimentos" className="reviews__all">Ver todos os depoimentos</Link>
                             </div>
                         </div>
                     </section>

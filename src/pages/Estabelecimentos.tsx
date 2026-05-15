@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { ESTABLISHMENTS } from "../data/establishments";
@@ -36,8 +36,11 @@ function StarRow({ count }: { count: number }) {
 }
 
 export default function Estabelecimentos() {
+    const [searchParams] = useSearchParams();
+    const initialType = searchParams.get("tipo") ?? ALL_TYPES;
+
     const [search, setSearch] = useState("");
-    const [activeType, setActiveType] = useState(ALL_TYPES);
+    const [activeType, setActiveType] = useState(initialType);
     const [minStars, setMinStars] = useState(0);
     const [activeCity, setActiveCity] = useState(ALL_CITIES);
     const [sort, setSort] = useState<"relevance" | "stars" | "name">("relevance");
