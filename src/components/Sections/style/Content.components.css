@@ -7,13 +7,11 @@ body {
     overflow-x: hidden;
 }
 
-/* ── Tokens de tipografia de seção ── */
 :root {
     --kicker-size: clamp(22px, 2.4vw, 28px);
     --section-title-size: clamp(26px, 3vw, 38px);
 }
 
-/* ===== ANIMAÇÃO DE ENTRADA (compartilhada) ===== */
 @keyframes slideUpFade {
     from {
         opacity: 0;
@@ -26,7 +24,6 @@ body {
     }
 }
 
-/* ===== REVEAL AO ROLAR ===== */
 .reveal {
     opacity: 0;
     transform: translateY(28px);
@@ -39,12 +36,10 @@ body {
     transform: translateY(0);
 }
 
-/* Typed delays for paired header elements */
 .reviews__title.reveal    { transition-delay: 0.07s; }
 .reviews__subtitle.reveal { transition-delay: 0.14s; }
 .contact-section__form-wrap.reveal { transition-delay: 0.12s; }
 
-/* Grid: children start hidden, stagger in when parent gets .is-visible */
 .grid-reveal > * {
     opacity: 0;
     transform: translateY(28px);
@@ -68,7 +63,6 @@ body {
 }
 
 section.section {
-    grid-row: 3;
     width: 100%;
     max-width: 100%;
     padding: 10px;
@@ -77,7 +71,6 @@ section.section {
     box-sizing: border-box;
 }
 
-/* Bleed da “folha” alinhado ao padding da section (evita 100vw + deslocamento no mobile) */
 div.paper {
     width: calc(100% + 20px);
     margin-left: -10px;
@@ -156,156 +149,112 @@ ul.list-cards {
     list-style: none;
     max-width: 1200px;
     width: 100%;
-    min-height: 260px;
     margin: 0 auto -120px;
-    gap: 20px;
+    gap: 18px;
     padding: 10px 20px 0;
     box-sizing: border-box;
 }
 
 ul.list-cards li {
-    color: #ebebeb;
-    flex: 1 1 240px;
+    flex: 1 1 230px;
     max-width: 280px;
     min-width: 180px;
-    min-height: 220px;
-    padding: 24px;
-    border-radius: 24px;
+    border-radius: 20px;
     position: relative;
     top: -120px;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
-    /* Animação de entrada */
+    overflow: hidden;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
     animation: slideUpFade 0.6s ease both;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
 }
 
 ul.list-cards li:hover {
     transform: translateY(-8px);
-    box-shadow: 0px 16px 32px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.32);
 }
 
-/* Delays escalonados por card */
-ul.list-cards li:nth-child(1) {
-    animation-delay: 0.1s;
-}
+ul.list-cards li:nth-child(1) { animation-delay: 0.1s; }
+ul.list-cards li:nth-child(2) { animation-delay: 0.2s; }
+ul.list-cards li:nth-child(3) { animation-delay: 0.3s; }
+ul.list-cards li:nth-child(4) { animation-delay: 0.4s; }
 
-ul.list-cards li:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-ul.list-cards li:nth-child(3) {
-    animation-delay: 0.3s;
-}
-
-ul.list-cards li:nth-child(4) {
-    animation-delay: 0.4s;
-}
-
-ul.list-cards li div.title h3 {
-    width: 100%;
+.info-card__link {
     display: flex;
-    align-items: center;
-    font-family: "Nunito", sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    line-height: 1.3;
-    margin: 16px 0px 8px 0px;
-    color: #ffffff;
-}
-
-ul.list-cards li div.knowmore {
-    display: flex; /* Adicionado para arrumar o botao com a seta caso tinha sumido */
-    align-items: center;
-    justify-content: center;
-    width: 130px;
-    height: 33px;
-    margin-top: auto; /* Empurra o botão pro final do card sempre */
-}
-
-ul.list-cards li div.knowmore a {
-    display: flex;
+    flex-direction: column;
+    padding: 22px 20px 20px;
     text-decoration: none;
+    color: #ffffff;
+    height: 100%;
+    min-height: 200px;
+    box-sizing: border-box;
     gap: 10px;
-    font-family: 'Inter';
-    font-weight: 500;
-    font-style: medium;
-    color: #00210C;
-    align-items: center;
+    position: relative;
 }
 
-ul.list-cards li div.knowmore a span {
-    line-height: 23px;
-    width: 97px;
-    height: 33px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    align-items: center;
-    justify-content: center;
-    color: #00210ca6;
-    background-color: #ffffff;
-    padding: 10px;
-    border-radius: 50px;
+.info-card__icon {
     display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    opacity: 0.86;
+    transition: opacity 0.22s ease;
 }
 
-ul.list-cards li div.knowmore a i {
-    line-height: 23px;
-    font-size: 25px;
-    font-weight: 600;
-    vertical-align: middle;
-    text-align: center;
-    color: #00210ca6;
-    background-color: #ffffff;
-    padding: 10px;
+.info-card__icon svg {
     width: 28px;
     height: 28px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-ul.list-cards li div.text p {
-    width: 100%;
+ul.list-cards li:hover .info-card__icon {
+    opacity: 1;
+}
+
+.info-card__content {
+    flex: 1;
+}
+
+.info-card__title {
+    font-family: "Nunito", sans-serif;
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1.25;
+    color: #ffffff;
+    margin: 0 0 6px;
+}
+
+.info-card__text {
     font-family: 'Inter', sans-serif;
-    font-style: normal;
+    font-size: 13px;
     font-weight: 400;
-    font-size: 14px;
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.72);
     margin: 0;
 }
 
-ul.list-cards li div#icon {
-    width: 21.74px;
-    height: 32.25px;
-    flex: none;
-    flex-grow: 0;
-    z-index: 1;
+.info-card__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    align-self: flex-end;
+    transition: background 0.25s ease, transform 0.25s ease;
+    flex-shrink: 0;
 }
 
-ul.list-cards li#fazer {
-    background-color: #4D6AE7;
+ul.list-cards li:hover .info-card__arrow {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateX(3px);
 }
 
-ul.list-cards li#comer {
-    background-color: #008e45;
-}
-
-ul.list-cards li#dormir {
-    background-color: #CD8700;
-}
-
-ul.list-cards li#chegar {
-    background-color: #005225;
-}
+ul.list-cards li#fazer  { background: linear-gradient(145deg, #4D6AE7, #3651c7); }
+ul.list-cards li#comer  { background: linear-gradient(145deg, #008e45, #006b32); }
+ul.list-cards li#dormir { background: linear-gradient(145deg, #CD8700, #a96e00); }
+ul.list-cards li#chegar { background: linear-gradient(145deg, #005225, #003016); }
 
 div.point {
-    /* Só vertical: o recuo horizontal fica em .point-container, igual ao padding DENTRO do ul.list-cards */
-    padding: 18px 0 20px;
+    padding: 32px 0 48px;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -313,6 +262,7 @@ div.point {
     top: 0;
     margin-top: 8px;
     box-sizing: border-box;
+    background: #ffffff;
 }
 
 @media only screen and (max-width: 400px) {
@@ -380,7 +330,6 @@ div.point div#more a:hover {
     margin: 0;
 }
 
-/* ── Point card (full-bleed photo style) ── */
 .cards-points ul li {
     position: relative;
     height: 380px;
@@ -398,7 +347,6 @@ div.point div#more a:hover {
     z-index: 2;
 }
 
-/* Full-bleed link that makes the entire card clickable */
 .point-card__link {
     display: block;
     position: absolute;
@@ -531,7 +479,6 @@ div.point div#more a:hover {
     font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
 }
 
-/* CTA highlights when the parent link (whole card) is hovered */
 .cards-points ul li:hover .point-card__cta {
     background: #ffffff;
     border-color: #8fc4a6;
@@ -698,7 +645,6 @@ div.desc {
     padding: 20px 0 8px;
 }
 
-/* Botão no padrão ghost do header (CONTATO) */
 div.restaurant {
     width: auto;
     height: auto;
@@ -743,22 +689,20 @@ div.restaurant a:active {
 }
 
 
-/*=== RESPONSIVO: Tablet (até 1024px) ===*/
 @media only screen and (max-width: 1024px) {
     ul.list-cards {
         flex-wrap: wrap;
         max-width: 100%;
-        gap: 20px;
-        margin-bottom: -100px;
+        gap: 16px;
+        margin-bottom: -120px;
     }
 
     ul.list-cards li {
-        flex: 1 1 240px;
-        max-width: 45%;
-        top: -100px;
+        flex: 1 1 220px;
+        max-width: 47%;
+        top: -120px;
     }
 
-    /* 2 colunas no tablet */
     .cards-points ul {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 20px;
@@ -772,10 +716,8 @@ div.restaurant a:active {
     .point-card__title { font-size: 19px; }
 }
 
-/*=== RESPONSIVO: Mobile (até 768px) ===*/
 @media only screen and (max-width: 768px) {
 
-    /* Gastronomia: cancela o bleed de desktop */
     div.news {
         width: 100%;
         margin-left: 0;
@@ -789,55 +731,38 @@ div.restaurant a:active {
         gap: 28px;
     }
 
-    /* Cards informativos: 2 por linha */
     ul.list-cards {
         flex-wrap: wrap;
         max-width: 100%;
-        gap: 15px;
+        gap: 12px;
         padding: 0 12px;
-        margin-bottom: -70px;
+        margin-bottom: -80px;
     }
 
     ul.list-cards li {
         flex: 1 1 45%;
         max-width: 48%;
         min-width: 0;
-        height: auto;
-        min-height: 200px;
-        top: -70px;
-        padding: 18px;
-        border-radius: 14px;
+        top: -80px;
+        border-radius: 16px;
     }
 
-    ul.list-cards li div.title h3 {
+    .info-card__link {
+        min-height: 180px;
+        padding: 18px 16px 16px;
+    }
+
+    .info-card__title {
         font-size: 16px;
-        margin: 10px 0 5px;
     }
 
-    ul.list-cards li div.text p {
+    .info-card__text {
         font-size: 12px;
-        line-height: 1.4;
     }
 
-    ul.list-cards li div.knowmore {
-        margin-top: 15px;
-        justify-content: flex-start;
-        width: 100%;
-    }
-
-    ul.list-cards li div.knowmore a span {
-        font-size: 9px;
-        /* Reduzido para não quebrar linha */
-        padding: 6px 10px;
-        width: auto;
-        /* Remove width fixo que causava a quebra */
-    }
-
-    ul.list-cards li div.knowmore a i {
-        font-size: 16px;
-        width: 20px;
-        height: 20px;
-        padding: 4px;
+    .info-card__icon svg {
+        width: 24px;
+        height: 24px;
     }
 
     .point {
@@ -851,7 +776,6 @@ div.restaurant a:active {
 
     .section-header {
         flex-direction: column;
-        /* Coloca o título e link em coluna para não expremer em telas pequenas */
         align-items: flex-start;
         gap: 8px;
         margin-bottom: 20px;
@@ -859,18 +783,15 @@ div.restaurant a:active {
 
     .title-group .subtitle {
         font-size: 16px;
-        /* Ajustado para mobile */
     }
 
     .title-group h1 {
         font-size: 24px;
-        /* Ajustado para caber sem quebrar estranho */
         line-height: 1.2;
     }
 
     div.point div#more {
         align-self: flex-start;
-        /* Alinha o link Ver Todos à esquerda logo abaixo do título */
     }
 
     div.point div#more a {
@@ -946,7 +867,7 @@ div.restaurant a:active {
         justify-content: center;
     }
 
-    div.protect ul>li {
+    div.protect ul > li {
         margin: 0;
     }
 
@@ -980,27 +901,35 @@ div.restaurant a:active {
 
 }
 
-/*=== RESPONSIVO: Telas muito pequenas (até 400px) ===*/
 @media only screen and (max-width: 400px) {
     ul.list-cards {
         gap: 10px;
         padding: 0 5px;
-        margin-bottom: -50px;
+        margin-bottom: -60px;
     }
 
     ul.list-cards li {
         flex: 1 1 45%;
         max-width: 48%;
-        top: -50px;
-        min-height: 220px;
+        top: -60px;
     }
 
-    ul.list-cards li div.title h3 {
+    .info-card__link {
+        min-height: 160px;
+        padding: 14px 12px 12px;
+    }
+
+    .info-card__title {
         font-size: 14px;
     }
 
-    ul.list-cards li div.text p {
+    .info-card__text {
         font-size: 11px;
+    }
+
+    .info-card__icon svg {
+        width: 20px;
+        height: 20px;
     }
 
     .point-container {
@@ -1018,18 +947,13 @@ div.restaurant a:active {
 
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   Novas seções (prefixo pub-): Guia de Estabelecimentos + Próximos Eventos.
-   Não altera regras anteriores; apenas acrescenta estilos novos.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
 .pub-landing-blocks {
     display: flex;
     flex-direction: column;
     gap: clamp(48px, 6vw, 72px);
-    padding: clamp(16px, 2vw, 24px) 0 clamp(24px, 3vw, 40px);
+    padding: clamp(40px, 5vw, 64px) 0 clamp(40px, 5vw, 64px);
     box-sizing: border-box;
-    background-color: #fcfcfc;
+    background: #f4f9f6;
     width: 100%;
 }
 
@@ -1044,7 +968,6 @@ div.restaurant a:active {
     box-sizing: border-box;
 }
 
-/* —— Guia de Estabelecimentos —— */
 .pub-guide__header {
     text-align: center;
     margin-bottom: clamp(20px, 3vw, 28px);
@@ -1250,7 +1173,6 @@ div.restaurant a:active {
     transform: translateX(3px);
 }
 
-/* —— Próximos Eventos —— */
 .pub-events__header {
     display: flex;
     justify-content: space-between;
@@ -1301,10 +1223,17 @@ div.restaurant a:active {
 .pub-event-card {
     background: #ffffff;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 33, 12, 0.08);
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0, 33, 12, 0.08);
     display: flex;
     flex-direction: column;
     min-width: 0;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.pub-event-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0, 33, 12, 0.13);
 }
 
 .pub-event-card__media {
@@ -1507,7 +1436,6 @@ div.restaurant a:active {
     }
 }
 
-/* ===== COMO CHEGAR ===== */
 .como-chegar {
     padding: 0;
     background: #f4f9f6;
@@ -1587,7 +1515,6 @@ div.restaurant a:active {
     box-sizing: border-box;
 }
 
-/* — Transport mode cards — */
 .como-chegar__transport {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1669,7 +1596,6 @@ div.restaurant a:active {
 .transport-card--bus .transport-card__badge { background: #e8f5ef; color: #006b32; }
 .transport-card--car .transport-card__badge { background: #fdf4e6; color: #a67520; }
 
-/* — Airports subsection — */
 .como-chegar__airports-section {
     display: flex;
     flex-direction: column;
@@ -1731,7 +1657,6 @@ div.restaurant a:active {
     margin: 0;
 }
 
-/* — CTA row — */
 .como-chegar__cta-row {
     text-align: center;
 }
@@ -1761,7 +1686,6 @@ div.restaurant a:active {
     transform: translateY(-2px);
 }
 
-/* Responsive */
 @media only screen and (max-width: 768px) {
     .como-chegar__banner {
         padding-bottom: clamp(72px, 12vw, 100px);
@@ -1789,7 +1713,6 @@ div.restaurant a:active {
     .como-chegar__transport { max-width: 100%; }
 }
 
-/* ===== O QUE DIZEM OS VISITANTES ===== */
 .reviews-block {
     margin-top: -90px;
     margin-bottom: -90px;
@@ -1958,7 +1881,12 @@ div.restaurant a:active {
     }
 }
 
-/* ===== GUIAS TURÍSTICOS ===== */
+.tour-guides-wrap {
+    background: #ffffff;
+    padding: clamp(40px, 5vw, 64px) 0;
+    width: 100%;
+}
+
 .tour-guides {
     width: 100%;
     max-width: 1200px;
@@ -2105,6 +2033,10 @@ div.restaurant a:active {
 }
 
 @media only screen and (max-width: 768px) {
+    .tour-guides-wrap {
+        padding-top: clamp(32px, 5vw, 48px);
+        padding-bottom: clamp(32px, 5vw, 48px);
+    }
     .tour-guides {
         padding-left: 16px;
         padding-right: 16px;
@@ -2127,10 +2059,9 @@ div.restaurant a:active {
     }
 }
 
-/* ===== DÚVIDAS FREQUENTES ===== */
 .faq {
     padding: clamp(40px, 5vw, 72px) 0 clamp(32px, 4vw, 56px);
-    background: #ffffff;
+    background: #f4f9f6;
 }
 
 .faq__inner {
@@ -2160,7 +2091,6 @@ div.restaurant a:active {
     border-bottom: 1px solid #dce9e2;
 }
 
-/* primeira linha da grid: os dois primeiros itens recebem borda no topo */
 .faq__item:nth-child(-n+2) {
     border-top: 1px solid #dce9e2;
 }
@@ -2202,7 +2132,6 @@ div.restaurant a:active {
     transform: rotate(180deg);
 }
 
-/* Smooth accordion via CSS grid trick */
 .faq__answer {
     display: grid;
     grid-template-rows: 0fr;
@@ -2233,7 +2162,6 @@ div.restaurant a:active {
     margin: 0;
 }
 
-/* ===== FALE CONOSCO ===== */
 .contact-section {
     padding: clamp(40px, 5vw, 72px) 0 clamp(48px, 6vw, 88px);
     background: #ffffff;
@@ -2331,12 +2259,12 @@ div.restaurant a:active {
     line-height: 1.5;
 }
 
-/* Form card */
 .contact-section__form-wrap {
-    background: #e2f0e9;
+    background: var(--pub-bg-alt, #f4f9f6);
+    border: 1px solid var(--pub-border, #d8ede2);
     border-radius: 20px;
     padding: clamp(24px, 3vw, 36px);
-    box-shadow: 0 4px 24px rgba(0, 48, 22, 0.07);
+    box-shadow: var(--pub-shadow, 0 6px 24px rgba(0, 33, 12, 0.08));
 }
 
 .contact-section__form {
@@ -2438,7 +2366,6 @@ div.restaurant a:active {
         grid-template-columns: 1fr;
     }
 
-    /* em 1 coluna, só o primeiro item recebe borda no topo */
     .faq__item:nth-child(-n+2) {
         border-top: none;
     }

@@ -31,16 +31,18 @@
     height: 2px;
     bottom: -4px;
     left: 50%;
-    background-color: #FFB527; /* Dourado */
+    background-color: #FFB527;
     transition: all 0.3s ease;
     transform: translateX(-50%);
 }
 
-.navbar ul li:not(#contact) a:hover {
-    color: #FFB527; /* Dourado */
+.navbar ul li:not(#contact) a:hover,
+.navbar ul li:not(#contact) a.nav-active {
+    color: #FFB527;
 }
 
-.navbar ul li:not(#contact) a:hover::after {
+.navbar ul li:not(#contact) a:hover::after,
+.navbar ul li:not(#contact) a.nav-active::after {
     width: 100%;
 }
 .navbar ul li#contact{

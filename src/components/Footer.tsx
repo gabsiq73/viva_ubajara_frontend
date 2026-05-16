@@ -44,12 +44,12 @@ export default function Footer(){
                     <div className="footer__col">
                         <h4 className="footer__col-title">Links Úteis</h4>
                         <ul className="footer__list">
-                            <li><Link to="/">Parque Nacional</Link></li>
-                            <li><Link to="/">Teleférico</Link></li>
-                            <li><Link to="/">Trilhas</Link></li>
-                            <li><Link to="/">Gastronomia</Link></li>
-                            <li><Link to="/">Pousadas</Link></li>
-                            <li><Link to="/">Artesanato</Link></li>
+                            <li><Link to="/pontos-turisticos">Parque Nacional</Link></li>
+                            <li><Link to="/pontos-turisticos">Teleférico</Link></li>
+                            <li><Link to="/pontos-turisticos">Trilhas</Link></li>
+                            <li><Link to="/estabelecimentos?tipo=Restaurante">Gastronomia</Link></li>
+                            <li><Link to="/estabelecimentos?tipo=Pousada">Pousadas</Link></li>
+                            <li><Link to="/estabelecimentos?tipo=Artesanato">Artesanato</Link></li>
                         </ul>
                     </div>
 
@@ -58,11 +58,12 @@ export default function Footer(){
                         <h4 className="footer__col-title">Mapa do Site</h4>
                         <ul className="footer__list">
                             <li><Link to="/">Início</Link></li>
-                            <li><Link to="/">Pontos Turísticos</Link></li>
-                            <li><Link to="/">Próximos Eventos</Link></li>
-                            <li><Link to="/">Guias Turísticos</Link></li>
-                            <li><Link to="/">Dúvidas Frequentes</Link></li>
-                            <li><Link to="/">Fale Conosco</Link></li>
+                            <li><Link to="/pontos-turisticos">Pontos Turísticos</Link></li>
+                            <li><Link to="/eventos">Próximos Eventos</Link></li>
+                            <li><Link to="/estabelecimentos">Estabelecimentos</Link></li>
+                            <li><Link to="/como-chegar">Como Chegar</Link></li>
+                            <li><Link to="/depoimentos">Depoimentos</Link></li>
+                            <li><Link to="/contato">Contato</Link></li>
                         </ul>
                     </div>
 

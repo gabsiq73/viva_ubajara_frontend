@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import "./styles/Navbar.components.css";
 import { LogOut } from 'lucide-react';
 import { useAuth } from '../admin/hooks/useAuth';
@@ -20,22 +20,19 @@ export default function Navbar(){
             <div className="menu">
                 <ul>
                     <li>
-                        <Link to="/pontos-turisticos">Atrativos</Link>
+                        <NavLink to="/pontos-turisticos" className={({ isActive }) => isActive ? "nav-active" : ""}>Atrativos</NavLink>
                     </li>
                     <li>
-                        <Link to="/estabelecimentos">Alimentação</Link>
+                        <NavLink to="/estabelecimentos" className={({ isActive }) => isActive ? "nav-active" : ""}>Alimentação</NavLink>
                     </li>
                     <li>
-                        <Link to="/estabelecimentos">Hospedagem</Link>
+                        <NavLink to="/eventos" className={({ isActive }) => isActive ? "nav-active" : ""}>Eventos</NavLink>
                     </li>
                     <li>
-                        <Link to="/">Condutores</Link>
-                    </li>
-                    <li>
-                        <Link to="/como-chegar">Como Chegar</Link>
+                        <NavLink to="/como-chegar" className={({ isActive }) => isActive ? "nav-active" : ""}>Como Chegar</NavLink>
                     </li>
                     <li id="contact">
-                        <Link to="/">Contato</Link>
+                        <NavLink to="/contato" className={({ isActive }) => isActive ? "nav-active" : ""}>Contato</NavLink>
                     </li>
                 </ul>
             </div>

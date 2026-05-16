@@ -7,8 +7,32 @@ import food from "./../../assets/images/food.png";
 import { GastronomyCarousel, type GastronomySlide } from "./GastronomyCarousel";
 import { TOURIST_POINTS } from "../../data/touristPoints";
 import { EVENTS } from "../../data/events";
+import { ArrowRight } from "lucide-react";
 
-// Re-import images still needed locally
+const IconFazer = () => (
+    <svg width="26" height="32" viewBox="0 0 22 33" fill="white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M3.74062 32.25L8.35312 8.925C8.50312 8.2 8.84063 7.65625 9.36563 7.29375C9.89062 6.93125 10.4406 6.75 11.0156 6.75C11.5906 6.75 12.1219 6.875 12.6094 7.125C13.0969 7.375 13.4906 7.75 13.7906 8.25L15.2906 10.65C15.7406 11.375 16.3219 12.0312 17.0344 12.6187C17.7469 13.2062 18.5656 13.6375 19.4906 13.9125V11.25H21.7406V32.25H19.4906V17.025C18.2906 16.75 17.1781 16.3125 16.1531 15.7125C15.1281 15.1125 14.2406 14.375 13.4906 13.5L12.5906 18L15.7406 21V32.25H12.7406V23.25L9.59062 20.25L6.89062 32.25H3.74062ZM4.37813 17.4375L1.19062 16.8375C0.790625 16.7625 0.478125 16.5562 0.253125 16.2188C0.028125 15.8813 -0.046875 15.5 0.028125 15.075L1.15313 9.1875C1.30313 8.3875 1.72812 7.75625 2.42812 7.29375C3.12812 6.83125 3.87812 6.675 4.67812 6.825L6.40312 7.1625L4.37813 17.4375ZM13.4906 6C12.6656 6 11.9594 5.70625 11.3719 5.11875C10.7844 4.53125 10.4906 3.825 10.4906 3C10.4906 2.175 10.7844 1.46875 11.3719 0.88125C11.9594 0.29375 12.6656 0 13.4906 0C14.3156 0 15.0219 0.29375 15.6094 0.88125C16.1969 1.46875 16.4906 2.175 16.4906 3C16.4906 3.825 16.1969 4.53125 15.6094 5.11875C15.0219 5.70625 14.3156 6 13.4906 6Z" />
+    </svg>
+);
+
+const IconComer = () => (
+    <svg width="26" height="30" viewBox="0 0 23 30" fill="white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M4.5 30V16.275C3.225 15.925 2.15625 15.225 1.29375 14.175C0.43125 13.125 0 11.9 0 10.5V0H3V10.5H4.5V0H7.5V10.5H9V0H12V10.5C12 11.9 11.5688 13.125 10.7063 14.175C9.84375 15.225 8.775 15.925 7.5 16.275V30H4.5ZM19.5 30V18H15V7.5C15 5.425 15.7313 3.65625 17.1938 2.19375C18.6562 0.73125 20.425 0 22.5 0V30H19.5Z" />
+    </svg>
+);
+
+const IconDormir = () => (
+    <svg width="34" height="24" viewBox="0 0 41 28" fill="white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M0 28V0H3.72727V18.6667H18.6364V3.73333H33.5455C35.5955 3.73333 37.3504 4.46444 38.8102 5.92667C40.2701 7.38889 41 9.14667 41 11.2V28H37.2727V22.4H3.72727V28H0ZM11.1818 16.8C9.62879 16.8 8.30871 16.2556 7.22159 15.1667C6.13447 14.0778 5.59091 12.7556 5.59091 11.2C5.59091 9.64444 6.13447 8.32222 7.22159 7.23333C8.30871 6.14444 9.62879 5.6 11.1818 5.6C12.7348 5.6 14.0549 6.14444 15.142 7.23333C16.2292 8.32222 16.7727 9.64444 16.7727 11.2C16.7727 12.7556 16.2292 14.0778 15.142 15.1667C14.0549 16.2556 12.7348 16.8 11.1818 16.8ZM22.3636 18.6667H37.2727V11.2C37.2727 10.1733 36.9078 9.29445 36.1778 8.56333C35.4479 7.83222 34.5705 7.46667 33.5455 7.46667H22.3636V18.6667ZM11.1818 13.0667C11.7098 13.0667 12.1525 12.8878 12.5097 12.53C12.8669 12.1722 13.0455 11.7289 13.0455 11.2C13.0455 10.6711 12.8669 10.2278 12.5097 9.87C12.1525 9.51222 11.7098 9.33333 11.1818 9.33333C10.6538 9.33333 10.2112 9.51222 9.85398 9.87C9.49678 10.2278 9.31818 10.6711 9.31818 11.2C9.31818 11.7289 9.49678 12.1722 9.85398 12.53C10.2112 12.8878 10.6538 13.0667 11.1818 13.0667Z" />
+    </svg>
+);
+
+const IconChegar = () => (
+    <svg width="26" height="26" viewBox="0 0 27 27" fill="white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M18 27L9 23.85L2.025 26.55C1.525 26.75 1.0625 26.6938 0.6375 26.3813C0.2125 26.0688 0 25.65 0 25.125V4.125C0 3.8 0.09375 3.5125 0.28125 3.2625C0.46875 3.0125 0.725 2.825 1.05 2.7L9 0L18 3.15L24.975 0.45C25.475 0.25 25.9375 0.30625 26.3625 0.61875C26.7875 0.93125 27 1.35 27 1.875V22.875C27 23.2 26.9062 23.4875 26.7188 23.7375C26.5312 23.9875 26.275 24.175 25.95 24.3L18 27ZM16.5 23.325V5.775L10.5 3.675V21.225L16.5 23.325ZM19.5 23.325L24 21.825V4.05L19.5 5.775V23.325ZM3 22.95L7.5 21.225V3.675L3 5.175V22.95ZM19.5 5.775V23.325V5.775ZM7.5 3.675V21.225V3.675Z" />
+    </svg>
+);
+
 import cac from "./../../assets/images/cachoeira.png";
 import farm from "./../../assets/images/fazenda.png";
 import mercado from "./../../assets/images/mercado.png";
@@ -211,72 +235,52 @@ export default function Content(){
                 <div className="cards">
                     <ul className="list-cards">
                         <li id="fazer">
-                            <div id="icon">
-                                <svg width="22" height="33" viewBox="0 0 22 33" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M3.74062 32.25L8.35312 8.925C8.50312 8.2 8.84063 7.65625 9.36563 7.29375C9.89062 6.93125 10.4406 6.75 11.0156 6.75C11.5906 6.75 12.1219 6.875 12.6094 7.125C13.0969 7.375 13.4906 7.75 13.7906 8.25L15.2906 10.65C15.7406 11.375 16.3219 12.0312 17.0344 12.6187C17.7469 13.2062 18.5656 13.6375 19.4906 13.9125V11.25H21.7406V32.25H19.4906V17.025C18.2906 16.75 17.1781 16.3125 16.1531 15.7125C15.1281 15.1125 14.2406 14.375 13.4906 13.5L12.5906 18L15.7406 21V32.25H12.7406V23.25L9.59062 20.25L6.89062 32.25H3.74062ZM4.37813 17.4375L1.19062 16.8375C0.790625 16.7625 0.478125 16.5562 0.253125 16.2188C0.028125 15.8813 -0.046875 15.5 0.028125 15.075L1.15313 9.1875C1.30313 8.3875 1.72812 7.75625 2.42812 7.29375C3.12812 6.83125 3.87812 6.675 4.67812 6.825L6.40312 7.1625L4.37813 17.4375ZM13.4906 6C12.6656 6 11.9594 5.70625 11.3719 5.11875C10.7844 4.53125 10.4906 3.825 10.4906 3C10.4906 2.175 10.7844 1.46875 11.3719 0.88125C11.9594 0.29375 12.6656 0 13.4906 0C14.3156 0 15.0219 0.29375 15.6094 0.88125C16.1969 1.46875 16.4906 2.175 16.4906 3C16.4906 3.825 16.1969 4.53125 15.6094 5.11875C15.0219 5.70625 14.3156 6 13.4906 6Z" fill="white"/>
-                                </svg>
-                            </div>
-                            <div className="title">
-                                <h3>
-                                    O que fazer
-                                </h3>
-                            </div>
-                            <div className="text">
-                                <p>
-                                    Trilhas ecológicas, mirantes de tirar o fôlego e o famoso teleférico
-                                </p>
-                            </div>
+                            <Link to="/pontos-turisticos" className="info-card__link" aria-label="Ver o que fazer em Ubajara">
+                                <div className="info-card__icon"><IconFazer /></div>
+                                <div className="info-card__content">
+                                    <h3 className="info-card__title">O que fazer</h3>
+                                    <p className="info-card__text">Trilhas ecológicas, mirantes de tirar o fôlego e o famoso teleférico</p>
+                                </div>
+                                <span className="info-card__arrow" aria-hidden="true">
+                                    <ArrowRight size={15} strokeWidth={2.2} />
+                                </span>
+                            </Link>
                         </li>
                         <li id="comer">
-                            <div id="icon">
-                                <svg width="23" height="30" viewBox="0 0 23 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M4.5 30V16.275C3.225 15.925 2.15625 15.225 1.29375 14.175C0.43125 13.125 0 11.9 0 10.5V0H3V10.5H4.5V0H7.5V10.5H9V0H12V10.5C12 11.9 11.5688 13.125 10.7063 14.175C9.84375 15.225 8.775 15.925 7.5 16.275V30H4.5ZM19.5 30V18H15V7.5C15 5.425 15.7313 3.65625 17.1938 2.19375C18.6562 0.73125 20.425 0 22.5 0V30H19.5Z" fill="white"/>
-                                </svg>
-                            </div>
-                            <div className="title">
-                                <h3>
-                                    Onde Comer
-                                </h3>
-                            </div>
-                            <div className="text">
-                                <p>
-                                    A melhor gastronomia da Ibiapaba, com temperos regionais e requinte.
-                                </p>
-                            </div>
+                            <Link to="/estabelecimentos?tipo=Restaurante" className="info-card__link" aria-label="Ver onde comer em Ubajara">
+                                <div className="info-card__icon"><IconComer /></div>
+                                <div className="info-card__content">
+                                    <h3 className="info-card__title">Onde Comer</h3>
+                                    <p className="info-card__text">A melhor gastronomia da Ibiapaba, com temperos regionais e requinte.</p>
+                                </div>
+                                <span className="info-card__arrow" aria-hidden="true">
+                                    <ArrowRight size={15} strokeWidth={2.2} />
+                                </span>
+                            </Link>
                         </li>
                         <li id="dormir">
-                            <div id="icon">
-                                <svg width="41" height="28" viewBox="0 0 41 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M0 28V0H3.72727V18.6667H18.6364V3.73333H33.5455C35.5955 3.73333 37.3504 4.46444 38.8102 5.92667C40.2701 7.38889 41 9.14667 41 11.2V28H37.2727V22.4H3.72727V28H0ZM11.1818 16.8C9.62879 16.8 8.30871 16.2556 7.22159 15.1667C6.13447 14.0778 5.59091 12.7556 5.59091 11.2C5.59091 9.64444 6.13447 8.32222 7.22159 7.23333C8.30871 6.14444 9.62879 5.6 11.1818 5.6C12.7348 5.6 14.0549 6.14444 15.142 7.23333C16.2292 8.32222 16.7727 9.64444 16.7727 11.2C16.7727 12.7556 16.2292 14.0778 15.142 15.1667C14.0549 16.2556 12.7348 16.8 11.1818 16.8ZM22.3636 18.6667H37.2727V11.2C37.2727 10.1733 36.9078 9.29445 36.1778 8.56333C35.4479 7.83222 34.5705 7.46667 33.5455 7.46667H22.3636V18.6667ZM11.1818 13.0667C11.7098 13.0667 12.1525 12.8878 12.5097 12.53C12.8669 12.1722 13.0455 11.7289 13.0455 11.2C13.0455 10.6711 12.8669 10.2278 12.5097 9.87C12.1525 9.51222 11.7098 9.33333 11.1818 9.33333C10.6538 9.33333 10.2112 9.51222 9.85398 9.87C9.49678 10.2278 9.31818 10.6711 9.31818 11.2C9.31818 11.7289 9.49678 12.1722 9.85398 12.53C10.2112 12.8878 10.6538 13.0667 11.1818 13.0667Z" fill="white"/>
-                                </svg>
-                            </div>
-                            <div className="title">
-                                <h3>
-                                    Onde Dormir
-                                </h3>
-                            </div>
-                            <div className="text">
-                                <p>
-                                    Pousadas charmosas e hotéis integrados à natureza para seu descanso.
-                                </p>
-                            </div>
+                            <Link to="/estabelecimentos?tipo=Pousada" className="info-card__link" aria-label="Ver onde dormir em Ubajara">
+                                <div className="info-card__icon"><IconDormir /></div>
+                                <div className="info-card__content">
+                                    <h3 className="info-card__title">Onde Dormir</h3>
+                                    <p className="info-card__text">Pousadas charmosas e hotéis integrados à natureza para seu descanso.</p>
+                                </div>
+                                <span className="info-card__arrow" aria-hidden="true">
+                                    <ArrowRight size={15} strokeWidth={2.2} />
+                                </span>
+                            </Link>
                         </li>
                         <li id="chegar">
-                            <div id="icon">
-                                <svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M18 27L9 23.85L2.025 26.55C1.525 26.75 1.0625 26.6938 0.6375 26.3813C0.2125 26.0688 0 25.65 0 25.125V4.125C0 3.8 0.09375 3.5125 0.28125 3.2625C0.46875 3.0125 0.725 2.825 1.05 2.7L9 0L18 3.15L24.975 0.45C25.475 0.25 25.9375 0.30625 26.3625 0.61875C26.7875 0.93125 27 1.35 27 1.875V22.875C27 23.2 26.9062 23.4875 26.7188 23.7375C26.5312 23.9875 26.275 24.175 25.95 24.3L18 27ZM16.5 23.325V5.775L10.5 3.675V21.225L16.5 23.325ZM19.5 23.325L24 21.825V4.05L19.5 5.775V23.325ZM3 22.95L7.5 21.225V3.675L3 5.175V22.95ZM19.5 5.775V23.325V5.775ZM7.5 3.675V21.225V3.675Z" fill="white"/>
-                                </svg>
-                            </div>
-                            <div className="title">
-                                <h3>
-                                    Como Chegar
-                                </h3>
-                            </div>
-                            <div className="text">
-                                <p>
-                                    Rotas aéreas e terrestres para chegar ao paraíso serrano com segurança.
-                                </p>
-                            </div>
+                            <Link to="/como-chegar" className="info-card__link" aria-label="Ver como chegar em Ubajara">
+                                <div className="info-card__icon"><IconChegar /></div>
+                                <div className="info-card__content">
+                                    <h3 className="info-card__title">Como Chegar</h3>
+                                    <p className="info-card__text">Rotas aéreas e terrestres para chegar ao paraíso serrano com segurança.</p>
+                                </div>
+                                <span className="info-card__arrow" aria-hidden="true">
+                                    <ArrowRight size={15} strokeWidth={2.2} />
+                                </span>
+                            </Link>
                         </li>
                     </ul>
                 </div>
@@ -516,7 +520,7 @@ export default function Content(){
                             </Link>
                         </div>
                     </section>
-                    {/* Guias Turísticos */}
+                    <div className="tour-guides-wrap">
                     <section className="tour-guides" aria-labelledby="tour-guides-title">
                         <div className="tour-guides__inner">
                             <header className="tour-guides__header reveal">
@@ -543,9 +547,9 @@ export default function Content(){
                             </div>
                         </div>
                     </section>
+                    </div>
                 </div>
 
-                {/* Como Chegar */}
                 <section className="como-chegar" aria-labelledby="como-chegar-title">
                     <div className="como-chegar__banner" style={{ backgroundImage: `url(${park})` }}>
                         <div className="como-chegar__banner-inner">
@@ -613,7 +617,6 @@ export default function Content(){
                     </div>
                 </section>
 
-                {/* O que dizem os visitantes */}
                 <div className="reviews-block">
                     <div className="papel">
                         <div className="paper1"><img src={paper} alt="" /></div>
@@ -652,7 +655,6 @@ export default function Content(){
                     </div>
                 </div>
 
-                {/* Dúvidas Frequentes */}
                 <section className="faq" aria-labelledby="faq-title">
                     <div className="faq__inner">
                         <h2 id="faq-title" className="faq__title reveal">Dúvidas Frequentes</h2>
@@ -684,69 +686,6 @@ export default function Content(){
                                     </div>
                                 </div>
                             ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* Fale Conosco */}
-                <section className="contact-section" aria-labelledby="contact-title">
-                    <div className="contact-section__inner">
-                        <div className="contact-section__left reveal">
-                            <span className="contact-section__kicker">Fale com a gente</span>
-                            <h2 id="contact-title" className="contact-section__title">Fale Conosco</h2>
-                            <p className="contact-section__desc">
-                                Planejando sua visita ou tem alguma dúvida específica? Nossa equipe da Secretaria de Turismo está pronta para ajudar você a ter a melhor experiência em Ubajara.
-                            </p>
-                            <ul className="contact-section__info">
-                                <li className="contact-section__info-item">
-                                    <span className="contact-section__info-icon material-symbols-outlined" aria-hidden="true">location_on</span>
-                                    <div className="contact-section__info-text">
-                                        <strong>Endereço</strong>
-                                        <span>Centro Administrativo Municipal, Ubajara - CE</span>
-                                    </div>
-                                </li>
-                                <li className="contact-section__info-item">
-                                    <span className="contact-section__info-icon material-symbols-outlined" aria-hidden="true">mail</span>
-                                    <div className="contact-section__info-text">
-                                        <strong>E-mail</strong>
-                                        <span>contato@vivaubajara.com.br</span>
-                                    </div>
-                                </li>
-                                <li className="contact-section__info-item">
-                                    <span className="contact-section__info-icon material-symbols-outlined" aria-hidden="true">call</span>
-                                    <div className="contact-section__info-text">
-                                        <strong>Telefone</strong>
-                                        <span>(88) 3634-1234</span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                        <div className="contact-section__form-wrap reveal">
-                            <form className="contact-section__form" onSubmit={(e) => e.preventDefault()}>
-                                <div className="contact-section__field">
-                                    <label htmlFor="cf-name" className="contact-section__label">Nome Completo</label>
-                                    <input id="cf-name" type="text" className="contact-section__input" placeholder="Como podemos te chamar?" />
-                                </div>
-                                <div className="contact-section__field">
-                                    <label htmlFor="cf-email" className="contact-section__label">E-mail</label>
-                                    <input id="cf-email" type="email" className="contact-section__input" placeholder="seu@email.com" />
-                                </div>
-                                <div className="contact-section__field">
-                                    <label htmlFor="cf-subject" className="contact-section__label">Assunto</label>
-                                    <select id="cf-subject" className="contact-section__select">
-                                        <option>Informações sobre o Parque</option>
-                                        <option>Teleférico e Trilhas</option>
-                                        <option>Hospedagem e Pousadas</option>
-                                        <option>Eventos e Programação</option>
-                                        <option>Outros</option>
-                                    </select>
-                                </div>
-                                <div className="contact-section__field">
-                                    <label htmlFor="cf-msg" className="contact-section__label">Mensagem</label>
-                                    <textarea id="cf-msg" className="contact-section__textarea" placeholder="Em que podemos te ajudar?" rows={4} />
-                                </div>
-                                <button type="submit" className="contact-section__submit">Enviar Mensagem</button>
-                            </form>
                         </div>
                     </div>
                 </section>

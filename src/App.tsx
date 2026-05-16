@@ -11,6 +11,7 @@ import Eventos from "./pages/Eventos";
 import Evento from "./pages/Evento";
 import ComoChegar from "./pages/ComoChegar";
 import Depoimentos from "./pages/Depoimentos";
+import Contato from "./pages/Contato";
 import Dashboard from "./pages/Dashboard";
 import { AdminRouter } from "./admin/AdminRouter";
 import ScrollToTop from "./components/ScrollToTop";
@@ -34,6 +35,7 @@ function App() {
             <Route path="/eventos/:id" element={<Evento />} />
             <Route path="/como-chegar" element={<ComoChegar />} />
             <Route path="/depoimentos" element={<Depoimentos />} />
+            <Route path="/contato" element={<Contato />} />
 
             {/* ─── Área do usuário autenticado ─── */}
             <Route path="/dashboard" element={<Dashboard />} />

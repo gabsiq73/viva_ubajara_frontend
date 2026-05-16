@@ -823,7 +823,7 @@
 }
 
 .adm-stat-card__value {
-  font-size: 36px;
+  font-size: clamp(28px, 2.5vw, 36px);
   font-weight: 900;
   color: var(--adm-text);
   font-family: var(--adm-font-serif);

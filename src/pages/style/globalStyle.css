@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 * {
     box-sizing: border-box;
@@ -8,10 +7,36 @@
 }
 
 :root {
-    /* Foto do hero: troca no mobile; posição ajustável por variável */
+    /* ── Foto do hero ── */
     --hero-photo: url('./../../assets/images/foto-capa-parque-ubajara (1).png');
     --hero-position-desktop: 30% 40%;
     --hero-position-mobile: center center;
+
+    /* ── Tokens de marca (site público) ── */
+    --pub-green-dark: #003016;
+    --pub-green:      #006b32;
+    --pub-green-mid:  #2d8a54;
+    --pub-green-dim:  #e8f5ef;
+    --pub-green-pale: #f0f7f3;
+    --pub-gold:       #c58b24;
+    --pub-gold-dim:   #fdf4e6;
+    --pub-text:       #00210c;
+    --pub-text-muted: #5c6670;
+    --pub-text-dim:   #7a9080;
+    --pub-border:     #d8ede2;
+    --pub-bg:         #ffffff;
+    --pub-bg-alt:     #f4f9f6;
+
+    /* ── Efeitos ── */
+    --pub-radius-sm:  10px;
+    --pub-radius:     16px;
+    --pub-radius-lg:  20px;
+    --pub-radius-xl:  28px;
+    --pub-shadow-sm:  0 2px 12px rgba(0, 33, 12, 0.06);
+    --pub-shadow:     0 6px 24px rgba(0, 33, 12, 0.08);
+    --pub-shadow-md:  0 12px 36px rgba(0, 33, 12, 0.11);
+    --pub-shadow-lg:  0 20px 56px rgba(0, 33, 12, 0.15);
+    --pub-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .container {
