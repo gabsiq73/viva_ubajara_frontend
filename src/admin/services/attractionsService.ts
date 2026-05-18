@@ -8,9 +8,9 @@ import type {
 } from '../types';
 
 export const attractionsService = {
-  getAll: async (page = 0, size = 10): Promise<PageResponse<AttractionResponse>> => {
+  getAll: async (page = 0, size = 10, active?: boolean): Promise<PageResponse<AttractionResponse>> => {
     const response = await api.get<PageResponse<AttractionResponse>>('/attractions', {
-      params: { page, size },
+      params: { page, size, ...(active !== undefined && { active }) },
     });
     return response.data;
   },

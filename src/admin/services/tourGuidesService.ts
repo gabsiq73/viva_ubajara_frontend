@@ -8,9 +8,9 @@ import type {
 } from '../types';
 
 export const tourGuidesService = {
-  getAll: async (page = 0, size = 10): Promise<PageResponse<TourGuideResponse>> => {
+  getAll: async (page = 0, size = 10, active?: boolean): Promise<PageResponse<TourGuideResponse>> => {
     const response = await api.get<PageResponse<TourGuideResponse>>('/tour-guides', {
-      params: { page, size },
+      params: { page, size, ...(active !== undefined && { active }) },
     });
     return response.data;
   },

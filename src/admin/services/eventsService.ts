@@ -8,9 +8,9 @@ import type {
 } from '../types';
 
 export const eventsService = {
-  getAll: async (page = 0, size = 10): Promise<PageResponse<EventResponse>> => {
+  getAll: async (page = 0, size = 10, active?: boolean): Promise<PageResponse<EventResponse>> => {
     const response = await api.get<PageResponse<EventResponse>>('/events', {
-      params: { page, size },
+      params: { page, size, ...(active !== undefined && { active }) },
     });
     return response.data;
   },

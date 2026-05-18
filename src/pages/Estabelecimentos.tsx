@@ -1,96 +1,130 @@
-import { useState, useMemo } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { ESTABLISHMENTS } from "../data/establishments";
-import type { EstabType } from "../data/establishments";
+import { restaurantsService } from "../admin/services/restaurantsService";
+import { hostPointsService } from "../admin/services/hostPointsService";
+import type { RestaurantResponse, HostPointResponse, HostType } from "../admin/types";
 import heroImg from "../assets/images/mercado.png";
 import "./style/Estabelecimentos.css";
 
 const ALL_TYPES = "Todos";
-const ALL_CITIES = "Todas";
 
-const STAR_OPTIONS = [
-    { label: "Todas", value: 0 },
-    { label: "5 ★", value: 5 },
-    { label: "4+ ★", value: 4 },
-    { label: "3+ ★", value: 3 },
-];
+type EstabType = "Restaurante" | "Hotel" | "Pousada" | "Hostel";
 
-function StarRow({ count }: { count: number }) {
-    return (
-        <span className="est-stars" aria-label={`${count} de 5 estrelas`}>
-            {[1, 2, 3, 4, 5].map((i) => (
-                <span
-                    key={i}
-                    className="material-symbols-outlined est-star"
-                    aria-hidden="true"
-                    style={{
-                        fontVariationSettings: `"FILL" ${i <= count ? 1 : 0}, "wght" 400, "GRAD" 0, "opsz" 20`,
-                    }}
-                >
-                    star
-                </span>
-            ))}
-        </span>
-    );
+const HOST_TYPE_LABELS: Record<HostType, EstabType> = {
+    HOTEL: "Hotel",
+    ROOST: "Pousada",
+    HOSTEL: "Hostel",
+};
+
+interface EstabItem {
+    id: string;
+    type: EstabType;
+    img: string;
+    name: string;
+    address: string;
+    description: string;
+    openingHours?: string;
+    avgPrice?: number;
+    features: string[];
+}
+
+function mapRestaurant(r: RestaurantResponse): EstabItem {
+    const features: string[] = [];
+    if (r.cuisineType) features.push(r.cuisineType);
+    if (r.acceptsReservation) features.push("Aceita Reservas");
+    return {
+        id: r.id,
+        type: "Restaurante",
+        img: r.photos?.[0]?.url ?? "",
+        name: r.name,
+        address: r.address,
+        description: r.description,
+        openingHours: r.openingHours,
+        avgPrice: r.avgPrice,
+        features,
+    };
+}
+
+function mapHostPoint(h: HostPointResponse): EstabItem {
+    const typeLabel = HOST_TYPE_LABELS[h.hostType] ?? "Hospedagem";
+    const features: string[] = [typeLabel];
+    if (h.numOfRooms) features.push(`${h.numOfRooms} quartos`);
+    if (h.bookingUrl) features.push("Reserva Online");
+    return {
+        id: h.id,
+        type: typeLabel as EstabType,
+        img: h.photos?.[0]?.url ?? "",
+        name: h.name,
+        address: h.address,
+        description: h.description,
+        openingHours: undefined,
+        avgPrice: h.avgPrice,
+        features,
+    };
+}
+
+function formatPrice(avgPrice?: number): string | null {
+    if (avgPrice == null) return null;
+    return `R$ ${avgPrice.toFixed(0)}`;
 }
 
 export default function Estabelecimentos() {
     const [searchParams] = useSearchParams();
     const initialType = searchParams.get("tipo") ?? ALL_TYPES;
 
+    const [items, setItems] = useState<EstabItem[]>([]);
+    const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
-    const [activeType, setActiveType] = useState<EstabType | "Todos">(initialType as EstabType | "Todos");
-    const [minStars, setMinStars] = useState(0);
-    const [activeCity, setActiveCity] = useState<string>(ALL_CITIES);
-    const [sort, setSort] = useState<"relevance" | "stars" | "name">("relevance");
+    const [activeType, setActiveType] = useState<string>(initialType);
+    const [sort, setSort] = useState<"relevance" | "name">("relevance");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const types = useMemo(() => {
-        const t = Array.from(new Set(ESTABLISHMENTS.map((e) => e.type)));
-        return [ALL_TYPES, ...t];
+    useEffect(() => {
+        Promise.allSettled([
+            restaurantsService.getAll(0, 100),
+            hostPointsService.getAll(0, 100),
+        ]).then(([restResult, hostResult]) => {
+            const restaurants = restResult.status === "fulfilled"
+                ? restResult.value.content.filter(r => r.active).map(mapRestaurant)
+                : [];
+            const hostPoints = hostResult.status === "fulfilled"
+                ? hostResult.value.content.filter(h => h.active).map(mapHostPoint)
+                : [];
+            setItems([...restaurants, ...hostPoints]);
+        }).finally(() => setLoading(false));
     }, []);
 
-    const cities = useMemo(() => {
-        const c = Array.from(new Set(ESTABLISHMENTS.map((e) => e.city))).sort((a, b) =>
-            a.localeCompare(b, "pt-BR")
-        );
-        return [ALL_CITIES, ...c];
-    }, []);
+    const types = useMemo(() => {
+        const t = Array.from(new Set(items.map(e => e.type)));
+        return [ALL_TYPES, ...t];
+    }, [items]);
 
     const filtered = useMemo(() => {
-        let result = ESTABLISHMENTS.filter((e) => {
+        let result = items.filter((e) => {
             const matchType = activeType === ALL_TYPES || e.type === activeType;
-            const matchStars = e.stars >= minStars;
-            const matchCity = activeCity === ALL_CITIES || e.city === activeCity;
             const q = search.trim().toLowerCase();
             const matchSearch =
                 !q ||
                 e.name.toLowerCase().includes(q) ||
-                e.desc.toLowerCase().includes(q) ||
-                e.city.toLowerCase().includes(q);
-            return matchType && matchStars && matchCity && matchSearch;
+                e.description.toLowerCase().includes(q) ||
+                e.address.toLowerCase().includes(q);
+            return matchType && matchSearch;
         });
 
-        if (sort === "stars") result = [...result].sort((a, b) => b.stars - a.stars);
-        else if (sort === "name")
-            result = [...result].sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+        if (sort === "name") result = [...result].sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
 
         return result;
-    }, [search, activeType, minStars, activeCity, sort]);
+    }, [items, search, activeType, sort]);
 
     const activeCount =
         (activeType !== ALL_TYPES ? 1 : 0) +
-        (minStars > 0 ? 1 : 0) +
-        (activeCity !== ALL_CITIES ? 1 : 0) +
         (search.trim() ? 1 : 0);
 
     function clearAll() {
         setSearch("");
         setActiveType(ALL_TYPES);
-        setMinStars(0);
-        setActiveCity(ALL_CITIES);
         setSort("relevance");
     }
 
@@ -99,7 +133,6 @@ export default function Estabelecimentos() {
             <Header />
             <main className="est-main">
 
-                {/* ── Hero ── */}
                 <section className="est-hero">
                     <img src={heroImg} alt="" className="est-hero__bg" aria-hidden />
                     <div className="est-hero__overlay" />
@@ -108,17 +141,15 @@ export default function Estabelecimentos() {
                             <span className="est-hero__kicker">PARQUE NACIONAL DE UBAJARA</span>
                             <h1 className="est-hero__title">Estabelecimentos</h1>
                             <p className="est-hero__subtitle">
-                                Restaurantes, pousadas, hotéis, cafeterias e lojas de artesanato
-                                para completar sua experiência na Serra da Ibiapaba.
+                                Restaurantes, pousadas, hotéis e cafeterias para completar
+                                sua experiência na Serra da Ibiapaba.
                             </p>
                         </div>
                     </div>
                 </section>
 
-                {/* ── Body: toggle + sidebar + cards ── */}
                 <div className="est-body">
 
-                    {/* Mobile filter toggle */}
                     <button
                         type="button"
                         className="est-filter-toggle"
@@ -136,25 +167,18 @@ export default function Estabelecimentos() {
                         </span>
                     </button>
 
-                    {/* ── Sidebar ── */}
                     <aside
                         id="est-sidebar"
                         className={`est-sidebar${sidebarOpen ? " is-open" : ""}`}
                         aria-label="Filtros"
                     >
-                        {/* Search */}
                         <div className="est-sidebar__section">
                             <p className="est-sidebar__label">Buscar</p>
                             <div className="est-search__wrap">
-                                <span
-                                    className="material-symbols-outlined est-search__icon"
-                                    aria-hidden="true"
-                                >
-                                    search
-                                </span>
+                                <span className="material-symbols-outlined est-search__icon" aria-hidden="true">search</span>
                                 <input
                                     type="search"
-                                    placeholder="Nome ou cidade..."
+                                    placeholder="Nome ou endereço..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     className="est-search__input"
@@ -163,7 +187,6 @@ export default function Estabelecimentos() {
                             </div>
                         </div>
 
-                        {/* Type filter */}
                         <div className="est-sidebar__section">
                             <p className="est-sidebar__label">Tipo</p>
                             <div className="est-filter-group">
@@ -180,68 +203,23 @@ export default function Estabelecimentos() {
                             </div>
                         </div>
 
-                        {/* Stars filter */}
-                        <div className="est-sidebar__section">
-                            <p className="est-sidebar__label">Avaliação</p>
-                            <div className="est-filter-group">
-                                {STAR_OPTIONS.map((o) => (
-                                    <button
-                                        key={o.value}
-                                        type="button"
-                                        className={`est-pill${minStars === o.value ? " is-active" : ""}`}
-                                        onClick={() => setMinStars(o.value)}
-                                    >
-                                        {o.label}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* City filter */}
-                        <div className="est-sidebar__section">
-                            <p className="est-sidebar__label">Cidade</p>
-                            <div className="est-filter-group">
-                                {cities.map((c) => (
-                                    <button
-                                        key={c}
-                                        type="button"
-                                        className={`est-pill${activeCity === c ? " is-active" : ""}`}
-                                        onClick={() => setActiveCity(c)}
-                                    >
-                                        {c}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Clear */}
                         {activeCount > 0 && (
-                            <button
-                                type="button"
-                                className="est-sidebar__clear"
-                                onClick={clearAll}
-                            >
-                                <span className="material-symbols-outlined" aria-hidden="true">
-                                    filter_alt_off
-                                </span>
+                            <button type="button" className="est-sidebar__clear" onClick={clearAll}>
+                                <span className="material-symbols-outlined" aria-hidden="true">filter_alt_off</span>
                                 Limpar filtros ({activeCount})
                             </button>
                         )}
                     </aside>
 
-                    {/* ── Cards content ── */}
                     <div className="est-content">
 
-                        {/* Topbar */}
                         <div className="est-topbar">
                             <p className="est-count">
                                 <strong>{filtered.length}</strong>{" "}
                                 {filtered.length === 1 ? "estabelecimento" : "estabelecimentos"} encontrados
                             </p>
                             <div className="est-sort">
-                                <label htmlFor="est-sort-select" className="est-sort__label">
-                                    Ordenar:
-                                </label>
+                                <label htmlFor="est-sort-select" className="est-sort__label">Ordenar:</label>
                                 <select
                                     id="est-sort-select"
                                     value={sort}
@@ -249,84 +227,58 @@ export default function Estabelecimentos() {
                                     className="est-sort__select"
                                 >
                                     <option value="relevance">Relevância</option>
-                                    <option value="stars">Maior Avaliação</option>
                                     <option value="name">Nome A–Z</option>
                                 </select>
                             </div>
                         </div>
 
-                        {/* Cards grid */}
-                        {filtered.length > 0 ? (
+                        {loading ? (
+                            <div className="est-empty">
+                                <span className="material-symbols-outlined est-empty__icon">hourglass_top</span>
+                                <p className="est-empty__msg">Carregando estabelecimentos...</p>
+                            </div>
+                        ) : filtered.length > 0 ? (
                             <div className="est-grid">
                                 {filtered.map((e) => (
-                                    <article
-                                        key={e.id}
-                                        className="est-card"
-                                        data-type={e.type}
-                                    >
+                                    <article key={e.id} className="est-card" data-type={e.type}>
                                         <div className="est-card__img-wrap">
-                                            <img
-                                                src={e.img}
-                                                alt={e.alt}
-                                                className="est-card__img"
-                                                loading="lazy"
-                                            />
+                                            {e.img ? (
+                                                <img src={e.img} alt={e.name} className="est-card__img" loading="lazy" />
+                                            ) : (
+                                                <div className="est-card__img est-card__img--placeholder" aria-hidden="true" />
+                                            )}
                                             <span className="est-card__type-badge">{e.type}</span>
-                                            <span className="est-card__price-badge">{e.priceLevel}</span>
+                                            {formatPrice(e.avgPrice) && (
+                                                <span className="est-card__price-badge">{formatPrice(e.avgPrice)}</span>
+                                            )}
                                         </div>
                                         <div className="est-card__body">
-                                            <div className="est-card__rating-row">
-                                                <StarRow count={e.stars} />
-                                                <span className="est-card__stars-label">{e.stars}.0</span>
-                                            </div>
                                             <h3 className="est-card__name">{e.name}</h3>
                                             <p className="est-card__city">
-                                                <span
-                                                    className="material-symbols-outlined"
-                                                    aria-hidden="true"
-                                                >
-                                                    location_on
-                                                </span>
-                                                {e.city}, CE
+                                                <span className="material-symbols-outlined" aria-hidden="true">location_on</span>
+                                                {e.address}
                                             </p>
-                                            <p className="est-card__desc">{e.desc}</p>
+                                            <p className="est-card__desc">{e.description}</p>
                                             <div className="est-card__features">
                                                 {e.features.slice(0, 3).map((f) => (
                                                     <span key={f} className="est-card__feature">{f}</span>
                                                 ))}
                                             </div>
-                                            <div className="est-card__footer">
-                                                <span className="est-card__hours">
-                                                    <span
-                                                        className="material-symbols-outlined"
-                                                        aria-hidden="true"
-                                                    >
-                                                        schedule
+                                            {e.openingHours && (
+                                                <div className="est-card__footer">
+                                                    <span className="est-card__hours">
+                                                        <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
+                                                        {e.openingHours}
                                                     </span>
-                                                    {e.hours}
-                                                </span>
-                                                <Link
-                                                    to={`/estabelecimentos/${e.id}`}
-                                                    className="est-card__cta"
-                                                >
-                                                    Ver Detalhes
-                                                    <span
-                                                        className="material-symbols-outlined"
-                                                        aria-hidden="true"
-                                                    >
-                                                        arrow_forward
-                                                    </span>
-                                                </Link>
-                                            </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </article>
                                 ))}
                             </div>
                         ) : (
                             <div className="est-empty">
-                                <span className="material-symbols-outlined est-empty__icon">
-                                    search_off
-                                </span>
+                                <span className="material-symbols-outlined est-empty__icon">search_off</span>
                                 <p className="est-empty__msg">
                                     Nenhum estabelecimento encontrado para essa busca.
                                 </p>
@@ -338,7 +290,6 @@ export default function Estabelecimentos() {
                     </div>
                 </div>
 
-                {/* ── CTA ── */}
                 <section className="est-cta">
                     <div className="est-cta__inner">
                         <h2 className="est-cta__title">Quer Cadastrar seu Estabelecimento?</h2>
@@ -348,9 +299,7 @@ export default function Estabelecimentos() {
                         </p>
                         <div className="est-cta__btns">
                             <a href="#" className="est-cta__btn">Cadastrar Estabelecimento</a>
-                            <a href="#" className="est-cta__btn est-cta__btn--outline">
-                                Falar com a Equipe
-                            </a>
+                            <a href="#" className="est-cta__btn est-cta__btn--outline">Falar com a Equipe</a>
                         </div>
                     </div>
                 </section>

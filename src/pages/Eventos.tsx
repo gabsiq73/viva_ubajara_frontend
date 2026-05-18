@@ -1,23 +1,74 @@
-import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { EVENTS } from "../data/events";
-import type { AppEvent, EventCategory } from "../data/events";
+import { eventsService } from "../admin/services/eventsService";
+import type { EventResponse } from "../admin/types";
 import "./style/Eventos.css";
 
-const ALL_CATEGORIES: EventCategory[] = ["Festival", "Cultura", "Esporte", "Gastronomia", "Natureza"];
+const PT_MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+const PT_MONTHS_LONG = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
-function sortKey(e: AppEvent) {
+function parseEventDate(raw: string): Date {
+    if (!raw) return new Date(NaN);
+    if (raw.includes("/")) {
+        const [datePart, timePart = "00:00:00"] = raw.split(" ");
+        const [d, m, y] = datePart.split("/");
+        return new Date(`${y}-${m}-${d}T${timePart}`);
+    }
+    return new Date(raw);
+}
+
+interface EventCard {
+    id: string;
+    img: string;
+    title: string;
+    desc: string;
+    place: string;
+    day: string;
+    month: string;
+    monthNum: number;
+    year: string;
+    time: string;
+    raw: EventResponse;
+}
+
+function mapEvent(ev: EventResponse): EventCard {
+    const date = parseEventDate(ev.startDateTime);
+    const day = isNaN(date.getTime()) ? "—" : String(date.getDate()).padStart(2, "0");
+    const monthNum = isNaN(date.getTime()) ? 0 : date.getMonth();
+    const month = isNaN(date.getTime()) ? "—" : PT_MONTHS[monthNum];
+    const year = isNaN(date.getTime()) ? "—" : String(date.getFullYear());
+    const time = isNaN(date.getTime())
+        ? "—"
+        : date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    return {
+        id: ev.id,
+        img: ev.photos?.[0]?.url ?? "",
+        title: ev.name,
+        desc: ev.description,
+        place: ev.location,
+        day,
+        month,
+        monthNum,
+        year,
+        time,
+        raw: ev,
+    };
+}
+
+function sortKey(e: EventCard) {
     return parseInt(e.year) * 100 + e.monthNum;
 }
 
-function EventCard({ ev }: { ev: AppEvent }) {
+function EventCardItem({ ev }: { ev: EventCard }) {
     return (
-        <article className="ev-card" data-category={ev.category}>
+        <article className="ev-card">
             <div className="ev-card__img-wrap">
-                <img src={ev.img} alt={ev.alt} className="ev-card__img" loading="lazy" />
-                <span className="ev-card__cat-badge" data-cat={ev.category}>{ev.category}</span>
+                {ev.img ? (
+                    <img src={ev.img} alt={ev.title} className="ev-card__img" loading="lazy" />
+                ) : (
+                    <div className="ev-card__img ev-card__img--placeholder" aria-hidden="true" />
+                )}
                 <div className="ev-card__date-badge">
                     <strong className="ev-card__date-day">{ev.day}</strong>
                     <span className="ev-card__date-month">{ev.month}</span>
@@ -36,32 +87,43 @@ function EventCard({ ev }: { ev: AppEvent }) {
                         <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
                         {ev.time}
                     </span>
-                    <span className="ev-card__meta-item">
-                        <span className="material-symbols-outlined" aria-hidden="true">payments</span>
-                        {ev.price}
-                    </span>
                 </div>
-                <div className="ev-card__footer">
-                    <Link to={`/eventos/${ev.id}`} className="ev-card__cta">
-                        Ver Evento
-                        <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
-                    </Link>
-                </div>
+                {ev.raw.registrationUrl && (
+                    <div className="ev-card__footer">
+                        <a
+                            href={ev.raw.registrationUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ev-card__cta"
+                        >
+                            Inscrever-se
+                            <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                        </a>
+                    </div>
+                )}
             </div>
         </article>
     );
 }
 
 export default function Eventos() {
+    const [events, setEvents] = useState<EventCard[]>([]);
+    const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
-    const [activeCategory, setActiveCategory] = useState<EventCategory | "Todos">("Todos");
     const [activeMonth, setActiveMonth] = useState<string>("Todos");
     const [sort, setSort] = useState<"date" | "name">("date");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
+    useEffect(() => {
+        eventsService.getAll(0, 100, true)
+            .then(page => setEvents(page.content.map(mapEvent)))
+            .catch(() => setEvents([]))
+            .finally(() => setLoading(false));
+    }, []);
+
     const monthOptions = useMemo(() => {
         const seen = new Set<string>();
-        return [...EVENTS]
+        return [...events]
             .sort((a, b) => sortKey(a) - sortKey(b))
             .filter(e => {
                 const key = `${e.monthNum}/${e.year}`;
@@ -69,27 +131,25 @@ export default function Eventos() {
                 seen.add(key);
                 return true;
             })
-            .map(e => ({ label: `${e.month} ${e.year}`, value: `${e.monthNum}/${e.year}` }));
-    }, []);
+            .map(e => ({ label: `${PT_MONTHS_LONG[e.monthNum]} ${e.year}`, value: `${e.monthNum}/${e.year}` }));
+    }, [events]);
 
     const filtered = useMemo(() => {
-        let list = EVENTS.filter(e => {
+        let list = events.filter(e => {
             const q = search.toLowerCase();
             if (q && !e.title.toLowerCase().includes(q) && !e.place.toLowerCase().includes(q)) return false;
-            if (activeCategory !== "Todos" && e.category !== activeCategory) return false;
             if (activeMonth !== "Todos" && `${e.monthNum}/${e.year}` !== activeMonth) return false;
             return true;
         });
         return sort === "date"
             ? [...list].sort((a, b) => sortKey(a) - sortKey(b))
             : [...list].sort((a, b) => a.title.localeCompare(b.title, "pt-BR"));
-    }, [search, activeCategory, activeMonth, sort]);
+    }, [events, search, activeMonth, sort]);
 
-    const activeCount = (search ? 1 : 0) + (activeCategory !== "Todos" ? 1 : 0) + (activeMonth !== "Todos" ? 1 : 0);
+    const activeCount = (search ? 1 : 0) + (activeMonth !== "Todos" ? 1 : 0);
 
     function clearAll() {
         setSearch("");
-        setActiveCategory("Todos");
         setActiveMonth("Todos");
     }
 
@@ -98,7 +158,6 @@ export default function Eventos() {
             <Header />
             <main className="ev-main">
 
-                {/* ── Hero ── */}
                 <section className="ev-hero" aria-labelledby="ev-hero-title">
                     <div className="ev-hero__overlay" aria-hidden="true" />
                     <div className="ev-hero__content">
@@ -112,10 +171,8 @@ export default function Eventos() {
                     </div>
                 </section>
 
-                {/* ── Body ── */}
                 <div className="ev-body">
 
-                    {/* Mobile toggle */}
                     <button
                         type="button"
                         className="ev-filter-toggle"
@@ -132,7 +189,6 @@ export default function Eventos() {
                         </span>
                     </button>
 
-                    {/* Sidebar */}
                     <aside className={`ev-sidebar${sidebarOpen ? " is-open" : ""}`} aria-label="Filtros">
 
                         <div className="ev-sidebar__section">
@@ -147,23 +203,6 @@ export default function Eventos() {
                                     onChange={e => setSearch(e.target.value)}
                                     aria-label="Buscar eventos"
                                 />
-                            </div>
-                        </div>
-
-                        <div className="ev-sidebar__section">
-                            <p className="ev-sidebar__label">Categoria</p>
-                            <div className="ev-filter-group">
-                                {["Todos", ...ALL_CATEGORIES].map(cat => (
-                                    <button
-                                        key={cat}
-                                        type="button"
-                                        className={`ev-pill${activeCategory === cat ? " is-active" : ""}`}
-                                        onClick={() => setActiveCategory(cat)}
-                                        aria-pressed={activeCategory === cat}
-                                    >
-                                        {cat}
-                                    </button>
-                                ))}
                             </div>
                         </div>
 
@@ -198,7 +237,6 @@ export default function Eventos() {
                         )}
                     </aside>
 
-                    {/* Main content */}
                     <div className="ev-content">
                         <div className="ev-topbar">
                             <p className="ev-count">
@@ -219,10 +257,15 @@ export default function Eventos() {
                             </div>
                         </div>
 
-                        {filtered.length > 0 ? (
+                        {loading ? (
+                            <div className="ev-empty">
+                                <span className="material-symbols-outlined ev-empty__icon" aria-hidden="true">hourglass_top</span>
+                                <p className="ev-empty__msg">Carregando eventos...</p>
+                            </div>
+                        ) : filtered.length > 0 ? (
                             <div className="ev-grid">
                                 {filtered.map(ev => (
-                                    <EventCard key={ev.id} ev={ev} />
+                                    <EventCardItem key={ev.id} ev={ev} />
                                 ))}
                             </div>
                         ) : (
