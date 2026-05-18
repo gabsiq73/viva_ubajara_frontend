@@ -1,10 +1,12 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { restaurantsService } from '../services/restaurantsService';
+import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormToggle } from '../components/FormField';
 import { Spinner } from '../components/Spinner';
 import { PhotoManager } from '../components/PhotoManager';
+import { PhotoPicker } from '../components/PhotoPicker';
 import type { RestaurantRequest, PhotoResponse } from '../types';
 
 const EMPTY: RestaurantRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', active: true, cuisineType: '', openingHours: '', avgPrice: undefined, acceptsReservation: false };
@@ -16,6 +18,7 @@ export function RestaurantFormPage() {
   const { showToast } = useToast();
   const [form, setForm] = useState<RestaurantRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof RestaurantRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
@@ -47,12 +50,14 @@ export function RestaurantFormPage() {
       if (isEdit) {
         await restaurantsService.update(id, form);
         showToast('Restaurante atualizado!', 'success');
-        navigate('/admin/restaurants');
       } else {
         const created = await restaurantsService.create(form);
-        showToast('Restaurante criado! Agora você pode adicionar fotos.', 'success');
-        navigate(`/admin/restaurants/${created.id}`);
+        await Promise.allSettled(
+          pendingFiles.map((f) => photosService.uploadForEntity('restaurants', created.id, f))
+        );
+        showToast('Restaurante criado com sucesso!', 'success');
       }
+      navigate('/admin/restaurants');
     } catch { showToast('Erro ao salvar.', 'error'); }
     finally { setLoading(false); }
   };
@@ -88,15 +93,14 @@ export function RestaurantFormPage() {
             <FormToggle label="Aceita Reserva" checked={!!form.acceptsReservation} onChange={(v) => set('acceptsReservation', v)} />
             <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
           </div>
+          {!isEdit && <PhotoPicker files={pendingFiles} onChange={setPendingFiles} />}
           <div className="adm-form-actions">
             <button type="button" className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/restaurants')}>Cancelar</button>
             <button type="submit" className="adm-btn adm-btn--primary" disabled={loading}>{loading ? 'Salvando…' : isEdit ? 'Atualizar' : 'Criar'}</button>
           </div>
         </form>
       </div>
-      {isEdit && id && (
-        <PhotoManager entityPath="restaurants" entityId={id} initialPhotos={photos} />
-      )}
+      {isEdit && id && <PhotoManager entityPath="restaurants" entityId={id} initialPhotos={photos} />}
     </div>
   );
 }

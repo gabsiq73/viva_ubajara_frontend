@@ -1,10 +1,12 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { eventsService } from '../services/eventsService';
+import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormToggle } from '../components/FormField';
 import { Spinner } from '../components/Spinner';
 import { PhotoManager } from '../components/PhotoManager';
+import { PhotoPicker } from '../components/PhotoPicker';
 import type { EventRequest, PhotoResponse } from '../types';
 
 const toApiFormat = (iso: string) => {
@@ -27,6 +29,7 @@ export function EventFormPage() {
   const { showToast } = useToast();
   const [form, setForm] = useState<EventRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [startLocal, setStartLocal] = useState('');
   const [endLocal, setEndLocal] = useState('');
   const [errors, setErrors] = useState<Partial<Record<keyof EventRequest, string>>>({});
@@ -37,7 +40,7 @@ export function EventFormPage() {
     if (!isEdit) return;
     setFetching(true);
     eventsService.getById(id).then((data) => {
-      setForm({ ...data, startDateTime: data.startDateTime, endDateTime: data.endDateTime });
+      setForm({ ...data });
       setStartLocal(toInputFormat(data.startDateTime));
       setEndLocal(toInputFormat(data.endDateTime));
       setPhotos(data.photos ?? []);
@@ -64,12 +67,14 @@ export function EventFormPage() {
       if (isEdit) {
         await eventsService.update(id, payload);
         showToast('Evento atualizado!', 'success');
-        navigate('/admin/events');
       } else {
         const created = await eventsService.create(payload);
-        showToast('Evento criado! Agora você pode adicionar fotos.', 'success');
-        navigate(`/admin/events/${created.id}`);
+        await Promise.allSettled(
+          pendingFiles.map((f) => photosService.uploadForEntity('events', created.id, f))
+        );
+        showToast('Evento criado com sucesso!', 'success');
       }
+      navigate('/admin/events');
     } catch { showToast('Erro ao salvar.', 'error'); }
     finally { setLoading(false); }
   };
@@ -92,15 +97,14 @@ export function EventFormPage() {
           </div>
           <FormInput label="URL de Inscrição" type="url" value={form.registrationUrl ?? ''} onChange={(e) => set('registrationUrl', e.target.value)} />
           <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
+          {!isEdit && <PhotoPicker files={pendingFiles} onChange={setPendingFiles} />}
           <div className="adm-form-actions">
             <button type="button" className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/events')}>Cancelar</button>
             <button type="submit" className="adm-btn adm-btn--primary" disabled={loading}>{loading ? 'Salvando…' : isEdit ? 'Atualizar' : 'Criar'}</button>
           </div>
         </form>
       </div>
-      {isEdit && id && (
-        <PhotoManager entityPath="events" entityId={id} initialPhotos={photos} />
-      )}
+      {isEdit && id && <PhotoManager entityPath="events" entityId={id} initialPhotos={photos} />}
     </div>
   );
 }

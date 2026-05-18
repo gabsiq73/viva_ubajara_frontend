@@ -1,10 +1,12 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { tourGuidesService } from '../services/tourGuidesService';
+import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormToggle } from '../components/FormField';
 import { Spinner } from '../components/Spinner';
 import { PhotoManager } from '../components/PhotoManager';
+import { PhotoPicker } from '../components/PhotoPicker';
 import type { TourGuideRequest, PhotoResponse } from '../types';
 
 const EMPTY: TourGuideRequest = { name: '', phone: '', email: '', languages: [], description: '', active: true };
@@ -16,6 +18,7 @@ export function TourGuideFormPage() {
   const { showToast } = useToast();
   const [form, setForm] = useState<TourGuideRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [langInput, setLangInput] = useState('');
   const [errors, setErrors] = useState<Partial<Record<keyof TourGuideRequest, string>>>({});
   const [loading, setLoading] = useState(false);
@@ -50,12 +53,14 @@ export function TourGuideFormPage() {
       if (isEdit) {
         await tourGuidesService.update(id, payload);
         showToast('Guia atualizado!', 'success');
-        navigate('/admin/tour-guides');
       } else {
         const created = await tourGuidesService.create(payload);
-        showToast('Guia criado! Agora você pode adicionar fotos.', 'success');
-        navigate(`/admin/tour-guides/${created.id}`);
+        await Promise.allSettled(
+          pendingFiles.map((f) => photosService.uploadForEntity('tour-guides', created.id, f))
+        );
+        showToast('Guia criado com sucesso!', 'success');
       }
+      navigate('/admin/tour-guides');
     } catch { showToast('Erro ao salvar.', 'error'); }
     finally { setLoading(false); }
   };
@@ -77,15 +82,14 @@ export function TourGuideFormPage() {
           <FormInput label="Idiomas" value={langInput} onChange={(e) => setLangInput(e.target.value)} hint="Separe por vírgula. Ex: Português, Inglês, Espanhol" />
           <FormTextarea label="Descrição" value={form.description ?? ''} onChange={(e) => set('description', e.target.value)} />
           <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
+          {!isEdit && <PhotoPicker files={pendingFiles} onChange={setPendingFiles} />}
           <div className="adm-form-actions">
             <button type="button" className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/tour-guides')}>Cancelar</button>
             <button type="submit" className="adm-btn adm-btn--primary" disabled={loading}>{loading ? 'Salvando…' : isEdit ? 'Atualizar' : 'Criar'}</button>
           </div>
         </form>
       </div>
-      {isEdit && id && (
-        <PhotoManager entityPath="tour-guides" entityId={id} initialPhotos={photos} />
-      )}
+      {isEdit && id && <PhotoManager entityPath="tour-guides" entityId={id} initialPhotos={photos} />}
     </div>
   );
 }

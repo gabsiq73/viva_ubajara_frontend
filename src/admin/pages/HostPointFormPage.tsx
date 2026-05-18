@@ -1,10 +1,12 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { hostPointsService } from '../services/hostPointsService';
+import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormSelect, FormToggle } from '../components/FormField';
 import { Spinner } from '../components/Spinner';
 import { PhotoManager } from '../components/PhotoManager';
+import { PhotoPicker } from '../components/PhotoPicker';
 import type { HostPointRequest, HostType, PhotoResponse } from '../types';
 
 const EMPTY: HostPointRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', active: true, hostType: 'HOTEL', numOfRooms: undefined, avgPrice: undefined, bookingUrl: '' };
@@ -16,6 +18,7 @@ export function HostPointFormPage() {
   const { showToast } = useToast();
   const [form, setForm] = useState<HostPointRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof HostPointRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
@@ -46,12 +49,14 @@ export function HostPointFormPage() {
       if (isEdit) {
         await hostPointsService.update(id, form);
         showToast('Hospedagem atualizada!', 'success');
-        navigate('/admin/host-points');
       } else {
         const created = await hostPointsService.create(form);
-        showToast('Hospedagem criada! Agora você pode adicionar fotos.', 'success');
-        navigate(`/admin/host-points/${created.id}`);
+        await Promise.allSettled(
+          pendingFiles.map((f) => photosService.uploadForEntity('host-points', created.id, f))
+        );
+        showToast('Hospedagem criada com sucesso!', 'success');
       }
+      navigate('/admin/host-points');
     } catch { showToast('Erro ao salvar.', 'error'); }
     finally { setLoading(false); }
   };
@@ -85,15 +90,14 @@ export function HostPointFormPage() {
           </div>
           <FormInput label="URL de Reserva" type="url" value={form.bookingUrl ?? ''} onChange={(e) => set('bookingUrl', e.target.value)} />
           <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
+          {!isEdit && <PhotoPicker files={pendingFiles} onChange={setPendingFiles} />}
           <div className="adm-form-actions">
             <button type="button" className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/host-points')}>Cancelar</button>
             <button type="submit" className="adm-btn adm-btn--primary" disabled={loading}>{loading ? 'Salvando…' : isEdit ? 'Atualizar' : 'Criar'}</button>
           </div>
         </form>
       </div>
-      {isEdit && id && (
-        <PhotoManager entityPath="host-points" entityId={id} initialPhotos={photos} />
-      )}
+      {isEdit && id && <PhotoManager entityPath="host-points" entityId={id} initialPhotos={photos} />}
     </div>
   );
 }

@@ -1,10 +1,12 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { touristSpotsService } from '../services/touristSpotsService';
+import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormToggle } from '../components/FormField';
 import { Spinner } from '../components/Spinner';
 import { PhotoManager } from '../components/PhotoManager';
+import { PhotoPicker } from '../components/PhotoPicker';
 import type { TouristSpotRequest, PhotoResponse } from '../types';
 
 const EMPTY: TouristSpotRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', active: true };
@@ -16,6 +18,7 @@ export function TouristSpotFormPage() {
   const { showToast } = useToast();
   const [form, setForm] = useState<TouristSpotRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof TouristSpotRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
@@ -46,12 +49,14 @@ export function TouristSpotFormPage() {
       if (isEdit) {
         await touristSpotsService.update(id, form);
         showToast('Ponto turístico atualizado!', 'success');
-        navigate('/admin/tourist-spots');
       } else {
         const created = await touristSpotsService.create(form);
-        showToast('Ponto turístico criado! Agora você pode adicionar fotos.', 'success');
-        navigate(`/admin/tourist-spots/${created.id}`);
+        await Promise.allSettled(
+          pendingFiles.map((f) => photosService.uploadForEntity('tourist-spots', created.id, f))
+        );
+        showToast('Ponto turístico criado com sucesso!', 'success');
       }
+      navigate('/admin/tourist-spots');
     } catch { showToast('Erro ao salvar.', 'error'); }
     finally { setLoading(false); }
   };
@@ -77,15 +82,14 @@ export function TouristSpotFormPage() {
             <FormInput label="Instagram" value={form.instagramUrl ?? ''} onChange={(e) => set('instagramUrl', e.target.value)} />
           </div>
           <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
+          {!isEdit && <PhotoPicker files={pendingFiles} onChange={setPendingFiles} />}
           <div className="adm-form-actions">
             <button type="button" className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/tourist-spots')}>Cancelar</button>
             <button type="submit" className="adm-btn adm-btn--primary" disabled={loading}>{loading ? 'Salvando…' : isEdit ? 'Atualizar' : 'Criar'}</button>
           </div>
         </form>
       </div>
-      {isEdit && id && (
-        <PhotoManager entityPath="tourist-spots" entityId={id} initialPhotos={photos} />
-      )}
+      {isEdit && id && <PhotoManager entityPath="tourist-spots" entityId={id} initialPhotos={photos} />}
     </div>
   );
 }
