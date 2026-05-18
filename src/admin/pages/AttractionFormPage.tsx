@@ -4,7 +4,8 @@ import { attractionsService } from '../services/attractionsService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormSelect, FormToggle } from '../components/FormField';
 import { Spinner } from '../components/Spinner';
-import type { AttractionRequest, AttractionCategory } from '../types';
+import { PhotoManager } from '../components/PhotoManager';
+import type { AttractionRequest, AttractionCategory, PhotoResponse } from '../types';
 
 const CATEGORIES: { value: AttractionCategory; label: string }[] = [
   { value: 'PARK', label: 'Parque' },
@@ -29,6 +30,7 @@ export function AttractionFormPage() {
   const { showToast } = useToast();
 
   const [form, setForm] = useState<AttractionRequest>(EMPTY);
+  const [photos, setPhotos] = useState<PhotoResponse[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof AttractionRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
@@ -38,6 +40,7 @@ export function AttractionFormPage() {
     setFetching(true);
     attractionsService.getById(id).then((data) => {
       setForm({ ...data, entryPrice: data.entryPrice ?? undefined, averageVisitDuration: data.averageVisitDuration ?? undefined });
+      setPhotos(data.photos ?? []);
     }).catch(() => showToast('Erro ao carregar atração.', 'error'))
       .finally(() => setFetching(false));
   }, [id]);
@@ -63,11 +66,12 @@ export function AttractionFormPage() {
       if (isEdit) {
         await attractionsService.update(id, form);
         showToast('Atração atualizada com sucesso!', 'success');
+        navigate('/admin/attractions');
       } else {
-        await attractionsService.create(form);
-        showToast('Atração criada com sucesso!', 'success');
+        const created = await attractionsService.create(form);
+        showToast('Atração criada! Agora você pode adicionar fotos.', 'success');
+        navigate(`/admin/attractions/${created.id}`);
       }
-      navigate('/admin/attractions');
     } catch {
       showToast('Erro ao salvar atração.', 'error');
     } finally {
@@ -128,6 +132,10 @@ export function AttractionFormPage() {
           </div>
         </form>
       </div>
+
+      {isEdit && id && (
+        <PhotoManager entityPath="attractions" entityId={id} initialPhotos={photos} />
+      )}
     </div>
   );
 }

@@ -4,16 +4,15 @@ import { eventsService } from '../services/eventsService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormToggle } from '../components/FormField';
 import { Spinner } from '../components/Spinner';
-import type { EventRequest } from '../types';
+import { PhotoManager } from '../components/PhotoManager';
+import type { EventRequest, PhotoResponse } from '../types';
 
-/** Converte ISO para formato dd/MM/yyyy HH:mm:ss */
 const toApiFormat = (iso: string) => {
   if (!iso) return '';
   const d = new Date(iso);
   return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:00`;
 };
 
-/** Para o input datetime-local */
 const toInputFormat = (dt: string) => {
   if (!dt) return '';
   try { return new Date(dt).toISOString().slice(0,16); } catch { return ''; }
@@ -27,6 +26,7 @@ export function EventFormPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [form, setForm] = useState<EventRequest>(EMPTY);
+  const [photos, setPhotos] = useState<PhotoResponse[]>([]);
   const [startLocal, setStartLocal] = useState('');
   const [endLocal, setEndLocal] = useState('');
   const [errors, setErrors] = useState<Partial<Record<keyof EventRequest, string>>>({});
@@ -40,6 +40,7 @@ export function EventFormPage() {
       setForm({ ...data, startDateTime: data.startDateTime, endDateTime: data.endDateTime });
       setStartLocal(toInputFormat(data.startDateTime));
       setEndLocal(toInputFormat(data.endDateTime));
+      setPhotos(data.photos ?? []);
     }).catch(() => showToast('Erro ao carregar.', 'error')).finally(() => setFetching(false));
   }, [id]);
 
@@ -60,9 +61,15 @@ export function EventFormPage() {
     const payload = { ...form, startDateTime: toApiFormat(startLocal), endDateTime: toApiFormat(endLocal) };
     setLoading(true);
     try {
-      isEdit ? await eventsService.update(id, payload) : await eventsService.create(payload);
-      showToast(`Evento ${isEdit ? 'atualizado' : 'criado'}!`, 'success');
-      navigate('/admin/events');
+      if (isEdit) {
+        await eventsService.update(id, payload);
+        showToast('Evento atualizado!', 'success');
+        navigate('/admin/events');
+      } else {
+        const created = await eventsService.create(payload);
+        showToast('Evento criado! Agora você pode adicionar fotos.', 'success');
+        navigate(`/admin/events/${created.id}`);
+      }
     } catch { showToast('Erro ao salvar.', 'error'); }
     finally { setLoading(false); }
   };
@@ -91,6 +98,9 @@ export function EventFormPage() {
           </div>
         </form>
       </div>
+      {isEdit && id && (
+        <PhotoManager entityPath="events" entityId={id} initialPhotos={photos} />
+      )}
     </div>
   );
 }

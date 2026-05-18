@@ -4,7 +4,8 @@ import { tourGuidesService } from '../services/tourGuidesService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormToggle } from '../components/FormField';
 import { Spinner } from '../components/Spinner';
-import type { TourGuideRequest } from '../types';
+import { PhotoManager } from '../components/PhotoManager';
+import type { TourGuideRequest, PhotoResponse } from '../types';
 
 const EMPTY: TourGuideRequest = { name: '', phone: '', email: '', languages: [], description: '', active: true };
 
@@ -14,6 +15,7 @@ export function TourGuideFormPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [form, setForm] = useState<TourGuideRequest>(EMPTY);
+  const [photos, setPhotos] = useState<PhotoResponse[]>([]);
   const [langInput, setLangInput] = useState('');
   const [errors, setErrors] = useState<Partial<Record<keyof TourGuideRequest, string>>>({});
   const [loading, setLoading] = useState(false);
@@ -22,8 +24,11 @@ export function TourGuideFormPage() {
   useEffect(() => {
     if (!isEdit) return;
     setFetching(true);
-    tourGuidesService.getById(id).then((d) => { setForm(d); setLangInput((d.languages ?? []).join(', ')); })
-      .catch(() => showToast('Erro ao carregar.', 'error')).finally(() => setFetching(false));
+    tourGuidesService.getById(id).then((d) => {
+      setForm(d);
+      setLangInput((d.languages ?? []).join(', '));
+      setPhotos(d.photos ?? []);
+    }).catch(() => showToast('Erro ao carregar.', 'error')).finally(() => setFetching(false));
   }, [id]);
 
   const set = <K extends keyof TourGuideRequest>(key: K, val: TourGuideRequest[K]) => setForm((p) => ({ ...p, [key]: val }));
@@ -42,9 +47,15 @@ export function TourGuideFormPage() {
     setLoading(true);
     try {
       const payload = { ...form, languages };
-      isEdit ? await tourGuidesService.update(id, payload) : await tourGuidesService.create(payload);
-      showToast(`Guia ${isEdit ? 'atualizado' : 'criado'}!`, 'success');
-      navigate('/admin/tour-guides');
+      if (isEdit) {
+        await tourGuidesService.update(id, payload);
+        showToast('Guia atualizado!', 'success');
+        navigate('/admin/tour-guides');
+      } else {
+        const created = await tourGuidesService.create(payload);
+        showToast('Guia criado! Agora você pode adicionar fotos.', 'success');
+        navigate(`/admin/tour-guides/${created.id}`);
+      }
     } catch { showToast('Erro ao salvar.', 'error'); }
     finally { setLoading(false); }
   };
@@ -72,6 +83,9 @@ export function TourGuideFormPage() {
           </div>
         </form>
       </div>
+      {isEdit && id && (
+        <PhotoManager entityPath="tour-guides" entityId={id} initialPhotos={photos} />
+      )}
     </div>
   );
 }

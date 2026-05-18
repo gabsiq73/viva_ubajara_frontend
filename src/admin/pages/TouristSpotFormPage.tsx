@@ -4,7 +4,8 @@ import { touristSpotsService } from '../services/touristSpotsService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormToggle } from '../components/FormField';
 import { Spinner } from '../components/Spinner';
-import type { TouristSpotRequest } from '../types';
+import { PhotoManager } from '../components/PhotoManager';
+import type { TouristSpotRequest, PhotoResponse } from '../types';
 
 const EMPTY: TouristSpotRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', active: true };
 
@@ -14,6 +15,7 @@ export function TouristSpotFormPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [form, setForm] = useState<TouristSpotRequest>(EMPTY);
+  const [photos, setPhotos] = useState<PhotoResponse[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof TouristSpotRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
@@ -21,7 +23,10 @@ export function TouristSpotFormPage() {
   useEffect(() => {
     if (!isEdit) return;
     setFetching(true);
-    touristSpotsService.getById(id).then(setForm).catch(() => showToast('Erro ao carregar.', 'error')).finally(() => setFetching(false));
+    touristSpotsService.getById(id).then((d) => {
+      setForm(d);
+      setPhotos(d.photos ?? []);
+    }).catch(() => showToast('Erro ao carregar.', 'error')).finally(() => setFetching(false));
   }, [id]);
 
   const set = <K extends keyof TouristSpotRequest>(key: K, val: TouristSpotRequest[K]) => setForm((p) => ({ ...p, [key]: val }));
@@ -38,9 +43,15 @@ export function TouristSpotFormPage() {
     e.preventDefault(); if (!validate()) return;
     setLoading(true);
     try {
-      isEdit ? await touristSpotsService.update(id, form) : await touristSpotsService.create(form);
-      showToast(`Ponto turístico ${isEdit ? 'atualizado' : 'criado'}!`, 'success');
-      navigate('/admin/tourist-spots');
+      if (isEdit) {
+        await touristSpotsService.update(id, form);
+        showToast('Ponto turístico atualizado!', 'success');
+        navigate('/admin/tourist-spots');
+      } else {
+        const created = await touristSpotsService.create(form);
+        showToast('Ponto turístico criado! Agora você pode adicionar fotos.', 'success');
+        navigate(`/admin/tourist-spots/${created.id}`);
+      }
     } catch { showToast('Erro ao salvar.', 'error'); }
     finally { setLoading(false); }
   };
@@ -72,6 +83,9 @@ export function TouristSpotFormPage() {
           </div>
         </form>
       </div>
+      {isEdit && id && (
+        <PhotoManager entityPath="tourist-spots" entityId={id} initialPhotos={photos} />
+      )}
     </div>
   );
 }

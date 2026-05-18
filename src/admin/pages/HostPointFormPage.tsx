@@ -4,7 +4,8 @@ import { hostPointsService } from '../services/hostPointsService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormSelect, FormToggle } from '../components/FormField';
 import { Spinner } from '../components/Spinner';
-import type { HostPointRequest, HostType } from '../types';
+import { PhotoManager } from '../components/PhotoManager';
+import type { HostPointRequest, HostType, PhotoResponse } from '../types';
 
 const EMPTY: HostPointRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', active: true, hostType: 'HOTEL', numOfRooms: undefined, avgPrice: undefined, bookingUrl: '' };
 
@@ -14,6 +15,7 @@ export function HostPointFormPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [form, setForm] = useState<HostPointRequest>(EMPTY);
+  const [photos, setPhotos] = useState<PhotoResponse[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof HostPointRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
@@ -21,8 +23,10 @@ export function HostPointFormPage() {
   useEffect(() => {
     if (!isEdit) return;
     setFetching(true);
-    hostPointsService.getById(id).then((d) => setForm({ ...d, avgPrice: d.avgPrice ?? undefined, numOfRooms: d.numOfRooms ?? undefined }))
-      .catch(() => showToast('Erro ao carregar.', 'error')).finally(() => setFetching(false));
+    hostPointsService.getById(id).then((d) => {
+      setForm({ ...d, avgPrice: d.avgPrice ?? undefined, numOfRooms: d.numOfRooms ?? undefined });
+      setPhotos(d.photos ?? []);
+    }).catch(() => showToast('Erro ao carregar.', 'error')).finally(() => setFetching(false));
   }, [id]);
 
   const set = <K extends keyof HostPointRequest>(key: K, val: HostPointRequest[K]) => setForm((p) => ({ ...p, [key]: val }));
@@ -39,9 +43,15 @@ export function HostPointFormPage() {
     e.preventDefault(); if (!validate()) return;
     setLoading(true);
     try {
-      isEdit ? await hostPointsService.update(id, form) : await hostPointsService.create(form);
-      showToast(`Hospedagem ${isEdit ? 'atualizada' : 'criada'}!`, 'success');
-      navigate('/admin/host-points');
+      if (isEdit) {
+        await hostPointsService.update(id, form);
+        showToast('Hospedagem atualizada!', 'success');
+        navigate('/admin/host-points');
+      } else {
+        const created = await hostPointsService.create(form);
+        showToast('Hospedagem criada! Agora você pode adicionar fotos.', 'success');
+        navigate(`/admin/host-points/${created.id}`);
+      }
     } catch { showToast('Erro ao salvar.', 'error'); }
     finally { setLoading(false); }
   };
@@ -81,6 +91,9 @@ export function HostPointFormPage() {
           </div>
         </form>
       </div>
+      {isEdit && id && (
+        <PhotoManager entityPath="host-points" entityId={id} initialPhotos={photos} />
+      )}
     </div>
   );
 }

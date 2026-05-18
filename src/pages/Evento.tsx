@@ -96,7 +96,6 @@ export default function Evento() {
 
     const heroImg = ev.photos?.[0]?.url ?? heroFallback;
     const start = parseDate(ev.startDateTime);
-    const end = parseDate(ev.endDateTime);
     const day = isNaN(start.getTime()) ? "" : String(start.getDate()).padStart(2, "0");
     const monthLong = isNaN(start.getTime()) ? "" : PT_MONTHS_LONG[start.getMonth()];
     const year = isNaN(start.getTime()) ? "" : start.getFullYear();

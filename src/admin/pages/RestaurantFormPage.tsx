@@ -4,7 +4,8 @@ import { restaurantsService } from '../services/restaurantsService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormToggle } from '../components/FormField';
 import { Spinner } from '../components/Spinner';
-import type { RestaurantRequest } from '../types';
+import { PhotoManager } from '../components/PhotoManager';
+import type { RestaurantRequest, PhotoResponse } from '../types';
 
 const EMPTY: RestaurantRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', active: true, cuisineType: '', openingHours: '', avgPrice: undefined, acceptsReservation: false };
 
@@ -14,6 +15,7 @@ export function RestaurantFormPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [form, setForm] = useState<RestaurantRequest>(EMPTY);
+  const [photos, setPhotos] = useState<PhotoResponse[]>([]);
   const [errors, setErrors] = useState<Partial<Record<keyof RestaurantRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
@@ -21,8 +23,10 @@ export function RestaurantFormPage() {
   useEffect(() => {
     if (!isEdit) return;
     setFetching(true);
-    restaurantsService.getById(id).then((d) => setForm({ ...d, avgPrice: d.avgPrice ?? undefined }))
-      .catch(() => showToast('Erro ao carregar.', 'error')).finally(() => setFetching(false));
+    restaurantsService.getById(id).then((d) => {
+      setForm({ ...d, avgPrice: d.avgPrice ?? undefined });
+      setPhotos(d.photos ?? []);
+    }).catch(() => showToast('Erro ao carregar.', 'error')).finally(() => setFetching(false));
   }, [id]);
 
   const set = <K extends keyof RestaurantRequest>(key: K, val: RestaurantRequest[K]) => setForm((p) => ({ ...p, [key]: val }));
@@ -40,9 +44,15 @@ export function RestaurantFormPage() {
     e.preventDefault(); if (!validate()) return;
     setLoading(true);
     try {
-      isEdit ? await restaurantsService.update(id, form) : await restaurantsService.create(form);
-      showToast(`Restaurante ${isEdit ? 'atualizado' : 'criado'}!`, 'success');
-      navigate('/admin/restaurants');
+      if (isEdit) {
+        await restaurantsService.update(id, form);
+        showToast('Restaurante atualizado!', 'success');
+        navigate('/admin/restaurants');
+      } else {
+        const created = await restaurantsService.create(form);
+        showToast('Restaurante criado! Agora você pode adicionar fotos.', 'success');
+        navigate(`/admin/restaurants/${created.id}`);
+      }
     } catch { showToast('Erro ao salvar.', 'error'); }
     finally { setLoading(false); }
   };
@@ -84,6 +94,9 @@ export function RestaurantFormPage() {
           </div>
         </form>
       </div>
+      {isEdit && id && (
+        <PhotoManager entityPath="restaurants" entityId={id} initialPhotos={photos} />
+      )}
     </div>
   );
 }

@@ -17,6 +17,15 @@ export const photosService = {
     return response.data;
   },
 
+  uploadForEntity: async (entityPath: string, entityId: string, file: File): Promise<PhotoResponse> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post<PhotoResponse>(`/${entityPath}/${entityId}/photos`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
   delete: async (id: string): Promise<void> => {
     await api.delete(`/photos/${id}`);
   },

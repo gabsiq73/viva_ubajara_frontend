@@ -128,8 +128,8 @@ export default function Estabelecimento() {
             : hostPointsService.getById(id);
 
         const fetchRelated = apiType === "restaurant"
-            ? restaurantsService.getAll(0, 10, true)
-            : hostPointsService.getAll(0, 10, true);
+            ? restaurantsService.getAll(0, 10)
+            : hostPointsService.getAll(0, 10);
 
         Promise.allSettled([fetchDetail, fetchRelated]).then(([detailResult, allResult]) => {
             if (detailResult.status === "fulfilled") {
