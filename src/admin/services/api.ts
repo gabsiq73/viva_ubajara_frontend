@@ -15,9 +15,15 @@ const api = axios.create({
   baseURL: BASE_URL,
 });
 
-// Interceptor de request: injeta o token JWT se válido
+// Interceptor de request: injeta o token JWT e corrige Content-Type para FormData
 api.interceptors.request.use(
   (config) => {
+    // Quando o body é FormData, remove o Content-Type para o browser definir
+    // o multipart/form-data com o boundary correto automaticamente
+    if (config.data instanceof FormData) {
+      config.headers.delete('Content-Type');
+    }
+
     const token = localStorage.getItem(TOKEN_KEY);
     if (token && !isTokenExpired(token)) {
       config.headers.Authorization = `Bearer ${token}`;
