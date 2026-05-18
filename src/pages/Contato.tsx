@@ -1,6 +1,8 @@
+import { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import heroImg from "../assets/images/foto-capa-parque-ubajara.png";
+import { contactMessagesService } from "../admin/services/contactMessagesService";
 import "../components/Sections/style/Content.components.css";
 import "./style/Contato.css";
 
@@ -23,11 +25,50 @@ const PARQUE = [
     { icon: "support_agent",   label: "Procon Ubajara",            phone: "(88) 3634-1222", desc: "Defesa do consumidor" },
 ] as const;
 
+const SUBJECTS = [
+    "Informações sobre o Parque",
+    "Teleférico e Trilhas",
+    "Hospedagem e Pousadas",
+    "Eventos e Programação",
+    "Outros",
+] as const;
+
 function cleanPhone(phone: string) {
     return phone.replace(/\D/g, "");
 }
 
-export default function Contato() {
+export default function Contato(): JSX.Element {
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [subject, setSubject] = useState<string>(SUBJECTS[0]);
+    const [message, setMessage] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+        e.preventDefault();
+        if (!name.trim() || !email.trim() || !message.trim()) {
+            setError("Preencha todos os campos obrigatórios.");
+            return;
+        }
+        setError(null);
+        setSubmitting(true);
+        try {
+            await contactMessagesService.create({ name: name.trim(), email: email.trim(), subject, message: message.trim() });
+            setSuccess(true);
+            setName("");
+            setEmail("");
+            setSubject(SUBJECTS[0]);
+            setMessage("");
+            setTimeout(() => setSuccess(false), 5000);
+        } catch {
+            setError("Não foi possível enviar a mensagem. Tente novamente em instantes.");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
     return (
         <div className="ct-page">
             <Header />
@@ -85,30 +126,75 @@ export default function Contato() {
                     </div>
 
                     <div className="contact-section__form-wrap">
-                        <form className="contact-section__form" onSubmit={(e) => e.preventDefault()}>
+                        {success && (
+                            <div className="contact-section__alert contact-section__alert--success" role="status">
+                                <span className="material-symbols-outlined">check_circle</span>
+                                Mensagem enviada com sucesso! Retornaremos em breve.
+                            </div>
+                        )}
+                        <form className="contact-section__form" onSubmit={handleSubmit} noValidate>
                             <div className="contact-section__field">
                                 <label htmlFor="ct-name" className="contact-section__label">Nome Completo</label>
-                                <input id="ct-name" type="text" className="contact-section__input" placeholder="Como podemos te chamar?" />
+                                <input
+                                    id="ct-name"
+                                    type="text"
+                                    className="contact-section__input"
+                                    placeholder="Como podemos te chamar?"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    disabled={submitting}
+                                    required
+                                />
                             </div>
                             <div className="contact-section__field">
                                 <label htmlFor="ct-email" className="contact-section__label">E-mail</label>
-                                <input id="ct-email" type="email" className="contact-section__input" placeholder="seu@email.com" />
+                                <input
+                                    id="ct-email"
+                                    type="email"
+                                    className="contact-section__input"
+                                    placeholder="seu@email.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    disabled={submitting}
+                                    required
+                                />
                             </div>
                             <div className="contact-section__field">
                                 <label htmlFor="ct-subject" className="contact-section__label">Assunto</label>
-                                <select id="ct-subject" className="contact-section__select">
-                                    <option>Informações sobre o Parque</option>
-                                    <option>Teleférico e Trilhas</option>
-                                    <option>Hospedagem e Pousadas</option>
-                                    <option>Eventos e Programação</option>
-                                    <option>Outros</option>
+                                <select
+                                    id="ct-subject"
+                                    className="contact-section__select"
+                                    value={subject}
+                                    onChange={(e) => setSubject(e.target.value)}
+                                    disabled={submitting}
+                                >
+                                    {SUBJECTS.map((s) => (
+                                        <option key={s} value={s}>{s}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="contact-section__field">
                                 <label htmlFor="ct-msg" className="contact-section__label">Mensagem</label>
-                                <textarea id="ct-msg" className="contact-section__textarea" placeholder="Em que podemos te ajudar?" rows={4} />
+                                <textarea
+                                    id="ct-msg"
+                                    className="contact-section__textarea"
+                                    placeholder="Em que podemos te ajudar?"
+                                    rows={4}
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    disabled={submitting}
+                                    required
+                                />
                             </div>
-                            <button type="submit" className="contact-section__submit">Enviar Mensagem</button>
+                            {error && (
+                                <div className="contact-section__alert contact-section__alert--error" role="alert">
+                                    <span className="material-symbols-outlined">error</span>
+                                    {error}
+                                </div>
+                            )}
+                            <button type="submit" className="contact-section__submit" disabled={submitting}>
+                                {submitting ? "Enviando…" : "Enviar Mensagem"}
+                            </button>
                         </form>
                     </div>
                 </div>

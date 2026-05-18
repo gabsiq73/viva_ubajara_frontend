@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Mountain, 
-  Calendar, 
-  Utensils, 
-  Hotel, 
-  MapPin, 
-  Compass, 
-  Phone, 
-  Image 
+import {
+  Mountain,
+  Calendar,
+  Utensils,
+  Hotel,
+  MapPin,
+  Compass,
+  Phone,
+  Image,
+  MessageSquare,
+  Star,
 } from 'lucide-react';
 import { attractionsService } from '../services/attractionsService';
 import { eventsService } from '../services/eventsService';
@@ -17,6 +19,8 @@ import { hostPointsService } from '../services/hostPointsService';
 import { touristSpotsService } from '../services/touristSpotsService';
 import { tourGuidesService } from '../services/tourGuidesService';
 import { contactsService } from '../services/contactsService';
+import { contactMessagesService } from '../services/contactMessagesService';
+import { testimonialsService } from '../services/testimonialsService';
 
 interface StatCard { label: string; value: number | string; icon: React.ReactNode; to: string; color: string; }
 
@@ -27,7 +31,7 @@ export function DashboardPage() {
   useEffect(() => {
     const load = async (): Promise<void> => {
       try {
-        const [att, ev, rest, host, spots, guides, contacts] = await Promise.allSettled([
+        const [att, ev, rest, host, spots, guides, contacts, messages, testimonials] = await Promise.allSettled([
           attractionsService.getAll(0, 1),
           eventsService.getAll(0, 1),
           restaurantsService.getAll(0, 1),
@@ -35,6 +39,8 @@ export function DashboardPage() {
           touristSpotsService.getAll(0, 1),
           tourGuidesService.getAll(0, 1),
           contactsService.getAll(0, 1),
+          contactMessagesService.getAll(0, 1),
+          testimonialsService.getAll(0, 1),
         ]);
 
         const get = (r: PromiseSettledResult<{ totalElements: number }>) =>
@@ -48,6 +54,8 @@ export function DashboardPage() {
           { label: 'Pontos Turísticos', value: get(spots), icon: <MapPin size={24} />, to: '/admin/tourist-spots', color: 'var(--adm-red)' },
           { label: 'Guias', value: get(guides), icon: <Compass size={24} />, to: '/admin/tour-guides', color: '#0ea5e9' },
           { label: 'Contatos', value: get(contacts), icon: <Phone size={24} />, to: '/admin/contacts', color: '#10b981' },
+          { label: 'Mensagens', value: get(messages), icon: <MessageSquare size={24} />, to: '/admin/contact-messages', color: '#f59e0b' },
+          { label: 'Depoimentos', value: get(testimonials), icon: <Star size={24} />, to: '/admin/testimonials', color: '#ec4899' },
         ]);
       } finally {
         setLoading(false);

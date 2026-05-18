@@ -1,28 +1,31 @@
 import api from './api';
-
-export interface Testimonial {
-  id: string;
-  userName: string;
-  userPhoto?: string;
-  userRole?: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
-}
-
-export interface TestimonialRequest {
-  rating: number;
-  comment: string;
-}
+import type { TestimonialRequest, TestimonialResponse, TestimonialUpdateDTO, PageResponse } from '../types';
 
 export const testimonialsService = {
-  list: async (): Promise<Testimonial[]> => {
-    const response = await api.get<Testimonial[]>('/testimonials');
+  listApproved: async (): Promise<TestimonialResponse[]> => {
+    const response = await api.get<PageResponse<TestimonialResponse>>('/testimonials', {
+      params: { approved: true, size: 50 },
+    });
+    return response.data.content;
+  },
+
+  create: async (data: TestimonialRequest): Promise<TestimonialResponse> => {
+    const response = await api.post<TestimonialResponse>('/testimonials', data);
     return response.data;
   },
 
-  create: async (data: TestimonialRequest): Promise<Testimonial> => {
-    const response = await api.post<Testimonial>('/testimonials', data);
+  getAll: async (page = 0, size = 10, approved?: boolean): Promise<PageResponse<TestimonialResponse>> => {
+    const response = await api.get<PageResponse<TestimonialResponse>>('/testimonials', {
+      params: { page, size, ...(approved !== undefined ? { approved } : {}) },
+    });
     return response.data;
+  },
+
+  update: async (id: string, data: TestimonialUpdateDTO): Promise<void> => {
+    await api.patch(`/testimonials/${id}`, data);
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/testimonials/${id}`);
   },
 };

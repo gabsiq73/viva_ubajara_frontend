@@ -18,6 +18,8 @@ import { TourGuidesListPage } from './pages/TourGuidesListPage';
 import { TourGuideFormPage } from './pages/TourGuideFormPage';
 import { ContactsListPage } from './pages/ContactsListPage';
 import { ContactFormPage } from './pages/ContactFormPage';
+import { ContactMessagesListPage } from './pages/ContactMessagesListPage';
+import { TestimonialsListPage } from './pages/TestimonialsListPage';
 import { PhotosPage } from './pages/PhotosPage';
 import './styles/admin.css';
 
@@ -64,6 +66,9 @@ export function AdminRouter() {
           <Route path="contacts" element={<ContactsListPage />} />
           <Route path="contacts/new" element={<ContactFormPage />} />
           <Route path="contacts/:id/edit" element={<ContactFormPage />} />
+
+          <Route path="contact-messages" element={<ContactMessagesListPage />} />
+          <Route path="testimonials" element={<TestimonialsListPage />} />
 
           <Route path="photos" element={<PhotosPage />} />
         </Route>

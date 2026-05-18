@@ -3,58 +3,65 @@ import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useAuth } from "../admin/hooks/useAuth";
-import { testimonialsService, type Testimonial } from "../admin/services/testimonialsService";
+import { testimonialsService } from "../admin/services/testimonialsService";
+import type { TestimonialResponse } from "../admin/types";
 import "./style/Depoimentos.css";
 
 // ─── Mock data mostrado enquanto a API não retorna ──────────────────────────
-const MOCK: Testimonial[] = [
+const MOCK: TestimonialResponse[] = [
   {
     id: "m1",
     userName: "Maria das Graças",
+    userEmail: "",
     rating: 5,
     comment: "Lugar incrível! O teleférico é uma experiência única. A cachoeira do Cafundó é lindíssima. Com certeza voltarei com minha família.",
-    createdAt: "2025-03-15",
-    userRole: "Visitante",
+    createdDate: "2025-03-15",
+    approved: true,
   },
   {
     id: "m2",
     userName: "Carlos Eduardo",
+    userEmail: "",
     rating: 5,
     comment: "Fiz a trilha até a caverna com um guia local e foi inesquecível. A fauna e flora da Serra da Ibiapaba são de tirar o fôlego. Recomendo muito!",
-    createdAt: "2025-02-20",
-    userRole: "Turista",
+    createdDate: "2025-02-20",
+    approved: true,
   },
   {
     id: "m3",
     userName: "Ana Paula Ferreira",
+    userEmail: "",
     rating: 4,
     comment: "Parque muito bem cuidado. O teleférico às vezes fica em manutenção, então confirme antes de ir. A paisagem do alto é deslumbrante.",
-    createdAt: "2025-01-08",
-    userRole: "Visitante",
+    createdDate: "2025-01-08",
+    approved: true,
   },
   {
     id: "m4",
     userName: "João Marcos",
+    userEmail: "",
     rating: 5,
     comment: "Visitei pela segunda vez e a experiência foi ainda melhor. Os guias são muito atenciosos e conhecem cada detalhe do parque. Imperdível!",
-    createdAt: "2024-12-22",
-    userRole: "Turista",
+    createdDate: "2024-12-22",
+    approved: true,
   },
   {
     id: "m5",
     userName: "Fernanda Lima",
+    userEmail: "",
     rating: 4,
     comment: "Natureza preservada e trilhas bem sinalizadas. Leve água e protetor solar. A estrutura de apoio pode melhorar um pouco, mas a beleza compensa.",
-    createdAt: "2024-11-30",
-    userRole: "Visitante",
+    createdDate: "2024-11-30",
+    approved: true,
   },
   {
     id: "m6",
     userName: "Ricardo Santos",
+    userEmail: "",
     rating: 5,
     comment: "Melhor passeio ecológico que já fiz no Ceará. A vista da Serra da Ibiapaba e a chegada à cachoeira são momentos que ficam para sempre na memória.",
-    createdAt: "2024-10-14",
-    userRole: "Turista",
+    createdDate: "2024-10-14",
+    approved: true,
   },
 ];
 
@@ -105,9 +112,9 @@ function StarPicker({ value, onChange }: { value: number; onChange: (v: number) 
 }
 
 // ─── Card de depoimento ────────────────────────────────────────────────────
-function TestimonialCard({ t }: { t: Testimonial }) {
+function TestimonialCard({ t }: { t: TestimonialResponse }) {
   const initials = t.userName.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
-  const date = new Date(t.createdAt).toLocaleDateString("pt-BR", {
+  const date = new Date(t.createdDate).toLocaleDateString("pt-BR", {
     day: "2-digit", month: "long", year: "numeric",
   });
 
@@ -122,12 +129,11 @@ function TestimonialCard({ t }: { t: Testimonial }) {
         </div>
         <div className="dep-card__meta">
           <strong className="dep-card__name">{t.userName}</strong>
-          {t.userRole && <span className="dep-card__role">{t.userRole}</span>}
         </div>
         <Stars value={t.rating} size={15} />
       </div>
       <p className="dep-card__comment">"{t.comment}"</p>
-      <time className="dep-card__date" dateTime={t.createdAt}>{date}</time>
+      <time className="dep-card__date" dateTime={t.createdDate}>{date}</time>
     </article>
   );
 }
@@ -142,10 +148,10 @@ const RATING_LABELS: Record<number, string> = {
 };
 
 // ─── Página principal ──────────────────────────────────────────────────────
-export default function Depoimentos() {
+export default function Depoimentos(): JSX.Element {
   const { isAuthenticated, user } = useAuth();
 
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(MOCK);
+  const [testimonials, setTestimonials] = useState<TestimonialResponse[]>(MOCK);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<0 | 1 | 2 | 3 | 4 | 5>(0);
 
@@ -155,10 +161,9 @@ export default function Depoimentos() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  // Carrega da API (se disponível) e complementa com mock
   const load = useCallback(async (): Promise<void> => {
     try {
-      const data = await testimonialsService.list();
+      const data = await testimonialsService.listApproved();
       setTestimonials(data.length ? data : MOCK);
     } catch {
       setTestimonials(MOCK);
@@ -190,20 +195,27 @@ export default function Depoimentos() {
     setSubmitError(null);
     setSubmitting(true);
 
-    const optimistic: Testimonial = {
+    const optimistic: TestimonialResponse = {
       id: `local-${Date.now()}`,
       userName: user?.name || user?.email?.split("@")[0] || "Visitante",
+      userEmail: user?.email ?? "",
       userPhoto: user?.photo,
       rating,
       comment: comment.trim(),
-      createdAt: new Date().toISOString().split("T")[0],
+      createdDate: new Date().toISOString(),
+      approved: true,
     };
 
     try {
-      const created = await testimonialsService.create({ rating, comment: comment.trim() });
+      const created = await testimonialsService.create({
+        userName: user?.name || user?.email?.split("@")[0] || "Visitante",
+        userEmail: user?.email ?? "",
+        userPhoto: user?.photo,
+        rating,
+        comment: comment.trim(),
+      });
       setTestimonials((prev) => [created, ...prev]);
     } catch {
-      // API não disponível ainda — usa versão otimista
       setTestimonials((prev) => [optimistic, ...prev]);
     } finally {
       setRating(0);
@@ -301,7 +313,7 @@ export default function Depoimentos() {
             {submitSuccess && (
               <div className="dep-alert dep-alert--success" role="status">
                 <span className="material-symbols-outlined">check_circle</span>
-                Obrigado! Seu depoimento foi enviado com sucesso.
+                Obrigado! Seu depoimento foi enviado e aguarda aprovação.
               </div>
             )}
 

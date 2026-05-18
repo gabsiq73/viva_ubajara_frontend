@@ -12,6 +12,8 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/host-points': 'Hospedagem',
   '/admin/tour-guides': 'Guias Turísticos',
   '/admin/contacts': 'Contatos',
+  '/admin/contact-messages': 'Mensagens',
+  '/admin/testimonials': 'Depoimentos',
   '/admin/photos': 'Fotos',
 };
 

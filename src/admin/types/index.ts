@@ -375,6 +375,52 @@ export interface AirportResponse {
 }
 
 // ============================================================
+// Contact Messages
+// ============================================================
+export interface ContactMessageRequest {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+export interface ContactMessageResponse {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  read: boolean;
+  createdDate: string;
+}
+
+// ============================================================
+// Testimonials
+// ============================================================
+export interface TestimonialRequest {
+  userName: string;
+  userEmail: string;
+  userPhoto?: string;
+  rating: number;
+  comment: string;
+}
+
+export interface TestimonialUpdateDTO {
+  approved: boolean;
+}
+
+export interface TestimonialResponse {
+  id: string;
+  userName: string;
+  userEmail: string;
+  userPhoto?: string;
+  rating: number;
+  comment: string;
+  approved: boolean;
+  createdDate: string;
+}
+
+// ============================================================
 // Util
 // ============================================================
 export interface StandardError {
