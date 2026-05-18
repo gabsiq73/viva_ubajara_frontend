@@ -13,9 +13,6 @@ export const UNAUTHORIZED_EVENT = 'adm:unauthorized';
 // Instância Axios configurada para a API do parque
 const api = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Interceptor de request: injeta o token JWT se válido
