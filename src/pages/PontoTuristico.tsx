@@ -61,7 +61,7 @@ export default function PontoTuristico() {
 
                 {/* ── Hero ── */}
                 <section className="pt-hero" aria-labelledby="pt-hero-title">
-                    <img src={heroImg} alt={attraction.name} className="pt-hero__bg" />
+                    <img src={heroImg} alt={attraction.name} className="pt-hero__bg" fetchPriority="high" decoding="async" />
                     <div className="pt-hero__overlay" aria-hidden="true" />
 
                     <nav className="pt-breadcrumb" aria-label="Navegação">

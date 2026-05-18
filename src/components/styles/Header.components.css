@@ -438,12 +438,33 @@ label input[type=checkbox]{
     background: #f3f4f6;
     margin: 0 -12px;
 }
-.header-user__dropdown-logout {
+.header-user__dropdown-action {
     display: flex;
     align-items: center;
     gap: 8px;
     width: 100%;
     margin-top: 8px;
+    padding: 8px 8px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #006b32;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+.header-user__dropdown-action:hover {
+    background: #e8f5ef;
+}
+.header-user__dropdown-logout {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 4px;
     padding: 8px 8px;
     background: none;
     border: none;

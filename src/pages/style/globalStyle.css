@@ -81,6 +81,29 @@
     z-index: 1;
 }
 
+/* ── Image loading ── */
+@keyframes img-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+@keyframes img-fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+img {
+    animation: img-fadein 0.35s ease both;
+}
+
+/* Skeleton placeholder for image containers before src loads */
+.point-card__img--placeholder,
+.est-card__img--placeholder,
+.evd-rel-card__img--placeholder {
+    background: linear-gradient(90deg, #e8f0eb 25%, #d4e4d9 50%, #e8f0eb 75%);
+    background-size: 200% 100%;
+    animation: img-shimmer 1.4s ease-in-out infinite !important;
+}
+
 /*Responsive*/
 @media screen and (max-width: 768px) {
     .container {

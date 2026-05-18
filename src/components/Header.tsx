@@ -3,7 +3,7 @@ import Navbar from "./Navbar";
 import "./styles/Header.components.css";
 import logo from './../assets/images/logo.webp';
 import { Link } from "react-router-dom";
-import { Heart, LogOut } from 'lucide-react';
+import { Heart, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../admin/hooks/useAuth';
 
 const ROLE_LABELS: Record<string, string> = {
@@ -111,6 +111,16 @@ export default function Header(): JSX.Element {
                                         </div>
                                     </div>
                                     <div className="header-user__dropdown-divider" />
+                                    {user.role === 'ADMIN' && (
+                                        <Link
+                                            to="/admin"
+                                            className="header-user__dropdown-action"
+                                            onClick={() => setDropdownOpen(false)}
+                                        >
+                                            <LayoutDashboard size={14} />
+                                            Painel Admin
+                                        </Link>
+                                    )}
                                     <button
                                         className="header-user__dropdown-logout"
                                         onClick={() => { logout(); setDropdownOpen(false); }}

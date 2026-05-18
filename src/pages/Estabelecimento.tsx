@@ -180,7 +180,7 @@ export default function Estabelecimento() {
 
                 {/* ── Hero ── */}
                 <section className="estd-hero" aria-labelledby="estd-hero-title">
-                    <img src={estab.heroImg} alt={estab.name} className="estd-hero__bg" />
+                    <img src={estab.heroImg} alt={estab.name} className="estd-hero__bg" fetchPriority="high" decoding="async" />
                     <div className="estd-hero__overlay" aria-hidden="true" />
 
                     <nav className="estd-breadcrumb" aria-label="Navegação">

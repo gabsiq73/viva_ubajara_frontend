@@ -110,7 +110,7 @@ export default function Evento() {
 
                 {/* ── Hero ── */}
                 <section className="evd-hero" aria-labelledby="evd-hero-title">
-                    <img src={heroImg} alt={ev.name} className="evd-hero__bg" />
+                    <img src={heroImg} alt={ev.name} className="evd-hero__bg" fetchPriority="high" decoding="async" />
                     <div className="evd-hero__overlay" aria-hidden="true" />
 
                     <nav className="evd-breadcrumb" aria-label="Navegação">
