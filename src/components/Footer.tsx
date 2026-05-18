@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 import logo from "./../assets/images/logo.webp"
 import "./styles/Footer.components.css"
 
-export default function Footer(){
+export default function Footer(): JSX.Element {
     return (
         <footer className="footer">
             <div className="footer__body">

@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { ESTABLISHMENTS } from "../data/establishments";
+import type { EstabType } from "../data/establishments";
 import heroImg from "../assets/images/mercado.png";
 import "./style/Estabelecimentos.css";
 
@@ -40,9 +41,9 @@ export default function Estabelecimentos() {
     const initialType = searchParams.get("tipo") ?? ALL_TYPES;
 
     const [search, setSearch] = useState("");
-    const [activeType, setActiveType] = useState(initialType);
+    const [activeType, setActiveType] = useState<EstabType | "Todos">(initialType as EstabType | "Todos");
     const [minStars, setMinStars] = useState(0);
-    const [activeCity, setActiveCity] = useState(ALL_CITIES);
+    const [activeCity, setActiveCity] = useState<string>(ALL_CITIES);
     const [sort, setSort] = useState<"relevance" | "stars" | "name">("relevance");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 

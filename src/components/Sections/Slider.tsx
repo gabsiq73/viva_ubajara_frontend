@@ -3,7 +3,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./styles/Slider.components.css"
 
-const SlickSlider = (Slider as any).default || Slider;
+type SlickModule = typeof Slider & { default?: typeof Slider };
+const SlickSlider = (Slider as SlickModule).default ?? Slider;
 
 export default function Carroussel(){
     var settings = {

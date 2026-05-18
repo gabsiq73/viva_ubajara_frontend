@@ -156,7 +156,7 @@ export default function Depoimentos() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // Carrega da API (se disponível) e complementa com mock
-  const load = useCallback(async () => {
+  const load = useCallback(async (): Promise<void> => {
     try {
       const data = await testimonialsService.list();
       setTestimonials(data.length ? data : MOCK);
@@ -182,7 +182,7 @@ export default function Depoimentos() {
     count: testimonials.filter((t) => t.rating === star).length,
   }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     if (rating === 0) { setSubmitError("Selecione uma avaliação de 1 a 5 estrelas."); return; }
     if (comment.trim().length < 10) { setSubmitError("O comentário precisa ter pelo menos 10 caracteres."); return; }

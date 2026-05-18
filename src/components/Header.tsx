@@ -12,7 +12,7 @@ const ROLE_LABELS: Record<string, string> = {
     GUIDE: 'Guia Turístico',
 };
 
-export default function Header(){
+export default function Header(): JSX.Element {
     const [scrolled, setScrolled] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const { isAuthenticated, user, logout } = useAuth();

@@ -40,7 +40,7 @@ interface AuthContextData {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function isAdminRole(role: any): boolean {
+function isAdminRole(role: unknown): boolean {
   if (!role) return false;
   if (Array.isArray(role)) return role.some((r) => isAdminRole(r));
   if (typeof role === 'object' && role.authority) return isAdminRole(role.authority);

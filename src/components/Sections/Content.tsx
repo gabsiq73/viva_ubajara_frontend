@@ -199,7 +199,7 @@ const FAQ_ITEMS = [
 
 export default function Content(){
     const [gastroIndex, setGastroIndex] = useState(0);
-    const [pubGuideFilter, setPubGuideFilter] = useState<string>("Todos");
+    const [pubGuideFilter, setPubGuideFilter] = useState<typeof PUB_GUIDE_FILTERS[number]>("Todos");
     const [faqOpen, setFaqOpen] = useState<number | null>(1);
 
     useEffect(() => {

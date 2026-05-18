@@ -54,8 +54,8 @@ function EventCard({ ev }: { ev: AppEvent }) {
 
 export default function Eventos() {
     const [search, setSearch] = useState("");
-    const [activeCategory, setActiveCategory] = useState("Todos");
-    const [activeMonth, setActiveMonth] = useState("Todos");
+    const [activeCategory, setActiveCategory] = useState<EventCategory | "Todos">("Todos");
+    const [activeMonth, setActiveMonth] = useState<string>("Todos");
     const [sort, setSort] = useState<"date" | "name">("date");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 

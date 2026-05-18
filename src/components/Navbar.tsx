@@ -9,7 +9,7 @@ const ROLE_LABELS: Record<string, string> = {
     GUIDE: 'Guia Turístico',
 };
 
-export default function Navbar(){
+export default function Navbar(): JSX.Element {
     const { isAuthenticated, user, logout } = useAuth();
     const displayName = user?.name || user?.email?.split('@')[0] || '';
     const initials = displayName.slice(0, 2).toUpperCase();

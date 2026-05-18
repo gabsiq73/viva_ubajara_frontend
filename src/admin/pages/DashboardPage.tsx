@@ -25,7 +25,7 @@ export function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const load = async () => {
+    const load = async (): Promise<void> => {
       try {
         const [att, ev, rest, host, spots, guides, contacts] = await Promise.allSettled([
           attractionsService.getAll(0, 1),
