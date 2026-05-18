@@ -1,66 +1,106 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { ESTABLISHMENTS } from "../data/establishments";
-import type { Establishment } from "../data/establishments";
+import { restaurantsService } from "../admin/services/restaurantsService";
+import { hostPointsService } from "../admin/services/hostPointsService";
+import type { RestaurantResponse, HostPointResponse, HostType } from "../admin/types";
+import heroFallback from "../assets/images/foto-capa-parque-ubajara.png";
 import "./style/Estabelecimento.css";
 
-const FEATURE_ICONS: Record<string, string> = {
-    "Wi-Fi": "wifi",
-    "Estacionamento": "local_parking",
-    "Reservas": "event_available",
-    "Acessível": "accessible",
-    "Café da Manhã": "free_breakfast",
-    "Piscina": "pool",
-    "Trilhas": "hiking",
-    "Entregas": "local_shipping",
-    "Restaurante": "restaurant",
+const HOST_TYPE_LABELS: Record<HostType, string> = {
+    HOTEL: "Hotel",
+    ROOST: "Pousada",
+    HOSTEL: "Hostel",
 };
 
-const PRICE_LABELS: Record<string, string> = {
-    "$": "Econômico ($)",
-    "$$": "Moderado ($$)",
-    "$$$": "Premium ($$$)",
-};
+type ApiType = "restaurant" | "hostpoint";
 
-function StarRow({ count, size = "medium" }: { count: number; size?: "small" | "medium" | "large" }) {
-    return (
-        <span className={`estd-stars estd-stars--${size}`} aria-label={`${count} de 5 estrelas`}>
-            {[1, 2, 3, 4, 5].map((i) => (
-                <span
-                    key={i}
-                    className="material-symbols-outlined estd-star"
-                    aria-hidden="true"
-                    style={{
-                        fontVariationSettings: `"FILL" ${i <= count ? 1 : 0}, "wght" 400, "GRAD" 0, "opsz" 20`,
-                    }}
-                >
-                    star
-                </span>
-            ))}
-        </span>
-    );
+interface EstabData {
+    id: string;
+    name: string;
+    description: string;
+    address: string;
+    phone?: string;
+    email?: string;
+    webUrl?: string;
+    openingHours?: string;
+    avgPrice?: number;
+    typeLabel: string;
+    features: string[];
+    heroImg: string;
+    mapsUrl: string;
+    bookingUrl?: string;
 }
 
-function RelatedCard({ e }: { e: Establishment }) {
+function mapRestaurant(r: RestaurantResponse): EstabData {
+    const features: string[] = [];
+    if (r.cuisineType) features.push(r.cuisineType);
+    if (r.acceptsReservation) features.push("Aceita Reservas");
+    if (r.openingHours) features.push(r.openingHours);
+    return {
+        id: r.id,
+        name: r.name,
+        description: r.description,
+        address: r.address,
+        phone: r.phone,
+        email: r.email,
+        webUrl: r.webUrl,
+        openingHours: r.openingHours,
+        avgPrice: r.avgPrice,
+        typeLabel: "Restaurante",
+        features,
+        heroImg: r.photos?.[0]?.url ?? heroFallback,
+        mapsUrl: `https://maps.google.com/maps?q=${encodeURIComponent(r.address)}`,
+    };
+}
+
+function mapHostPoint(h: HostPointResponse): EstabData {
+    const typeLabel = HOST_TYPE_LABELS[h.hostType] ?? "Hospedagem";
+    const features: string[] = [typeLabel];
+    if (h.numOfRooms) features.push(`${h.numOfRooms} quartos`);
+    if (h.bookingUrl) features.push("Reserva Online");
+    return {
+        id: h.id,
+        name: h.name,
+        description: h.description,
+        address: h.address,
+        phone: h.phone,
+        email: h.email,
+        webUrl: h.bookingUrl ?? h.webUrl,
+        avgPrice: h.avgPrice,
+        typeLabel,
+        features,
+        heroImg: h.photos?.[0]?.url ?? heroFallback,
+        mapsUrl: `https://maps.google.com/maps?q=${encodeURIComponent(h.address)}`,
+        bookingUrl: h.bookingUrl,
+    };
+}
+
+interface RelatedItem {
+    id: string;
+    name: string;
+    description: string;
+    address: string;
+    heroImg: string;
+    typeLabel: string;
+    apiType: ApiType;
+}
+
+function RelatedCard({ item }: { item: RelatedItem }) {
     return (
-        <Link to={`/estabelecimentos/${e.id}`} className="estd-rel-card">
+        <Link to={`/estabelecimentos/${item.id}?apiType=${item.apiType}`} className="estd-rel-card">
             <div className="estd-rel-card__img-wrap">
-                <img src={e.img} alt={e.alt} className="estd-rel-card__img" loading="lazy" />
-                <span className="estd-rel-card__type" data-type={e.type}>{e.type}</span>
-                <span className="estd-rel-card__price">{e.priceLevel}</span>
+                <img src={item.heroImg} alt={item.name} className="estd-rel-card__img" loading="lazy" />
+                <span className="estd-rel-card__type" data-type={item.typeLabel}>{item.typeLabel}</span>
             </div>
             <div className="estd-rel-card__body">
-                <div className="estd-rel-card__rating-row">
-                    <StarRow count={e.stars} size="small" />
-                    <span className="estd-rel-card__stars-label">{e.stars}.0</span>
-                </div>
-                <h3 className="estd-rel-card__name">{e.name}</h3>
+                <h3 className="estd-rel-card__name">{item.name}</h3>
                 <p className="estd-rel-card__city">
                     <span className="material-symbols-outlined" aria-hidden="true">location_on</span>
-                    {e.city}, CE
+                    {item.address}
                 </p>
-                <p className="estd-rel-card__desc">{e.desc}</p>
+                <p className="estd-rel-card__desc">{item.description}</p>
                 <span className="estd-rel-card__cta" aria-hidden="true">
                     Ver Detalhes
                     <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
@@ -72,16 +112,66 @@ function RelatedCard({ e }: { e: Establishment }) {
 
 export default function Estabelecimento() {
     const { id } = useParams<{ id: string }>();
-    const estab = ESTABLISHMENTS.find((e) => e.id === Number(id)) ?? ESTABLISHMENTS[0];
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const apiType = (searchParams.get("apiType") ?? "restaurant") as ApiType;
 
-    const sameType = ESTABLISHMENTS.filter((e) => e.id !== estab.id && e.type === estab.type);
-    const related =
-        sameType.length >= 3
-            ? sameType.slice(0, 3)
-            : [
-                  ...sameType,
-                  ...ESTABLISHMENTS.filter((e) => e.id !== estab.id && e.type !== estab.type),
-              ].slice(0, 3);
+    const [estab, setEstab] = useState<EstabData | null>(null);
+    const [related, setRelated] = useState<RelatedItem[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!id) { navigate("/estabelecimentos"); return; }
+
+        const fetchDetail = apiType === "restaurant"
+            ? restaurantsService.getById(id)
+            : hostPointsService.getById(id);
+
+        const fetchRelated = apiType === "restaurant"
+            ? restaurantsService.getAll(0, 10, true)
+            : hostPointsService.getAll(0, 10, true);
+
+        Promise.allSettled([fetchDetail, fetchRelated]).then(([detailResult, allResult]) => {
+            if (detailResult.status === "fulfilled") {
+                const mapped = apiType === "restaurant"
+                    ? mapRestaurant(detailResult.value as RestaurantResponse)
+                    : mapHostPoint(detailResult.value as HostPointResponse);
+                setEstab(mapped);
+
+                if (allResult.status === "fulfilled") {
+                    const others = (allResult.value.content as (RestaurantResponse | HostPointResponse)[])
+                        .filter(item => item.id !== id)
+                        .slice(0, 3)
+                        .map(item => {
+                            if (apiType === "restaurant") {
+                                const r = item as RestaurantResponse;
+                                return { id: r.id, name: r.name, description: r.description, address: r.address, heroImg: r.photos?.[0]?.url ?? heroFallback, typeLabel: "Restaurante", apiType: "restaurant" as ApiType };
+                            } else {
+                                const h = item as HostPointResponse;
+                                return { id: h.id, name: h.name, description: h.description, address: h.address, heroImg: h.photos?.[0]?.url ?? heroFallback, typeLabel: HOST_TYPE_LABELS[h.hostType] ?? "Hospedagem", apiType: "hostpoint" as ApiType };
+                            }
+                        });
+                    setRelated(others);
+                }
+            } else {
+                navigate("/estabelecimentos");
+            }
+        }).finally(() => setLoading(false));
+    }, [id, apiType]);
+
+    if (loading) {
+        return (
+            <div className="estd-page">
+                <Header />
+                <main className="estd-main" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
+                    <span className="adm-spinner adm-spinner--lg" />
+                </main>
+                <Footer />
+            </div>
+        );
+    }
+
+    if (!estab) return null;
 
     return (
         <div className="estd-page">
@@ -90,7 +180,7 @@ export default function Estabelecimento() {
 
                 {/* ── Hero ── */}
                 <section className="estd-hero" aria-labelledby="estd-hero-title">
-                    <img src={estab.img} alt={estab.alt} className="estd-hero__bg" />
+                    <img src={estab.heroImg} alt={estab.name} className="estd-hero__bg" />
                     <div className="estd-hero__overlay" aria-hidden="true" />
 
                     <nav className="estd-breadcrumb" aria-label="Navegação">
@@ -105,15 +195,17 @@ export default function Estabelecimento() {
 
                     <div className="estd-hero__content">
                         <div className="estd-hero__inner">
-                            <span className={`estd-hero__type estd-hero__type--${estab.type}`}>
-                                {estab.type}
+                            <span className={`estd-hero__type estd-hero__type--${estab.typeLabel}`}>
+                                {estab.typeLabel}
                             </span>
                             <h1 id="estd-hero-title" className="estd-hero__title">{estab.name}</h1>
-                            <div className="estd-hero__rating-row">
-                                <StarRow count={estab.stars} size="large" />
-                                <span className="estd-hero__stars-label">{estab.stars}.0</span>
-                                <span className="estd-hero__price-pill">{estab.priceLevel}</span>
-                            </div>
+                            {estab.avgPrice != null && (
+                                <div className="estd-hero__rating-row">
+                                    <span className="estd-hero__price-pill">
+                                        R$ {estab.avgPrice.toFixed(0)} / pessoa
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -121,18 +213,26 @@ export default function Estabelecimento() {
                         <div className="estd-hero__infobar-inner">
                             <span className="estd-info-item">
                                 <span className="material-symbols-outlined" aria-hidden="true">location_on</span>
-                                {estab.city}, CE
+                                {estab.address}
                             </span>
-                            <span className="estd-info-sep" aria-hidden="true">|</span>
-                            <span className="estd-info-item">
-                                <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
-                                {estab.hours}
-                            </span>
-                            <span className="estd-info-sep" aria-hidden="true">|</span>
-                            <span className="estd-info-item">
-                                <span className="material-symbols-outlined" aria-hidden="true">call</span>
-                                {estab.phone}
-                            </span>
+                            {estab.openingHours && (
+                                <>
+                                    <span className="estd-info-sep" aria-hidden="true">|</span>
+                                    <span className="estd-info-item">
+                                        <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
+                                        {estab.openingHours}
+                                    </span>
+                                </>
+                            )}
+                            {estab.phone && (
+                                <>
+                                    <span className="estd-info-sep" aria-hidden="true">|</span>
+                                    <span className="estd-info-item">
+                                        <span className="material-symbols-outlined" aria-hidden="true">call</span>
+                                        {estab.phone}
+                                    </span>
+                                </>
+                            )}
                         </div>
                     </div>
                 </section>
@@ -144,31 +244,32 @@ export default function Estabelecimento() {
                         <div className="estd-content__left">
                             <span className="estd-content__kicker">SOBRE O ESTABELECIMENTO</span>
                             <h2 className="estd-content__title">Conheça o {estab.name}</h2>
-                            <p className="estd-content__desc">{estab.desc}</p>
+                            <p className="estd-content__desc">{estab.description}</p>
                             <p className="estd-content__desc">
-                                Localizado em {estab.city}, CE, o estabelecimento oferece uma
+                                Localizado em {estab.address}, o estabelecimento oferece uma
                                 experiência autêntica da Serra da Ibiapaba, com atendimento de
                                 qualidade e ambiente acolhedor para visitantes de todo o Brasil.
                             </p>
 
-                            <h3 className="estd-features-title">Comodidades e Facilidades</h3>
-                            <div className="estd-features">
-                                {estab.features.map((f) => (
-                                    <span key={f} className="estd-feature">
-                                        <span
-                                            className="material-symbols-outlined"
-                                            aria-hidden="true"
-                                            style={{
-                                                fontVariationSettings:
-                                                    '"FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20',
-                                            }}
-                                        >
-                                            {FEATURE_ICONS[f] ?? "check_circle"}
-                                        </span>
-                                        {f}
-                                    </span>
-                                ))}
-                            </div>
+                            {estab.features.length > 0 && (
+                                <>
+                                    <h3 className="estd-features-title">Comodidades e Facilidades</h3>
+                                    <div className="estd-features">
+                                        {estab.features.map((f) => (
+                                            <span key={f} className="estd-feature">
+                                                <span
+                                                    className="material-symbols-outlined"
+                                                    aria-hidden="true"
+                                                    style={{ fontVariationSettings: '"FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20' }}
+                                                >
+                                                    check_circle
+                                                </span>
+                                                {f}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         <aside className="estd-info-card" aria-label="Informações">
@@ -178,65 +279,65 @@ export default function Estabelecimento() {
                             <div className="estd-info-card__body">
                                 <ul className="estd-info-list">
                                     <li className="estd-info-list__item">
-                                        <span
-                                            className="material-symbols-outlined estd-info-list__icon"
-                                            aria-hidden="true"
-                                        >
-                                            location_on
-                                        </span>
+                                        <span className="material-symbols-outlined estd-info-list__icon" aria-hidden="true">location_on</span>
                                         <div>
                                             <span className="estd-info-list__label">Endereço</span>
                                             <span className="estd-info-list__value">{estab.address}</span>
                                         </div>
                                     </li>
-                                    <li className="estd-info-list__item">
-                                        <span
-                                            className="material-symbols-outlined estd-info-list__icon"
-                                            aria-hidden="true"
-                                        >
-                                            schedule
-                                        </span>
-                                        <div>
-                                            <span className="estd-info-list__label">Horário</span>
-                                            <span className="estd-info-list__value">{estab.hours}</span>
-                                        </div>
-                                    </li>
-                                    <li className="estd-info-list__item">
-                                        <span
-                                            className="material-symbols-outlined estd-info-list__icon"
-                                            aria-hidden="true"
-                                        >
-                                            call
-                                        </span>
-                                        <div>
-                                            <span className="estd-info-list__label">Telefone</span>
-                                            <span className="estd-info-list__value">{estab.phone}</span>
-                                        </div>
-                                    </li>
-                                    <li className="estd-info-list__item">
-                                        <span
-                                            className="material-symbols-outlined estd-info-list__icon"
-                                            aria-hidden="true"
-                                        >
-                                            payments
-                                        </span>
-                                        <div>
-                                            <span className="estd-info-list__label">Faixa de Preço</span>
-                                            <span className="estd-info-list__value">
-                                                {PRICE_LABELS[estab.priceLevel]}
-                                            </span>
-                                        </div>
-                                    </li>
+                                    {estab.openingHours && (
+                                        <li className="estd-info-list__item">
+                                            <span className="material-symbols-outlined estd-info-list__icon" aria-hidden="true">schedule</span>
+                                            <div>
+                                                <span className="estd-info-list__label">Horário</span>
+                                                <span className="estd-info-list__value">{estab.openingHours}</span>
+                                            </div>
+                                        </li>
+                                    )}
+                                    {estab.phone && (
+                                        <li className="estd-info-list__item">
+                                            <span className="material-symbols-outlined estd-info-list__icon" aria-hidden="true">call</span>
+                                            <div>
+                                                <span className="estd-info-list__label">Telefone</span>
+                                                <span className="estd-info-list__value">{estab.phone}</span>
+                                            </div>
+                                        </li>
+                                    )}
+                                    {estab.avgPrice != null && (
+                                        <li className="estd-info-list__item">
+                                            <span className="material-symbols-outlined estd-info-list__icon" aria-hidden="true">payments</span>
+                                            <div>
+                                                <span className="estd-info-list__label">Preço Médio</span>
+                                                <span className="estd-info-list__value">R$ {estab.avgPrice.toFixed(0)} / pessoa</span>
+                                            </div>
+                                        </li>
+                                    )}
+                                    {estab.email && (
+                                        <li className="estd-info-list__item">
+                                            <span className="material-symbols-outlined estd-info-list__icon" aria-hidden="true">mail</span>
+                                            <div>
+                                                <span className="estd-info-list__label">E-mail</span>
+                                                <a href={`mailto:${estab.email}`} className="estd-info-list__value" style={{ color: "var(--adm-green)" }}>{estab.email}</a>
+                                            </div>
+                                        </li>
+                                    )}
                                 </ul>
-                                <a
-                                    href="https://maps.google.com"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="estd-info-card__maps-btn"
-                                >
-                                    <span className="material-symbols-outlined" aria-hidden="true">map</span>
-                                    Abrir no Google Maps
-                                </a>
+                                {estab.bookingUrl ? (
+                                    <a href={estab.bookingUrl} target="_blank" rel="noopener noreferrer" className="estd-info-card__maps-btn">
+                                        <span className="material-symbols-outlined" aria-hidden="true">open_in_new</span>
+                                        Fazer Reserva
+                                    </a>
+                                ) : estab.webUrl ? (
+                                    <a href={estab.webUrl} target="_blank" rel="noopener noreferrer" className="estd-info-card__maps-btn">
+                                        <span className="material-symbols-outlined" aria-hidden="true">language</span>
+                                        Site Oficial
+                                    </a>
+                                ) : (
+                                    <a href={estab.mapsUrl} target="_blank" rel="noopener noreferrer" className="estd-info-card__maps-btn">
+                                        <span className="material-symbols-outlined" aria-hidden="true">map</span>
+                                        Abrir no Google Maps
+                                    </a>
+                                )}
                             </div>
                         </aside>
 
@@ -249,23 +350,17 @@ export default function Estabelecimento() {
                         <div className="estd-related__inner">
                             <div className="estd-related__header">
                                 <div>
-                                    <h2 id="estd-related-title" className="estd-related__title">
-                                        Estabelecimentos Recomendados
-                                    </h2>
-                                    <p className="estd-related__subtitle">
-                                        Outros lugares para visitar na Serra da Ibiapaba
-                                    </p>
+                                    <h2 id="estd-related-title" className="estd-related__title">Estabelecimentos Recomendados</h2>
+                                    <p className="estd-related__subtitle">Outros lugares para visitar na Serra da Ibiapaba</p>
                                 </div>
                                 <Link to="/estabelecimentos" className="estd-related__all">
                                     Ver todos
-                                    <span className="material-symbols-outlined" aria-hidden="true">
-                                        arrow_forward
-                                    </span>
+                                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
                                 </Link>
                             </div>
                             <div className="estd-related__grid">
-                                {related.map((e) => (
-                                    <RelatedCard key={e.id} e={e} />
+                                {related.map((item) => (
+                                    <RelatedCard key={item.id} item={item} />
                                 ))}
                             </div>
                         </div>

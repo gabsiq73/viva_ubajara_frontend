@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { restaurantsService } from "../admin/services/restaurantsService";
@@ -21,6 +21,7 @@ const HOST_TYPE_LABELS: Record<HostType, EstabType> = {
 interface EstabItem {
     id: string;
     type: EstabType;
+    apiType: "restaurant" | "hostpoint";
     img: string;
     name: string;
     address: string;
@@ -37,6 +38,7 @@ function mapRestaurant(r: RestaurantResponse): EstabItem {
     return {
         id: r.id,
         type: "Restaurante",
+        apiType: "restaurant",
         img: r.photos?.[0]?.url ?? "",
         name: r.name,
         address: r.address,
@@ -55,6 +57,7 @@ function mapHostPoint(h: HostPointResponse): EstabItem {
     return {
         id: h.id,
         type: typeLabel as EstabType,
+        apiType: "hostpoint",
         img: h.photos?.[0]?.url ?? "",
         name: h.name,
         address: h.address,
@@ -240,7 +243,8 @@ export default function Estabelecimentos() {
                         ) : filtered.length > 0 ? (
                             <div className="est-grid">
                                 {filtered.map((e) => (
-                                    <article key={e.id} className="est-card" data-type={e.type}>
+                                    <Link key={e.id} to={`/estabelecimentos/${e.id}?apiType=${e.apiType}`} style={{ textDecoration: "none", color: "inherit" }}>
+                                    <article className="est-card" data-type={e.type}>
                                         <div className="est-card__img-wrap">
                                             {e.img ? (
                                                 <img src={e.img} alt={e.name} className="est-card__img" loading="lazy" />
@@ -274,6 +278,7 @@ export default function Estabelecimentos() {
                                             )}
                                         </div>
                                     </article>
+                                    </Link>
                                 ))}
                             </div>
                         ) : (

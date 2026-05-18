@@ -79,14 +79,16 @@ export function DashboardPage() {
         <div className="adm-stat-grid">
           {stats.map((s) => (
             <Link to={s.to} key={s.label} style={{ textDecoration: 'none' }}>
-              <div 
-                className="adm-stat-card" 
+              <div
+                className="adm-stat-card"
                 style={{ '--card-color': s.color } as React.CSSProperties}
               >
-                <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: s.color }} />
+                <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '3px', background: s.color }} />
+                <div className="adm-stat-card__text">
+                  <span className="adm-stat-card__label">{s.label}</span>
+                  <span className="adm-stat-card__value">{s.value}</span>
+                </div>
                 <span className="adm-stat-card__icon">{s.icon}</span>
-                <span className="adm-stat-card__value">{s.value}</span>
-                <span className="adm-stat-card__label">{s.label}</span>
               </div>
             </Link>
           ))}
