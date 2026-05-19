@@ -4,9 +4,8 @@ import { eventsService } from '../services/eventsService';
 import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormToggle } from '../components/FormField';
+import { RolePhotoSlot } from '../components/RolePhotoSlot';
 import { Spinner } from '../components/Spinner';
-import { PhotoManager } from '../components/PhotoManager';
-import { PhotoPicker } from '../components/PhotoPicker';
 import type { EventRequest, PhotoResponse } from '../types';
 
 const toApiFormat = (iso: string) => {
@@ -36,7 +35,7 @@ export function EventFormPage() {
   const { showToast } = useToast();
   const [form, setForm] = useState<EventRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
-  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
   const [startLocal, setStartLocal] = useState('');
   const [endLocal, setEndLocal] = useState('');
   const [errors, setErrors] = useState<Partial<Record<keyof EventRequest, string>>>({});
@@ -76,14 +75,23 @@ export function EventFormPage() {
         showToast('Evento atualizado!', 'success');
       } else {
         const created = await eventsService.create(payload);
-        await Promise.allSettled(
-          pendingFiles.map((f) => photosService.uploadForEntity('events', created.id, f))
-        );
+        const uploads: Promise<unknown>[] = [];
+        if (coverFile) uploads.push(photosService.uploadForEntity('events', created.id, coverFile, 'cover'));
+        await Promise.allSettled(uploads);
         showToast('Evento criado com sucesso!', 'success');
       }
       navigate('/admin/events');
     } catch { showToast('Erro ao salvar.', 'error'); }
     finally { setLoading(false); }
+  };
+
+  const coverPhoto = photos.find(p => p.description === 'cover') ?? null;
+
+  const handleCoverUpdate = (photo: PhotoResponse | null) => {
+    setPhotos(prev => {
+      const filtered = prev.filter(p => p.description !== 'cover');
+      return photo ? [...filtered, photo] : filtered;
+    });
   };
 
   if (fetching) return <Spinner center size="lg" />;
@@ -104,14 +112,27 @@ export function EventFormPage() {
           </div>
           <FormInput label="URL de Inscrição" type="url" value={form.registrationUrl ?? ''} onChange={(e) => set('registrationUrl', e.target.value)} />
           <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
-          {!isEdit && <PhotoPicker files={pendingFiles} onChange={setPendingFiles} />}
+
+          <div className="adm-role-slots-section">
+            <p className="adm-role-slots-section__title">Foto do Evento</p>
+            <div className="adm-role-slots-grid" style={{ gridTemplateColumns: 'minmax(200px, 360px)' }}>
+              <RolePhotoSlot
+                label="Foto de Capa"
+                hint="Imagem principal exibida no card e página do evento"
+                roleDescription="cover"
+                {...(isEdit
+                  ? { entityPath: 'events', entityId: id, existingPhoto: coverPhoto, onPhotoUpdate: handleCoverUpdate }
+                  : { pendingFile: coverFile, onPendingFileChange: setCoverFile })}
+              />
+            </div>
+          </div>
+
           <div className="adm-form-actions">
             <button type="button" className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/events')}>Cancelar</button>
             <button type="submit" className="adm-btn adm-btn--primary" disabled={loading}>{loading ? 'Salvando…' : isEdit ? 'Atualizar' : 'Criar'}</button>
           </div>
         </form>
       </div>
-      {isEdit && id && <PhotoManager entityPath="events" entityId={id} initialPhotos={photos} />}
     </div>
   );
 }

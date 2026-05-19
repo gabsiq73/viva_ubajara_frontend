@@ -76,7 +76,11 @@ export default function PontoTuristico() {
 
     if (!attraction) return null;
 
-    const heroImg = attraction.photos?.[0]?.url ?? heroFallback;
+    const getPhotoByRole = (role: string) =>
+        attraction.photos?.find(p => p.description === role)?.url;
+
+    const heroImg = getPhotoByRole('cover') ?? attraction.photos?.[0]?.url ?? heroFallback;
+    const howToGetImg = getPhotoByRole('how_to_get') ?? heroImg;
     const catLabel = CATEGORY_LABELS[attraction.category] ?? attraction.category;
 
     return (
@@ -303,7 +307,7 @@ export default function PontoTuristico() {
                                 </a>
                             </div>
                             <div className="pt-how__right">
-                                <img src={heroImg} alt={attraction.name} className="pt-how__img" />
+                                <img src={howToGetImg} alt={attraction.name} className="pt-how__img" />
                             </div>
                         </div>
                     </section>

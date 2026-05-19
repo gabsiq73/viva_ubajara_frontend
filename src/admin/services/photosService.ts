@@ -11,9 +11,11 @@ export const photosService = {
     return response.data;
   },
 
-  uploadForEntity: async (entityPath: string, entityId: string, file: File): Promise<PhotoResponse> => {
+  uploadForEntity: async (entityPath: string, entityId: string, file: File, description?: string, displayOrder?: number): Promise<PhotoResponse> => {
     const formData = new FormData();
     formData.append('file', file);
+    if (description) formData.append('description', description);
+    if (displayOrder !== undefined) formData.append('displayOrder', String(displayOrder));
     const response = await api.post<PhotoResponse>(`/${entityPath}/${entityId}/photos`, formData);
     return response.data;
   },

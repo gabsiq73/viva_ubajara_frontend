@@ -4,9 +4,9 @@ import { attractionsService } from '../services/attractionsService';
 import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormSelect, FormToggle } from '../components/FormField';
+import { RolePhotoSlot } from '../components/RolePhotoSlot';
 import { Spinner } from '../components/Spinner';
 import { PhotoManager } from '../components/PhotoManager';
-import { PhotoPicker } from '../components/PhotoPicker';
 import type { AttractionRequest, AttractionCategory, PhotoResponse } from '../types';
 
 const CATEGORIES: { value: AttractionCategory; label: string }[] = [
@@ -25,6 +25,8 @@ const EMPTY: AttractionRequest = {
   category: 'PARK',
 };
 
+const ROLE_DESCS = ['cover', 'how_to_get', 'card'];
+
 export function AttractionFormPage() {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
@@ -33,7 +35,12 @@ export function AttractionFormPage() {
 
   const [form, setForm] = useState<AttractionRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
-  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+
+  // Create-mode pending files per role
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [howToGetFile, setHowToGetFile] = useState<File | null>(null);
+  const [cardFile, setCardFile] = useState<File | null>(null);
+
   const [errors, setErrors] = useState<Partial<Record<keyof AttractionRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
@@ -71,9 +78,11 @@ export function AttractionFormPage() {
         showToast('Atração atualizada com sucesso!', 'success');
       } else {
         const created = await attractionsService.create(form);
-        await Promise.allSettled(
-          pendingFiles.map((f) => photosService.uploadForEntity('attractions', created.id, f))
-        );
+        const uploads: Promise<unknown>[] = [];
+        if (coverFile) uploads.push(photosService.uploadForEntity('attractions', created.id, coverFile, 'cover'));
+        if (howToGetFile) uploads.push(photosService.uploadForEntity('attractions', created.id, howToGetFile, 'how_to_get'));
+        if (cardFile) uploads.push(photosService.uploadForEntity('attractions', created.id, cardFile, 'card'));
+        await Promise.allSettled(uploads);
         showToast('Atração criada com sucesso!', 'success');
       }
       navigate('/admin/attractions');
@@ -82,6 +91,19 @@ export function AttractionFormPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Derive role photos from photos list
+  const coverPhoto = photos.find(p => p.description === 'cover') ?? null;
+  const howToGetPhoto = photos.find(p => p.description === 'how_to_get') ?? null;
+  const cardPhoto = photos.find(p => p.description === 'card') ?? null;
+  const galleryPhotos = photos.filter(p => !ROLE_DESCS.includes(p.description ?? ''));
+
+  const handleRoleUpdate = (role: string) => (photo: PhotoResponse | null) => {
+    setPhotos(prev => {
+      const filtered = prev.filter(p => p.description !== role);
+      return photo ? [...filtered, photo] : filtered;
+    });
   };
 
   if (fetching) return <Spinner center size="lg" />;
@@ -127,7 +149,35 @@ export function AttractionFormPage() {
             <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
           </div>
 
-          {!isEdit && <PhotoPicker files={pendingFiles} onChange={setPendingFiles} />}
+          <div className="adm-role-slots-section">
+            <p className="adm-role-slots-section__title">Fotos</p>
+            <div className="adm-role-slots-grid">
+              <RolePhotoSlot
+                label="Foto de Capa"
+                hint="Hero da página e seção 'Como Chegar'"
+                roleDescription="cover"
+                {...(isEdit
+                  ? { entityPath: 'attractions', entityId: id, existingPhoto: coverPhoto, onPhotoUpdate: handleRoleUpdate('cover') }
+                  : { pendingFile: coverFile, onPendingFileChange: setCoverFile })}
+              />
+              <RolePhotoSlot
+                label="Foto Como Chegar"
+                hint="Imagem na seção de direções"
+                roleDescription="how_to_get"
+                {...(isEdit
+                  ? { entityPath: 'attractions', entityId: id, existingPhoto: howToGetPhoto, onPhotoUpdate: handleRoleUpdate('how_to_get') }
+                  : { pendingFile: howToGetFile, onPendingFileChange: setHowToGetFile })}
+              />
+              <RolePhotoSlot
+                label="Foto do Card"
+                hint="Miniatura nos cards da listagem"
+                roleDescription="card"
+                {...(isEdit
+                  ? { entityPath: 'attractions', entityId: id, existingPhoto: cardPhoto, onPhotoUpdate: handleRoleUpdate('card') }
+                  : { pendingFile: cardFile, onPendingFileChange: setCardFile })}
+              />
+            </div>
+          </div>
 
           <div className="adm-form-actions">
             <button type="button" className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/attractions')}>Cancelar</button>
@@ -139,7 +189,7 @@ export function AttractionFormPage() {
       </div>
 
       {isEdit && id && (
-        <PhotoManager entityPath="attractions" entityId={id} initialPhotos={photos} />
+        <PhotoManager entityPath="attractions" entityId={id} initialPhotos={galleryPhotos} />
       )}
     </div>
   );

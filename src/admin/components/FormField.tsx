@@ -51,7 +51,7 @@ export function FormSelect({ label, error, hint, required, children, ...props }:
   );
 }
 
-// Toggle (checkbox)
+// Toggle (slider)
 interface FormToggleProps extends BaseFieldProps {
   checked: boolean;
   onChange: (val: boolean) => void;
@@ -61,14 +61,17 @@ interface FormToggleProps extends BaseFieldProps {
 export function FormToggle({ label, checked, onChange, id }: FormToggleProps) {
   const fieldId = id ?? `toggle-${label}`;
   return (
-    <div className="adm-field adm-field--toggle">
+    <label className="adm-toggle" htmlFor={fieldId}>
       <input
         type="checkbox"
         id={fieldId}
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
       />
-      <label htmlFor={fieldId}>{label}</label>
-    </div>
+      <span className="adm-toggle__track">
+        <span className="adm-toggle__thumb" />
+      </span>
+      <span className="adm-toggle__label">{label}</span>
+    </label>
   );
 }

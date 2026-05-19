@@ -1188,6 +1188,126 @@
   transform: translateX(18px);
 }
 
+/* ── Role photo slots ─────────────────────────────────────────────────────── */
+
+.adm-role-slots-section {
+  margin-top: 8px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.adm-role-slots-section__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 16px;
+}
+
+.adm-role-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.adm-role-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.adm-role-slot__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.adm-role-slot__preview {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: var(--adm-bg);
+  border: 1px solid #e5e7eb;
+}
+
+.adm-role-slot__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.adm-role-slot__actions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.65));
+}
+
+.adm-role-slot__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+
+.adm-role-slot__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.adm-role-slot__btn--replace {
+  background: rgba(255, 255, 255, 0.92);
+  color: #1f2937;
+}
+
+.adm-role-slot__btn--remove {
+  background: rgba(220, 38, 38, 0.85);
+  color: #ffffff;
+}
+
+.adm-role-slot__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  aspect-ratio: 16 / 9;
+  border: 2px dashed #d1d5db;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #9ca3af;
+  background: #f9fafb;
+  font-size: 12px;
+  font-weight: 500;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  width: 100%;
+}
+
+.adm-role-slot__empty:hover:not(:disabled) {
+  border-color: var(--adm-green);
+  color: var(--adm-green);
+  background: #f0fdf4;
+}
+
+.adm-role-slot__empty:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 /* Primary button full-width */
 .adm-btn--full {
   width: 100%;

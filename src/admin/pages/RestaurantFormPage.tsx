@@ -4,12 +4,14 @@ import { restaurantsService } from '../services/restaurantsService';
 import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormToggle } from '../components/FormField';
+import { RolePhotoSlot } from '../components/RolePhotoSlot';
 import { Spinner } from '../components/Spinner';
 import { PhotoManager } from '../components/PhotoManager';
-import { PhotoPicker } from '../components/PhotoPicker';
 import type { RestaurantRequest, PhotoResponse } from '../types';
 
 const EMPTY: RestaurantRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', mapsUrl: '', active: true, cuisineType: '', openingHours: '', avgPrice: undefined, acceptsReservation: false };
+
+const ROLE_DESCS = ['cover'];
 
 export function RestaurantFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -18,7 +20,7 @@ export function RestaurantFormPage() {
   const { showToast } = useToast();
   const [form, setForm] = useState<RestaurantRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
-  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof RestaurantRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
@@ -52,14 +54,24 @@ export function RestaurantFormPage() {
         showToast('Restaurante atualizado!', 'success');
       } else {
         const created = await restaurantsService.create(form);
-        await Promise.allSettled(
-          pendingFiles.map((f) => photosService.uploadForEntity('restaurants', created.id, f))
-        );
+        const uploads: Promise<unknown>[] = [];
+        if (coverFile) uploads.push(photosService.uploadForEntity('restaurants', created.id, coverFile, 'cover'));
+        await Promise.allSettled(uploads);
         showToast('Restaurante criado com sucesso!', 'success');
       }
       navigate('/admin/restaurants');
     } catch { showToast('Erro ao salvar.', 'error'); }
     finally { setLoading(false); }
+  };
+
+  const coverPhoto = photos.find(p => p.description === 'cover') ?? null;
+  const galleryPhotos = photos.filter(p => !ROLE_DESCS.includes(p.description ?? ''));
+
+  const handleRoleUpdate = (photo: PhotoResponse | null) => {
+    setPhotos(prev => {
+      const filtered = prev.filter(p => p.description !== 'cover');
+      return photo ? [...filtered, photo] : filtered;
+    });
   };
 
   if (fetching) return <Spinner center size="lg" />;
@@ -94,14 +106,28 @@ export function RestaurantFormPage() {
             <FormToggle label="Aceita Reserva" checked={!!form.acceptsReservation} onChange={(v) => set('acceptsReservation', v)} />
             <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
           </div>
-          {!isEdit && <PhotoPicker files={pendingFiles} onChange={setPendingFiles} />}
+
+          <div className="adm-role-slots-section">
+            <p className="adm-role-slots-section__title">Foto de Capa</p>
+            <div className="adm-role-slots-grid" style={{ gridTemplateColumns: 'minmax(200px, 360px)' }}>
+              <RolePhotoSlot
+                label="Foto Principal"
+                hint="Exibida no topo da página do estabelecimento"
+                roleDescription="cover"
+                {...(isEdit
+                  ? { entityPath: 'restaurants', entityId: id, existingPhoto: coverPhoto, onPhotoUpdate: handleRoleUpdate }
+                  : { pendingFile: coverFile, onPendingFileChange: setCoverFile })}
+              />
+            </div>
+          </div>
+
           <div className="adm-form-actions">
             <button type="button" className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/restaurants')}>Cancelar</button>
             <button type="submit" className="adm-btn adm-btn--primary" disabled={loading}>{loading ? 'Salvando…' : isEdit ? 'Atualizar' : 'Criar'}</button>
           </div>
         </form>
       </div>
-      {isEdit && id && <PhotoManager entityPath="restaurants" entityId={id} initialPhotos={photos} />}
+      {isEdit && id && <PhotoManager entityPath="restaurants" entityId={id} initialPhotos={galleryPhotos} />}
     </div>
   );
 }
