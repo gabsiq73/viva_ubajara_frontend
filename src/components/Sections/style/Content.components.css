@@ -62,6 +62,23 @@ body {
     }
 }
 
+/* ── Skeleton shimmer ───────────────────────────────────────────────────── */
+
+@keyframes skel-shimmer {
+    0%   { background-position: -800px 0; }
+    100% { background-position:  800px 0; }
+}
+
+.skel {
+    display: block;
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 1600px 100%;
+    animation: skel-shimmer 1.5s infinite linear;
+    border-radius: 6px;
+}
+
+/* ── Empty states ───────────────────────────────────────────────────────── */
+
 .content-empty {
     text-align: center;
     padding: 48px 24px;

@@ -71,6 +71,56 @@ const FAQ_ITEMS = [
     { id: 4, q: "É possível acampar dentro do Parque?", a: "O camping é permitido em áreas específicas e requer agendamento prévio junto ao ICMBio. Consulte o site oficial do parque ou entre em contato com nossa secretaria de turismo." },
 ];
 
+// ── Skeleton cards ─────────────────────────────────────────────
+
+const PointSkeleton = () => (
+    <li aria-hidden="true" style={{ cursor: "default" }}>
+        <div className="skel" style={{ height: "100%", width: "100%", borderRadius: 20 }} />
+    </li>
+);
+
+const PubGuideSkeleton = () => (
+    <article className="pub-guide-card" aria-hidden="true" style={{ pointerEvents: "none" }}>
+        <div className="pub-guide-card__media">
+            <div className="skel" style={{ width: "100%", height: "100%", borderRadius: 0 }} />
+        </div>
+        <div className="pub-guide-card__body">
+            <div className="skel" style={{ height: 17, width: "65%" }} />
+            <div className="skel" style={{ height: 13, width: "100%" }} />
+            <div className="skel" style={{ height: 13, width: "80%" }} />
+            <div className="skel" style={{ height: 34, width: 110, borderRadius: 20, marginTop: 6 }} />
+        </div>
+    </article>
+);
+
+const EventSkeleton = () => (
+    <article className="pub-event-card" aria-hidden="true" style={{ pointerEvents: "none" }}>
+        <div className="pub-event-card__media" style={{ position: "relative" }}>
+            <div className="skel" style={{ position: "absolute", inset: 0, borderRadius: 0 }} />
+        </div>
+        <div className="pub-event-card__body">
+            <div className="skel" style={{ height: 17, width: "75%" }} />
+            <div className="skel" style={{ height: 13, width: "100%" }} />
+            <div className="skel" style={{ height: 13, width: "60%" }} />
+            <div className="skel" style={{ height: 36, width: 120, borderRadius: 20, marginTop: 4 }} />
+        </div>
+    </article>
+);
+
+const GuideSkeleton = () => (
+    <article className="guide-card" aria-hidden="true" style={{ pointerEvents: "none" }}>
+        <div className="guide-card__photo">
+            <div className="skel" style={{ width: "100%", height: "100%", borderRadius: 0 }} />
+        </div>
+        <div className="guide-card__body">
+            <div className="skel" style={{ height: 17, width: "60%" }} />
+            <div className="skel" style={{ height: 12, width: "35%" }} />
+            <div className="skel" style={{ height: 13, width: "100%", marginTop: 4 }} />
+            <div className="skel" style={{ height: 13, width: "85%" }} />
+        </div>
+    </article>
+);
+
 // ── Type helpers ───────────────────────────────────────────────
 const CATEGORY_LABELS: Record<AttractionCategory, string> = {
     PARK: "Parque", WATERFALL: "Cachoeira", MUSEUM: "Museu",
@@ -248,7 +298,11 @@ export default function Content() {
                             <div id="more"><Link to="/pontos-turisticos">Ver Todos</Link></div>
                         </div>
                         {loading ? (
-                            <div className="content-empty">Carregando pontos turísticos…</div>
+                            <div className="cards-points">
+                                <ul className="list-points">
+                                    {Array.from({ length: 4 }).map((_, i) => <PointSkeleton key={i} />)}
+                                </ul>
+                            </div>
                         ) : attractions.length === 0 ? (
                             <div className="content-empty">Nenhum ponto turístico cadastrado ainda.</div>
                         ) : (
@@ -343,7 +397,9 @@ export default function Content() {
                             <p className="pub-guide__subtitle">Os melhores lugares para comer, dormir e viver momentos inesquecíveis em nossa cidade.</p>
                         </header>
                         {loading ? (
-                            <div className="content-empty">Carregando estabelecimentos…</div>
+                            <div className="pub-guide__grid reveal">
+                                {Array.from({ length: 4 }).map((_, i) => <PubGuideSkeleton key={i} />)}
+                            </div>
                         ) : pubItems.length === 0 ? (
                             <div className="content-empty">Nenhum estabelecimento cadastrado ainda.</div>
                         ) : (
@@ -407,7 +463,9 @@ export default function Content() {
                             <p className="pub-events__lede">Fique por dentro da programação cultural e festivais que movimentam a nossa serra.</p>
                         </header>
                         {loading ? (
-                            <div className="content-empty">Carregando eventos…</div>
+                            <div className="pub-events__grid">
+                                {Array.from({ length: 4 }).map((_, i) => <EventSkeleton key={i} />)}
+                            </div>
                         ) : homeEvents.length === 0 ? (
                             <div className="content-empty">Nenhum evento cadastrado ainda.</div>
                         ) : (
@@ -460,7 +518,9 @@ export default function Content() {
                                     <p className="tour-guides__subtitle">Conheça os profissionais credenciados que vão transformar sua visita em uma experiência inesquecível.</p>
                                 </header>
                                 {loading ? (
-                                    <div className="content-empty">Carregando guias…</div>
+                                    <div className="tour-guides__grid">
+                                        {Array.from({ length: 4 }).map((_, i) => <GuideSkeleton key={i} />)}
+                                    </div>
                                 ) : homeGuides.length === 0 ? (
                                     <div className="content-empty">Nenhum guia turístico cadastrado ainda.</div>
                                 ) : (
