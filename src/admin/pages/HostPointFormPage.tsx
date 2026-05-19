@@ -9,7 +9,7 @@ import { PhotoManager } from '../components/PhotoManager';
 import { PhotoPicker } from '../components/PhotoPicker';
 import type { HostPointRequest, HostType, PhotoResponse } from '../types';
 
-const EMPTY: HostPointRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', active: true, hostType: 'HOTEL', numOfRooms: undefined, avgPrice: undefined, bookingUrl: '' };
+const EMPTY: HostPointRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', mapsUrl: '', active: true, hostType: 'HOTEL', numOfRooms: undefined, avgPrice: undefined, bookingUrl: '' };
 
 export function HostPointFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -89,6 +89,7 @@ export function HostPointFormPage() {
             <FormInput label="Preço Médio (R$)" type="number" value={form.avgPrice ?? ''} onChange={(e) => set('avgPrice', e.target.value ? Number(e.target.value) : undefined)} />
           </div>
           <FormInput label="URL de Reserva" type="url" value={form.bookingUrl ?? ''} onChange={(e) => set('bookingUrl', e.target.value)} />
+          <FormInput label="URL Google Maps" type="url" value={form.mapsUrl ?? ''} onChange={(e) => set('mapsUrl', e.target.value)} hint="Link para o local no Google Maps" />
           <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
           {!isEdit && <PhotoPicker files={pendingFiles} onChange={setPendingFiles} />}
           <div className="adm-form-actions">

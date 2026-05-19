@@ -20,7 +20,7 @@ const CATEGORIES: { value: AttractionCategory; label: string }[] = [
 
 const EMPTY: AttractionRequest = {
   name: '', description: '', shortDescription: '', address: '', phone: '', email: '',
-  webUrl: '', instagramUrl: '', active: true, openToPublic: true, freeAccess: false,
+  webUrl: '', instagramUrl: '', mapsUrl: '', active: true, openToPublic: true, freeAccess: false,
   openingHours: '', entryPrice: undefined, hasGuide: false, averageVisitDuration: undefined,
   category: 'PARK',
 };
@@ -101,7 +101,7 @@ export function AttractionFormPage() {
               {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
             </FormSelect>
           </div>
-          <FormTextarea label="Descrição Completa" value={form.description} onChange={(e) => set('description', e.target.value)} error={errors.description} required />
+          <FormTextarea label="Descrição Completa" value={form.description} onChange={(e) => set('description', e.target.value)} error={errors.description} required maxLength={300} />
           <FormInput label="Descrição Curta (exibida no topo da página e nos cards)" value={form.shortDescription ?? ''} onChange={(e) => set('shortDescription', e.target.value)} maxLength={200} hint="Máx. 200 caracteres — texto breve e impactante" />
           <FormInput label="Endereço" value={form.address} onChange={(e) => set('address', e.target.value)} error={errors.address} required />
           <div className="adm-form-row">
@@ -112,6 +112,7 @@ export function AttractionFormPage() {
             <FormInput label="Website" type="url" value={form.webUrl ?? ''} onChange={(e) => set('webUrl', e.target.value)} />
             <FormInput label="Instagram" value={form.instagramUrl ?? ''} onChange={(e) => set('instagramUrl', e.target.value)} />
           </div>
+          <FormInput label="URL Google Maps" type="url" value={form.mapsUrl ?? ''} onChange={(e) => set('mapsUrl', e.target.value)} hint="Link para o local no Google Maps — usado no botão 'Como Chegar'" />
           <div className="adm-form-row">
             <FormInput label="Horário de Funcionamento" value={form.openingHours ?? ''} onChange={(e) => set('openingHours', e.target.value)} hint="Ex: Seg-Sex 08:00-17:00" />
             <FormInput label="Preço de Entrada (R$)" type="number" value={form.entryPrice ?? ''} onChange={(e) => set('entryPrice', e.target.value ? Number(e.target.value) : undefined)} />

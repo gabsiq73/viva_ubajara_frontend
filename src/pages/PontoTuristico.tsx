@@ -80,7 +80,7 @@ export default function PontoTuristico() {
                             <h1 id="pt-hero-title" className="pt-hero__title">{attraction.name}</h1>
                             {(attraction.shortDescription || attraction.description) && (
                                 <p className="pt-hero__subtitle">
-                                    {attraction.shortDescription ?? attraction.description}
+                                    {attraction.shortDescription || attraction.description}
                                 </p>
                             )}
                         </div>
@@ -256,7 +256,7 @@ export default function PontoTuristico() {
                                     )}
                                 </ul>
                                 <a
-                                    href={`https://maps.google.com/maps?q=${encodeURIComponent(attraction.address)}`}
+                                    href={attraction.mapsUrl || `https://maps.google.com/maps?q=${encodeURIComponent(attraction.address)}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="pt-how__maps-btn"

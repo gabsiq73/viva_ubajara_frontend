@@ -9,7 +9,7 @@ import { PhotoManager } from '../components/PhotoManager';
 import { PhotoPicker } from '../components/PhotoPicker';
 import type { RestaurantRequest, PhotoResponse } from '../types';
 
-const EMPTY: RestaurantRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', active: true, cuisineType: '', openingHours: '', avgPrice: undefined, acceptsReservation: false };
+const EMPTY: RestaurantRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', mapsUrl: '', active: true, cuisineType: '', openingHours: '', avgPrice: undefined, acceptsReservation: false };
 
 export function RestaurantFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -89,6 +89,7 @@ export function RestaurantFormPage() {
             <FormInput label="Website" type="url" value={form.webUrl ?? ''} onChange={(e) => set('webUrl', e.target.value)} />
             <FormInput label="Instagram" value={form.instagramUrl ?? ''} onChange={(e) => set('instagramUrl', e.target.value)} />
           </div>
+          <FormInput label="URL Google Maps" type="url" value={form.mapsUrl ?? ''} onChange={(e) => set('mapsUrl', e.target.value)} hint="Link para o local no Google Maps" />
           <div style={{ display: 'flex', gap: 24 }}>
             <FormToggle label="Aceita Reserva" checked={!!form.acceptsReservation} onChange={(v) => set('acceptsReservation', v)} />
             <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />

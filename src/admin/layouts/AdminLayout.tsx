@@ -15,6 +15,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/contact-messages': 'Mensagens',
   '/admin/testimonials': 'Depoimentos',
   '/admin/photos': 'Fotos',
+  '/admin/recommended-items': 'Itens Recomendados',
 };
 
 export function AdminLayout() {

@@ -17,7 +17,14 @@ const toApiFormat = (iso: string) => {
 
 const toInputFormat = (dt: string) => {
   if (!dt) return '';
-  try { return new Date(dt).toISOString().slice(0,16); } catch { return ''; }
+  try {
+    if (dt.includes('/')) {
+      const [datePart, timePart = '00:00:00'] = dt.split(' ');
+      const [day, month, year] = datePart.split('/');
+      return `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}T${timePart.slice(0,5)}`;
+    }
+    return new Date(dt).toISOString().slice(0, 16);
+  } catch { return ''; }
 };
 
 const EMPTY: EventRequest = { name: '', description: '', startDateTime: '', endDateTime: '', location: '', registrationUrl: '', active: true };

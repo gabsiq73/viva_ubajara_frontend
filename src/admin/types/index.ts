@@ -75,6 +75,7 @@ export interface AttractionRequest {
   email?: string;
   webUrl?: string;
   instagramUrl?: string;
+  mapsUrl?: string;
   active: boolean;
   openToPublic?: boolean;
   freeAccess?: boolean;
@@ -94,6 +95,7 @@ export interface AttractionUpdateDTO {
   email?: string;
   webUrl?: string;
   instagramUrl?: string;
+  mapsUrl?: string;
   active?: boolean;
   openToPublic?: boolean;
   freeAccess?: boolean;
@@ -114,6 +116,7 @@ export interface AttractionResponse {
   email?: string;
   webUrl?: string;
   instagramUrl?: string;
+  mapsUrl?: string;
   active: boolean;
   openToPublic?: boolean;
   freeAccess?: boolean;
@@ -211,6 +214,7 @@ export interface RestaurantRequest {
   email?: string;
   webUrl?: string;
   instagramUrl?: string;
+  mapsUrl?: string;
   active: boolean;
   cuisineType: string;
   openingHours?: string;
@@ -226,6 +230,7 @@ export interface RestaurantUpdateDTO {
   email?: string;
   webUrl?: string;
   instagramUrl?: string;
+  mapsUrl?: string;
   active?: boolean;
   cuisineType?: string;
   openingHours?: string;
@@ -242,6 +247,7 @@ export interface RestaurantResponse {
   email?: string;
   webUrl?: string;
   instagramUrl?: string;
+  mapsUrl?: string;
   active: boolean;
   cuisineType: string;
   openingHours?: string;
@@ -263,6 +269,7 @@ export interface HostPointRequest {
   email?: string;
   webUrl?: string;
   instagramUrl?: string;
+  mapsUrl?: string;
   active: boolean;
   hostType: HostType;
   numOfRooms?: number;
@@ -278,6 +285,7 @@ export interface HostPointUpdateDTO {
   email?: string;
   webUrl?: string;
   instagramUrl?: string;
+  mapsUrl?: string;
   active?: boolean;
   hostType?: HostType;
   numOfRooms?: number;
@@ -294,11 +302,53 @@ export interface HostPointResponse {
   email?: string;
   webUrl?: string;
   instagramUrl?: string;
+  mapsUrl?: string;
   active: boolean;
   hostType: HostType;
   numOfRooms?: number;
   avgPrice?: number;
   bookingUrl?: string;
+  photos: PhotoResponse[];
+}
+
+// ============================================================
+// Recommended Items
+// ============================================================
+export interface RecommendedItemRequest {
+  name: string;
+  description: string;
+  shortDescription?: string;
+  address?: string;
+  webUrl?: string;
+  mapsUrl?: string;
+  category: string;
+  featured?: boolean;
+  active: boolean;
+}
+
+export interface RecommendedItemUpdateDTO {
+  name?: string;
+  description?: string;
+  shortDescription?: string;
+  address?: string;
+  webUrl?: string;
+  mapsUrl?: string;
+  category?: string;
+  featured?: boolean;
+  active?: boolean;
+}
+
+export interface RecommendedItemResponse {
+  id: string;
+  name: string;
+  description: string;
+  shortDescription?: string;
+  address?: string;
+  webUrl?: string;
+  mapsUrl?: string;
+  active: boolean;
+  category: string;
+  featured?: boolean;
   photos: PhotoResponse[];
 }
 

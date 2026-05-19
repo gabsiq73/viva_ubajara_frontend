@@ -21,6 +21,8 @@ import { ContactFormPage } from './pages/ContactFormPage';
 import { ContactMessagesListPage } from './pages/ContactMessagesListPage';
 import { TestimonialsListPage } from './pages/TestimonialsListPage';
 import { PhotosPage } from './pages/PhotosPage';
+import { RecommendedItemsListPage } from './pages/RecommendedItemsListPage';
+import { RecommendedItemFormPage } from './pages/RecommendedItemFormPage';
 import './styles/admin.css';
 
 /**
@@ -71,6 +73,10 @@ export function AdminRouter() {
           <Route path="testimonials" element={<TestimonialsListPage />} />
 
           <Route path="photos" element={<PhotosPage />} />
+
+          <Route path="recommended-items" element={<RecommendedItemsListPage />} />
+          <Route path="recommended-items/new" element={<RecommendedItemFormPage />} />
+          <Route path="recommended-items/:id/edit" element={<RecommendedItemFormPage />} />
         </Route>
       </Routes>
     </ToastProvider>
