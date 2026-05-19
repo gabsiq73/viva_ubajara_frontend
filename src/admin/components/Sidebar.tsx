@@ -13,6 +13,7 @@ import {
   MessageSquare,
   Star,
   Bookmark,
+  Users,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import logo from '../../assets/images/logo.webp';
@@ -30,6 +31,7 @@ const NAV_ITEMS = [
   { to: '/admin/contact-messages', label: 'Mensagens',          icon: <MessageSquare size={18} />, section: 'Visitantes' },
   { to: '/admin/testimonials',     label: 'Depoimentos',        icon: <Star size={18} />,          section: null },
   { to: '/admin/photos',           label: 'Fotos',              icon: <Image size={18} />,         section: 'Mídia' },
+  { to: '/admin/users',            label: 'Usuários',           icon: <Users size={18} />,         section: 'Sistema' },
 ];
 
 interface SidebarProps {

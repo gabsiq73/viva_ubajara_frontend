@@ -46,6 +46,7 @@ export interface UserResponse {
   username: string;
   email: string;
   role: UserRole;
+  photoUrl?: string;
 }
 
 // ============================================================
@@ -477,6 +478,26 @@ export interface TestimonialResponse {
   comment: string;
   approved: boolean;
   createdDate: string;
+}
+
+// ============================================================
+// User Management
+// ============================================================
+export interface UserProfileUpdateRequest {
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  email?: string;
+  password?: string;
+}
+
+export interface UserAdminUpdateRequest {
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  email?: string;
+  password?: string;
+  role?: UserRole;
 }
 
 // ============================================================

@@ -23,6 +23,8 @@ import { TestimonialsListPage } from './pages/TestimonialsListPage';
 import { PhotosPage } from './pages/PhotosPage';
 import { RecommendedItemsListPage } from './pages/RecommendedItemsListPage';
 import { RecommendedItemFormPage } from './pages/RecommendedItemFormPage';
+import { UsersListPage } from './pages/UsersListPage';
+import { ProfilePage } from './pages/ProfilePage';
 import './styles/admin.css';
 
 /**
@@ -77,6 +79,9 @@ export function AdminRouter() {
           <Route path="recommended-items" element={<RecommendedItemsListPage />} />
           <Route path="recommended-items/new" element={<RecommendedItemFormPage />} />
           <Route path="recommended-items/:id/edit" element={<RecommendedItemFormPage />} />
+
+          <Route path="users" element={<UsersListPage />} />
+          <Route path="profile" element={<ProfilePage />} />
         </Route>
       </Routes>
     </ToastProvider>

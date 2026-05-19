@@ -27,6 +27,7 @@ const toInputFormat = (dt: string) => {
 };
 
 const EMPTY: EventRequest = { name: '', description: '', startDateTime: '', endDateTime: '', location: '', registrationUrl: '', active: true };
+const ROLE_DESCS = ['cover', 'card'];
 
 export function EventFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -36,6 +37,7 @@ export function EventFormPage() {
   const [form, setForm] = useState<EventRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [cardFile, setCardFile] = useState<File | null>(null);
   const [startLocal, setStartLocal] = useState('');
   const [endLocal, setEndLocal] = useState('');
   const [errors, setErrors] = useState<Partial<Record<keyof EventRequest, string>>>({});
@@ -77,6 +79,7 @@ export function EventFormPage() {
         const created = await eventsService.create(payload);
         const uploads: Promise<unknown>[] = [];
         if (coverFile) uploads.push(photosService.uploadForEntity('events', created.id, coverFile, 'cover'));
+        if (cardFile) uploads.push(photosService.uploadForEntity('events', created.id, cardFile, 'card'));
         await Promise.allSettled(uploads);
         showToast('Evento criado com sucesso!', 'success');
       }
@@ -86,10 +89,11 @@ export function EventFormPage() {
   };
 
   const coverPhoto = photos.find(p => p.description === 'cover') ?? null;
+  const cardPhoto = photos.find(p => p.description === 'card') ?? null;
 
-  const handleCoverUpdate = (photo: PhotoResponse | null) => {
+  const handleRoleUpdate = (role: string) => (photo: PhotoResponse | null) => {
     setPhotos(prev => {
-      const filtered = prev.filter(p => p.description !== 'cover');
+      const filtered = prev.filter(p => p.description !== role);
       return photo ? [...filtered, photo] : filtered;
     });
   };
@@ -114,15 +118,23 @@ export function EventFormPage() {
           <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
 
           <div className="adm-role-slots-section">
-            <p className="adm-role-slots-section__title">Foto do Evento</p>
-            <div className="adm-role-slots-grid" style={{ gridTemplateColumns: 'minmax(200px, 360px)' }}>
+            <p className="adm-role-slots-section__title">Fotos do Evento</p>
+            <div className="adm-role-slots-grid">
               <RolePhotoSlot
                 label="Foto de Capa"
-                hint="Imagem principal exibida no card e página do evento"
+                hint="Imagem principal exibida na página do evento"
                 roleDescription="cover"
                 {...(isEdit
-                  ? { entityPath: 'events', entityId: id, existingPhoto: coverPhoto, onPhotoUpdate: handleCoverUpdate }
+                  ? { entityPath: 'events', entityId: id, existingPhoto: coverPhoto, onPhotoUpdate: handleRoleUpdate('cover') }
                   : { pendingFile: coverFile, onPendingFileChange: setCoverFile })}
+              />
+              <RolePhotoSlot
+                label="Foto do Card"
+                hint="Miniatura exibida na listagem de eventos"
+                roleDescription="card"
+                {...(isEdit
+                  ? { entityPath: 'events', entityId: id, existingPhoto: cardPhoto, onPhotoUpdate: handleRoleUpdate('card') }
+                  : { pendingFile: cardFile, onPendingFileChange: setCardFile })}
               />
             </div>
           </div>

@@ -36,6 +36,7 @@ interface AuthContextData {
   loginWithGitHub: (code: string) => Promise<void>;
   logout: () => void;
   applyAuthResponse: (response: AuthResponse) => void;
+  updateUserPhoto: (photoUrl: string) => void;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -153,6 +154,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   }, []);
 
+  // ─── Atualiza foto de perfil no estado e localStorage ─────────────────────
+  const updateUserPhoto = useCallback((photoUrl: string) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, photo: photoUrl };
+      localStorage.setItem(USER_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
   // ─── Intercepta 401 e 403 do Axios ───────────────────────────────────────
   useEffect(() => {
     const handle403 = (e: Event) => {
@@ -224,6 +235,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loginWithGitHub,
         logout,
         applyAuthResponse,
+        updateUserPhoto,
       }}
     >
       {children}

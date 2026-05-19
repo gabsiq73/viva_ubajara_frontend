@@ -4,9 +4,9 @@ import { recommendedItemsService } from '../services/recommendedItemsService';
 import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormToggle } from '../components/FormField';
+import { RolePhotoSlot } from '../components/RolePhotoSlot';
 import { Spinner } from '../components/Spinner';
 import { PhotoManager } from '../components/PhotoManager';
-import { PhotoPicker } from '../components/PhotoPicker';
 import type { RecommendedItemRequest, PhotoResponse } from '../types';
 
 const CATEGORIES = [
@@ -19,6 +19,8 @@ const EMPTY: RecommendedItemRequest = {
   webUrl: '', mapsUrl: '', category: 'Natureza', featured: false, active: true,
 };
 
+const ROLE_DESCS = ['cover', 'card'];
+
 export function RecommendedItemFormPage() {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
@@ -27,7 +29,8 @@ export function RecommendedItemFormPage() {
 
   const [form, setForm] = useState<RecommendedItemRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
-  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [cardFile, setCardFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof RecommendedItemRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
@@ -64,9 +67,10 @@ export function RecommendedItemFormPage() {
         showToast('Item atualizado com sucesso!', 'success');
       } else {
         const created = await recommendedItemsService.create(form);
-        await Promise.allSettled(
-          pendingFiles.map((f) => photosService.uploadForEntity('recommended-items', created.id, f))
-        );
+        const uploads: Promise<unknown>[] = [];
+        if (coverFile) uploads.push(photosService.uploadForEntity('recommended-items', created.id, coverFile, 'cover'));
+        if (cardFile) uploads.push(photosService.uploadForEntity('recommended-items', created.id, cardFile, 'card'));
+        await Promise.allSettled(uploads);
         showToast('Item criado com sucesso!', 'success');
       }
       navigate('/admin/recommended-items');
@@ -75,6 +79,17 @@ export function RecommendedItemFormPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const coverPhoto = photos.find(p => p.description === 'cover') ?? null;
+  const cardPhoto = photos.find(p => p.description === 'card') ?? null;
+  const galleryPhotos = photos.filter(p => !ROLE_DESCS.includes(p.description ?? ''));
+
+  const handleRoleUpdate = (role: string) => (photo: PhotoResponse | null) => {
+    setPhotos(prev => {
+      const filtered = prev.filter(p => p.description !== role);
+      return photo ? [...filtered, photo] : filtered;
+    });
   };
 
   if (fetching) return <Spinner center size="lg" />;
@@ -133,7 +148,27 @@ export function RecommendedItemFormPage() {
             <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
           </div>
 
-          {!isEdit && <PhotoPicker files={pendingFiles} onChange={setPendingFiles} />}
+          <div className="adm-role-slots-section">
+            <p className="adm-role-slots-section__title">Fotos</p>
+            <div className="adm-role-slots-grid">
+              <RolePhotoSlot
+                label="Foto de Capa"
+                hint="Imagem principal da página do item"
+                roleDescription="cover"
+                {...(isEdit
+                  ? { entityPath: 'recommended-items', entityId: id, existingPhoto: coverPhoto, onPhotoUpdate: handleRoleUpdate('cover') }
+                  : { pendingFile: coverFile, onPendingFileChange: setCoverFile })}
+              />
+              <RolePhotoSlot
+                label="Foto do Card"
+                hint="Miniatura exibida na listagem"
+                roleDescription="card"
+                {...(isEdit
+                  ? { entityPath: 'recommended-items', entityId: id, existingPhoto: cardPhoto, onPhotoUpdate: handleRoleUpdate('card') }
+                  : { pendingFile: cardFile, onPendingFileChange: setCardFile })}
+              />
+            </div>
+          </div>
 
           <div className="adm-form-actions">
             <button type="button" className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/recommended-items')}>Cancelar</button>
@@ -145,7 +180,7 @@ export function RecommendedItemFormPage() {
       </div>
 
       {isEdit && id && (
-        <PhotoManager entityPath="recommended-items" entityId={id} initialPhotos={photos} />
+        <PhotoManager entityPath="recommended-items" entityId={id} initialPhotos={galleryPhotos} />
       )}
     </div>
   );

@@ -4,12 +4,13 @@ import { hostPointsService } from '../services/hostPointsService';
 import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormSelect, FormToggle } from '../components/FormField';
+import { RolePhotoSlot } from '../components/RolePhotoSlot';
 import { Spinner } from '../components/Spinner';
 import { PhotoManager } from '../components/PhotoManager';
-import { PhotoPicker } from '../components/PhotoPicker';
 import type { HostPointRequest, HostType, PhotoResponse } from '../types';
 
 const EMPTY: HostPointRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', mapsUrl: '', active: true, hostType: 'HOTEL', numOfRooms: undefined, avgPrice: undefined, bookingUrl: '' };
+const ROLE_DESCS = ['cover', 'card'];
 
 export function HostPointFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -18,7 +19,8 @@ export function HostPointFormPage() {
   const { showToast } = useToast();
   const [form, setForm] = useState<HostPointRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
-  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [cardFile, setCardFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof HostPointRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
@@ -51,14 +53,26 @@ export function HostPointFormPage() {
         showToast('Hospedagem atualizada!', 'success');
       } else {
         const created = await hostPointsService.create(form);
-        await Promise.allSettled(
-          pendingFiles.map((f) => photosService.uploadForEntity('host-points', created.id, f))
-        );
+        const uploads: Promise<unknown>[] = [];
+        if (coverFile) uploads.push(photosService.uploadForEntity('host-points', created.id, coverFile, 'cover'));
+        if (cardFile) uploads.push(photosService.uploadForEntity('host-points', created.id, cardFile, 'card'));
+        await Promise.allSettled(uploads);
         showToast('Hospedagem criada com sucesso!', 'success');
       }
       navigate('/admin/host-points');
     } catch { showToast('Erro ao salvar.', 'error'); }
     finally { setLoading(false); }
+  };
+
+  const coverPhoto = photos.find(p => p.description === 'cover') ?? null;
+  const cardPhoto = photos.find(p => p.description === 'card') ?? null;
+  const galleryPhotos = photos.filter(p => !ROLE_DESCS.includes(p.description ?? ''));
+
+  const handleRoleUpdate = (role: string) => (photo: PhotoResponse | null) => {
+    setPhotos(prev => {
+      const filtered = prev.filter(p => p.description !== role);
+      return photo ? [...filtered, photo] : filtered;
+    });
   };
 
   if (fetching) return <Spinner center size="lg" />;
@@ -91,14 +105,36 @@ export function HostPointFormPage() {
           <FormInput label="URL de Reserva" type="url" value={form.bookingUrl ?? ''} onChange={(e) => set('bookingUrl', e.target.value)} />
           <FormInput label="URL Google Maps" type="url" value={form.mapsUrl ?? ''} onChange={(e) => set('mapsUrl', e.target.value)} hint="Link para o local no Google Maps" />
           <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
-          {!isEdit && <PhotoPicker files={pendingFiles} onChange={setPendingFiles} />}
+
+          <div className="adm-role-slots-section">
+            <p className="adm-role-slots-section__title">Fotos</p>
+            <div className="adm-role-slots-grid">
+              <RolePhotoSlot
+                label="Foto de Capa"
+                hint="Imagem principal exibida na página da hospedagem"
+                roleDescription="cover"
+                {...(isEdit
+                  ? { entityPath: 'host-points', entityId: id, existingPhoto: coverPhoto, onPhotoUpdate: handleRoleUpdate('cover') }
+                  : { pendingFile: coverFile, onPendingFileChange: setCoverFile })}
+              />
+              <RolePhotoSlot
+                label="Foto do Card"
+                hint="Miniatura exibida na listagem"
+                roleDescription="card"
+                {...(isEdit
+                  ? { entityPath: 'host-points', entityId: id, existingPhoto: cardPhoto, onPhotoUpdate: handleRoleUpdate('card') }
+                  : { pendingFile: cardFile, onPendingFileChange: setCardFile })}
+              />
+            </div>
+          </div>
+
           <div className="adm-form-actions">
             <button type="button" className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/host-points')}>Cancelar</button>
             <button type="submit" className="adm-btn adm-btn--primary" disabled={loading}>{loading ? 'Salvando…' : isEdit ? 'Atualizar' : 'Criar'}</button>
           </div>
         </form>
       </div>
-      {isEdit && id && <PhotoManager entityPath="host-points" entityId={id} initialPhotos={photos} />}
+      {isEdit && id && <PhotoManager entityPath="host-points" entityId={id} initialPhotos={galleryPhotos} />}
     </div>
   );
 }

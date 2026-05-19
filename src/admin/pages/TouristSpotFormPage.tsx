@@ -4,12 +4,13 @@ import { touristSpotsService } from '../services/touristSpotsService';
 import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormToggle } from '../components/FormField';
+import { RolePhotoSlot } from '../components/RolePhotoSlot';
 import { Spinner } from '../components/Spinner';
 import { PhotoManager } from '../components/PhotoManager';
-import { PhotoPicker } from '../components/PhotoPicker';
 import type { TouristSpotRequest, PhotoResponse } from '../types';
 
 const EMPTY: TouristSpotRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', active: true };
+const ROLE_DESCS = ['cover', 'card'];
 
 export function TouristSpotFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -18,7 +19,8 @@ export function TouristSpotFormPage() {
   const { showToast } = useToast();
   const [form, setForm] = useState<TouristSpotRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
-  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [cardFile, setCardFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof TouristSpotRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
@@ -51,14 +53,26 @@ export function TouristSpotFormPage() {
         showToast('Ponto turístico atualizado!', 'success');
       } else {
         const created = await touristSpotsService.create(form);
-        await Promise.allSettled(
-          pendingFiles.map((f) => photosService.uploadForEntity('tourist-spots', created.id, f))
-        );
+        const uploads: Promise<unknown>[] = [];
+        if (coverFile) uploads.push(photosService.uploadForEntity('tourist-spots', created.id, coverFile, 'cover'));
+        if (cardFile) uploads.push(photosService.uploadForEntity('tourist-spots', created.id, cardFile, 'card'));
+        await Promise.allSettled(uploads);
         showToast('Ponto turístico criado com sucesso!', 'success');
       }
       navigate('/admin/tourist-spots');
     } catch { showToast('Erro ao salvar.', 'error'); }
     finally { setLoading(false); }
+  };
+
+  const coverPhoto = photos.find(p => p.description === 'cover') ?? null;
+  const cardPhoto = photos.find(p => p.description === 'card') ?? null;
+  const galleryPhotos = photos.filter(p => !ROLE_DESCS.includes(p.description ?? ''));
+
+  const handleRoleUpdate = (role: string) => (photo: PhotoResponse | null) => {
+    setPhotos(prev => {
+      const filtered = prev.filter(p => p.description !== role);
+      return photo ? [...filtered, photo] : filtered;
+    });
   };
 
   if (fetching) return <Spinner center size="lg" />;
@@ -82,14 +96,36 @@ export function TouristSpotFormPage() {
             <FormInput label="Instagram" value={form.instagramUrl ?? ''} onChange={(e) => set('instagramUrl', e.target.value)} />
           </div>
           <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
-          {!isEdit && <PhotoPicker files={pendingFiles} onChange={setPendingFiles} />}
+
+          <div className="adm-role-slots-section">
+            <p className="adm-role-slots-section__title">Fotos</p>
+            <div className="adm-role-slots-grid">
+              <RolePhotoSlot
+                label="Foto de Capa"
+                hint="Imagem principal da página do ponto turístico"
+                roleDescription="cover"
+                {...(isEdit
+                  ? { entityPath: 'tourist-spots', entityId: id, existingPhoto: coverPhoto, onPhotoUpdate: handleRoleUpdate('cover') }
+                  : { pendingFile: coverFile, onPendingFileChange: setCoverFile })}
+              />
+              <RolePhotoSlot
+                label="Foto do Card"
+                hint="Miniatura exibida na listagem"
+                roleDescription="card"
+                {...(isEdit
+                  ? { entityPath: 'tourist-spots', entityId: id, existingPhoto: cardPhoto, onPhotoUpdate: handleRoleUpdate('card') }
+                  : { pendingFile: cardFile, onPendingFileChange: setCardFile })}
+              />
+            </div>
+          </div>
+
           <div className="adm-form-actions">
             <button type="button" className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/tourist-spots')}>Cancelar</button>
             <button type="submit" className="adm-btn adm-btn--primary" disabled={loading}>{loading ? 'Salvando…' : isEdit ? 'Atualizar' : 'Criar'}</button>
           </div>
         </form>
       </div>
-      {isEdit && id && <PhotoManager entityPath="tourist-spots" entityId={id} initialPhotos={photos} />}
+      {isEdit && id && <PhotoManager entityPath="tourist-spots" entityId={id} initialPhotos={galleryPhotos} />}
     </div>
   );
 }

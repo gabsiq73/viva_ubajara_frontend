@@ -16,9 +16,9 @@ export function TopBar({ title, onMenuToggle }: TopBarProps) {
     navigate('/admin/login');
   };
 
-  const initials = user?.email
-    ? user.email.split('@')[0].slice(0, 2).toUpperCase()
-    : '?';
+  const initials = user?.name
+    ? user.name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
+    : (user?.email ? user.email.split('@')[0].slice(0, 2).toUpperCase() : '?');
 
   return (
     <header className="adm-topbar">
@@ -35,15 +35,27 @@ export function TopBar({ title, onMenuToggle }: TopBarProps) {
 
       <div className="adm-topbar__right">
         {user && (
-          <div className="adm-topbar__user">
+          <button
+            className="adm-topbar__user"
+            onClick={() => navigate('/admin/profile')}
+            title="Ver meu perfil"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          >
             <div className="adm-topbar__user-info">
-              <strong>{user.email}</strong>
-              <span>{user.role === 'ADMIN' ? 'Administrador' : 'Usuário'}</span>
+              <strong>{user.name || user.email}</strong>
+              <span>{user.role === 'ADMIN' ? 'Administrador' : user.role === 'GUIDE' ? 'Guia' : 'Usuário'}</span>
             </div>
-            <div className="adm-topbar__avatar" title={user.email}>
-              {initials}
+            <div
+              className="adm-topbar__avatar"
+              title="Meu perfil"
+              style={{ overflow: 'hidden' }}
+            >
+              {user.photo
+                ? <img src={user.photo} alt="Foto de perfil" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : initials
+              }
             </div>
-          </div>
+          </button>
         )}
         <button
           className="adm-btn adm-btn--ghost adm-btn--sm"

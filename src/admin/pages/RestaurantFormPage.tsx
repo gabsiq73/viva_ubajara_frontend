@@ -11,7 +11,7 @@ import type { RestaurantRequest, PhotoResponse } from '../types';
 
 const EMPTY: RestaurantRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', mapsUrl: '', active: true, cuisineType: '', openingHours: '', avgPrice: undefined, acceptsReservation: false };
 
-const ROLE_DESCS = ['cover'];
+const ROLE_DESCS = ['cover', 'card'];
 
 export function RestaurantFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +21,7 @@ export function RestaurantFormPage() {
   const [form, setForm] = useState<RestaurantRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [cardFile, setCardFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof RestaurantRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
@@ -56,6 +57,7 @@ export function RestaurantFormPage() {
         const created = await restaurantsService.create(form);
         const uploads: Promise<unknown>[] = [];
         if (coverFile) uploads.push(photosService.uploadForEntity('restaurants', created.id, coverFile, 'cover'));
+        if (cardFile) uploads.push(photosService.uploadForEntity('restaurants', created.id, cardFile, 'card'));
         await Promise.allSettled(uploads);
         showToast('Restaurante criado com sucesso!', 'success');
       }
@@ -65,11 +67,12 @@ export function RestaurantFormPage() {
   };
 
   const coverPhoto = photos.find(p => p.description === 'cover') ?? null;
+  const cardPhoto = photos.find(p => p.description === 'card') ?? null;
   const galleryPhotos = photos.filter(p => !ROLE_DESCS.includes(p.description ?? ''));
 
-  const handleRoleUpdate = (photo: PhotoResponse | null) => {
+  const handleRoleUpdate = (role: string) => (photo: PhotoResponse | null) => {
     setPhotos(prev => {
-      const filtered = prev.filter(p => p.description !== 'cover');
+      const filtered = prev.filter(p => p.description !== role);
       return photo ? [...filtered, photo] : filtered;
     });
   };
@@ -108,15 +111,23 @@ export function RestaurantFormPage() {
           </div>
 
           <div className="adm-role-slots-section">
-            <p className="adm-role-slots-section__title">Foto de Capa</p>
-            <div className="adm-role-slots-grid" style={{ gridTemplateColumns: 'minmax(200px, 360px)' }}>
+            <p className="adm-role-slots-section__title">Fotos</p>
+            <div className="adm-role-slots-grid">
               <RolePhotoSlot
-                label="Foto Principal"
+                label="Foto de Capa"
                 hint="Exibida no topo da página do estabelecimento"
                 roleDescription="cover"
                 {...(isEdit
-                  ? { entityPath: 'restaurants', entityId: id, existingPhoto: coverPhoto, onPhotoUpdate: handleRoleUpdate }
+                  ? { entityPath: 'restaurants', entityId: id, existingPhoto: coverPhoto, onPhotoUpdate: handleRoleUpdate('cover') }
                   : { pendingFile: coverFile, onPendingFileChange: setCoverFile })}
+              />
+              <RolePhotoSlot
+                label="Foto do Card"
+                hint="Miniatura exibida na listagem e nos banners"
+                roleDescription="card"
+                {...(isEdit
+                  ? { entityPath: 'restaurants', entityId: id, existingPhoto: cardPhoto, onPhotoUpdate: handleRoleUpdate('card') }
+                  : { pendingFile: cardFile, onPendingFileChange: setCardFile })}
               />
             </div>
           </div>
@@ -127,7 +138,14 @@ export function RestaurantFormPage() {
           </div>
         </form>
       </div>
-      {isEdit && id && <PhotoManager entityPath="restaurants" entityId={id} initialPhotos={galleryPhotos} />}
+      {isEdit && id && (
+        <PhotoManager
+          entityPath="restaurants"
+          entityId={id}
+          initialPhotos={galleryPhotos}
+          title="Cardápio — Fotos dos Pratos"
+        />
+      )}
     </div>
   );
 }

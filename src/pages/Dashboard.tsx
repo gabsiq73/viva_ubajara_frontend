@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useAuth } from "../admin/hooks/useAuth";
+import { usersService } from "../admin/services/usersService";
 import { testimonialsService } from "../admin/services/testimonialsService";
 import "./style/Dashboard.css";
 
@@ -60,7 +61,7 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
 
 // ─── Main page ─────────────────────────────────────────────────────────────────
 
-type Tab = "favorites" | "messages" | "testimonial";
+type Tab = "favorites" | "messages" | "testimonial" | "profile";
 
 const ROLE_LABELS: Record<string, string> = {
   ADMIN: "Administrador",
@@ -76,7 +77,7 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 export default function Dashboard() {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, logout, updateUserPhoto } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -86,6 +87,12 @@ export default function Dashboard() {
   const [favorites, setFavorites] = useState<FavoriteItem[]>(loadFavorites);
   const [messages, setMessages] = useState<SentMessage[]>(loadMessages);
 
+  // Photo upload
+  const [currentPhoto, setCurrentPhoto] = useState<string | null>(user?.photo ?? null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+
+  // Testimonial
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
   const [submitting, setSubmitting] = useState(false);
@@ -94,11 +101,38 @@ export default function Dashboard() {
   );
   const [testimonialError, setTestimonialError] = useState<string | null>(null);
 
+  // Profile edit
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [savingInfo, setSavingInfo] = useState(false);
+  const [savingPwd, setSavingPwd] = useState(false);
+  const [pwdError, setPwdError] = useState("");
+  const [profileSaved, setProfileSaved] = useState(false);
+
   useEffect(() => {
     if (!isAuthenticated) navigate("/admin/login", { replace: true });
   }, [isAuthenticated, navigate]);
 
-  // Sync favorites from localStorage when the tab becomes active
+  // Load user profile from API to get DB-stored photoUrl + current info
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    usersService.getMe().then((data) => {
+      setFirstName(data.firstName ?? "");
+      setLastName(data.lastName ?? "");
+      setUsername(data.username ?? "");
+      setEmail(data.email ?? "");
+      if (data.photoUrl) {
+        setCurrentPhoto(data.photoUrl);
+        updateUserPhoto(data.photoUrl);
+      }
+    }).catch(() => {});
+  }, [isAuthenticated]);
+
+  // Sync favorites / messages when tab changes
   useEffect(() => {
     if (tab === "favorites") setFavorites(loadFavorites());
     if (tab === "messages") setMessages(loadMessages());
@@ -110,6 +144,27 @@ export default function Dashboard() {
     setFavorites(updated);
   };
 
+  // ─── Photo upload ──────────────────────────────────────────────────────────
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+    setUploadingPhoto(true);
+    const localPreview = URL.createObjectURL(file);
+    setCurrentPhoto(localPreview);
+    try {
+      const { photoUrl } = await usersService.uploadPhoto(file);
+      updateUserPhoto(photoUrl);
+      setCurrentPhoto(photoUrl);
+      URL.revokeObjectURL(localPreview);
+    } catch {
+      setCurrentPhoto(user?.photo ?? null);
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  // ─── Testimonial ──────────────────────────────────────────────────────────
   const handleTestimonialSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!comment.trim()) return;
@@ -119,7 +174,7 @@ export default function Dashboard() {
       await testimonialsService.create({
         userName: user?.name || user?.email?.split("@")[0] || "Visitante",
         userEmail: user?.email ?? "",
-        userPhoto: user?.photo,
+        userPhoto: currentPhoto ?? user?.photo,
         rating,
         comment: comment.trim(),
       });
@@ -133,31 +188,102 @@ export default function Dashboard() {
     }
   };
 
+  // ─── Profile save ─────────────────────────────────────────────────────────
+  const handleInfoSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingInfo(true);
+    try {
+      await usersService.updateMe({ firstName, lastName, username, email });
+      setProfileSaved(true);
+      setTimeout(() => setProfileSaved(false), 2500);
+    } catch {
+    } finally {
+      setSavingInfo(false);
+    }
+  };
+
+  const handlePasswordSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwdError("");
+    if (newPassword.length < 6) { setPwdError("A senha deve ter no mínimo 6 caracteres."); return; }
+    if (newPassword !== confirmPassword) { setPwdError("As senhas não coincidem."); return; }
+    setSavingPwd(true);
+    try {
+      await usersService.updateMe({ password: newPassword });
+      setNewPassword("");
+      setConfirmPassword("");
+      setProfileSaved(true);
+      setTimeout(() => setProfileSaved(false), 2500);
+    } catch {
+      setPwdError("Erro ao alterar senha.");
+    } finally {
+      setSavingPwd(false);
+    }
+  };
+
   if (!isAuthenticated || !user) return null;
 
-  const displayName = user.name || user.email?.split("@")[0] || "";
+  const displayName = [firstName, lastName].filter(Boolean).join(" ") || user.name || user.email?.split("@")[0] || "";
   const initials = displayName.slice(0, 2).toUpperCase();
   const roleLabel = ROLE_LABELS[user.role] ?? user.role;
+  const favCount = loadFavorites().length;
+  const msgCount = loadMessages().length;
 
   return (
     <div className="dash-page">
       <Header />
 
       <main className="dash-main">
-        {/* ── Profile card ─────────────────────────────────────────────────── */}
+        {/* ── Profile hero ──────────────────────────────────────────────────── */}
         <section className="dash-profile-hero" aria-label="Seu perfil">
           <div className="dash-profile-hero__inner">
-            <div className="dash-profile-avatar">
-              {user.photo
-                ? <img src={user.photo} alt={displayName} />
-                : <span>{initials}</span>
-              }
+            {/* Avatar with photo upload */}
+            <div className="dash-avatar-wrap">
+              <div className="dash-profile-avatar">
+                {currentPhoto
+                  ? <img src={currentPhoto} alt={displayName} />
+                  : <span>{initials}</span>
+                }
+              </div>
+              <button
+                className="dash-avatar-camera"
+                onClick={() => photoInputRef.current?.click()}
+                disabled={uploadingPhoto}
+                title="Alterar foto de perfil"
+                aria-label="Alterar foto de perfil"
+              >
+                {uploadingPhoto
+                  ? <span className="material-symbols-outlined" style={{ fontSize: 16, animation: "dash-spin 0.7s linear infinite" }}>autorenew</span>
+                  : <span className="material-symbols-outlined" style={{ fontSize: 16 }}>photo_camera</span>
+                }
+              </button>
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                style={{ display: "none" }}
+                onChange={handlePhotoChange}
+              />
             </div>
+
             <div className="dash-profile-info">
               <h1 className="dash-profile-name">{displayName}</h1>
               <p className="dash-profile-email">{user.email}</p>
               <span className="dash-profile-role">{roleLabel}</span>
+              {/* Stats row */}
+              <div className="dash-profile-stats">
+                <button className="dash-stat" onClick={() => setTab("favorites")}>
+                  <span className="dash-stat__num">{favCount}</span>
+                  <span className="dash-stat__label">favorito{favCount !== 1 ? "s" : ""}</span>
+                </button>
+                <span className="dash-stat-divider" />
+                <button className="dash-stat" onClick={() => setTab("messages")}>
+                  <span className="dash-stat__num">{msgCount}</span>
+                  <span className="dash-stat__label">mensagem{msgCount !== 1 ? "s" : ""}</span>
+                </button>
+              </div>
             </div>
+
             <div className="dash-profile-actions">
               {user.role === "ADMIN" && (
                 <Link to="/admin" className="dash-action-btn dash-action-btn--outline">
@@ -176,13 +302,14 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* ── Tabs ─────────────────────────────────────────────────────────── */}
+        {/* ── Tabs ──────────────────────────────────────────────────────────── */}
         <div className="dash-container">
           <nav className="dash-tabs" role="tablist" aria-label="Seções do perfil">
             {([
               { key: "favorites", label: "Favoritos", icon: "favorite" },
-              { key: "messages", label: "Mensagens Enviadas", icon: "mail" },
-              { key: "testimonial", label: "Meu Depoimento", icon: "rate_review" },
+              { key: "messages", label: "Mensagens", icon: "mail" },
+              { key: "testimonial", label: "Depoimento", icon: "rate_review" },
+              { key: "profile", label: "Editar Perfil", icon: "manage_accounts" },
             ] as { key: Tab; label: string; icon: string }[]).map(({ key, label, icon }) => (
               <button
                 key={key}
@@ -199,7 +326,7 @@ export default function Dashboard() {
 
           <div className="dash-tab-content" role="tabpanel">
 
-            {/* ── Favoritos ─────────────────────────────────────────────── */}
+            {/* ── Favoritos ─────────────────────────────────────────────────── */}
             {tab === "favorites" && (
               <div>
                 {favorites.length === 0 ? (
@@ -245,7 +372,7 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* ── Mensagens ─────────────────────────────────────────────── */}
+            {/* ── Mensagens ─────────────────────────────────────────────────── */}
             {tab === "messages" && (
               <div>
                 {messages.length === 0 ? (
@@ -277,7 +404,7 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* ── Depoimento ────────────────────────────────────────────── */}
+            {/* ── Depoimento ────────────────────────────────────────────────── */}
             {tab === "testimonial" && (
               <div className="dash-dep-wrap">
                 {testimonialSent ? (
@@ -298,12 +425,10 @@ export default function Dashboard() {
                     <p className="dash-dep-form__sub">
                       Como foi sua visita ao Parque Nacional de Ubajara? Sua opinião ajuda outros visitantes.
                     </p>
-
                     <div className="dash-field">
                       <label className="dash-label">Avaliação</label>
                       <StarRating value={rating} onChange={setRating} />
                     </div>
-
                     <div className="dash-field">
                       <label className="dash-label" htmlFor="dep-comment">Depoimento <span aria-hidden="true">*</span></label>
                       <textarea
@@ -318,16 +443,79 @@ export default function Dashboard() {
                       />
                       <span className="dash-char-count">{comment.length}/600</span>
                     </div>
-
-                    {testimonialError && (
-                      <p className="dash-error" role="alert">{testimonialError}</p>
-                    )}
-
+                    {testimonialError && <p className="dash-error" role="alert">{testimonialError}</p>}
                     <button type="submit" className="dash-submit-btn" disabled={submitting || !comment.trim()}>
                       {submitting ? "Enviando…" : "Enviar Depoimento"}
                     </button>
                   </form>
                 )}
+              </div>
+            )}
+
+            {/* ── Editar Perfil ─────────────────────────────────────────────── */}
+            {tab === "profile" && (
+              <div className="dash-edit-profile">
+                {profileSaved && (
+                  <div className="dash-profile-saved">
+                    <span className="material-symbols-outlined" aria-hidden="true">check_circle</span>
+                    Alterações salvas com sucesso!
+                  </div>
+                )}
+
+                <div className="dash-edit-card">
+                  <h3 className="dash-edit-card__title">
+                    <span className="material-symbols-outlined" aria-hidden="true">person</span>
+                    Informações Pessoais
+                  </h3>
+                  <form className="dash-edit-form" onSubmit={handleInfoSave}>
+                    <div className="dash-edit-row">
+                      <div className="dash-edit-field">
+                        <label className="dash-label" htmlFor="edit-firstname">Nome</label>
+                        <input id="edit-firstname" className="dash-input" type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} maxLength={20} />
+                      </div>
+                      <div className="dash-edit-field">
+                        <label className="dash-label" htmlFor="edit-lastname">Sobrenome</label>
+                        <input id="edit-lastname" className="dash-input" type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} maxLength={20} />
+                      </div>
+                    </div>
+                    <div className="dash-edit-row">
+                      <div className="dash-edit-field">
+                        <label className="dash-label" htmlFor="edit-username">Username</label>
+                        <input id="edit-username" className="dash-input" type="text" value={username} onChange={(e) => setUsername(e.target.value)} maxLength={30} />
+                      </div>
+                      <div className="dash-edit-field">
+                        <label className="dash-label" htmlFor="edit-email">Email</label>
+                        <input id="edit-email" className="dash-input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                      </div>
+                    </div>
+                    <button type="submit" className="dash-submit-btn" disabled={savingInfo}>
+                      {savingInfo ? "Salvando…" : "Salvar Informações"}
+                    </button>
+                  </form>
+                </div>
+
+                <div className="dash-edit-card">
+                  <h3 className="dash-edit-card__title">
+                    <span className="material-symbols-outlined" aria-hidden="true">lock</span>
+                    Alterar Senha
+                  </h3>
+                  <form className="dash-edit-form" onSubmit={handlePasswordSave}>
+                    <div className="dash-edit-row">
+                      <div className="dash-edit-field">
+                        <label className="dash-label" htmlFor="edit-pwd">Nova Senha</label>
+                        <input id="edit-pwd" className="dash-input" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Mínimo 6 caracteres" />
+                      </div>
+                      <div className="dash-edit-field">
+                        <label className="dash-label" htmlFor="edit-pwd2">Confirmar Senha</label>
+                        <input id="edit-pwd2" className="dash-input" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                      </div>
+                    </div>
+                    {pwdError && <p className="dash-error">{pwdError}</p>}
+                    <button type="submit" className="dash-submit-btn" disabled={savingPwd || !newPassword}>
+                      {savingPwd ? "Alterando…" : "Alterar Senha"}
+                    </button>
+                  </form>
+                </div>
               </div>
             )}
 

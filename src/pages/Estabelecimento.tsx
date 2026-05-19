@@ -51,7 +51,7 @@ function mapRestaurant(r: RestaurantResponse): EstabData {
         typeLabel: "Restaurante",
         features,
         heroImg: r.photos?.[0]?.url ?? heroFallback,
-        mapsUrl: `https://maps.google.com/maps?q=${encodeURIComponent(r.address)}`,
+        mapsUrl: r.mapsUrl || `https://maps.google.com/maps?q=${encodeURIComponent(r.address)}`,
     };
 }
 
@@ -72,7 +72,7 @@ function mapHostPoint(h: HostPointResponse): EstabData {
         typeLabel,
         features,
         heroImg: h.photos?.[0]?.url ?? heroFallback,
-        mapsUrl: `https://maps.google.com/maps?q=${encodeURIComponent(h.address)}`,
+        mapsUrl: h.mapsUrl || `https://maps.google.com/maps?q=${encodeURIComponent(h.address)}`,
         bookingUrl: h.bookingUrl,
     };
 }

@@ -8,9 +8,10 @@ interface Props {
   entityPath: string;
   entityId: string;
   initialPhotos: PhotoResponse[];
+  title?: string;
 }
 
-export function PhotoManager({ entityPath, entityId, initialPhotos }: Props) {
+export function PhotoManager({ entityPath, entityId, initialPhotos, title }: Props) {
   const [photos, setPhotos] = useState<PhotoResponse[]>(initialPhotos);
   const [uploading, setUploading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -50,7 +51,7 @@ export function PhotoManager({ entityPath, entityId, initialPhotos }: Props) {
     <div className="adm-card" style={{ marginTop: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <h3 className="adm-serif" style={{ fontSize: 16, color: 'var(--adm-green)', margin: 0 }}>
-          Fotos ({photos.length})
+          {title ?? 'Fotos'} ({photos.length})
         </h3>
         <button
           type="button"

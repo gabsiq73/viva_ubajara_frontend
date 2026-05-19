@@ -523,6 +523,12 @@
   border: 1px solid #fef3c7;
 }
 
+.adm-badge--blue {
+  background: #eff6ff;
+  color: #3b82f6;
+  border: 1px solid #dbeafe;
+}
+
 /* ============ PAGINATION ============ */
 .adm-pagination {
   display: flex;
