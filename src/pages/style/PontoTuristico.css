@@ -164,12 +164,13 @@
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 16px 20px;
+    padding: 16px 0;
 }
 
 .pt-hero__infobar-inner {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -208,12 +209,13 @@
 /* ─── Gallery ─── */
 .pt-gallery {
     background: #f0f7f3;
-    padding: clamp(20px, 3vw, 36px) 20px;
+    padding: clamp(20px, 3vw, 36px) 0;
 }
 
 .pt-gallery__inner {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
     display: grid;
     grid-template-columns: 1.5fr 1fr;
     grid-template-rows: 500px;
@@ -265,13 +267,14 @@
 
 /* ─── Content + Planeje sua Visita ─── */
 .pt-content {
-    padding: clamp(36px, 5vw, 68px) 20px;
+    padding: clamp(36px, 5vw, 68px) 0;
     background: #ffffff;
 }
 
 .pt-content__inner {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
     display: grid;
     grid-template-columns: 1fr 400px;
     gap: clamp(40px, 5vw, 80px);
@@ -455,12 +458,13 @@
 /* ─── Como Chegar ─── */
 .pt-how {
     background: #f4f9f6;
-    padding: clamp(36px, 5vw, 68px) 20px;
+    padding: clamp(36px, 5vw, 68px) 0;
 }
 
 .pt-how__inner {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: clamp(40px, 5vw, 72px);
@@ -619,12 +623,12 @@
     left: 0;
     right: 0;
     z-index: 3;
-    padding: 0 20px;
 }
 
 .pt-breadcrumb__inner {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -673,12 +677,13 @@
 /* ─── Pontos Recomendados ─── */
 .pt-related {
     background: #f0f7f3;
-    padding: clamp(40px, 5vw, 72px) 20px;
+    padding: clamp(40px, 5vw, 72px) 0;
 }
 
 .pt-related__inner {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
 }
 
 .pt-related__title {
