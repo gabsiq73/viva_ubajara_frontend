@@ -84,16 +84,67 @@
     border: 1px solid rgba(107, 207, 145, 0.3);
 }
 
+.pt-hero__title-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin: 0 0 18px;
+}
+
 .pt-hero__title {
     font-family: "Nunito", sans-serif;
     font-weight: 900;
     font-size: clamp(34px, 5.5vw, 68px);
     color: #ffffff;
     line-height: 1.08;
-    margin: 0 0 18px;
+    margin: 0;
     max-width: 700px;
     user-select: none;
     -webkit-user-select: none;
+    flex: 1;
+}
+
+.pt-hero__fav-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.8);
+    flex-shrink: 0;
+    margin-top: 8px;
+    transition: background 0.18s, color 0.18s, transform 0.15s, border-color 0.18s;
+    backdrop-filter: blur(6px);
+}
+
+.pt-hero__fav-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    transform: scale(1.08);
+}
+
+.pt-hero__fav-btn--active {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #fca5a5;
+}
+
+.pt-hero__fav-btn--active:hover {
+    background: rgba(239, 68, 68, 0.35);
+    color: #f87171;
+}
+
+.pt-hero__fav-btn .material-symbols-outlined {
+    font-size: 22px;
+    font-variation-settings: 'FILL' 0, 'wght' 400;
+}
+
+.pt-hero__fav-btn--active .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1, 'wght' 400;
 }
 
 .pt-hero__subtitle {

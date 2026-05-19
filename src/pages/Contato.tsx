@@ -56,6 +56,9 @@ export default function Contato(): JSX.Element {
         setSubmitting(true);
         try {
             await contactMessagesService.create({ name: name.trim(), email: email.trim(), subject, message: message.trim() });
+            const sent = JSON.parse(localStorage.getItem("ubajara-sent-messages") ?? "[]");
+            sent.push({ subject, message: message.trim(), sentAt: new Date().toISOString() });
+            localStorage.setItem("ubajara-sent-messages", JSON.stringify(sent));
             setSuccess(true);
             setName("");
             setEmail("");

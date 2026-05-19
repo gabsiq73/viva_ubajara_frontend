@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { attractionsService } from "../admin/services/attractionsService";
@@ -19,6 +19,25 @@ export default function PontoTuristico() {
     const [attraction, setAttraction] = useState<AttractionResponse | null>(null);
     const [related, setRelated] = useState<AttractionResponse[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isFavorite, setIsFavorite] = useState(false);
+
+    const toggleFavorite = useCallback(() => {
+        if (!attraction) return;
+        const stored: unknown[] = JSON.parse(localStorage.getItem("ubajara-favorites") ?? "[]");
+        const exists = stored.some((f: unknown) => (f as { id: string }).id === attraction.id);
+        const updated = exists
+            ? stored.filter((f: unknown) => (f as { id: string }).id !== attraction.id)
+            : [...stored, {
+                id: attraction.id,
+                name: attraction.name,
+                type: "attraction",
+                photo: attraction.photos?.[0]?.url,
+                shortDescription: attraction.shortDescription || attraction.description?.slice(0, 100),
+                path: `/pontos/${attraction.id}`,
+            }];
+        localStorage.setItem("ubajara-favorites", JSON.stringify(updated));
+        setIsFavorite(!exists);
+    }, [attraction]);
 
     useEffect(() => {
         if (!id) { navigate("/pontos-turisticos"); return; }
@@ -36,6 +55,12 @@ export default function PontoTuristico() {
             }
         }).finally(() => setLoading(false));
     }, [id]);
+
+    useEffect(() => {
+        if (!attraction) return;
+        const stored: unknown[] = JSON.parse(localStorage.getItem("ubajara-favorites") ?? "[]");
+        setIsFavorite(stored.some((f: unknown) => (f as { id: string }).id === attraction.id));
+    }, [attraction]);
 
     if (loading) {
         return (
@@ -77,7 +102,19 @@ export default function PontoTuristico() {
                     <div className="pt-hero__content">
                         <div className="pt-hero__inner">
                             <span className="pt-hero__tag">{catLabel}</span>
-                            <h1 id="pt-hero-title" className="pt-hero__title">{attraction.name}</h1>
+                            <div className="pt-hero__title-row">
+                                <h1 id="pt-hero-title" className="pt-hero__title">{attraction.name}</h1>
+                                <button
+                                    className={`pt-hero__fav-btn${isFavorite ? " pt-hero__fav-btn--active" : ""}`}
+                                    onClick={toggleFavorite}
+                                    aria-label={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                                    title={isFavorite ? "Remover dos favoritos" : "Salvar nos favoritos"}
+                                >
+                                    <span className="material-symbols-outlined" aria-hidden="true">
+                                        {isFavorite ? "favorite" : "favorite_border"}
+                                    </span>
+                                </button>
+                            </div>
                             {(attraction.shortDescription || attraction.description) && (
                                 <p className="pt-hero__subtitle">
                                     {attraction.shortDescription || attraction.description}

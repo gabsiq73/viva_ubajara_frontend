@@ -3,7 +3,7 @@ import Navbar from "./Navbar";
 import "./styles/Header.components.css";
 import logo from './../assets/images/logo.webp';
 import { Link } from "react-router-dom";
-import { Heart, LogOut, LayoutDashboard } from 'lucide-react';
+import { Heart, LogOut, LayoutDashboard, User } from 'lucide-react';
 import { useAuth } from '../admin/hooks/useAuth';
 
 const ROLE_LABELS: Record<string, string> = {
@@ -77,9 +77,9 @@ export default function Header(): JSX.Element {
                 <div className="icon-position">
                     {isAuthenticated && user ? (
                         <div className="header-auth" ref={dropdownRef}>
-                            <button className="header-favorites" title="Pontos favoritos" aria-label="Favoritos">
+                            <Link to="/dashboard?tab=favorites" className="header-favorites" title="Meus Favoritos" aria-label="Meus Favoritos">
                                 <Heart size={20} />
-                            </button>
+                            </Link>
 
                             <button
                                 className="header-user-btn"
@@ -111,6 +111,14 @@ export default function Header(): JSX.Element {
                                         </div>
                                     </div>
                                     <div className="header-user__dropdown-divider" />
+                                    <Link
+                                        to="/dashboard"
+                                        className="header-user__dropdown-action"
+                                        onClick={() => setDropdownOpen(false)}
+                                    >
+                                        <User size={14} />
+                                        Meu Perfil
+                                    </Link>
                                     {user.role === 'ADMIN' && (
                                         <Link
                                             to="/admin"

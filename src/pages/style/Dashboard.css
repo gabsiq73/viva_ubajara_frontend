@@ -1,127 +1,595 @@
-/* ── Dashboard placeholder page ── */
+/* ── Profile page ─────────────────────────────────────────────────────────── */
 
 .dash-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-
-.dash-page > footer {
-  align-self: stretch;
-  width: 100%;
-  margin-top: auto;
+  background: #f5f7f6;
 }
 
 .dash-main {
   flex: 1;
+}
+
+/* ── Profile hero ─────────────────────────────────────────────────────────── */
+
+.dash-profile-hero {
+  background: linear-gradient(135deg, #153a27 0%, #1e5237 100%);
+  padding: 56px 24px 48px;
+}
+
+.dash-profile-hero__inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.dash-profile-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 3px solid rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 80px 24px;
-  background: #f5f7f6;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
-.dash-hero {
-  text-align: center;
-  max-width: 640px;
+.dash-profile-avatar img {
   width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.dash-badge {
-  display: inline-block;
-  background: #eef5f1;
-  color: #153a27;
-  border: 1px solid #b8d8c4;
-  border-radius: 24px;
-  padding: 6px 20px;
-  font-size: 12px;
+.dash-profile-avatar span {
+  font-size: 28px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 28px;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.5px;
 }
 
-.dash-title {
+.dash-profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.dash-profile-name {
   font-family: 'Merriweather', serif;
-  font-size: clamp(32px, 5vw, 48px);
+  font-size: clamp(22px, 3vw, 30px);
   font-weight: 700;
-  color: #153a27;
-  margin-bottom: 20px;
+  color: #ffffff;
+  margin: 0 0 4px;
   line-height: 1.2;
 }
 
-.dash-desc {
-  font-size: 17px;
-  color: #64748b;
-  line-height: 1.75;
-  margin-bottom: 48px;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
+.dash-profile-email {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0 0 10px;
 }
 
-.dash-features {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 48px;
+.dash-profile-role {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
-.dash-feature {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 28px 20px;
+.dash-profile-actions {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+  margin-left: auto;
 }
 
-.dash-feature .material-symbols-outlined {
-  font-size: 32px;
-  color: #153a27;
+.dash-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+  text-decoration: none;
+  border: none;
+}
+
+.dash-action-btn .material-symbols-outlined {
+  font-size: 16px;
   font-variation-settings: 'FILL' 1;
 }
 
-.dash-feature strong {
-  font-size: 15px;
-  color: #1f2937;
+.dash-action-btn--outline {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.dash-action-btn--ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.dash-action-btn:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+/* ── Container ────────────────────────────────────────────────────────────── */
+
+.dash-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+/* ── Tabs ─────────────────────────────────────────────────────────────────── */
+
+.dash-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 20px 0 0;
+  border-bottom: 2px solid #e5eae7;
+  margin-bottom: 32px;
+}
+
+.dash-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
   font-weight: 600;
+  color: #64748b;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  border-radius: 8px 8px 0 0;
 }
 
-.dash-feature p {
-  font-size: 13px;
-  color: #94a3b8;
-  margin: 0;
-  line-height: 1.4;
+.dash-tab .material-symbols-outlined {
+  font-size: 18px;
+  font-variation-settings: 'FILL' 0, 'wght' 400;
 }
 
-.dash-cta {
+.dash-tab--active {
+  color: #153a27;
+  border-bottom-color: #153a27;
+}
+
+.dash-tab--active .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 500;
+}
+
+.dash-tab:hover:not(.dash-tab--active) {
+  color: #1e5237;
+  background: #f0f7f3;
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
+
+.dash-empty {
+  text-align: center;
+  padding: 64px 24px;
+}
+
+.dash-empty__icon {
+  font-size: 56px;
+  color: #b8d8c4;
+  font-variation-settings: 'FILL' 0;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.dash-empty__title {
+  font-family: 'Merriweather', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #153a27;
+  margin: 0 0 10px;
+}
+
+.dash-empty__desc {
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.65;
+  max-width: 420px;
+  margin: 0 auto 28px;
+}
+
+.dash-empty__cta {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   background: #153a27;
   color: #ffffff;
   text-decoration: none;
-  padding: 14px 32px;
+  padding: 12px 28px;
   border-radius: 8px;
   font-weight: 600;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.dash-empty__cta:hover {
+  background: #1e5237;
+}
+
+/* ── Favorites grid ───────────────────────────────────────────────────────── */
+
+.dash-fav-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.dash-fav-card {
+  background: #ffffff;
+  border: 1px solid #e5eae7;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.dash-fav-card:hover {
+  box-shadow: 0 8px 24px rgba(21, 58, 39, 0.1);
+  transform: translateY(-2px);
+}
+
+.dash-fav-card__img-wrap {
+  display: block;
+  height: 160px;
+  overflow: hidden;
+}
+
+.dash-fav-card__img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.dash-fav-card:hover .dash-fav-card__img-wrap img {
+  transform: scale(1.04);
+}
+
+.dash-fav-card__img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #c8ddd0, #eef5f1);
+}
+
+.dash-fav-card__body {
+  padding: 16px 16px 12px;
+  flex: 1;
+}
+
+.dash-fav-card__type {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #006b32;
+  margin-bottom: 6px;
+}
+
+.dash-fav-card__name {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: #153a27;
+  text-decoration: none;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.dash-fav-card__name:hover { text-decoration: underline; }
+
+.dash-fav-card__desc {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.dash-fav-card__remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #e53e3e;
+  transition: background 0.15s, transform 0.15s;
+  backdrop-filter: blur(4px);
+}
+
+.dash-fav-card__remove:hover {
+  background: #fff5f5;
+  transform: scale(1.1);
+}
+
+.dash-fav-card__remove .material-symbols-outlined {
+  font-size: 18px;
+  font-variation-settings: 'FILL' 1;
+}
+
+/* ── Messages list ────────────────────────────────────────────────────────── */
+
+.dash-msg-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dash-msg-item {
+  background: #ffffff;
+  border: 1px solid #e5eae7;
+  border-radius: 12px;
+  padding: 20px 24px;
+  transition: box-shadow 0.15s;
+}
+
+.dash-msg-item:hover {
+  box-shadow: 0 4px 16px rgba(21, 58, 39, 0.07);
+}
+
+.dash-msg-item__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.dash-msg-item__subject {
   font-size: 15px;
+  font-weight: 700;
+  color: #153a27;
+}
+
+.dash-msg-item__time {
+  font-size: 12px;
+  color: #94a3b8;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dash-msg-item__preview {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Testimonial form ─────────────────────────────────────────────────────── */
+
+.dash-dep-wrap {
+  max-width: 600px;
+}
+
+.dash-dep-form__title {
+  font-family: 'Merriweather', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #153a27;
+  margin: 0 0 8px;
+}
+
+.dash-dep-form__sub {
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0 0 32px;
+}
+
+.dash-field {
+  margin-bottom: 24px;
+}
+
+.dash-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.dash-stars {
+  display: flex;
+  gap: 6px;
+}
+
+.dash-star {
+  font-size: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #d1d5db;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.1s, transform 0.1s;
+}
+
+.dash-star--active {
+  color: #f59e0b;
+}
+
+.dash-star:hover {
+  transform: scale(1.15);
+}
+
+.dash-textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  color: #1f2937;
+  resize: vertical;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+
+.dash-textarea:focus {
+  outline: none;
+  border-color: #153a27;
+  box-shadow: 0 0 0 3px rgba(21, 58, 39, 0.08);
+}
+
+.dash-char-count {
+  display: block;
+  text-align: right;
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 6px;
+}
+
+.dash-error {
+  font-size: 14px;
+  color: #dc2626;
+  margin: 0 0 16px;
+}
+
+.dash-submit-btn {
+  background: #153a27;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 36px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
   transition: background 0.2s, transform 0.15s;
 }
 
-.dash-cta:hover {
+.dash-submit-btn:hover:not(:disabled) {
   background: #1e5237;
   transform: translateY(-1px);
 }
 
+.dash-submit-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Testimonial sent state ───────────────────────────────────────────────── */
+
+.dash-dep-sent {
+  text-align: center;
+  padding: 60px 24px;
+  max-width: 480px;
+}
+
+.dash-dep-sent__icon {
+  font-size: 64px;
+  color: #22c55e;
+  font-variation-settings: 'FILL' 1;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.dash-dep-sent h3 {
+  font-family: 'Merriweather', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #153a27;
+  margin: 0 0 12px;
+}
+
+.dash-dep-sent p {
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.65;
+  margin: 0 0 28px;
+}
+
+.dash-dep-reset {
+  background: none;
+  border: 1px solid #153a27;
+  color: #153a27;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.dash-dep-reset:hover {
+  background: #153a27;
+  color: #ffffff;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
 @media (max-width: 640px) {
-  .dash-features {
-    grid-template-columns: 1fr;
+  .dash-profile-hero__inner {
+    gap: 20px;
   }
 
-  .dash-main {
-    padding: 60px 20px;
+  .dash-profile-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .dash-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0;
+    gap: 0;
+  }
+
+  .dash-tab {
+    white-space: nowrap;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .dash-fav-grid {
+    grid-template-columns: 1fr;
   }
 }
