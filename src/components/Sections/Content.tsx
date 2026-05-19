@@ -124,6 +124,7 @@ export default function Content() {
     const [faqOpen, setFaqOpen] = useState<number | null>(1);
 
     // API state
+    const [loading, setLoading] = useState(true);
     const [attractions, setAttractions] = useState<AttractionResponse[]>([]);
     const [homeEvents, setHomeEvents] = useState<EventResponse[]>([]);
     const [pubItems, setPubItems] = useState<PubItem[]>([]);
@@ -150,7 +151,7 @@ export default function Content() {
             const hosts = hostR.status === "fulfilled"
                 ? hostR.value.content.filter(h => h.active).map(mapHostPub) : [];
             setPubItems([...rests, ...hosts]);
-        });
+        }).finally(() => setLoading(false));
     }, []);
 
     useEffect(() => {
@@ -236,16 +237,20 @@ export default function Content() {
                 </div>
 
                 {/* ── Pontos Turísticos ── */}
-                {attractions.length > 0 && (
-                    <div className="point">
-                        <div className="point-container">
-                            <div className="section-header reveal">
-                                <div className="title-group">
-                                    <span className="subtitle">Experiências Únicas</span>
-                                    <h1>Pontos Turísticos</h1>
-                                </div>
-                                <div id="more"><Link to="/pontos-turisticos">Ver Todos</Link></div>
+                <div className="point">
+                    <div className="point-container">
+                        <div className="section-header reveal">
+                            <div className="title-group">
+                                <span className="subtitle">Experiências Únicas</span>
+                                <h1>Pontos Turísticos</h1>
                             </div>
+                            <div id="more"><Link to="/pontos-turisticos">Ver Todos</Link></div>
+                        </div>
+                        {loading ? (
+                            <div className="content-empty">Carregando pontos turísticos…</div>
+                        ) : attractions.length === 0 ? (
+                            <div className="content-empty">Nenhum ponto turístico cadastrado ainda.</div>
+                        ) : (
                             <div className="cards-points">
                                 <ul className="list-points grid-reveal">
                                     {attractions.map((pt) => (
@@ -278,9 +283,9 @@ export default function Content() {
                                     ))}
                                 </ul>
                             </div>
-                        </div>
+                        )}
                     </div>
-                )}
+                </div>
 
                 {/* ── Gastronomia ── */}
                 <div className="top-n">
@@ -331,70 +336,80 @@ export default function Content() {
                 <div className="pub-landing-blocks">
 
                     {/* Estabelecimentos */}
-                    {pubItems.length > 0 && (
-                        <section className="pub-guide" aria-labelledby="pub-guide-title">
-                            <header className="pub-guide__header reveal">
-                                <h2 id="pub-guide-title" className="pub-guide__title">Guia de Estabelecimentos</h2>
-                                <p className="pub-guide__subtitle">Os melhores lugares para comer, dormir e viver momentos inesquecíveis em nossa cidade.</p>
-                            </header>
-                            <div className="pub-guide__filters" role="toolbar" aria-label="Filtrar por tipo">
-                                {pubCategories.map((label) => (
-                                    <button
-                                        key={label}
-                                        type="button"
-                                        className={pubGuideFilter === label ? "pub-guide__filter pub-guide__filter--active" : "pub-guide__filter"}
-                                        onClick={() => setPubGuideFilter(label)}
-                                        aria-pressed={pubGuideFilter === label}
-                                    >
-                                        {label}
-                                    </button>
-                                ))}
-                            </div>
-                            <div className="pub-guide__grid reveal grid-reveal">
-                                {filteredPub.map((item) => (
-                                    <article key={item.id} className="pub-guide-card">
-                                        <div className="pub-guide-card__media">
-                                            {item.img
-                                                ? <img src={item.img} alt={item.title} />
-                                                : <div style={{ background: "#e5e7eb", height: "100%" }} aria-hidden="true" />
-                                            }
-                                            <span
-                                                className="pub-guide-card__tag"
-                                                style={{ background: PUB_GUIDE_TAG_COLORS[item.category] ?? "#006B32" }}
-                                            >
-                                                {item.category.toUpperCase()}
-                                            </span>
-                                        </div>
-                                        <div className="pub-guide-card__body">
-                                            <h3 className="pub-guide-card__name">{item.title}</h3>
-                                            <p className="pub-guide-card__desc">{item.desc}</p>
-                                            <Link
-                                                to={`/estabelecimentos/${item.id}?apiType=${item.apiType}`}
-                                                className="pub-guide-card__cta"
-                                            >
-                                                Ver Detalhes
-                                                <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
-                                            </Link>
-                                        </div>
-                                    </article>
-                                ))}
-                            </div>
-                            <div className="pub-guide__footer reveal">
-                                <Link to="/estabelecimentos" className="pub-guide__all">Ver todos os Estabelecimentos</Link>
-                            </div>
-                        </section>
-                    )}
+                    <section className="pub-guide" aria-labelledby="pub-guide-title">
+                        <header className="pub-guide__header reveal">
+                            <h2 id="pub-guide-title" className="pub-guide__title">Guia de Estabelecimentos</h2>
+                            <p className="pub-guide__subtitle">Os melhores lugares para comer, dormir e viver momentos inesquecíveis em nossa cidade.</p>
+                        </header>
+                        {loading ? (
+                            <div className="content-empty">Carregando estabelecimentos…</div>
+                        ) : pubItems.length === 0 ? (
+                            <div className="content-empty">Nenhum estabelecimento cadastrado ainda.</div>
+                        ) : (
+                            <>
+                                <div className="pub-guide__filters" role="toolbar" aria-label="Filtrar por tipo">
+                                    {pubCategories.map((label) => (
+                                        <button
+                                            key={label}
+                                            type="button"
+                                            className={pubGuideFilter === label ? "pub-guide__filter pub-guide__filter--active" : "pub-guide__filter"}
+                                            onClick={() => setPubGuideFilter(label)}
+                                            aria-pressed={pubGuideFilter === label}
+                                        >
+                                            {label}
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="pub-guide__grid reveal grid-reveal">
+                                    {filteredPub.map((item) => (
+                                        <article key={item.id} className="pub-guide-card">
+                                            <div className="pub-guide-card__media">
+                                                {item.img
+                                                    ? <img src={item.img} alt={item.title} />
+                                                    : <div style={{ background: "#e5e7eb", height: "100%" }} aria-hidden="true" />
+                                                }
+                                                <span
+                                                    className="pub-guide-card__tag"
+                                                    style={{ background: PUB_GUIDE_TAG_COLORS[item.category] ?? "#006B32" }}
+                                                >
+                                                    {item.category.toUpperCase()}
+                                                </span>
+                                            </div>
+                                            <div className="pub-guide-card__body">
+                                                <h3 className="pub-guide-card__name">{item.title}</h3>
+                                                <p className="pub-guide-card__desc">{item.desc}</p>
+                                                <Link
+                                                    to={`/estabelecimentos/${item.id}?apiType=${item.apiType}`}
+                                                    className="pub-guide-card__cta"
+                                                >
+                                                    Ver Detalhes
+                                                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                                                </Link>
+                                            </div>
+                                        </article>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                        <div className="pub-guide__footer reveal">
+                            <Link to="/estabelecimentos" className="pub-guide__all">Ver todos os Estabelecimentos</Link>
+                        </div>
+                    </section>
 
                     {/* Eventos */}
-                    {homeEvents.length > 0 && (
-                        <section className="pub-events" aria-labelledby="pub-events-title">
-                            <header className="pub-events__header reveal">
-                                <div className="pub-events__head-left">
-                                    <span className="pub-events__kicker">Experiências Inesquecíveis</span>
-                                    <h2 id="pub-events-title" className="pub-events__title">Próximos Eventos</h2>
-                                </div>
-                                <p className="pub-events__lede">Fique por dentro da programação cultural e festivais que movimentam a nossa serra.</p>
-                            </header>
+                    <section className="pub-events" aria-labelledby="pub-events-title">
+                        <header className="pub-events__header reveal">
+                            <div className="pub-events__head-left">
+                                <span className="pub-events__kicker">Experiências Inesquecíveis</span>
+                                <h2 id="pub-events-title" className="pub-events__title">Próximos Eventos</h2>
+                            </div>
+                            <p className="pub-events__lede">Fique por dentro da programação cultural e festivais que movimentam a nossa serra.</p>
+                        </header>
+                        {loading ? (
+                            <div className="content-empty">Carregando eventos…</div>
+                        ) : homeEvents.length === 0 ? (
+                            <div className="content-empty">Nenhum evento cadastrado ainda.</div>
+                        ) : (
                             <div className="pub-events__grid reveal grid-reveal">
                                 {homeEvents.map((ev) => {
                                     const d = parseDate(ev.startDateTime);
@@ -428,22 +443,26 @@ export default function Content() {
                                     );
                                 })}
                             </div>
-                            <div className="pub-events__footer reveal">
-                                <Link to="/eventos" className="pub-events__all">Ver todos os Eventos</Link>
-                            </div>
-                        </section>
-                    )}
+                        )}
+                        <div className="pub-events__footer reveal">
+                            <Link to="/eventos" className="pub-events__all">Ver todos os Eventos</Link>
+                        </div>
+                    </section>
 
                     {/* Guias Turísticos */}
-                    {homeGuides.length > 0 && (
-                        <div className="tour-guides-wrap">
-                            <section className="tour-guides" aria-labelledby="tour-guides-title">
-                                <div className="tour-guides__inner">
-                                    <header className="tour-guides__header reveal">
-                                        <span className="tour-guides__kicker">Seu passeio em boas mãos</span>
-                                        <h2 id="tour-guides-title" className="tour-guides__title">Nossos Guias Turísticos</h2>
-                                        <p className="tour-guides__subtitle">Conheça os profissionais credenciados que vão transformar sua visita em uma experiência inesquecível.</p>
-                                    </header>
+                    <div className="tour-guides-wrap">
+                        <section className="tour-guides" aria-labelledby="tour-guides-title">
+                            <div className="tour-guides__inner">
+                                <header className="tour-guides__header reveal">
+                                    <span className="tour-guides__kicker">Seu passeio em boas mãos</span>
+                                    <h2 id="tour-guides-title" className="tour-guides__title">Nossos Guias Turísticos</h2>
+                                    <p className="tour-guides__subtitle">Conheça os profissionais credenciados que vão transformar sua visita em uma experiência inesquecível.</p>
+                                </header>
+                                {loading ? (
+                                    <div className="content-empty">Carregando guias…</div>
+                                ) : homeGuides.length === 0 ? (
+                                    <div className="content-empty">Nenhum guia turístico cadastrado ainda.</div>
+                                ) : (
                                     <div className="tour-guides__grid reveal grid-reveal">
                                         {homeGuides.map((guide) => (
                                             <article key={guide.id} className="guide-card">
@@ -464,10 +483,10 @@ export default function Content() {
                                             </article>
                                         ))}
                                     </div>
-                                </div>
-                            </section>
-                        </div>
-                    )}
+                                )}
+                            </div>
+                        </section>
+                    </div>
                 </div>
 
                 {/* ── Como Chegar ── */}

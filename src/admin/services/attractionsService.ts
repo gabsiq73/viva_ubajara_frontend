@@ -38,9 +38,7 @@ export const attractionsService = {
     formData.append('file', file);
     if (description) formData.append('description', description);
     if (displayOrder) formData.append('displayOrder', displayOrder);
-    const response = await api.post<PhotoResponse>(`/attractions/${id}/photos`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const response = await api.post<PhotoResponse>(`/attractions/${id}/photos`, formData);
     return response.data;
   },
 };
