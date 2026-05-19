@@ -121,6 +121,24 @@ const GuideSkeleton = () => (
     </article>
 );
 
+const ReviewSkeleton = () => (
+    <article className="review-card" aria-hidden="true" style={{ pointerEvents: "none" }}>
+        <div className="skel" style={{ height: 18, width: 100 }} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+            <div className="skel" style={{ height: 14, width: "100%" }} />
+            <div className="skel" style={{ height: 14, width: "85%" }} />
+            <div className="skel" style={{ height: 14, width: "70%" }} />
+        </div>
+        <div className="review-card__author">
+            <div className="skel" style={{ width: 42, height: 42, borderRadius: "50%", flexShrink: 0 }} />
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
+                <div className="skel" style={{ height: 14, width: "60%" }} />
+                <div className="skel" style={{ height: 12, width: "40%" }} />
+            </div>
+        </div>
+    </article>
+);
+
 // ── Type helpers ───────────────────────────────────────────────
 const CATEGORY_LABELS: Record<AttractionCategory, string> = {
     PARK: "Parque", WATERFALL: "Cachoeira", MUSEUM: "Museu",
@@ -213,7 +231,6 @@ export default function Content() {
     }, []);
 
     useEffect(() => {
-        if (loading) return;
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach(({ target, isIntersecting }) => {
@@ -303,8 +320,6 @@ export default function Content() {
                                     {Array.from({ length: 4 }).map((_, i) => <PointSkeleton key={i} />)}
                                 </ul>
                             </div>
-                        ) : attractions.length === 0 ? (
-                            <div className="content-empty">Nenhum ponto turístico cadastrado ainda.</div>
                         ) : (
                             <div className="cards-points">
                                 <ul className="list-points grid-reveal">
@@ -335,6 +350,9 @@ export default function Content() {
                                                 </div>
                                             </Link>
                                         </li>
+                                    ))}
+                                    {Array.from({ length: Math.max(0, 4 - attractions.length) }).map((_, i) => (
+                                        <PointSkeleton key={`pad-${i}`} />
                                     ))}
                                 </ul>
                             </div>
@@ -396,12 +414,10 @@ export default function Content() {
                             <h2 id="pub-guide-title" className="pub-guide__title">Guia de Estabelecimentos</h2>
                             <p className="pub-guide__subtitle">Os melhores lugares para comer, dormir e viver momentos inesquecíveis em nossa cidade.</p>
                         </header>
-                        {loading ? (
-                            <div className="pub-guide__grid reveal">
+                        {loading || pubItems.length === 0 ? (
+                            <div className="pub-guide__grid">
                                 {Array.from({ length: 4 }).map((_, i) => <PubGuideSkeleton key={i} />)}
                             </div>
-                        ) : pubItems.length === 0 ? (
-                            <div className="content-empty">Nenhum estabelecimento cadastrado ainda.</div>
                         ) : (
                             <>
                                 <div className="pub-guide__filters" role="toolbar" aria-label="Filtrar por tipo">
@@ -445,6 +461,11 @@ export default function Content() {
                                             </div>
                                         </article>
                                     ))}
+                                    {filteredPub.length > 0 && filteredPub.length < 4 && (
+                                        Array.from({ length: 4 - filteredPub.length }).map((_, i) => (
+                                            <PubGuideSkeleton key={`pad-${i}`} />
+                                        ))
+                                    )}
                                 </div>
                             </>
                         )}
@@ -462,12 +483,10 @@ export default function Content() {
                             </div>
                             <p className="pub-events__lede">Fique por dentro da programação cultural e festivais que movimentam a nossa serra.</p>
                         </header>
-                        {loading ? (
+                        {loading || homeEvents.length === 0 ? (
                             <div className="pub-events__grid">
                                 {Array.from({ length: 4 }).map((_, i) => <EventSkeleton key={i} />)}
                             </div>
-                        ) : homeEvents.length === 0 ? (
-                            <div className="content-empty">Nenhum evento cadastrado ainda.</div>
                         ) : (
                             <div className="pub-events__grid reveal grid-reveal">
                                 {homeEvents.map((ev) => {
@@ -501,6 +520,9 @@ export default function Content() {
                                         </article>
                                     );
                                 })}
+                                {Array.from({ length: Math.max(0, 4 - homeEvents.length) }).map((_, i) => (
+                                    <EventSkeleton key={`pad-${i}`} />
+                                ))}
                             </div>
                         )}
                         <div className="pub-events__footer reveal">
@@ -521,8 +543,6 @@ export default function Content() {
                                     <div className="tour-guides__grid">
                                         {Array.from({ length: 4 }).map((_, i) => <GuideSkeleton key={i} />)}
                                     </div>
-                                ) : homeGuides.length === 0 ? (
-                                    <div className="content-empty">Nenhum guia turístico cadastrado ainda.</div>
                                 ) : (
                                     <div className="tour-guides__grid reveal grid-reveal">
                                         {homeGuides.map((guide) => (
@@ -542,6 +562,9 @@ export default function Content() {
                                                     <p className="guide-card__desc">{guide.description}</p>
                                                 </div>
                                             </article>
+                                        ))}
+                                        {Array.from({ length: Math.max(0, 4 - homeGuides.length) }).map((_, i) => (
+                                            <GuideSkeleton key={`pad-${i}`} />
                                         ))}
                                     </div>
                                 )}
@@ -610,17 +633,21 @@ export default function Content() {
                 </section>
 
                 {/* ── Depoimentos ── */}
-                {homeReviews.length > 0 && (
-                    <div className="reviews-block">
-                        <div className="papel">
-                            <div className="paper1"><img src={paper} alt="" /></div>
-                            <div className="paper2"><img src={paper} alt="" /></div>
-                        </div>
-                        <section className="reviews" aria-labelledby="reviews-title">
-                            <div className="reviews__inner">
-                                <span className="reviews__kicker reveal">Quem já visitou recomenda</span>
-                                <h2 id="reviews-title" className="reviews__title reveal">O que dizem os visitantes</h2>
-                                <p className="reviews__subtitle reveal">Experiências reais de quem já se encantou com as belezas de Ubajara.</p>
+                <div className="reviews-block">
+                    <div className="papel">
+                        <div className="paper1"><img src={paper} alt="" /></div>
+                        <div className="paper2"><img src={paper} alt="" /></div>
+                    </div>
+                    <section className="reviews" aria-labelledby="reviews-title">
+                        <div className="reviews__inner">
+                            <span className="reviews__kicker">Quem já visitou recomenda</span>
+                            <h2 id="reviews-title" className="reviews__title">O que dizem os visitantes</h2>
+                            <p className="reviews__subtitle">Experiências reais de quem já se encantou com as belezas de Ubajara.</p>
+                            {loading || homeReviews.length === 0 ? (
+                                <div className="reviews__grid">
+                                    {Array.from({ length: 3 }).map((_, i) => <ReviewSkeleton key={i} />)}
+                                </div>
+                            ) : (
                                 <div className="reviews__grid reveal grid-reveal">
                                     {homeReviews.map((r, i) => (
                                         <article key={r.id} className="review-card">
@@ -641,18 +668,21 @@ export default function Content() {
                                             </div>
                                         </article>
                                     ))}
+                                    {Array.from({ length: Math.max(0, 3 - homeReviews.length) }).map((_, i) => (
+                                        <ReviewSkeleton key={`pad-${i}`} />
+                                    ))}
                                 </div>
-                                <div className="reviews__footer reveal">
-                                    <Link to="/depoimentos" className="reviews__all">Ver todos os depoimentos</Link>
-                                </div>
+                            )}
+                            <div className="reviews__footer reveal">
+                                <Link to="/depoimentos" className="reviews__all">Ver todos os depoimentos</Link>
                             </div>
-                        </section>
-                        <div className="papel ptop">
-                            <div className="paper1"><img src={paper} alt="" /></div>
-                            <div className="paper2"><img src={paper} alt="" /></div>
                         </div>
+                    </section>
+                    <div className="papel ptop">
+                        <div className="paper1"><img src={paper} alt="" /></div>
+                        <div className="paper2"><img src={paper} alt="" /></div>
                     </div>
-                )}
+                </div>
 
                 {/* ── FAQ ── */}
                 <section className="faq" aria-labelledby="faq-title">
