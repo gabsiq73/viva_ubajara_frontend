@@ -78,19 +78,27 @@ export default function PontoTuristico() {
                         <div className="pt-hero__inner">
                             <span className="pt-hero__tag">{catLabel}</span>
                             <h1 id="pt-hero-title" className="pt-hero__title">{attraction.name}</h1>
-                            <p className="pt-hero__subtitle">{attraction.description}</p>
+                            {(attraction.shortDescription || attraction.description) && (
+                                <p className="pt-hero__subtitle">
+                                    {attraction.shortDescription ?? attraction.description}
+                                </p>
+                            )}
                         </div>
                     </div>
 
                     <div className="pt-hero__infobar">
                         <div className="pt-hero__infobar-inner">
-                            <span className="pt-hero__info-item pt-hero__info-item--status">
-                                <span className="material-symbols-outlined" aria-hidden="true">check_circle</span>
-                                {attraction.active ? "Aberto ao Público" : "Temporariamente Fechado"}
-                            </span>
+                            {attraction.openToPublic != null && (
+                                <span className={`pt-hero__info-item${attraction.openToPublic ? " pt-hero__info-item--status" : " pt-hero__info-item--closed"}`}>
+                                    <span className="material-symbols-outlined" aria-hidden="true">
+                                        {attraction.openToPublic ? "check_circle" : "cancel"}
+                                    </span>
+                                    {attraction.openToPublic ? "Aberto ao Público" : "Temporariamente Fechado"}
+                                </span>
+                            )}
                             {attraction.openingHours && (
                                 <>
-                                    <span className="pt-hero__info-sep" aria-hidden="true">|</span>
+                                    {attraction.openToPublic != null && <span className="pt-hero__info-sep" aria-hidden="true">|</span>}
                                     <span className="pt-hero__info-item">
                                         <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
                                         {attraction.openingHours}
@@ -106,12 +114,12 @@ export default function PontoTuristico() {
                                     </span>
                                 </>
                             )}
-                            {attraction.hasGuide != null && (
+                            {attraction.freeAccess && (
                                 <>
                                     <span className="pt-hero__info-sep" aria-hidden="true">|</span>
-                                    <span className="pt-hero__info-item">
-                                        <span className="material-symbols-outlined" aria-hidden="true">person</span>
-                                        {attraction.hasGuide ? "Guia Disponível" : "Acesso Livre"}
+                                    <span className="pt-hero__info-item pt-hero__info-item--status">
+                                        <span className="material-symbols-outlined" aria-hidden="true">lock_open</span>
+                                        Acesso Livre
                                     </span>
                                 </>
                             )}
@@ -149,25 +157,31 @@ export default function PontoTuristico() {
                             <p className="pt-content__p">{attraction.description}</p>
                             <div className="pt-content__stats">
                                 {attraction.entryPrice != null && (
-                                    <div className="pt-stat">
-                                        <span className="material-symbols-outlined pt-stat__icon" aria-hidden="true">payments</span>
-                                        <strong className="pt-stat__value">
-                                            {attraction.entryPrice === 0 ? "Grátis" : `R$ ${attraction.entryPrice.toFixed(2)}`}
-                                        </strong>
-                                        <span className="pt-stat__label">Entrada</span>
+                                    <div className="pt-stat-pill">
+                                        <span className="material-symbols-outlined pt-stat-pill__icon" aria-hidden="true">payments</span>
+                                        <div>
+                                            <span className="pt-stat-pill__lbl">Entrada</span>
+                                            <span className="pt-stat-pill__val">
+                                                {attraction.entryPrice === 0 ? "Gratuita" : `R$ ${attraction.entryPrice.toFixed(2)}`}
+                                            </span>
+                                        </div>
                                     </div>
                                 )}
                                 {attraction.averageVisitDuration != null && (
-                                    <div className="pt-stat">
-                                        <span className="material-symbols-outlined pt-stat__icon" aria-hidden="true">schedule</span>
-                                        <strong className="pt-stat__value">{attraction.averageVisitDuration} min</strong>
-                                        <span className="pt-stat__label">Duração média</span>
+                                    <div className="pt-stat-pill">
+                                        <span className="material-symbols-outlined pt-stat-pill__icon" aria-hidden="true">schedule</span>
+                                        <div>
+                                            <span className="pt-stat-pill__lbl">Duração média</span>
+                                            <span className="pt-stat-pill__val">{attraction.averageVisitDuration} min</span>
+                                        </div>
                                     </div>
                                 )}
-                                <div className="pt-stat">
-                                    <span className="material-symbols-outlined pt-stat__icon" aria-hidden="true">category</span>
-                                    <strong className="pt-stat__value">{catLabel}</strong>
-                                    <span className="pt-stat__label">Categoria</span>
+                                <div className="pt-stat-pill">
+                                    <span className="material-symbols-outlined pt-stat-pill__icon" aria-hidden="true">category</span>
+                                    <div>
+                                        <span className="pt-stat-pill__lbl">Categoria</span>
+                                        <span className="pt-stat-pill__val">{catLabel}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -277,7 +291,7 @@ export default function PontoTuristico() {
                                                 <span className="point-card__tag" aria-hidden="true">{CATEGORY_LABELS[pt.category] ?? pt.category}</span>
                                                 <div className="point-card__body">
                                                     <h3 className="point-card__title">{pt.name}</h3>
-                                                    <p className="point-card__desc">{pt.description}</p>
+                                                    <p className="point-card__desc">{pt.shortDescription ?? pt.description}</p>
                                                     {pt.averageVisitDuration != null && (
                                                         <div className="point-card__meta">
                                                             <span className="point-card__meta-item">

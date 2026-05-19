@@ -139,7 +139,7 @@ export default function PontosTuristicos() {
                         </span>
                         <div className="point-card__body">
                           <h3 className="point-card__title">{pt.name}</h3>
-                          <p className="point-card__desc">{pt.description}</p>
+                          <p className="point-card__desc">{pt.shortDescription ?? pt.description}</p>
                           <div className="point-card__meta">
                             {pt.averageVisitDuration != null && (
                               <span className="point-card__meta-item">

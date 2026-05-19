@@ -163,6 +163,7 @@ export default function Content() {
     }, []);
 
     useEffect(() => {
+        if (loading) return;
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach(({ target, isIntersecting }) => {
@@ -173,7 +174,7 @@ export default function Content() {
         );
         document.querySelectorAll(".reveal, .grid-reveal").forEach((el) => observer.observe(el));
         return () => observer.disconnect();
-    }, []);
+    }, [loading]);
 
     const pubCategories = useMemo(() => {
         const cats = Array.from(new Set(pubItems.map(i => i.category)));
@@ -264,7 +265,7 @@ export default function Content() {
                                                 <span className="point-card__tag" aria-hidden="true">{CATEGORY_LABELS[pt.category] ?? pt.category}</span>
                                                 <div className="point-card__body">
                                                     <h3 className="point-card__title">{pt.name}</h3>
-                                                    <p className="point-card__desc">{pt.description}</p>
+                                                    <p className="point-card__desc">{pt.shortDescription ?? pt.description}</p>
                                                     <div className="point-card__meta">
                                                         {pt.averageVisitDuration != null && (
                                                             <span className="point-card__meta-item">

@@ -19,9 +19,9 @@ const CATEGORIES: { value: AttractionCategory; label: string }[] = [
 ];
 
 const EMPTY: AttractionRequest = {
-  name: '', description: '', address: '', phone: '', email: '',
-  webUrl: '', instagramUrl: '', active: true, openingHours: '',
-  entryPrice: undefined, hasGuide: false, averageVisitDuration: undefined,
+  name: '', description: '', shortDescription: '', address: '', phone: '', email: '',
+  webUrl: '', instagramUrl: '', active: true, openToPublic: true, freeAccess: false,
+  openingHours: '', entryPrice: undefined, hasGuide: false, averageVisitDuration: undefined,
   category: 'PARK',
 };
 
@@ -101,7 +101,8 @@ export function AttractionFormPage() {
               {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
             </FormSelect>
           </div>
-          <FormTextarea label="Descrição" value={form.description} onChange={(e) => set('description', e.target.value)} error={errors.description} required maxLength={300} />
+          <FormTextarea label="Descrição Completa" value={form.description} onChange={(e) => set('description', e.target.value)} error={errors.description} required />
+          <FormInput label="Descrição Curta (exibida no topo da página e nos cards)" value={form.shortDescription ?? ''} onChange={(e) => set('shortDescription', e.target.value)} maxLength={200} hint="Máx. 200 caracteres — texto breve e impactante" />
           <FormInput label="Endereço" value={form.address} onChange={(e) => set('address', e.target.value)} error={errors.address} required />
           <div className="adm-form-row">
             <FormInput label="Telefone" value={form.phone ?? ''} onChange={(e) => set('phone', e.target.value)} />
@@ -120,6 +121,8 @@ export function AttractionFormPage() {
           </div>
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
             <FormToggle label="Possui Guia" checked={!!form.hasGuide} onChange={(v) => set('hasGuide', v)} />
+            <FormToggle label="Aberto ao Público" checked={!!form.openToPublic} onChange={(v) => set('openToPublic', v)} />
+            <FormToggle label="Acesso Livre" checked={!!form.freeAccess} onChange={(v) => set('freeAccess', v)} />
             <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
           </div>
 

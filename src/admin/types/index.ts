@@ -69,12 +69,15 @@ export type AttractionCategory = 'PARK' | 'WATERFALL' | 'MUSEUM' | 'FARM' | 'ROU
 export interface AttractionRequest {
   name: string;
   description: string;
+  shortDescription?: string;
   address: string;
   phone?: string;
   email?: string;
   webUrl?: string;
   instagramUrl?: string;
   active: boolean;
+  openToPublic?: boolean;
+  freeAccess?: boolean;
   openingHours?: string;
   entryPrice?: number;
   hasGuide?: boolean;
@@ -85,12 +88,15 @@ export interface AttractionRequest {
 export interface AttractionUpdateDTO {
   name?: string;
   description?: string;
+  shortDescription?: string;
   address?: string;
   phone?: string;
   email?: string;
   webUrl?: string;
   instagramUrl?: string;
   active?: boolean;
+  openToPublic?: boolean;
+  freeAccess?: boolean;
   openingHours?: string;
   entryPrice?: number;
   hasGuide?: boolean;
@@ -102,12 +108,15 @@ export interface AttractionResponse {
   id: string;
   name: string;
   description: string;
+  shortDescription?: string;
   address: string;
   phone?: string;
   email?: string;
   webUrl?: string;
   instagramUrl?: string;
   active: boolean;
+  openToPublic?: boolean;
+  freeAccess?: boolean;
   openingHours?: string;
   entryPrice?: number;
   hasGuide?: boolean;
