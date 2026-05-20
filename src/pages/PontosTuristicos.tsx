@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { attractionsService } from "../admin/services/attractionsService";
+import { pageConfigService } from "../admin/services/pageConfigService";
 import type { AttractionResponse, AttractionCategory } from "../admin/types";
-import heroImg from "../assets/images/foto-capa-parque-ubajara.png";
+import heroFallback from "../assets/images/foto-capa-parque-ubajara.png";
 import "../components/Sections/style/Content.components.css";
 import "./style/PontosTuristicos.css";
 
@@ -22,10 +23,16 @@ const CATEGORY_LABELS: Record<AttractionCategory, string> = {
 export default function PontosTuristicos() {
   const [items, setItems] = useState<AttractionResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [coverImg, setCoverImg] = useState<string>(heroFallback);
+  const [heroDesc, setHeroDesc] = useState("Descubra cachoeiras, fazendas, mercados históricos e museus que fazem da Serra da Ibiapaba um destino único no Ceará.");
   const [activeCategory, setActiveCategory] = useState(ALL);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
+    pageConfigService.getConfig('PONTOS_TURISTICOS').then((cfg) => {
+      if (cfg.imageUrl) setCoverImg(cfg.imageUrl);
+      if (cfg.description) setHeroDesc(cfg.description);
+    });
     attractionsService.getAll(0, 100, true)
       .then(page => setItems(page.content))
       .catch(() => setItems([]))
@@ -58,16 +65,13 @@ export default function PontosTuristicos() {
       <main className="ptl-main">
 
         <section className="ptl-hero">
-          <img src={heroImg} alt="" className="ptl-hero__bg" aria-hidden />
+          <img src={coverImg} alt="" className="ptl-hero__bg" aria-hidden />
           <div className="ptl-hero__overlay" />
           <div className="ptl-hero__content">
             <div className="ptl-hero__inner">
               <span className="ptl-hero__kicker">PARQUE NACIONAL DE UBAJARA</span>
               <h1 className="ptl-hero__title">Pontos Turísticos</h1>
-              <p className="ptl-hero__subtitle">
-                Descubra cachoeiras, fazendas, mercados históricos e museus que
-                fazem da Serra da Ibiapaba um destino único no Ceará.
-              </p>
+              <p className="ptl-hero__subtitle">{heroDesc}</p>
             </div>
           </div>
         </section>

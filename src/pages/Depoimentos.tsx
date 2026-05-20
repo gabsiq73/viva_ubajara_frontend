@@ -156,6 +156,7 @@ export default function Depoimentos(): JSX.Element {
   const [testimonials, setTestimonials] = useState<TestimonialResponse[]>(MOCK);
   const [loading, setLoading] = useState(true);
   const [coverImg, setCoverImg] = useState<string | null>(null);
+  const [heroDesc, setHeroDesc] = useState("O que visitantes de todo o Brasil dizem sobre o Parque Nacional de Ubajara.");
   const [filter, setFilter] = useState<0 | 1 | 2 | 3 | 4 | 5>(0);
 
   const [rating, setRating] = useState(0);
@@ -176,7 +177,7 @@ export default function Depoimentos(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    pageConfigService.getImageUrl('DEPOIMENTOS').then((url) => { if (url) setCoverImg(url); });
+    pageConfigService.getConfig('DEPOIMENTOS').then((cfg) => { if (cfg.imageUrl) setCoverImg(cfg.imageUrl); if (cfg.description) setHeroDesc(cfg.description); });
     load();
   }, [load]);
 
@@ -243,9 +244,7 @@ export default function Depoimentos(): JSX.Element {
         <div className="dep-hero__content">
           <span className="dep-hero__label">Comunidade</span>
           <h1 className="dep-hero__title">Depoimentos</h1>
-          <p className="dep-hero__sub">
-            O que visitantes de todo o Brasil dizem sobre o Parque Nacional de Ubajara.
-          </p>
+          <p className="dep-hero__sub">{heroDesc}</p>
         </div>
       </section>
 

@@ -1,13 +1,31 @@
 import api from './api';
 
+export interface PageConfigData {
+  imageUrl?: string;
+  description?: string;
+}
+
 export const pageConfigService = {
+  getConfig: async (pageKey: string): Promise<PageConfigData> => {
+    try {
+      const response = await api.get<PageConfigData>(`/page-configs/${pageKey}`);
+      return response.data ?? {};
+    } catch {
+      return {};
+    }
+  },
+
   getImageUrl: async (pageKey: string): Promise<string | null> => {
     try {
-      const response = await api.get<{ imageUrl: string }>(`/page-configs/${pageKey}`);
-      return response.data.imageUrl;
+      const response = await api.get<PageConfigData>(`/page-configs/${pageKey}`);
+      return response.data.imageUrl ?? null;
     } catch {
       return null;
     }
+  },
+
+  updateDescription: async (pageKey: string, description: string): Promise<void> => {
+    await api.put(`/page-configs/${pageKey}/description`, { description });
   },
 
   uploadImage: async (pageKey: string, file: File): Promise<string> => {

@@ -81,14 +81,16 @@ export default function Estabelecimentos() {
     const [items, setItems] = useState<EstabItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [coverImg, setCoverImg] = useState<string>(heroFallback);
+    const [heroDesc, setHeroDesc] = useState("Restaurantes, pousadas, hotéis e cafeterias para completar sua experiência na Serra da Ibiapaba.");
     const [search, setSearch] = useState("");
     const [activeType, setActiveType] = useState<string>(initialType);
     const [sort, setSort] = useState<"relevance" | "name">("relevance");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
-        pageConfigService.getImageUrl('ESTABELECIMENTOS').then((url) => {
-            if (url) setCoverImg(url);
+        pageConfigService.getConfig('ESTABELECIMENTOS').then((cfg) => {
+            if (cfg.imageUrl) setCoverImg(cfg.imageUrl);
+            if (cfg.description) setHeroDesc(cfg.description);
         });
         Promise.allSettled([
             restaurantsService.getAll(0, 100),
@@ -148,10 +150,7 @@ export default function Estabelecimentos() {
                         <div className="est-hero__inner">
                             <span className="est-hero__kicker">PARQUE NACIONAL DE UBAJARA</span>
                             <h1 className="est-hero__title">Estabelecimentos</h1>
-                            <p className="est-hero__subtitle">
-                                Restaurantes, pousadas, hotéis e cafeterias para completar
-                                sua experiência na Serra da Ibiapaba.
-                            </p>
+                            <p className="est-hero__subtitle">{heroDesc}</p>
                         </div>
                     </div>
                 </section>

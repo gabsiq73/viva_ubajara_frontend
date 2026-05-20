@@ -111,13 +111,17 @@ export default function Eventos() {
     const [events, setEvents] = useState<EventCard[]>([]);
     const [loading, setLoading] = useState(true);
     const [coverImg, setCoverImg] = useState<string | null>(null);
+    const [heroDesc, setHeroDesc] = useState("Festivais, feiras, trilhas guiadas e muito mais aguardam você em Ubajara.");
     const [search, setSearch] = useState("");
     const [activeMonth, setActiveMonth] = useState<string>("Todos");
     const [sort, setSort] = useState<"date" | "name">("date");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
-        pageConfigService.getImageUrl('EVENTOS').then((url) => { if (url) setCoverImg(url); });
+        pageConfigService.getConfig('EVENTOS').then((cfg) => {
+            if (cfg.imageUrl) setCoverImg(cfg.imageUrl);
+            if (cfg.description) setHeroDesc(cfg.description);
+        });
         eventsService.getAll(0, 100, true)
             .then(page => setEvents(page.content.map(mapEvent)))
             .catch(() => setEvents([]))
@@ -168,9 +172,7 @@ export default function Eventos() {
                         <div className="ev-hero__inner">
                             <span className="ev-hero__kicker">Agenda Cultural</span>
                             <h1 id="ev-hero-title" className="ev-hero__title">Eventos &amp; Programação</h1>
-                            <p className="ev-hero__subtitle">
-                                Festivais, feiras, trilhas guiadas e muito mais aguardam você em Ubajara.
-                            </p>
+                            <p className="ev-hero__subtitle">{heroDesc}</p>
                         </div>
                     </div>
                 </section>
