@@ -50,7 +50,7 @@ function mapRestaurant(r: RestaurantResponse): EstabData {
         avgPrice: r.avgPrice,
         typeLabel: "Restaurante",
         features,
-        heroImg: r.photos?.[0]?.url ?? heroFallback,
+        heroImg: r.photos?.find(p => p.description === 'cover')?.url ?? r.photos?.[0]?.url ?? heroFallback,
         mapsUrl: r.mapsUrl || `https://maps.google.com/maps?q=${encodeURIComponent(r.address)}`,
     };
 }
@@ -71,7 +71,7 @@ function mapHostPoint(h: HostPointResponse): EstabData {
         avgPrice: h.avgPrice,
         typeLabel,
         features,
-        heroImg: h.photos?.[0]?.url ?? heroFallback,
+        heroImg: h.photos?.find(p => p.description === 'cover')?.url ?? h.photos?.[0]?.url ?? heroFallback,
         mapsUrl: h.mapsUrl || `https://maps.google.com/maps?q=${encodeURIComponent(h.address)}`,
         bookingUrl: h.bookingUrl,
     };

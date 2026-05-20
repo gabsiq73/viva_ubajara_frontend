@@ -65,39 +65,57 @@ export function PagesConfigPage() {
     fileInputRef.current?.click();
   };
 
+  const apiErrorMsg = (err: unknown): string => {
+    const e = err as { response?: { data?: { message?: string } }; message?: string };
+    return e?.response?.data?.message ?? e?.message ?? '';
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     const key = uploadTarget.current;
     if (!file || !key) return;
     e.target.value = '';
     update(key, { imageLoading: true });
+    const label = PAGES.find(p => p.key === key)?.label ?? key;
     try {
       const url = await pageConfigService.uploadImage(key, file);
       update(key, { imageUrl: url });
-      showToast('Imagem atualizada!', 'success');
-    } catch { showToast('Erro ao enviar imagem.', 'error'); }
-    finally { update(key, { imageLoading: false }); }
+      showToast(`Imagem de "${label}" atualizada!`, 'success');
+    } catch (err) {
+      const msg = apiErrorMsg(err);
+      showToast(`Erro ao enviar imagem de "${label}"${msg ? `: ${msg}` : '.'}`, 'error');
+    } finally { update(key, { imageLoading: false }); }
   };
 
   const handleRemoveImage = async (key: string) => {
     update(key, { imageLoading: true });
+    const label = PAGES.find(p => p.key === key)?.label ?? key;
     try {
       await pageConfigService.removeImage(key);
       update(key, { imageUrl: null });
-      showToast('Imagem removida.', 'success');
-    } catch { showToast('Erro ao remover imagem.', 'error'); }
-    finally { update(key, { imageLoading: false }); }
+      showToast(`Imagem de "${label}" removida.`, 'success');
+    } catch (err) {
+      const msg = apiErrorMsg(err);
+      showToast(`Erro ao remover imagem de "${label}"${msg ? `: ${msg}` : '.'}`, 'error');
+    } finally { update(key, { imageLoading: false }); }
   };
 
   const handleSaveDescription = async (key: string) => {
     const desc = states[key].description;
+    const label = PAGES.find(p => p.key === key)?.label ?? key;
+    if (desc.length > 500) {
+      showToast('A descrição não pode ter mais de 500 caracteres.', 'error');
+      return;
+    }
     update(key, { descSaving: true });
     try {
       await pageConfigService.updateDescription(key, desc);
       update(key, { savedDescription: desc });
-      showToast('Descrição salva!', 'success');
-    } catch { showToast('Erro ao salvar descrição.', 'error'); }
-    finally { update(key, { descSaving: false }); }
+      showToast(`Descrição de "${label}" salva!`, 'success');
+    } catch (err) {
+      const msg = apiErrorMsg(err);
+      showToast(`Erro ao salvar descrição de "${label}"${msg ? `: ${msg}` : '.'}`, 'error');
+    } finally { update(key, { descSaving: false }); }
   };
 
   return (
@@ -161,10 +179,11 @@ export function PagesConfigPage() {
                     onChange={(e) => update(key, { description: e.target.value })}
                     placeholder="Texto exibido no subtítulo da página..."
                     rows={3}
+                    maxLength={500}
                     style={{
                       width: '100%',
                       padding: '8px 12px',
-                      border: '1px solid var(--adm-border)',
+                      border: `1px solid ${s.description.length > 480 ? '#ef4444' : 'var(--adm-border)'}`,
                       borderRadius: 8,
                       fontSize: 13,
                       fontFamily: 'inherit',
@@ -175,6 +194,9 @@ export function PagesConfigPage() {
                       background: '#fff',
                     }}
                   />
+                  <div style={{ textAlign: 'right', fontSize: 11, marginTop: 3, color: s.description.length > 480 ? '#ef4444' : 'var(--adm-text-muted)' }}>
+                    {s.description.length}/500
+                  </div>
                 </div>
                 <button
                   className="adm-btn adm-btn--primary adm-btn--sm"
