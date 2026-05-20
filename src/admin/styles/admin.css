@@ -114,6 +114,25 @@
   padding: 8px 0;
   overflow-y: auto;
   min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+
+.adm-sidebar__nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.adm-sidebar__nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.adm-sidebar__nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.adm-sidebar__nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
 }
 
 .adm-sidebar__section {

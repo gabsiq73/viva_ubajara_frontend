@@ -53,10 +53,8 @@ export function HostPointFormPage() {
         showToast('Hospedagem atualizada!', 'success');
       } else {
         const created = await hostPointsService.create(form);
-        const uploads: Promise<unknown>[] = [];
-        if (coverFile) uploads.push(photosService.uploadForEntity('host-points', created.id, coverFile, 'cover'));
-        if (cardFile) uploads.push(photosService.uploadForEntity('host-points', created.id, cardFile, 'card'));
-        await Promise.allSettled(uploads);
+        if (coverFile) await photosService.uploadForEntity('host-points', created.id, coverFile, 'cover');
+        if (cardFile) await photosService.uploadForEntity('host-points', created.id, cardFile, 'card');
         showToast('Hospedagem criada com sucesso!', 'success');
       }
       navigate('/admin/host-points');

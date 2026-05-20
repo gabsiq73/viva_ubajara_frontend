@@ -81,9 +81,19 @@ export function RolePhotoSlot({
     }
   };
 
+  const roleBadge = roleDescription === 'cover' ? 'CAPA' : roleDescription === 'card' ? 'CARD' : roleDescription.toUpperCase();
+
   return (
     <div className="adm-role-slot">
-      <span className="adm-role-slot__label">{label}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+        <span className="adm-role-slot__label">{label}</span>
+        <span style={{
+          fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
+          padding: '2px 7px', borderRadius: 4,
+          background: roleDescription === 'cover' ? '#1e4a34' : '#c29543',
+          color: '#fff',
+        }}>{roleBadge}</span>
+      </div>
       {hint && <span className="adm-field__hint">{hint}</span>}
 
       {currentUrl ? (

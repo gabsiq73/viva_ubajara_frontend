@@ -55,10 +55,8 @@ export function RestaurantFormPage() {
         showToast('Restaurante atualizado!', 'success');
       } else {
         const created = await restaurantsService.create(form);
-        const uploads: Promise<unknown>[] = [];
-        if (coverFile) uploads.push(photosService.uploadForEntity('restaurants', created.id, coverFile, 'cover'));
-        if (cardFile) uploads.push(photosService.uploadForEntity('restaurants', created.id, cardFile, 'card'));
-        await Promise.allSettled(uploads);
+        if (coverFile) await photosService.uploadForEntity('restaurants', created.id, coverFile, 'cover');
+        if (cardFile) await photosService.uploadForEntity('restaurants', created.id, cardFile, 'card');
         showToast('Restaurante criado com sucesso!', 'success');
       }
       navigate('/admin/restaurants');
