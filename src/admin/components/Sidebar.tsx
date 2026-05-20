@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import {
   LayoutDashboard,
   Mountain,
@@ -44,10 +44,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <aside className={`adm-sidebar${isOpen ? ' open' : ''}`}>
-      <div className="adm-sidebar__logo">
+      <Link to="/" className="adm-sidebar__logo" onClick={onClose} title="Ir para o site público">
         <img src={logo} alt="Parque Nacional de Ubajara" className="adm-sidebar__logo-img" />
         <div className="adm-sidebar__logo-sub">Painel Administrativo</div>
-      </div>
+      </Link>
 
       <nav className="adm-sidebar__nav">
         {NAV_ITEMS.map((item) => (
