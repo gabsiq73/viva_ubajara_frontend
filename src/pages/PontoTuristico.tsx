@@ -313,6 +313,43 @@ export default function PontoTuristico() {
                     </section>
                 )}
 
+                {/* ── Pontos Turísticos Vinculados ── */}
+                {attraction.linkedSpots && attraction.linkedSpots.length > 0 && (
+                    <section className="pt-related" aria-labelledby="pt-linked-title">
+                        <div className="pt-related__inner">
+                            <h2 id="pt-linked-title" className="pt-related__title">Pontos Turísticos Vinculados</h2>
+                            <p className="pt-related__subtitle">Locais que fazem parte desta atração</p>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginTop: 24 }}>
+                                {attraction.linkedSpots.map((spot) => (
+                                    <Link
+                                        key={spot.id}
+                                        to={`/local/${spot.id}`}
+                                        style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: 8,
+                                            padding: '12px 20px',
+                                            borderRadius: 12,
+                                            background: 'rgba(255,255,255,0.07)',
+                                            border: '1px solid rgba(255,255,255,0.15)',
+                                            color: '#fff',
+                                            textDecoration: 'none',
+                                            fontWeight: 600,
+                                            fontSize: 15,
+                                            backdropFilter: 'blur(4px)',
+                                            transition: 'background 0.2s',
+                                        }}
+                                    >
+                                        <span className="material-symbols-outlined" style={{ fontSize: 18 }} aria-hidden="true">location_on</span>
+                                        {spot.name}
+                                        <span className="material-symbols-outlined" style={{ fontSize: 16, opacity: 0.7 }} aria-hidden="true">arrow_forward</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                )}
+
                 {/* ── Pontos Recomendados ── */}
                 {related.length > 0 && (
                     <section className="pt-related" aria-labelledby="pt-related-title">

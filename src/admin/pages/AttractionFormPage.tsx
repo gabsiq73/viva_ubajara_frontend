@@ -1,13 +1,14 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { attractionsService } from '../services/attractionsService';
+import { touristSpotsService } from '../services/touristSpotsService';
 import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
 import { FormInput, FormTextarea, FormSelect, FormToggle } from '../components/FormField';
 import { RolePhotoSlot } from '../components/RolePhotoSlot';
 import { Spinner } from '../components/Spinner';
 import { PhotoManager } from '../components/PhotoManager';
-import type { AttractionRequest, AttractionCategory, PhotoResponse } from '../types';
+import type { AttractionRequest, AttractionCategory, PhotoResponse, TouristSpotSummary } from '../types';
 
 const CATEGORIES: { value: AttractionCategory; label: string }[] = [
   { value: 'PARK', label: 'Parque' },
@@ -22,7 +23,7 @@ const EMPTY: AttractionRequest = {
   name: '', description: '', shortDescription: '', address: '', phone: '', email: '',
   webUrl: '', instagramUrl: '', mapsUrl: '', active: true, openToPublic: true, freeAccess: false,
   openingHours: '', entryPrice: undefined, hasGuide: false, averageVisitDuration: undefined,
-  category: 'PARK',
+  category: 'PARK', linkedSpotIds: [],
 };
 
 const ROLE_DESCS = ['cover', 'how_to_get', 'card'];
@@ -35,6 +36,7 @@ export function AttractionFormPage() {
 
   const [form, setForm] = useState<AttractionRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
+  const [allSpots, setAllSpots] = useState<TouristSpotSummary[]>([]);
 
   // Create-mode pending files per role
   const [coverFile, setCoverFile] = useState<File | null>(null);
@@ -46,10 +48,21 @@ export function AttractionFormPage() {
   const [fetching, setFetching] = useState(isEdit);
 
   useEffect(() => {
+    touristSpotsService.getAll(0, 200).then((page) => {
+      setAllSpots(page.content.map((s) => ({ id: s.id, name: s.name })));
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
     if (!isEdit) return;
     setFetching(true);
     attractionsService.getById(id).then((data) => {
-      setForm({ ...data, entryPrice: data.entryPrice ?? undefined, averageVisitDuration: data.averageVisitDuration ?? undefined });
+      setForm({
+        ...data,
+        entryPrice: data.entryPrice ?? undefined,
+        averageVisitDuration: data.averageVisitDuration ?? undefined,
+        linkedSpotIds: data.linkedSpots?.map((s) => s.id) ?? [],
+      });
       setPhotos(data.photos ?? []);
     }).catch(() => showToast('Erro ao carregar atração.', 'error'))
       .finally(() => setFetching(false));
@@ -57,6 +70,16 @@ export function AttractionFormPage() {
 
   const set = <K extends keyof AttractionRequest>(key: K, val: AttractionRequest[K]) =>
     setForm((prev) => ({ ...prev, [key]: val }));
+
+  const toggleLinkedSpot = (id: string) => {
+    setForm((prev) => {
+      const ids = prev.linkedSpotIds ?? [];
+      return {
+        ...prev,
+        linkedSpotIds: ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
+      };
+    });
+  };
 
   const validate = () => {
     const e: typeof errors = {};
@@ -148,6 +171,40 @@ export function AttractionFormPage() {
             <FormToggle label="Acesso Livre" checked={!!form.freeAccess} onChange={(v) => set('freeAccess', v)} />
             <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
           </div>
+
+          {allSpots.length > 0 && (
+            <div className="adm-role-slots-section">
+              <p className="adm-role-slots-section__title">Pontos Turísticos Vinculados</p>
+              <p style={{ fontSize: 12, color: 'var(--adm-text-muted)', marginBottom: 12 }}>
+                Selecione os pontos turísticos que aparecem nesta atração (visíveis na página pública).
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {allSpots.map((spot) => {
+                  const selected = (form.linkedSpotIds ?? []).includes(spot.id);
+                  return (
+                    <button
+                      key={spot.id}
+                      type="button"
+                      onClick={() => toggleLinkedSpot(spot.id)}
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: 20,
+                        border: `2px solid ${selected ? 'var(--adm-green)' : 'var(--adm-border)'}`,
+                        background: selected ? 'var(--adm-green-dim)' : 'transparent',
+                        color: selected ? 'var(--adm-green)' : 'var(--adm-text-muted)',
+                        fontSize: 13,
+                        fontWeight: selected ? 600 : 400,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {selected ? '✓ ' : ''}{spot.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           <div className="adm-role-slots-section">
             <p className="adm-role-slots-section__title">Fotos</p>

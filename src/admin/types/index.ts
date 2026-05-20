@@ -67,6 +67,11 @@ export interface PhotoResponse {
 // ============================================================
 export type AttractionCategory = 'PARK' | 'WATERFALL' | 'MUSEUM' | 'FARM' | 'ROUTE' | 'MARKET';
 
+export interface TouristSpotSummary {
+  id: string;
+  name: string;
+}
+
 export interface AttractionRequest {
   name: string;
   description: string;
@@ -85,6 +90,7 @@ export interface AttractionRequest {
   hasGuide?: boolean;
   averageVisitDuration?: number;
   category: AttractionCategory;
+  linkedSpotIds?: string[];
 }
 
 export interface AttractionUpdateDTO {
@@ -105,6 +111,7 @@ export interface AttractionUpdateDTO {
   hasGuide?: boolean;
   averageVisitDuration?: number;
   category?: AttractionCategory;
+  linkedSpotIds?: string[];
 }
 
 export interface AttractionResponse {
@@ -127,6 +134,7 @@ export interface AttractionResponse {
   averageVisitDuration?: number;
   category: AttractionCategory;
   photos: PhotoResponse[];
+  linkedSpots?: TouristSpotSummary[];
 }
 
 // ============================================================

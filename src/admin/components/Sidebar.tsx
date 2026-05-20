@@ -8,7 +8,6 @@ import {
   Hotel,
   Compass,
   Phone,
-  Image,
   LogOut,
   MessageSquare,
   Star,
@@ -30,7 +29,6 @@ const NAV_ITEMS = [
   { to: '/admin/contacts',          label: 'Contatos',           icon: <Phone size={18} />,         section: null },
   { to: '/admin/contact-messages', label: 'Mensagens',          icon: <MessageSquare size={18} />, section: 'Visitantes' },
   { to: '/admin/testimonials',     label: 'Depoimentos',        icon: <Star size={18} />,          section: null },
-  { to: '/admin/photos',           label: 'Fotos',              icon: <Image size={18} />,         section: 'Mídia' },
   { to: '/admin/users',            label: 'Usuários',           icon: <Users size={18} />,         section: 'Sistema' },
 ];
 

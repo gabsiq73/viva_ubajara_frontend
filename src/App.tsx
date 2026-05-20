@@ -5,6 +5,7 @@ import { AuthProvider } from "./admin/contexts/AuthContext";
 import Index from "./pages/Index";
 import PontoTuristico from "./pages/PontoTuristico";
 import PontosTuristicos from "./pages/PontosTuristicos";
+import Local from "./pages/Local";
 import Estabelecimentos from "./pages/Estabelecimentos";
 import Estabelecimento from "./pages/Estabelecimento";
 import Eventos from "./pages/Eventos";
@@ -27,6 +28,7 @@ function App() {
           <Route path="/" element={<Index />} />
           <Route path="/pontos-turisticos" element={<PontosTuristicos />} />
           <Route path="/pontos/:id" element={<PontoTuristico />} />
+          <Route path="/local/:id" element={<Local />} />
           <Route path="/estabelecimentos" element={<Estabelecimentos />} />
           <Route path="/estabelecimentos/:id" element={<Estabelecimento />} />
           <Route path="/eventos" element={<Eventos />} />
