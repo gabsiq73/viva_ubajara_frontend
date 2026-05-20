@@ -16,9 +16,6 @@ const ERROR_MESSAGES: Record<NonNullable<ErrorType>, string> = {
   unknown: 'Ocorreu um erro inesperado. Tente novamente.',
 };
 
-// Remove /api/v1 para chegar na raiz do backend onde ficam as rotas OAuth2
-const OAUTH_BASE = BASE_URL.replace(/\/api\/v1\/?$/, '');
-
 function GoogleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -59,7 +56,7 @@ export function LoginPage() {
 
   const handleGoogleLogin = () => {
     setErrorType(null);
-    window.location.href = `${OAUTH_BASE}/oauth2/authorization/google`;
+    window.location.href = `${BASE_URL}/oauth2/authorization/google`;
   };
 
   const handleLogin = async (e: FormEvent) => {
