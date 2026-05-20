@@ -3,6 +3,7 @@ import { authService } from '../services/authService';
 import { socialAuthService } from '../services/socialAuthService';
 import { TOKEN_KEY, USER_KEY, FORBIDDEN_EVENT, UNAUTHORIZED_EVENT } from '../services/api';
 import { isTokenExpired, secondsUntilExpiry } from '../services/jwtUtils';
+import { usersService } from '../services/usersService';
 import type { AuthResponse, LoginRequest, UserRequest } from '../types';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -30,6 +31,7 @@ interface AuthContextData {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isLoading: boolean;
+  roleSynced: boolean;
   login: (data: LoginRequest) => Promise<void>;
   register: (data: UserRequest) => Promise<void>;
   loginWithGoogle: (accessToken: string) => Promise<void>;
@@ -87,6 +89,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return loadUserFromStorage();
   });
   const [isLoading, setIsLoading] = useState(false);
+  // true when we're syncing role/photo from API on mount
+  const [roleSynced, setRoleSynced] = useState(false);
 
   // ─── Aplica a resposta da API (aceita qualquer role) ──────────────────────
   const applyAuthResponse = useCallback((response: AuthResponse) => {
@@ -164,6 +168,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // ─── Sync role + photo from API on mount (handles role changes without re-login) ─
+  useEffect(() => {
+    const t = localStorage.getItem(TOKEN_KEY);
+    if (!t || isTokenExpired(t)) { setRoleSynced(true); return; }
+    usersService.getMe()
+      .then((data) => {
+        const newRole = data.role as Role;
+        const newPhoto = data.photoUrl ?? undefined;
+        const newName = [data.firstName, data.lastName].filter(Boolean).join(' ') || undefined;
+        setUser((prev) => {
+          if (!prev) return prev;
+          const updated: StoredUser = {
+            ...prev,
+            role: newRole,
+            photo: newPhoto ?? prev.photo,
+            name: newName ?? prev.name,
+          };
+          localStorage.setItem(USER_KEY, JSON.stringify(updated));
+          return updated;
+        });
+      })
+      .catch(() => {})
+      .finally(() => setRoleSynced(true));
+  }, []);
+
   // ─── Intercepta 401 e 403 do Axios ───────────────────────────────────────
   useEffect(() => {
     const handle403 = (e: Event) => {
@@ -229,6 +258,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated,
         isAdmin,
         isLoading,
+        roleSynced,
         login,
         register,
         loginWithGoogle,

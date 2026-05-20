@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../components/Toast';
 import { FormInput } from '../components/FormField';
 import { Spinner } from '../components/Spinner';
-import { ShieldCheck, User, UserCog, Save, KeyRound, Camera, Loader } from 'lucide-react';
+import { ShieldCheck, User, UserCog, Save, KeyRound, Camera, Loader, Trash2 } from 'lucide-react';
 import type { UserResponse } from '../types';
 
 const ROLE_LABELS = { ADMIN: 'Administrador', USER: 'Usuário', GUIDE: 'Guia' };
@@ -27,10 +27,13 @@ export function ProfilePage() {
   const [email, setEmail] = useState('');
   const [savingInfo, setSavingInfo] = useState(false);
 
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [savingPwd, setSavingPwd] = useState(false);
   const [pwdError, setPwdError] = useState('');
+
+  const [removingPhoto, setRemovingPhoto] = useState(false);
 
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
@@ -88,18 +91,34 @@ export function ProfilePage() {
   const handlePasswordSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setPwdError('');
-    if (newPassword.length < 6) { setPwdError('A senha deve ter no mínimo 6 caracteres.'); return; }
+    if (!currentPassword) { setPwdError('Informe a senha atual.'); return; }
+    if (newPassword.length < 6) { setPwdError('A nova senha deve ter no mínimo 6 caracteres.'); return; }
     if (newPassword !== confirmPassword) { setPwdError('As senhas não coincidem.'); return; }
     setSavingPwd(true);
     try {
-      await usersService.updateMe({ password: newPassword });
+      await usersService.changePassword(currentPassword, newPassword);
+      setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
       showToast('Senha alterada com sucesso!', 'success');
     } catch {
-      showToast('Erro ao alterar senha.', 'error');
+      showToast('Senha atual incorreta.', 'error');
     } finally {
       setSavingPwd(false);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    setRemovingPhoto(true);
+    try {
+      await usersService.removePhoto();
+      updateUserPhoto('');
+      setPreviewPhoto(null);
+      showToast('Foto removida com sucesso.', 'success');
+    } catch {
+      showToast('Erro ao remover foto.', 'error');
+    } finally {
+      setRemovingPhoto(false);
     }
   };
 
@@ -178,9 +197,23 @@ export function ProfilePage() {
             </div>
           </div>
         </div>
-        <p style={{ marginTop: 12, fontSize: 12, color: 'var(--adm-text-dim)' }}>
-          Clique no ícone da câmera para alterar sua foto. Formatos aceitos: JPG, PNG, WEBP.
-        </p>
+        <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <p style={{ fontSize: 12, color: 'var(--adm-text-dim)', margin: 0 }}>
+            Clique no ícone da câmera para alterar sua foto. Formatos aceitos: JPG, PNG, WEBP.
+          </p>
+          {currentPhoto && (
+            <button
+              type="button"
+              className="adm-btn adm-btn--danger adm-btn--sm"
+              onClick={handleRemovePhoto}
+              disabled={removingPhoto}
+              style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}
+            >
+              {removingPhoto ? <Loader size={12} style={{ animation: 'adm-spin 0.6s linear infinite' }} /> : <Trash2 size={12} />}
+              Remover foto
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Info form */}
@@ -213,6 +246,13 @@ export function ProfilePage() {
           Alterar Senha
         </h3>
         <form className="adm-form" onSubmit={handlePasswordSubmit}>
+          <FormInput
+            label="Senha Atual"
+            type="password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            autoComplete="current-password"
+          />
           <div className="adm-form-row">
             <FormInput
               label="Nova Senha"
@@ -220,12 +260,14 @@ export function ProfilePage() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               hint="Mínimo 6 caracteres"
+              autoComplete="new-password"
             />
             <FormInput
               label="Confirmar Nova Senha"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              autoComplete="new-password"
             />
           </div>
           {pwdError && (

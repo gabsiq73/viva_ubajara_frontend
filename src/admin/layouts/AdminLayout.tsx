@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from '../components/Sidebar';
 import { TopBar } from '../components/TopBar';
-import { useAuth } from '../hooks/useAuth';
-import { usersService } from '../services/usersService';
 
 const PAGE_TITLES: Record<string, string> = {
   '/admin/dashboard': 'Dashboard',
@@ -27,15 +25,6 @@ export function AdminLayout() {
   const title = PAGE_TITLES[base] ?? 'Admin';
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, updateUserPhoto } = useAuth();
-
-  useEffect(() => {
-    if (!user?.photo) {
-      usersService.getMe().then((data) => {
-        if (data.photoUrl) updateUserPhoto(data.photoUrl);
-      }).catch(() => {});
-    }
-  }, []);
 
   return (
     <div className={`adm-root${sidebarOpen ? ' sidebar-open' : ''}`}>

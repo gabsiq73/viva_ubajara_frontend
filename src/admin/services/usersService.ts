@@ -36,4 +36,12 @@ export const usersService = {
     const response = await api.post<{ photoUrl: string }>('/users/me/photo', formData);
     return response.data;
   },
+
+  removePhoto: async (): Promise<void> => {
+    await api.delete('/users/me/photo');
+  },
+
+  changePassword: async (currentPassword: string, newPassword: string): Promise<void> => {
+    await api.patch('/users/me/password', { currentPassword, newPassword });
+  },
 };

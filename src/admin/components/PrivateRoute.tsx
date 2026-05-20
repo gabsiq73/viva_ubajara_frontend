@@ -13,11 +13,15 @@ interface PrivateRouteProps {
  * - ADMIN → renderiza normalmente
  */
 export function PrivateRoute({ children }: PrivateRouteProps) {
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, roleSynced } = useAuth();
   const location = useLocation();
 
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
+  }
+
+  if (!roleSynced) {
+    return null;
   }
 
   if (!isAdmin) {

@@ -106,12 +106,14 @@ export default function Dashboard() {
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingInfo, setSavingInfo] = useState(false);
   const [savingPwd, setSavingPwd] = useState(false);
   const [pwdError, setPwdError] = useState("");
   const [profileSaved, setProfileSaved] = useState(false);
+  const [removingPhoto, setRemovingPhoto] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) navigate("/admin/login", { replace: true });
@@ -205,19 +207,33 @@ export default function Dashboard() {
   const handlePasswordSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setPwdError("");
-    if (newPassword.length < 6) { setPwdError("A senha deve ter no mínimo 6 caracteres."); return; }
+    if (!currentPassword) { setPwdError("Informe a senha atual."); return; }
+    if (newPassword.length < 6) { setPwdError("A nova senha deve ter no mínimo 6 caracteres."); return; }
     if (newPassword !== confirmPassword) { setPwdError("As senhas não coincidem."); return; }
     setSavingPwd(true);
     try {
-      await usersService.updateMe({ password: newPassword });
+      await usersService.changePassword(currentPassword, newPassword);
+      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
       setProfileSaved(true);
       setTimeout(() => setProfileSaved(false), 2500);
     } catch {
-      setPwdError("Erro ao alterar senha.");
+      setPwdError("Senha atual incorreta.");
     } finally {
       setSavingPwd(false);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    setRemovingPhoto(true);
+    try {
+      await usersService.removePhoto();
+      updateUserPhoto("");
+      setCurrentPhoto(null);
+    } catch {
+    } finally {
+      setRemovingPhoto(false);
     }
   };
 
@@ -264,6 +280,20 @@ export default function Dashboard() {
                 style={{ display: "none" }}
                 onChange={handlePhotoChange}
               />
+              {currentPhoto && (
+                <button
+                  className="dash-avatar-camera"
+                  onClick={handleRemovePhoto}
+                  disabled={removingPhoto}
+                  title="Remover foto de perfil"
+                  aria-label="Remover foto de perfil"
+                  style={{ bottom: 0, right: -32, background: "var(--dash-red, #ef4444)" }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
+                    {removingPhoto ? "autorenew" : "delete"}
+                  </span>
+                </button>
+              )}
             </div>
 
             <div className="dash-profile-info">
@@ -500,14 +530,18 @@ export default function Dashboard() {
                     Alterar Senha
                   </h3>
                   <form className="dash-edit-form" onSubmit={handlePasswordSave}>
+                    <div className="dash-edit-field">
+                      <label className="dash-label" htmlFor="edit-current-pwd">Senha Atual</label>
+                      <input id="edit-current-pwd" className="dash-input" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} autoComplete="current-password" />
+                    </div>
                     <div className="dash-edit-row">
                       <div className="dash-edit-field">
                         <label className="dash-label" htmlFor="edit-pwd">Nova Senha</label>
-                        <input id="edit-pwd" className="dash-input" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Mínimo 6 caracteres" />
+                        <input id="edit-pwd" className="dash-input" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Mínimo 6 caracteres" autoComplete="new-password" />
                       </div>
                       <div className="dash-edit-field">
-                        <label className="dash-label" htmlFor="edit-pwd2">Confirmar Senha</label>
-                        <input id="edit-pwd2" className="dash-input" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                        <label className="dash-label" htmlFor="edit-pwd2">Confirmar Nova Senha</label>
+                        <input id="edit-pwd2" className="dash-input" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} autoComplete="new-password" />
                       </div>
                     </div>
                     {pwdError && <p className="dash-error">{pwdError}</p>}
