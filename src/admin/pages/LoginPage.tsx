@@ -1,8 +1,8 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useGoogleLogin } from '@react-oauth/google';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { BASE_URL } from '../services/api';
 import logo from '../../assets/images/logo.webp';
 import cachoeira from '../../assets/images/cachoeira.png';
 import '../styles/admin.css';
@@ -16,6 +16,9 @@ const ERROR_MESSAGES: Record<NonNullable<ErrorType>, string> = {
   unknown: 'Ocorreu um erro inesperado. Tente novamente.',
 };
 
+// Remove /api/v1 para chegar na raiz do backend onde ficam as rotas OAuth2
+const OAUTH_BASE = BASE_URL.replace(/\/api\/v1\/?$/, '');
+
 function GoogleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -28,7 +31,7 @@ function GoogleIcon() {
 }
 
 export function LoginPage() {
-  const { login, register, loginWithGoogle, isLoading, isAuthenticated, isAdmin } = useAuth();
+  const { login, register, isLoading, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/admin/dashboard';
@@ -46,7 +49,6 @@ export function LoginPage() {
   const [showRegPassword, setShowRegPassword] = useState(false);
 
   const [errorType, setErrorType] = useState<ErrorType>(null);
-  const [googleLoading, setGoogleLoading] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -55,20 +57,10 @@ export function LoginPage() {
     }
   }, [isAuthenticated, isAdmin, navigate, from]);
 
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      setErrorType(null);
-      setGoogleLoading(true);
-      try {
-        await loginWithGoogle(tokenResponse.access_token);
-      } catch {
-        setErrorType('social');
-      } finally {
-        setGoogleLoading(false);
-      }
-    },
-    onError: () => { setErrorType('social'); setGoogleLoading(false); },
-  });
+  const handleGoogleLogin = () => {
+    setErrorType(null);
+    window.location.href = `${OAUTH_BASE}/oauth2/authorization/google`;
+  };
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -94,7 +86,7 @@ export function LoginPage() {
     }
   };
 
-  const isBusy = isLoading || googleLoading;
+  const isBusy = isLoading;
 
   return (
     <div className="adm-login">
@@ -219,10 +211,10 @@ export function LoginPage() {
               <button
                 type="button"
                 className="adm-btn-social adm-btn-social--google adm-btn-social--full"
-                onClick={() => { setErrorType(null); googleLogin(); }}
+                onClick={handleGoogleLogin}
                 disabled={isBusy}
               >
-                {googleLoading ? <span className="adm-spinner" /> : <GoogleIcon />}
+                <GoogleIcon />
                 Continuar com Google
               </button>
             </div>
@@ -301,10 +293,10 @@ export function LoginPage() {
               <button
                 type="button"
                 className="adm-btn-social adm-btn-social--google adm-btn-social--full"
-                onClick={() => { setErrorType(null); googleLogin(); }}
+                onClick={handleGoogleLogin}
                 disabled={isBusy}
               >
-                {googleLoading ? <span className="adm-spinner" /> : <GoogleIcon />}
+                <GoogleIcon />
                 Continuar com Google
               </button>
             </div>
