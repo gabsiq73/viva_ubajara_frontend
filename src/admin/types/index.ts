@@ -86,7 +86,7 @@ export interface AttractionRequest {
   openToPublic?: boolean;
   freeAccess?: boolean;
   openingHours?: string;
-  entryPrice?: number;
+  entryPrice?: string;
   hasGuide?: boolean;
   averageVisitDuration?: number;
   category: AttractionCategory;
@@ -107,7 +107,7 @@ export interface AttractionUpdateDTO {
   openToPublic?: boolean;
   freeAccess?: boolean;
   openingHours?: string;
-  entryPrice?: number;
+  entryPrice?: string;
   hasGuide?: boolean;
   averageVisitDuration?: number;
   category?: AttractionCategory;
@@ -129,7 +129,7 @@ export interface AttractionResponse {
   openToPublic?: boolean;
   freeAccess?: boolean;
   openingHours?: string;
-  entryPrice?: number;
+  entryPrice?: string;
   hasGuide?: boolean;
   averageVisitDuration?: number;
   category: AttractionCategory;

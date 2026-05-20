@@ -160,7 +160,7 @@ export function AttractionFormPage() {
           <FormInput label="URL Google Maps" type="url" value={form.mapsUrl ?? ''} onChange={(e) => set('mapsUrl', e.target.value)} hint="Link para o local no Google Maps — usado no botão 'Como Chegar'" />
           <div className="adm-form-row">
             <FormInput label="Horário de Funcionamento" value={form.openingHours ?? ''} onChange={(e) => set('openingHours', e.target.value)} hint="Ex: Seg-Sex 08:00-17:00" />
-            <FormInput label="Preço de Entrada (R$)" type="number" value={form.entryPrice ?? ''} onChange={(e) => set('entryPrice', e.target.value ? Number(e.target.value) : undefined)} />
+            <FormInput label="Preço de Entrada" value={form.entryPrice ?? ''} onChange={(e) => set('entryPrice', e.target.value || undefined)} hint="Ex: R$ 15,00 por pessoa" />
           </div>
           <div className="adm-form-row">
             <FormInput label="Duração Média (min)" type="number" value={form.averageVisitDuration ?? ''} onChange={(e) => set('averageVisitDuration', e.target.value ? Number(e.target.value) : undefined)} />

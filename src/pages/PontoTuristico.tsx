@@ -151,7 +151,7 @@ export default function PontoTuristico() {
                                     <span className="pt-hero__info-sep" aria-hidden="true">|</span>
                                     <span className="pt-hero__info-item">
                                         <span className="material-symbols-outlined" aria-hidden="true">payments</span>
-                                        {attraction.entryPrice === 0 ? "Entrada Gratuita" : `R$ ${attraction.entryPrice.toFixed(2)}`}
+                                        {attraction.entryPrice}
                                     </span>
                                 </>
                             )}
@@ -203,7 +203,7 @@ export default function PontoTuristico() {
                                         <div>
                                             <span className="pt-stat-pill__lbl">Entrada</span>
                                             <span className="pt-stat-pill__val">
-                                                {attraction.entryPrice === 0 ? "Gratuita" : `R$ ${attraction.entryPrice.toFixed(2)}`}
+                                                {attraction.entryPrice}
                                             </span>
                                         </div>
                                     </div>

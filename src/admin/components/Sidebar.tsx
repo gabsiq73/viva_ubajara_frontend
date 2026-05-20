@@ -2,7 +2,6 @@ import { NavLink, Link } from 'react-router-dom';
 import {
   LayoutDashboard,
   Mountain,
-  MapPin,
   Calendar,
   Utensils,
   Hotel,
@@ -22,7 +21,6 @@ import logo from '../../assets/images/logo.webp';
 const NAV_ITEMS = [
   { to: '/admin/dashboard',    label: 'Dashboard',          icon: <LayoutDashboard size={18} />, section: 'Geral' },
   { to: '/admin/attractions',  label: 'Atrações',           icon: <Mountain size={18} />,        section: 'Conteúdo' },
-  { to: '/admin/tourist-spots',label: 'Pontos Turísticos',  icon: <MapPin size={18} />,          section: null },
   { to: '/admin/events',       label: 'Eventos',            icon: <Calendar size={18} />,        section: null },
   { to: '/admin/restaurants',  label: 'Restaurantes',       icon: <Utensils size={18} />,        section: null },
   { to: '/admin/host-points',  label: 'Hospedagem',         icon: <Hotel size={18} />,           section: null },

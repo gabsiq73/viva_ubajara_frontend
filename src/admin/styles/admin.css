@@ -78,11 +78,13 @@
   top: 0;
   left: 0;
   height: 100vh;
+  overflow: hidden;
   z-index: 100;
   transition: transform var(--adm-transition);
 }
 
 .adm-sidebar__logo {
+  flex-shrink: 0;
   padding: 20px 24px 12px;
   display: flex;
   flex-direction: column;
@@ -150,9 +152,9 @@
 }
 
 .adm-sidebar__footer {
+  flex-shrink: 0;
   padding: 8px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  margin-top: auto;
 }
 
 .adm-sidebar__link span.icon {
