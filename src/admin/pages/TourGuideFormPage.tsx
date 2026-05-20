@@ -101,7 +101,7 @@ export function TourGuideFormPage() {
             <p className="adm-role-slots-section__title">Fotos</p>
             <div className="adm-role-slots-grid">
               <RolePhotoSlot
-                label="Foto de Perfil / Capa"
+                label="Capa"
                 hint="Foto principal do guia turístico"
                 roleDescription="cover"
                 {...(isEdit

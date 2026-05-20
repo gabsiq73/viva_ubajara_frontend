@@ -1,6 +1,5 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, useCallback, type ReactNode } from 'react';
 import { usersService } from '../services/usersService';
-import { useCrudList } from '../hooks/useCrudList';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
 import { ConfirmModal } from '../components/Modal';
@@ -27,19 +26,39 @@ const ROLE_ICONS: Record<UserRole, ReactNode> = {
 
 export function UsersListPage() {
   const { showToast } = useToast();
+
+  const [data, setData] = useState<UserResponse[]>([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState<UserRole | ''>('');
+
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
   const [roleChangeId, setRoleChangeId] = useState<string | null>(null);
   const [roleChanging, setRoleChanging] = useState(false);
   const [selectedRole, setSelectedRole] = useState<UserRole>('USER');
 
-  const {
-    data, page, setPage, totalPages, totalElements, loading,
-    search, setSearch, deleteId, deleting, confirmDelete, cancelDelete, executeDelete, refresh,
-  } = useCrudList<UserResponse>({
-    fetchFn: usersService.getAll,
-    deleteFn: usersService.delete,
-    onSuccess: (m) => showToast(m, 'success'),
-    onError: (m) => showToast(m, 'error'),
-  });
+  const fetch = useCallback(async (p = page) => {
+    setLoading(true);
+    try {
+      const result = await usersService.getAll(p, 10, search || undefined, roleFilter || undefined);
+      setData(result.content);
+      setTotalPages(result.totalPages);
+      setTotalElements(result.totalElements);
+    } catch {
+      showToast('Erro ao carregar usuários.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }, [page, search, roleFilter]);
+
+  useEffect(() => { setPage(0); }, [search, roleFilter]);
+  useEffect(() => { fetch(page); }, [page, search, roleFilter]);
 
   const openRoleChange = (user: UserResponse) => {
     setRoleChangeId(user.id);
@@ -50,14 +69,29 @@ export function UsersListPage() {
     if (!roleChangeId) return;
     setRoleChanging(true);
     try {
-      await usersService.update(roleChangeId, { role: selectedRole });
+      await usersService.changeRole(roleChangeId, selectedRole);
       showToast('Função atualizada com sucesso.', 'success');
       setRoleChangeId(null);
-      refresh();
+      fetch(page);
     } catch {
       showToast('Erro ao atualizar função.', 'error');
     } finally {
       setRoleChanging(false);
+    }
+  };
+
+  const executeDelete = async () => {
+    if (!deleteId) return;
+    setDeleting(true);
+    try {
+      await usersService.delete(deleteId);
+      showToast('Usuário excluído com sucesso.', 'success');
+      setDeleteId(null);
+      fetch(page);
+    } catch {
+      showToast('Erro ao excluir usuário.', 'error');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -94,7 +128,7 @@ export function UsersListPage() {
           </button>
           <button
             className="adm-btn adm-btn--danger adm-btn--sm"
-            onClick={() => confirmDelete(r.id)}
+            onClick={() => setDeleteId(r.id)}
             title="Excluir usuário"
           >
             <Trash2 size={14} />
@@ -111,26 +145,41 @@ export function UsersListPage() {
       </div>
 
       <div className="adm-card">
-        <div className="adm-search">
-          <span className="adm-search__icon"><Search size={18} /></span>
-          <input placeholder="Buscar por nome, email ou username…" value={search} onChange={(e) => setSearch(e.target.value)} />
+        <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+          <div className="adm-search" style={{ flex: 1, minWidth: 200 }}>
+            <span className="adm-search__icon"><Search size={18} /></span>
+            <input
+              placeholder="Buscar por username…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <select
+            className="adm-select"
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value as UserRole | '')}
+            style={{ minWidth: 160 }}
+          >
+            <option value="">Todas as funções</option>
+            <option value="ADMIN">Administrador</option>
+            <option value="USER">Usuário</option>
+            <option value="GUIDE">Guia</option>
+          </select>
         </div>
 
         <DataTable columns={columns} data={data} keyField="id" loading={loading} emptyMessage="Nenhum usuário encontrado." />
         <Pagination page={page} totalPages={totalPages} totalElements={totalElements} onPageChange={setPage} />
       </div>
 
-      {/* Delete confirmation */}
       <ConfirmModal
         isOpen={!!deleteId}
         title="Excluir Usuário"
         message="Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita."
         onConfirm={executeDelete}
-        onCancel={cancelDelete}
+        onCancel={() => setDeleteId(null)}
         loading={deleting}
       />
 
-      {/* Role change modal */}
       {roleChangeId && (
         <div className="adm-modal-overlay" onClick={() => setRoleChangeId(null)}>
           <div className="adm-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 400 }}>
