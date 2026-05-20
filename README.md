@@ -1,73 +1,140 @@
-# React + TypeScript + Vite
+# Viva Ubajara — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Site público e painel administrativo do **Parque Nacional de Ubajara** (CE, Brasil).
 
-Currently, two official plugins are available:
+Desenvolvido com React 18 + TypeScript + Vite, consome uma API REST Spring Boot em separado.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Funcionalidades
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Site público
 
-## Expanding the ESLint configuration
+| Página | Descrição |
+|---|---|
+| Home | Hero com foto, seções de atrações em destaque, itens recomendados, depoimentos e cards de eventos |
+| Atrações | Listagem e detalhe de atrações do parque (cachoeiras, trilhas, museu, etc.) |
+| Pontos Turísticos | Listagem e detalhe de pontos turísticos da região |
+| Eventos | Agenda de eventos com datas, localização e link de inscrição |
+| Estabelecimentos | Restaurantes e hospedagens próximos ao parque |
+| Como Chegar | Informações de acesso, aeroportos e rotas |
+| Depoimentos | Avaliações de visitantes com sistema de estrelas |
+| Contato | Formulário de mensagem e números de emergência |
+| Perfil / Dashboard | Área do usuário: favoritos, depoimentos, histórico de mensagens e edição de perfil com foto |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Painel administrativo (`/admin`)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Acesso restrito a usuários com role **ADMIN** ou **GUIDE**.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+| Módulo | ADMIN | GUIDE |
+|---|---|---|
+| Dashboard | ✓ | ✓ |
+| Atrações (+ sub-atrações) | ✓ | ✓ |
+| Pontos Turísticos | ✓ | ✓ |
+| Eventos | ✓ | ✓ |
+| Restaurantes | ✓ | — |
+| Hospedagem | ✓ | — |
+| Guias Turísticos | ✓ | — |
+| Itens Recomendados | ✓ | — |
+| Contatos | ✓ | — |
+| Mensagens de Contato | ✓ | — |
+| Depoimentos (aprovação) | ✓ | — |
+| Galeria de Fotos | ✓ | — |
+| Usuários | ✓ | — |
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## Stack
+
+- **React 18** + **TypeScript** + **Vite**
+- **React Router v6** — roteamento com proteção por role
+- **Axios** — comunicação com a API REST
+- **Lucide React** — ícones
+- **CSS puro por arquivo** — sem framework de UI, sistema de design próprio com variáveis CSS
+- **JWT** — autenticação stateless com expiração automática
+- **Login social** — Google OAuth2 e GitHub
+
+---
+
+## Estrutura do projeto
+
+```
+src/
+├── admin/
+│   ├── components/     # DataTable, FormField, Modal, Sidebar, Toast, RolePhotoSlot…
+│   ├── contexts/       # AuthContext (JWT + roles)
+│   ├── hooks/          # useAuth, useCrudList
+│   ├── layouts/        # AdminLayout
+│   ├── pages/          # Uma página por recurso (List + Form)
+│   ├── services/       # Chamadas à API (attractions, events, users…)
+│   └── types/          # Interfaces TypeScript completas
+├── components/
+│   ├── Sections/       # Seções da home (Hero, Content, Testimonials…)
+│   ├── Header.tsx
+│   ├── Footer.tsx
+│   └── Navbar.tsx
+├── pages/              # Páginas públicas
+└── assets/images/
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Configuração e execução
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Pré-requisitos
+
+- Node.js 18+
+- API backend rodando (repositório separado)
+
+### Instalação
+
+```bash
+git clone https://github.com/gabsiq73/viva_ubajara_frontend.git
+cd viva_ubajara_frontend
+npm install
 ```
+
+### Variáveis de ambiente
+
+Crie um arquivo `.env` na raiz:
+
+```env
+VITE_API_BASE_URL=http://localhost:8080/api
+VITE_GOOGLE_CLIENT_ID=seu_google_client_id
+```
+
+### Rodando em desenvolvimento
+
+```bash
+npm run dev
+```
+
+### Build de produção
+
+```bash
+npm run build
+```
+
+---
+
+## Autenticação
+
+O sistema suporta três formas de login:
+
+- **Email + senha** (cadastro próprio)
+- **Google OAuth2**
+- **GitHub OAuth**
+
+O token JWT é armazenado no `localStorage` e expirado automaticamente no frontend. Rotas do painel verificam o role do usuário antes de renderizar.
+
+---
+
+## CI
+
+Pull requests para `main` rodam automaticamente verificação de tipos TypeScript e build de produção via GitHub Actions.
+
+---
+
+## API Backend
+
+Este repositório é apenas o frontend. O backend (Spring Boot + PostgreSQL) está em repositório separado e expõe os endpoints consumidos aqui.
