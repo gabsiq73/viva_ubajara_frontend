@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { useState, useEffect, useRef } from "react";
 import Navbar from "./Navbar";
 import "./styles/Header.components.css";

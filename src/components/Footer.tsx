@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { Link } from "react-router-dom"
 import logo from "./../assets/images/logo.webp"
 import "./styles/Footer.components.css"

@@ -44,7 +44,7 @@ interface AuthContextData {
 function isAdminRole(role: unknown): boolean {
   if (!role) return false;
   if (Array.isArray(role)) return role.some((r) => isAdminRole(r));
-  if (typeof role === 'object' && role.authority) return isAdminRole(role.authority);
+  if (typeof role === 'object' && (role as { authority?: unknown }).authority) return isAdminRole((role as { authority: unknown }).authority);
   const r = String(role).toUpperCase();
   return r === 'ADMIN' || r === 'ROLE_ADMIN' || r === 'ROOT' || r === 'ROLE_ROOT' || r.includes('ADMIN');
 }

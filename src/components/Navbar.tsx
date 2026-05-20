@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { Link, NavLink } from "react-router-dom";
 import "./styles/Navbar.components.css";
 import { LogOut } from 'lucide-react';

@@ -27,7 +27,6 @@ const toInputFormat = (dt: string) => {
 };
 
 const EMPTY: EventRequest = { name: '', description: '', startDateTime: '', endDateTime: '', location: '', registrationUrl: '', active: true };
-const ROLE_DESCS = ['cover', 'card'];
 
 export function EventFormPage() {
   const { id } = useParams<{ id: string }>();

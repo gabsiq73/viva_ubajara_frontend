@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
