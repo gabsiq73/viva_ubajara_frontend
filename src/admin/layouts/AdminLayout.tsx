@@ -17,6 +17,8 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/photos': 'Fotos',
   '/admin/recommended-items': 'Itens Recomendados',
   '/admin/users': 'Usuários',
+  '/admin/gastronomy-items': 'Gastronomia',
+  '/admin/pages-config': 'Configurar Páginas',
 };
 
 export function AdminLayout() {

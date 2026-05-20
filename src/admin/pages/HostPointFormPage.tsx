@@ -100,7 +100,7 @@ export function HostPointFormPage() {
           </div>
           <div className="adm-form-row">
             <FormInput label="Nº de Quartos" type="number" value={form.numOfRooms ?? ''} onChange={(e) => set('numOfRooms', e.target.value ? Number(e.target.value) : undefined)} />
-            <FormInput label="Preço Médio (R$)" type="number" value={form.avgPrice ?? ''} onChange={(e) => set('avgPrice', e.target.value ? Number(e.target.value) : undefined)} />
+            <FormInput label="Preço Médio" value={form.avgPrice ?? ''} onChange={(e) => set('avgPrice', e.target.value || undefined)} hint="Ex: R$ 180,00 / noite" />
           </div>
           <FormInput label="URL de Reserva" type="url" value={form.bookingUrl ?? ''} onChange={(e) => set('bookingUrl', e.target.value)} />
           <FormInput label="URL Google Maps" type="url" value={form.mapsUrl ?? ''} onChange={(e) => set('mapsUrl', e.target.value)} hint="Link para o local no Google Maps" />

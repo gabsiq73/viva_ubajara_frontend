@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { eventsService } from "../admin/services/eventsService";
+import { pageConfigService } from "../admin/services/pageConfigService";
 import type { EventResponse } from "../admin/types";
 import "./style/Eventos.css";
 
@@ -109,12 +110,14 @@ function EventCardItem({ ev }: { ev: EventCard }) {
 export default function Eventos() {
     const [events, setEvents] = useState<EventCard[]>([]);
     const [loading, setLoading] = useState(true);
+    const [coverImg, setCoverImg] = useState<string | null>(null);
     const [search, setSearch] = useState("");
     const [activeMonth, setActiveMonth] = useState<string>("Todos");
     const [sort, setSort] = useState<"date" | "name">("date");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
+        pageConfigService.getImageUrl('EVENTOS').then((url) => { if (url) setCoverImg(url); });
         eventsService.getAll(0, 100, true)
             .then(page => setEvents(page.content.map(mapEvent)))
             .catch(() => setEvents([]))
@@ -159,6 +162,7 @@ export default function Eventos() {
             <main className="ev-main">
 
                 <section className="ev-hero" aria-labelledby="ev-hero-title">
+                    {coverImg && <img src={coverImg} alt="" className="ev-hero__bg" aria-hidden />}
                     <div className="ev-hero__overlay" aria-hidden="true" />
                     <div className="ev-hero__content">
                         <div className="ev-hero__inner">

@@ -20,7 +20,7 @@ export function HostPointsListPage() {
     { header: 'Nome', accessor: 'name' as keyof HostPointResponse },
     { header: 'Tipo', accessor: (r: HostPointResponse): ReactNode => TYPE_LABELS[r.hostType] ?? r.hostType },
     { header: 'Quartos', accessor: (r: HostPointResponse): ReactNode => r.numOfRooms ?? '—' },
-    { header: 'Preço Médio', accessor: (r: HostPointResponse): ReactNode => r.avgPrice ? `R$ ${r.avgPrice.toFixed(2)}` : '—' },
+    { header: 'Preço Médio', accessor: (r: HostPointResponse): ReactNode => r.avgPrice || '—' },
     { header: 'Status', width: '90px', accessor: (r: HostPointResponse): ReactNode => <span className={`adm-badge adm-badge--${r.active ? 'green' : 'red'}`}>{r.active ? 'Ativo' : 'Inativo'}</span> },
     { header: 'Ações', width: '130px', accessor: (r: HostPointResponse): ReactNode => (
       <div className="adm-table__actions">

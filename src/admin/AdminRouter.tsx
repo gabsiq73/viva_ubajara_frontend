@@ -25,6 +25,8 @@ import { RecommendedItemsListPage } from './pages/RecommendedItemsListPage';
 import { RecommendedItemFormPage } from './pages/RecommendedItemFormPage';
 import { UsersListPage } from './pages/UsersListPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { GastronomyItemsPage } from './pages/GastronomyItemsPage';
+import { PagesConfigPage } from './pages/PagesConfigPage';
 import './styles/admin.css';
 
 /**
@@ -79,6 +81,9 @@ export function AdminRouter() {
           <Route path="recommended-items" element={<RecommendedItemsListPage />} />
           <Route path="recommended-items/new" element={<RecommendedItemFormPage />} />
           <Route path="recommended-items/:id/edit" element={<RecommendedItemFormPage />} />
+
+          <Route path="gastronomy-items" element={<GastronomyItemsPage />} />
+          <Route path="pages-config" element={<PagesConfigPage />} />
 
           <Route path="users" element={<UsersListPage />} />
           <Route path="profile" element={<ProfilePage />} />

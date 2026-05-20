@@ -9,6 +9,7 @@ import farm from "./../../assets/images/fazenda.png";
 import mercado from "./../../assets/images/mercado.png";
 import museum from "./../../assets/images/museu.png";
 import { GastronomyCarousel, type GastronomySlide } from "./GastronomyCarousel";
+import { gastronomyItemsService } from "../../admin/services/gastronomyItemsService";
 import { attractionsService } from "../../admin/services/attractionsService";
 import { eventsService } from "../../admin/services/eventsService";
 import { restaurantsService } from "../../admin/services/restaurantsService";
@@ -49,8 +50,8 @@ const IconChegar = () => (
     </svg>
 );
 
-// ── Static data ────────────────────────────────────────────────
-const GASTRO_SLIDES: GastronomySlide[] = [
+// ── Static fallback gastronomy slides (used when API returns nothing) ──
+const GASTRO_SLIDES_FALLBACK: GastronomySlide[] = [
     { tag: "Cachaça Artesanal", src: food, alt: "Cachaça artesanal e produtos da roça" },
     { tag: "Café de Sombra", src: farm, alt: "Cultivo de café em altitude" },
     { tag: "Comida Caipira", src: mercado, alt: "Mercado e sabores da cozinha regional" },
@@ -189,6 +190,7 @@ const FALLBACK_AVATARS = [cac, farm, mercado];
 
 export default function Content() {
     const [gastroIndex, setGastroIndex] = useState(0);
+    const [gastroSlides, setGastroSlides] = useState<GastronomySlide[]>(GASTRO_SLIDES_FALLBACK);
     const [faqOpen, setFaqOpen] = useState<number | null>(1);
 
     // API state
@@ -201,6 +203,13 @@ export default function Content() {
     const [pubGuideFilter, setPubGuideFilter] = useState("Todos");
 
     useEffect(() => {
+        gastronomyItemsService.getActive().then((items) => {
+            const slides: GastronomySlide[] = items
+                .filter(item => item.imageUrl)
+                .map(item => ({ tag: item.name, src: item.imageUrl!, alt: item.name }));
+            if (slides.length > 0) setGastroSlides(slides);
+        }).catch(() => {});
+
         Promise.allSettled([
             attractionsService.getAll(0, 4, true),
             eventsService.getAll(0, 4, true),
@@ -223,12 +232,12 @@ export default function Content() {
     }, []);
 
     useEffect(() => {
-        if (GASTRO_SLIDES.length <= 1) return;
+        if (gastroSlides.length <= 1) return;
         const id = window.setInterval(() => {
-            setGastroIndex((i) => (i + 1) % GASTRO_SLIDES.length);
+            setGastroIndex((i) => (i + 1) % gastroSlides.length);
         }, 4500);
         return () => window.clearInterval(id);
-    }, []);
+    }, [gastroSlides]);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -369,14 +378,14 @@ export default function Content() {
                     <div className="news">
                         <div className="news-inner">
                             <div className="caixa">
-                                <GastronomyCarousel slides={GASTRO_SLIDES} activeIndex={gastroIndex} onActiveChange={setGastroIndex} />
+                                <GastronomyCarousel slides={gastroSlides} activeIndex={gastroIndex} onActiveChange={setGastroIndex} />
                             </div>
                             <div className="text-n">
                                 <h2>Sabores da Ibiapaba</h2>
                                 <h1>Gastronomia Regional</h1>
                                 <div className="protect">
                                     <ul>
-                                        {GASTRO_SLIDES.map((slide, i) => (
+                                        {gastroSlides.map((slide, i) => (
                                             <li key={slide.tag}>
                                                 <button
                                                     type="button"

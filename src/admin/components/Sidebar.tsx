@@ -13,6 +13,8 @@ import {
   Star,
   Bookmark,
   Users,
+  ChefHat,
+  Settings,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import logo from '../../assets/images/logo.webp';
@@ -29,6 +31,8 @@ const NAV_ITEMS = [
   { to: '/admin/contacts',          label: 'Contatos',           icon: <Phone size={18} />,         section: null },
   { to: '/admin/contact-messages', label: 'Mensagens',          icon: <MessageSquare size={18} />, section: 'Visitantes' },
   { to: '/admin/testimonials',     label: 'Depoimentos',        icon: <Star size={18} />,          section: null },
+  { to: '/admin/gastronomy-items', label: 'Gastronomia',        icon: <ChefHat size={18} />,       section: 'Configurações' },
+  { to: '/admin/pages-config',     label: 'Configurar Páginas', icon: <Settings size={18} />,      section: null },
   { to: '/admin/users',            label: 'Usuários',           icon: <Users size={18} />,         section: 'Sistema' },
 ];
 

@@ -18,7 +18,7 @@ export function RestaurantsListPage() {
     { header: 'Nome', accessor: 'name' as keyof RestaurantResponse },
     { header: 'Tipo', accessor: 'cuisineType' as keyof RestaurantResponse },
     { header: 'Endereço', accessor: 'address' as keyof RestaurantResponse },
-    { header: 'Preço Médio', accessor: (r: RestaurantResponse): ReactNode => r.avgPrice ? `R$ ${r.avgPrice.toFixed(2)}` : '—' },
+    { header: 'Preço Médio', accessor: (r: RestaurantResponse): ReactNode => r.avgPrice || '—' },
     { header: 'Status', width: '90px', accessor: (r: RestaurantResponse): ReactNode => <span className={`adm-badge adm-badge--${r.active ? 'green' : 'red'}`}>{r.active ? 'Ativo' : 'Inativo'}</span> },
     { header: 'Ações', width: '130px', accessor: (r: RestaurantResponse): ReactNode => (
       <div className="adm-table__actions">

@@ -227,8 +227,9 @@ export interface RestaurantRequest {
   active: boolean;
   cuisineType: string;
   openingHours?: string;
-  avgPrice?: number;
+  avgPrice?: string;
   acceptsReservation?: boolean;
+  starRating?: number;
 }
 
 export interface RestaurantUpdateDTO {
@@ -243,8 +244,9 @@ export interface RestaurantUpdateDTO {
   active?: boolean;
   cuisineType?: string;
   openingHours?: string;
-  avgPrice?: number;
+  avgPrice?: string;
   acceptsReservation?: boolean;
+  starRating?: number;
 }
 
 export interface RestaurantResponse {
@@ -260,8 +262,9 @@ export interface RestaurantResponse {
   active: boolean;
   cuisineType: string;
   openingHours?: string;
-  avgPrice?: number;
+  avgPrice?: string;
   acceptsReservation?: boolean;
+  starRating?: number;
   photos: PhotoResponse[];
 }
 
@@ -282,7 +285,7 @@ export interface HostPointRequest {
   active: boolean;
   hostType: HostType;
   numOfRooms?: number;
-  avgPrice?: number;
+  avgPrice?: string;
   bookingUrl?: string;
 }
 
@@ -298,7 +301,7 @@ export interface HostPointUpdateDTO {
   active?: boolean;
   hostType?: HostType;
   numOfRooms?: number;
-  avgPrice?: number;
+  avgPrice?: string;
   bookingUrl?: string;
 }
 
@@ -315,7 +318,7 @@ export interface HostPointResponse {
   active: boolean;
   hostType: HostType;
   numOfRooms?: number;
-  avgPrice?: number;
+  avgPrice?: string;
   bookingUrl?: string;
   photos: PhotoResponse[];
 }
@@ -506,6 +509,36 @@ export interface UserAdminUpdateRequest {
   email?: string;
   password?: string;
   role?: UserRole;
+}
+
+// ============================================================
+// Page Config
+// ============================================================
+export interface PageConfigResponse {
+  imageUrl: string;
+}
+
+// ============================================================
+// Gastronomy Items
+// ============================================================
+export interface GastronomyItemRequest {
+  name: string;
+  displayOrder?: number;
+  active: boolean;
+}
+
+export interface GastronomyItemUpdateDTO {
+  name?: string;
+  displayOrder?: number;
+  active?: boolean;
+}
+
+export interface GastronomyItemResponse {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  displayOrder?: number;
+  active: boolean;
 }
 
 // ============================================================

@@ -4,8 +4,9 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { restaurantsService } from "../admin/services/restaurantsService";
 import { hostPointsService } from "../admin/services/hostPointsService";
+import { pageConfigService } from "../admin/services/pageConfigService";
 import type { RestaurantResponse, HostPointResponse, HostType } from "../admin/types";
-import heroImg from "../assets/images/mercado.png";
+import heroFallback from "../assets/images/mercado.png";
 import "./style/Estabelecimentos.css";
 
 const ALL_TYPES = "Todos";
@@ -27,7 +28,7 @@ interface EstabItem {
     address: string;
     description: string;
     openingHours?: string;
-    avgPrice?: number;
+    avgPrice?: string;
     features: string[];
 }
 
@@ -68,9 +69,9 @@ function mapHostPoint(h: HostPointResponse): EstabItem {
     };
 }
 
-function formatPrice(avgPrice?: number): string | null {
-    if (avgPrice == null) return null;
-    return `R$ ${avgPrice.toFixed(0)}`;
+function formatPrice(avgPrice?: string): string | null {
+    if (!avgPrice) return null;
+    return avgPrice;
 }
 
 export default function Estabelecimentos() {
@@ -79,12 +80,16 @@ export default function Estabelecimentos() {
 
     const [items, setItems] = useState<EstabItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [coverImg, setCoverImg] = useState<string>(heroFallback);
     const [search, setSearch] = useState("");
     const [activeType, setActiveType] = useState<string>(initialType);
     const [sort, setSort] = useState<"relevance" | "name">("relevance");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
+        pageConfigService.getImageUrl('ESTABELECIMENTOS').then((url) => {
+            if (url) setCoverImg(url);
+        });
         Promise.allSettled([
             restaurantsService.getAll(0, 100),
             hostPointsService.getAll(0, 100),
@@ -137,7 +142,7 @@ export default function Estabelecimentos() {
             <main className="est-main">
 
                 <section className="est-hero">
-                    <img src={heroImg} alt="" className="est-hero__bg" aria-hidden />
+                    <img src={coverImg} alt="" className="est-hero__bg" aria-hidden />
                     <div className="est-hero__overlay" />
                     <div className="est-hero__content">
                         <div className="est-hero__inner">

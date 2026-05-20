@@ -9,7 +9,7 @@ import { Spinner } from '../components/Spinner';
 import { PhotoManager } from '../components/PhotoManager';
 import type { RestaurantRequest, PhotoResponse } from '../types';
 
-const EMPTY: RestaurantRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', mapsUrl: '', active: true, cuisineType: '', openingHours: '', avgPrice: undefined, acceptsReservation: false };
+const EMPTY: RestaurantRequest = { name: '', description: '', address: '', phone: '', email: '', webUrl: '', instagramUrl: '', mapsUrl: '', active: true, cuisineType: '', openingHours: '', avgPrice: undefined, acceptsReservation: false, starRating: undefined };
 
 const ROLE_DESCS = ['cover', 'card'];
 
@@ -98,13 +98,16 @@ export function RestaurantFormPage() {
           </div>
           <div className="adm-form-row">
             <FormInput label="Horário de Funcionamento" value={form.openingHours ?? ''} onChange={(e) => set('openingHours', e.target.value)} hint="Ex: Seg-Dom 11:00-22:00" />
-            <FormInput label="Preço Médio (R$)" type="number" value={form.avgPrice ?? ''} onChange={(e) => set('avgPrice', e.target.value ? Number(e.target.value) : undefined)} />
+            <FormInput label="Preço Médio" value={form.avgPrice ?? ''} onChange={(e) => set('avgPrice', e.target.value || undefined)} hint="Ex: R$ 45,00 por pessoa" />
           </div>
           <div className="adm-form-row">
             <FormInput label="Website" type="url" value={form.webUrl ?? ''} onChange={(e) => set('webUrl', e.target.value)} />
             <FormInput label="Instagram" value={form.instagramUrl ?? ''} onChange={(e) => set('instagramUrl', e.target.value)} />
           </div>
           <FormInput label="URL Google Maps" type="url" value={form.mapsUrl ?? ''} onChange={(e) => set('mapsUrl', e.target.value)} hint="Link para o local no Google Maps" />
+          <div className="adm-form-row">
+            <FormInput label="Avaliação (1–5 estrelas)" type="number" value={form.starRating ?? ''} onChange={(e) => set('starRating', e.target.value ? Math.min(5, Math.max(1, Number(e.target.value))) : undefined)} hint="Deixe em branco para sem avaliação" />
+          </div>
           <div style={{ display: 'flex', gap: 24 }}>
             <FormToggle label="Aceita Reserva" checked={!!form.acceptsReservation} onChange={(v) => set('acceptsReservation', v)} />
             <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />

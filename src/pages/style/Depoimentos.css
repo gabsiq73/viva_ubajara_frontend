@@ -21,6 +21,23 @@
   overflow: hidden;
 }
 
+.dep-hero__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 45%;
+  z-index: 0;
+}
+
+.dep-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.55) 100%);
+  z-index: 1;
+}
+
 .dep-hero::before {
   content: '';
   position: absolute;
@@ -37,6 +54,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 40px 20px 0;
+  position: relative;
+  z-index: 2;
 }
 
 .dep-hero__label {

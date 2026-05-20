@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useAuth } from "../admin/hooks/useAuth";
 import { testimonialsService } from "../admin/services/testimonialsService";
+import { pageConfigService } from "../admin/services/pageConfigService";
 import type { TestimonialResponse } from "../admin/types";
 import "./style/Depoimentos.css";
 
@@ -154,6 +155,7 @@ export default function Depoimentos(): JSX.Element {
 
   const [testimonials, setTestimonials] = useState<TestimonialResponse[]>(MOCK);
   const [loading, setLoading] = useState(true);
+  const [coverImg, setCoverImg] = useState<string | null>(null);
   const [filter, setFilter] = useState<0 | 1 | 2 | 3 | 4 | 5>(0);
 
   const [rating, setRating] = useState(0);
@@ -173,7 +175,10 @@ export default function Depoimentos(): JSX.Element {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    pageConfigService.getImageUrl('DEPOIMENTOS').then((url) => { if (url) setCoverImg(url); });
+    load();
+  }, [load]);
 
   const filtered = filter === 0
     ? testimonials
@@ -233,6 +238,8 @@ export default function Depoimentos(): JSX.Element {
 
       {/* ── Hero ── */}
       <section className="dep-hero">
+        {coverImg && <img src={coverImg} alt="" className="dep-hero__bg" aria-hidden />}
+        {coverImg && <div className="dep-hero__overlay" aria-hidden />}
         <div className="dep-hero__content">
           <span className="dep-hero__label">Comunidade</span>
           <h1 className="dep-hero__title">Depoimentos</h1>

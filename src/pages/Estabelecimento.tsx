@@ -25,7 +25,7 @@ interface EstabData {
     email?: string;
     webUrl?: string;
     openingHours?: string;
-    avgPrice?: number;
+    avgPrice?: string;
     typeLabel: string;
     features: string[];
     heroImg: string;
@@ -202,7 +202,7 @@ export default function Estabelecimento() {
                             {estab.avgPrice != null && (
                                 <div className="estd-hero__rating-row">
                                     <span className="estd-hero__price-pill">
-                                        R$ {estab.avgPrice.toFixed(0)} / pessoa
+                                        {estab.avgPrice}
                                     </span>
                                 </div>
                             )}
@@ -308,7 +308,7 @@ export default function Estabelecimento() {
                                             <span className="material-symbols-outlined estd-info-list__icon" aria-hidden="true">payments</span>
                                             <div>
                                                 <span className="estd-info-list__label">Preço Médio</span>
-                                                <span className="estd-info-list__value">R$ {estab.avgPrice.toFixed(0)} / pessoa</span>
+                                                <span className="estd-info-list__value">{estab.avgPrice}</span>
                                             </div>
                                         </li>
                                     )}
