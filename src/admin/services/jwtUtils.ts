@@ -1,5 +1,5 @@
 /** Decodes the payload of a JWT without verifying the signature. */
-function decodePayload(token: string): Record<string, unknown> | null {
+export function decodePayload(token: string): Record<string, unknown> | null {
   try {
     const base64 = token.split('.')[1];
     if (!base64) return null;
