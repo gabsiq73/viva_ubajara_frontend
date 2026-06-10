@@ -63,7 +63,7 @@ export function ContactFormPage() {
             <FormInput label="Telefone" value={form.phone} onChange={(e) => set('phone', e.target.value)} error={errors.phone} required />
             <FormInput label="Email" type="email" value={form.email} onChange={(e) => set('email', e.target.value)} error={errors.email} required />
           </div>
-          <FormTextarea label="Descrição" value={form.description ?? ''} onChange={(e) => set('description', e.target.value)} />
+          <FormTextarea label="Descrição" value={form.description ?? ''} onChange={(e) => set('description', e.target.value)} maxLength={600} />
           <div className="adm-form-actions">
             <button type="button" className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/contacts')}>Cancelar</button>
             <button type="submit" className="adm-btn adm-btn--primary" disabled={loading}>{loading ? 'Salvando…' : isEdit ? 'Atualizar' : 'Criar'}</button>

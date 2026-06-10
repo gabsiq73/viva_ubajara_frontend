@@ -88,7 +88,7 @@ export function RestaurantFormPage() {
             <FormInput label="Nome" value={form.name} onChange={(e) => set('name', e.target.value)} error={errors.name} required />
             <FormInput label="Tipo de Culinária" value={form.cuisineType} onChange={(e) => set('cuisineType', e.target.value)} error={errors.cuisineType} required />
           </div>
-          <FormTextarea label="Descrição" value={form.description} onChange={(e) => set('description', e.target.value)} error={errors.description} required />
+          <FormTextarea label="Descrição" value={form.description} onChange={(e) => set('description', e.target.value)} error={errors.description} required maxLength={600} />
           <FormInput label="Endereço" value={form.address} onChange={(e) => set('address', e.target.value)} error={errors.address} required />
           <div className="adm-form-row">
             <FormInput label="Telefone" value={form.phone ?? ''} onChange={(e) => set('phone', e.target.value)} />
@@ -96,7 +96,7 @@ export function RestaurantFormPage() {
           </div>
           <div className="adm-form-row">
             <FormInput label="Horário de Funcionamento" value={form.openingHours ?? ''} onChange={(e) => set('openingHours', e.target.value)} hint="Ex: Seg-Dom 11:00-22:00" />
-            <FormInput label="Preço Médio" value={form.avgPrice ?? ''} onChange={(e) => set('avgPrice', e.target.value || undefined)} hint="Ex: R$ 45,00 por pessoa" />
+            <FormInput label="Preço Médio" value={form.avgPrice ?? ''} onChange={(e) => set('avgPrice', e.target.value || undefined)} hint="Ex: R$ 45,00 por pessoa" maxLength={20} />
           </div>
           <div className="adm-form-row">
             <FormInput label="Website" type="url" value={form.webUrl ?? ''} onChange={(e) => set('webUrl', e.target.value)} />

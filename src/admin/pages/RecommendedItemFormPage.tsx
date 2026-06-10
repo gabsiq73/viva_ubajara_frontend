@@ -124,6 +124,7 @@ export function RecommendedItemFormPage() {
             onChange={(e) => set('description', e.target.value)}
             error={errors.description}
             required
+            maxLength={600}
           />
           <FormInput
             label="Descrição Curta (exibida nos cards)"
