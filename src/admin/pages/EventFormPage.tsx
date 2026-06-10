@@ -107,7 +107,7 @@ export function EventFormPage() {
       <div className="adm-card">
         <form className="adm-form" onSubmit={handleSubmit}>
           <FormInput label="Nome" value={form.name} onChange={(e) => set('name', e.target.value)} error={errors.name} required />
-          <FormTextarea label="Descrição" value={form.description} onChange={(e) => set('description', e.target.value)} error={errors.description} required />
+          <FormTextarea label="Descrição" value={form.description} onChange={(e) => set('description', e.target.value)} error={errors.description} required maxLength={600} />
           <FormInput label="Local" value={form.location} onChange={(e) => set('location', e.target.value)} error={errors.location} required />
           <div className="adm-form-row">
             <FormInput label="Data/Hora Início" type="datetime-local" value={startLocal} onChange={(e) => setStartLocal(e.target.value)} error={errors.startDateTime} required />

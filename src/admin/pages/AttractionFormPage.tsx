@@ -146,7 +146,7 @@ export function AttractionFormPage() {
               {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
             </FormSelect>
           </div>
-          <FormTextarea label="Descrição Completa" value={form.description} onChange={(e) => set('description', e.target.value)} error={errors.description} required maxLength={300} />
+          <FormTextarea label="Descrição Completa" value={form.description} onChange={(e) => set('description', e.target.value)} error={errors.description} required maxLength={600} />
           <FormInput label="Descrição Curta (exibida no topo da página e nos cards)" value={form.shortDescription ?? ''} onChange={(e) => set('shortDescription', e.target.value)} maxLength={200} hint="Máx. 200 caracteres — texto breve e impactante" />
           <FormInput label="Endereço" value={form.address} onChange={(e) => set('address', e.target.value)} error={errors.address} required />
           <div className="adm-form-row">

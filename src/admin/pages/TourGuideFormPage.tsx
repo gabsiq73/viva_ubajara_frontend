@@ -94,7 +94,7 @@ export function TourGuideFormPage() {
             <FormInput label="Email" type="email" value={form.email} onChange={(e) => set('email', e.target.value)} error={errors.email} required />
           </div>
           <FormInput label="Idiomas" value={langInput} onChange={(e) => setLangInput(e.target.value)} hint="Separe por vírgula. Ex: Português, Inglês, Espanhol" />
-          <FormTextarea label="Descrição" value={form.description ?? ''} onChange={(e) => set('description', e.target.value)} />
+          <FormTextarea label="Descrição" value={form.description ?? ''} onChange={(e) => set('description', e.target.value)} maxLength={600} />
           <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
 
           <div className="adm-role-slots-section">
