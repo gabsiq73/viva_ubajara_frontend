@@ -8,6 +8,7 @@ import PontosTuristicos from "./pages/PontosTuristicos";
 import Local from "./pages/Local";
 import Estabelecimentos from "./pages/Estabelecimentos";
 import Estabelecimento from "./pages/Estabelecimento";
+import CadastroEmpresa from "./pages/CadastroEmpresa";
 import Eventos from "./pages/Eventos";
 import Evento from "./pages/Evento";
 import ComoChegar from "./pages/ComoChegar";
@@ -32,6 +33,7 @@ function App() {
           <Route path="/local/:id" element={<Local />} />
           <Route path="/estabelecimentos" element={<Estabelecimentos />} />
           <Route path="/estabelecimentos/:id" element={<Estabelecimento />} />
+          <Route path="/cadastro-empresa" element={<CadastroEmpresa />} />
           <Route path="/eventos" element={<Eventos />} />
           <Route path="/eventos/:id" element={<Evento />} />
           <Route path="/como-chegar" element={<ComoChegar />} />

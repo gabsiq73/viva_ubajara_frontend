@@ -4,26 +4,56 @@ import { useCrudList } from '../hooks/useCrudList';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
 import { ConfirmModal } from '../components/Modal';
-import type { HostPointResponse } from '../types';
+import type { ApprovalStatus, HostPointResponse } from '../types';
 import type { ReactNode } from 'react';
-import { Pencil, Trash2, Search, Plus } from 'lucide-react';
+import { Pencil, Trash2, Search, Plus, Check, X } from 'lucide-react';
 
 const TYPE_LABELS: Record<string, string> = { HOTEL: 'Hotel', ROOST: 'Pousada', HOSTEL: 'Hostel' };
+
+const STATUS_LABEL: Record<ApprovalStatus, string> = {
+  PENDING: 'Pendente',
+  APPROVED: 'Aprovado',
+  REJECTED: 'Rejeitado',
+};
+
+const STATUS_BADGE: Record<ApprovalStatus, string> = {
+  PENDING: 'adm-badge--gold',
+  APPROVED: 'adm-badge--green',
+  REJECTED: 'adm-badge--red',
+};
 
 export function HostPointsListPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { data, page, setPage, totalPages, totalElements, loading, search, setSearch, deleteId, deleting, confirmDelete, cancelDelete, executeDelete } =
-    useCrudList<HostPointResponse>({ fetchFn: hostPointsService.getAll, deleteFn: hostPointsService.delete, onSuccess: (m) => showToast(m, 'success'), onError: (m) => showToast(m, 'error') });
+  const { data, page, setPage, totalPages, totalElements, loading, search, setSearch, deleteId, deleting, confirmDelete, cancelDelete, executeDelete, refresh } =
+    useCrudList<HostPointResponse>({ fetchFn: hostPointsService.getAllForModeration, deleteFn: hostPointsService.delete, onSuccess: (m) => showToast(m, 'success'), onError: (m) => showToast(m, 'error') });
+
+  const handleApproval = async (id: string, status: 'APPROVED' | 'REJECTED') => {
+    try {
+      await hostPointsService.approveOrReject(id, status);
+      showToast(status === 'APPROVED' ? 'Hospedagem aprovada.' : 'Hospedagem rejeitada.', 'success');
+      refresh();
+    } catch {
+      showToast('Erro ao atualizar aprovação.', 'error');
+    }
+  };
 
   const columns = [
     { header: 'Nome', accessor: 'name' as keyof HostPointResponse },
     { header: 'Tipo', accessor: (r: HostPointResponse): ReactNode => TYPE_LABELS[r.hostType] ?? r.hostType },
     { header: 'Quartos', accessor: (r: HostPointResponse): ReactNode => r.numOfRooms ?? '—' },
     { header: 'Preço Médio', accessor: (r: HostPointResponse): ReactNode => r.avgPrice || '—' },
-    { header: 'Status', width: '90px', accessor: (r: HostPointResponse): ReactNode => <span className={`adm-badge adm-badge--${r.active ? 'green' : 'red'}`}>{r.active ? 'Ativo' : 'Inativo'}</span> },
-    { header: 'Ações', width: '130px', accessor: (r: HostPointResponse): ReactNode => (
+    { header: 'Status', width: '90px', accessor: (r: HostPointResponse): ReactNode => r.approvalStatus
+      ? <span className={`adm-badge ${STATUS_BADGE[r.approvalStatus]}`}>{STATUS_LABEL[r.approvalStatus]}</span>
+      : <span className={`adm-badge adm-badge--${r.active ? 'green' : 'red'}`}>{r.active ? 'Ativo' : 'Inativo'}</span> },
+    { header: 'Ações', width: '190px', accessor: (r: HostPointResponse): ReactNode => (
       <div className="adm-table__actions">
+        {(r.approvalStatus ? r.approvalStatus !== 'APPROVED' : !r.active) && (
+          <>
+            <button className="adm-btn adm-btn--ghost adm-btn--sm" title="Aprovar" onClick={() => handleApproval(r.id, 'APPROVED')}><Check size={14} /></button>
+            <button className="adm-btn adm-btn--ghost adm-btn--sm" title="Rejeitar" onClick={() => handleApproval(r.id, 'REJECTED')}><X size={14} /></button>
+          </>
+        )}
         <button className="adm-btn adm-btn--ghost adm-btn--sm" onClick={() => navigate(`/admin/host-points/${r.id}/edit`)}><Pencil size={14} /></button>
         <button className="adm-btn adm-btn--danger adm-btn--sm" onClick={() => confirmDelete(r.id)}><Trash2 size={14} /></button>
       </div>

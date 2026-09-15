@@ -6,6 +6,7 @@ import type {
   HostType,
   PageResponse,
   PhotoResponse,
+  ApprovalStatus,
 } from '../types';
 
 export const hostPointsService = {
@@ -14,6 +15,17 @@ export const hostPointsService = {
       params: { page, size, ...(type ? { type } : {}) },
     });
     return response.data;
+  },
+
+  getAllForModeration: async (page = 0, size = 10): Promise<PageResponse<HostPointResponse>> => {
+    const response = await api.get<PageResponse<HostPointResponse>>('/host-points/moderation', {
+      params: { page, size },
+    });
+    return response.data;
+  },
+
+  approveOrReject: async (id: string, status: ApprovalStatus): Promise<void> => {
+    await api.patch(`/host-points/${id}/approval`, { status });
   },
 
   getById: async (id: string): Promise<HostPointResponse> => {

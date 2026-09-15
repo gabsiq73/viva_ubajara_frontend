@@ -28,7 +28,7 @@ function GoogleIcon() {
 }
 
 export function LoginPage() {
-  const { login, register, isLoading, isAuthenticated, isAdmin } = useAuth();
+  const { login, register, isLoading, isAuthenticated, isAdmin, isCompany } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/admin/dashboard';
@@ -50,9 +50,10 @@ export function LoginPage() {
   useEffect(() => {
     if (isAuthenticated) {
       if (isAdmin) navigate(from, { replace: true });
+      else if (isCompany) navigate('/empresa/estabelecimento', { replace: true });
       else navigate('/dashboard', { replace: true });
     }
-  }, [isAuthenticated, isAdmin, navigate, from]);
+  }, [isAuthenticated, isAdmin, isCompany, navigate, from]);
 
   const handleGoogleLogin = () => {
     setErrorType(null);

@@ -307,7 +307,7 @@ export default function Estabelecimentos() {
                             sua visibilidade para turistas de todo o Brasil.
                         </p>
                         <div className="est-cta__btns">
-                            <a href="#" className="est-cta__btn">Cadastrar Estabelecimento</a>
+                            <Link to="/cadastro-empresa" className="est-cta__btn">Cadastrar Estabelecimento</Link>
                             <a href="#" className="est-cta__btn est-cta__btn--outline">Falar com a Equipe</a>
                         </div>
                     </div>

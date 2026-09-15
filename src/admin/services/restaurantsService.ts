@@ -5,6 +5,7 @@ import type {
   RestaurantResponse,
   PageResponse,
   PhotoResponse,
+  ApprovalStatus,
 } from '../types';
 
 export const restaurantsService = {
@@ -13,6 +14,17 @@ export const restaurantsService = {
       params: { page, size },
     });
     return response.data;
+  },
+
+  getAllForModeration: async (page = 0, size = 10): Promise<PageResponse<RestaurantResponse>> => {
+    const response = await api.get<PageResponse<RestaurantResponse>>('/restaurants/moderation', {
+      params: { page, size },
+    });
+    return response.data;
+  },
+
+  approveOrReject: async (id: string, status: ApprovalStatus): Promise<void> => {
+    await api.patch(`/restaurants/${id}/approval`, { status });
   },
 
   getById: async (id: string): Promise<RestaurantResponse> => {

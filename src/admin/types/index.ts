@@ -29,6 +29,16 @@ export interface UserRequest {
   password: string;
 }
 
+export interface CompanyRegisterRequest {
+  firstName: string;
+  lastName?: string;
+  username: string;
+  email: string;
+  password: string;
+  companyName: string;
+  cnpj: string;
+}
+
 export type UserRole = 'ADMIN' | 'USER' | 'GUIDE' | 'EMPRESA';
 
 export interface AuthResponse {
@@ -266,6 +276,7 @@ export interface RestaurantResponse {
   acceptsReservation?: boolean;
   starRating?: number;
   photos: PhotoResponse[];
+  approvalStatus?: ApprovalStatus;
 }
 
 // ============================================================
@@ -321,6 +332,7 @@ export interface HostPointResponse {
   avgPrice?: string;
   bookingUrl?: string;
   photos: PhotoResponse[];
+  approvalStatus?: ApprovalStatus;
 }
 
 // ============================================================
