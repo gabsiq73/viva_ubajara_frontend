@@ -3,6 +3,7 @@ import { ToastProvider } from '../admin/components/Toast';
 import { CompanyRoute } from './components/CompanyRoute';
 import { CompanyLayout } from './layouts/CompanyLayout';
 import { EstablishmentPage } from './pages/EstablishmentPage';
+import { MenuItemsPage } from './pages/MenuItemsPage';
 
 /**
  * CompanyRouter — área self-service da empresa (role EMPRESA).
@@ -15,6 +16,7 @@ export function CompanyRouter() {
         <Route element={<CompanyRoute><CompanyLayout /></CompanyRoute>}>
           <Route index element={<Navigate to="estabelecimento" replace />} />
           <Route path="estabelecimento" element={<EstablishmentPage />} />
+          <Route path="cardapio" element={<MenuItemsPage />} />
         </Route>
       </Routes>
     </ToastProvider>

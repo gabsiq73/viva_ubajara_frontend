@@ -1,12 +1,19 @@
-import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { Store, LogOut } from 'lucide-react';
+import { Outlet, Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Store, Utensils, LogOut } from 'lucide-react';
 import { useAuth } from '../../admin/hooks/useAuth';
 import logo from '../../assets/images/logo.webp';
 import '../../admin/styles/admin.css';
 
+const PAGE_TITLES: Record<string, string> = {
+  '/empresa/estabelecimento': 'Meu Estabelecimento',
+  '/empresa/cardapio': 'Cardápio',
+};
+
 export function CompanyLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const title = PAGE_TITLES[pathname] ?? 'Meu Estabelecimento';
 
   const handleLogout = () => {
     logout();
@@ -22,10 +29,20 @@ export function CompanyLayout() {
         </Link>
 
         <nav className="adm-sidebar__nav">
-          <Link to="/empresa/estabelecimento" className="adm-sidebar__link active">
+          <NavLink
+            to="/empresa/estabelecimento"
+            className={({ isActive }) => `adm-sidebar__link${isActive ? ' active' : ''}`}
+          >
             <span className="icon"><Store size={18} /></span>
             Meu Estabelecimento
-          </Link>
+          </NavLink>
+          <NavLink
+            to="/empresa/cardapio"
+            className={({ isActive }) => `adm-sidebar__link${isActive ? ' active' : ''}`}
+          >
+            <span className="icon"><Utensils size={18} /></span>
+            Cardápio
+          </NavLink>
         </nav>
 
         <div className="adm-sidebar__footer">
@@ -46,7 +63,7 @@ export function CompanyLayout() {
       </aside>
 
       <header className="adm-topbar">
-        <h1 className="adm-topbar__title">Meu Estabelecimento</h1>
+        <h1 className="adm-topbar__title">{title}</h1>
       </header>
 
       <main className="adm-main">
