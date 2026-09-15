@@ -29,7 +29,7 @@ export interface UserRequest {
   password: string;
 }
 
-export type UserRole = 'ADMIN' | 'USER' | 'GUIDE';
+export type UserRole = 'ADMIN' | 'USER' | 'GUIDE' | 'EMPRESA';
 
 export interface AuthResponse {
   token: string;
@@ -539,6 +539,84 @@ export interface GastronomyItemResponse {
   imageUrl?: string;
   displayOrder?: number;
   active: boolean;
+}
+
+// ============================================================
+// Company (área self-service da empresa)
+// ============================================================
+export type EstablishmentType = 'RESTAURANT' | 'HOST_POINT';
+export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export interface CompanyEstablishmentRequest {
+  type: EstablishmentType;
+  name: string;
+  description: string;
+  address: string;
+  phone?: string;
+  email?: string;
+  webUrl?: string;
+  instagramUrl?: string;
+  mapsUrl?: string;
+
+  // Específicos de Restaurant
+  cuisineType?: string;
+  openingHours?: string;
+  avgPrice?: string;
+  acceptsReservation?: boolean;
+  starRating?: number;
+
+  // Específicos de HostPoint
+  hostType?: HostType;
+  numOfRooms?: number;
+  bookingUrl?: string;
+}
+
+export interface CompanyEstablishmentUpdate {
+  name?: string;
+  description?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  webUrl?: string;
+  instagramUrl?: string;
+  mapsUrl?: string;
+
+  cuisineType?: string;
+  openingHours?: string;
+  avgPrice?: string;
+  acceptsReservation?: boolean;
+  starRating?: number;
+
+  hostType?: HostType;
+  numOfRooms?: number;
+  bookingUrl?: string;
+}
+
+export interface CompanyEstablishmentResponse {
+  id: string;
+  type: EstablishmentType;
+  name: string;
+  description: string;
+  address: string;
+  phone?: string;
+  email?: string;
+  webUrl?: string;
+  instagramUrl?: string;
+  mapsUrl?: string;
+  active: boolean;
+  approvalStatus: ApprovalStatus;
+
+  cuisineType?: string;
+  openingHours?: string;
+  avgPrice?: string;
+  acceptsReservation?: boolean;
+  starRating?: number;
+
+  hostType?: HostType;
+  numOfRooms?: number;
+  bookingUrl?: string;
+
+  photos: PhotoResponse[];
 }
 
 // ============================================================

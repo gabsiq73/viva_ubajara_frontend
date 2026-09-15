@@ -8,7 +8,7 @@ import type { AuthResponse, LoginRequest, UserRequest } from '../types';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
-type Role = 'ADMIN' | 'USER' | 'GUIDE';
+type Role = 'ADMIN' | 'USER' | 'GUIDE' | 'EMPRESA';
 
 interface StoredUser {
   email: string;
@@ -30,6 +30,7 @@ interface AuthContextData {
   user: StoredUser | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isCompany: boolean;
   isLoading: boolean;
   roleSynced: boolean;
   login: (data: LoginRequest) => Promise<void>;
@@ -95,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ─── Aplica a resposta da API (aceita qualquer role) ──────────────────────
   const applyAuthResponse = useCallback((response: AuthResponse) => {
     const r = String(response.role ?? '').toUpperCase();
-    const resolvedRole: Role = isAdminRole(response.role) ? 'ADMIN' : r === 'GUIDE' ? 'GUIDE' : 'USER';
+    const resolvedRole: Role = isAdminRole(response.role) ? 'ADMIN' : r === 'GUIDE' ? 'GUIDE' : r === 'EMPRESA' ? 'EMPRESA' : 'USER';
     const userInfo: StoredUser = {
       email: response.email,
       role: resolvedRole,
@@ -248,6 +249,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const isAdmin = !!user && isAdminRole(user.role);
+  const isCompany = !!user && user.role === 'EMPRESA';
   const isAuthenticated = !!token && !!user;
 
   return (
@@ -257,6 +259,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         isAuthenticated,
         isAdmin,
+        isCompany,
         isLoading,
         roleSynced,
         login,

@@ -16,6 +16,7 @@ import Contato from "./pages/Contato";
 import Dashboard from "./pages/Dashboard";
 import { LoginSuccessPage } from "./pages/LoginSuccessPage";
 import { AdminRouter } from "./admin/AdminRouter";
+import { CompanyRouter } from "./company/CompanyRouter";
 import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
@@ -45,6 +46,9 @@ function App() {
 
           {/* ─── Área administrativa isolada ─── */}
           <Route path="/admin/*" element={<AdminRouter />} />
+
+          {/* ─── Área self-service da empresa ─── */}
+          <Route path="/empresa/*" element={<CompanyRouter />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

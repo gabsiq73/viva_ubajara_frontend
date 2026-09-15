@@ -10,18 +10,21 @@ const ROLE_LABELS: Record<UserRole, string> = {
   ADMIN: 'Administrador',
   USER: 'Usuário',
   GUIDE: 'Guia',
+  EMPRESA: 'Empresa',
 };
 
 const ROLE_BADGE: Record<UserRole, string> = {
   ADMIN: 'adm-badge--green',
   USER: 'adm-badge--blue',
   GUIDE: 'adm-badge--gold',
+  EMPRESA: 'adm-badge--blue',
 };
 
 const ROLE_ICONS: Record<UserRole, ReactNode> = {
   ADMIN: <ShieldCheck size={13} />,
   USER: <User size={13} />,
   GUIDE: <UserCog size={13} />,
+  EMPRESA: <UserCog size={13} />,
 };
 
 export function UsersListPage() {
