@@ -1,320 +1,531 @@
-import { useState, useMemo, useEffect } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import FiltersPanel from "../components/establishments/FiltersPanel";
+import BottomSheet from "../components/ui/BottomSheet";
+import { Button, ButtonLink } from "../components/ui/Button";
+import { AppliedChip, FilterChip } from "../components/ui/Chip";
+import EstablishmentCard from "../components/ui/EstablishmentCard";
+import Icon from "../components/ui/Icon";
+import PageHero from "../components/ui/PageHero";
+import SearchField from "../components/ui/SearchField";
+import { EstablishmentCardSkeleton, Skeleton } from "../components/ui/Skeleton";
+import StateBlock from "../components/ui/StateBlock";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { restaurantsService } from "../admin/services/restaurantsService";
 import { hostPointsService } from "../admin/services/hostPointsService";
 import { pageConfigService } from "../admin/services/pageConfigService";
-import type { RestaurantResponse, HostPointResponse, HostType } from "../admin/types";
-import heroFallback from "../assets/images/mercado.png";
+import {
+    EMPTY_FILTERS,
+    ESTABLISHMENT_TYPES,
+    ROOM_RANGES,
+    applyFilters,
+    cuisineOptionsFrom,
+    humanizeSlug,
+    mapHostPoint,
+    mapRestaurant,
+    parseFilters,
+    sanitizeFilters,
+    serializeFilters,
+    sortEstablishments,
+    toFavoriteItem,
+    type Establishment,
+    type EstablishmentFilters,
+    type EstablishmentType,
+    type SortKey,
+} from "../utils/establishments";
+import { loadFavorites, toggleFavorite } from "../utils/favorites";
+import "../components/ui/ui.css";
 import "./style/Estabelecimentos.css";
 
-const ALL_TYPES = "Todos";
+type LoadStatus = "loading" | "ready" | "error";
+type ViewMode = "grid" | "list";
+type PartialFailure = "restaurantes" | "hospedagens" | null;
 
-type EstabType = "Restaurante" | "Hotel" | "Pousada" | "Hostel";
-
-const HOST_TYPE_LABELS: Record<HostType, EstabType> = {
-    HOTEL: "Hotel",
-    ROOST: "Pousada",
-    HOSTEL: "Hostel",
-};
-
-interface EstabItem {
-    id: string;
-    type: EstabType;
-    apiType: "restaurant" | "hostpoint";
-    img: string;
-    name: string;
-    address: string;
-    description: string;
-    openingHours?: string;
-    avgPrice?: string;
-    features: string[];
+interface ActiveFilter {
+    key: string;
+    label: string;
+    quoted?: boolean;
+    remove: Partial<EstablishmentFilters>;
 }
 
-function mapRestaurant(r: RestaurantResponse): EstabItem {
-    const features: string[] = [];
-    if (r.cuisineType) features.push(r.cuisineType);
-    if (r.acceptsReservation) features.push("Aceita Reservas");
+const VIEW_KEY = "ubajara-estabelecimentos-view";
+const SEARCH_DEBOUNCE_MS = 300;
+const HERO_DESCRIPTION = "Restaurantes, pousadas, hotéis e hostels de Ubajara, cadastrados por quem é daqui.";
+
+function loadView(): ViewMode {
+    try {
+        return localStorage.getItem(VIEW_KEY) === "list" ? "list" : "grid";
+    } catch {
+        return "grid";
+    }
+}
+
+async function fetchEstablishments() {
+    const [restaurants, hostPoints] = await Promise.allSettled([
+        restaurantsService.getAll(0, 100),
+        hostPointsService.getAll(0, 100),
+    ]);
     return {
-        id: r.id,
-        type: "Restaurante",
-        apiType: "restaurant",
-        img: r.photos?.find(p => p.description === 'card')?.url ?? r.photos?.[0]?.url ?? "",
-        name: r.name,
-        address: r.address,
-        description: r.description,
-        openingHours: r.openingHours,
-        avgPrice: r.avgPrice,
-        features,
+        restaurants:
+            restaurants.status === "fulfilled" ? restaurants.value.content.filter((r) => r.active).map(mapRestaurant) : null,
+        hostPoints:
+            hostPoints.status === "fulfilled" ? hostPoints.value.content.filter((h) => h.active).map(mapHostPoint) : null,
     };
-}
-
-function mapHostPoint(h: HostPointResponse): EstabItem {
-    const typeLabel = HOST_TYPE_LABELS[h.hostType] ?? "Hospedagem";
-    const features: string[] = [typeLabel];
-    if (h.numOfRooms) features.push(`${h.numOfRooms} quartos`);
-    if (h.bookingUrl) features.push("Reserva Online");
-    return {
-        id: h.id,
-        type: typeLabel as EstabType,
-        apiType: "hostpoint",
-        img: h.photos?.find(p => p.description === 'card')?.url ?? h.photos?.[0]?.url ?? "",
-        name: h.name,
-        address: h.address,
-        description: h.description,
-        openingHours: undefined,
-        avgPrice: h.avgPrice,
-        features,
-    };
-}
-
-function formatPrice(avgPrice?: string): string | null {
-    if (!avgPrice) return null;
-    return avgPrice;
 }
 
 export default function Estabelecimentos() {
-    const [searchParams] = useSearchParams();
-    const initialType = searchParams.get("tipo") ?? ALL_TYPES;
+    const [searchParams, setSearchParams] = useSearchParams();
+    const { filters: urlFilters, invalidType } = useMemo(() => parseFilters(searchParams), [searchParams]);
 
-    const [items, setItems] = useState<EstabItem[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [coverImg, setCoverImg] = useState<string>(heroFallback);
-    const [heroDesc, setHeroDesc] = useState("Restaurantes, pousadas, hotéis e cafeterias para completar sua experiência na Serra da Ibiapaba.");
-    const [search, setSearch] = useState("");
-    const [activeType, setActiveType] = useState<string>(initialType);
-    const [sort, setSort] = useState<"relevance" | "name">("relevance");
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [items, setItems] = useState<Establishment[]>([]);
+    const [status, setStatus] = useState<LoadStatus>("loading");
+    const [partial, setPartial] = useState<PartialFailure>(null);
+    const [heroImage, setHeroImage] = useState<string | null>(null);
+    const [heroDescription, setHeroDescription] = useState(HERO_DESCRIPTION);
+    const [sort, setSort] = useState<SortKey>("relevance");
+    const [view, setView] = useState<ViewMode>(loadView);
+    const [sheetOpen, setSheetOpen] = useState(false);
+    const [favoriteIds, setFavoriteIds] = useState<Set<string>>(() => new Set(loadFavorites().map((f) => f.id)));
 
-    useEffect(() => {
-        pageConfigService.getConfig('ESTABELECIMENTOS').then((cfg) => {
-            if (cfg.imageUrl) setCoverImg(cfg.imageUrl);
-            if (cfg.description) setHeroDesc(cfg.description);
-        });
-        Promise.allSettled([
-            restaurantsService.getAll(0, 100),
-            hostPointsService.getAll(0, 100),
-        ]).then(([restResult, hostResult]) => {
-            const restaurants = restResult.status === "fulfilled"
-                ? restResult.value.content.filter(r => r.active).map(mapRestaurant)
-                : [];
-            const hostPoints = hostResult.status === "fulfilled"
-                ? hostResult.value.content.filter(h => h.active).map(mapHostPoint)
-                : [];
-            setItems([...restaurants, ...hostPoints]);
-        }).finally(() => setLoading(false));
-    }, []);
-
-    const types = useMemo(() => {
-        const t = Array.from(new Set(items.map(e => e.type)));
-        return [ALL_TYPES, ...t];
-    }, [items]);
-
-    const filtered = useMemo(() => {
-        let result = items.filter((e) => {
-            const matchType = activeType === ALL_TYPES || e.type === activeType;
-            const q = search.trim().toLowerCase();
-            const matchSearch =
-                !q ||
-                e.name.toLowerCase().includes(q) ||
-                e.description.toLowerCase().includes(q) ||
-                e.address.toLowerCase().includes(q);
-            return matchType && matchSearch;
-        });
-
-        if (sort === "name") result = [...result].sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
-
-        return result;
-    }, [items, search, activeType, sort]);
-
-    const activeCount =
-        (activeType !== ALL_TYPES ? 1 : 0) +
-        (search.trim() ? 1 : 0);
-
-    function clearAll() {
-        setSearch("");
-        setActiveType(ALL_TYPES);
-        setSort("relevance");
+    const [searchInput, setSearchInput] = useState(urlFilters.q);
+    const [lastUrlQuery, setLastUrlQuery] = useState(urlFilters.q);
+    if (lastUrlQuery !== urlFilters.q) {
+        setLastUrlQuery(urlFilters.q);
+        if (searchInput.trim() !== urlFilters.q) setSearchInput(urlFilters.q);
     }
 
-    return (
-        <div className="est-page">
-            <Header />
-            <main className="est-main">
+    const isMobile = useMediaQuery("(max-width: 768px)");
+    const effectiveView: ViewMode = isMobile ? "grid" : view;
 
-                <section className="est-hero">
-                    <img src={coverImg} alt="" className="est-hero__bg" aria-hidden />
-                    <div className="est-hero__overlay" />
-                    <div className="est-hero__content">
-                        <div className="est-hero__inner">
-                            <span className="est-hero__kicker">PARQUE NACIONAL DE UBAJARA</span>
-                            <h1 className="est-hero__title">Estabelecimentos</h1>
-                            <p className="est-hero__subtitle">{heroDesc}</p>
+    const filters = useMemo<EstablishmentFilters>(() => ({ ...urlFilters, q: searchInput.trim() }), [urlFilters, searchInput]);
+    const filtersRef = useRef(filters);
+    const debounceRef = useRef<number | undefined>(undefined);
+
+    useEffect(() => {
+        filtersRef.current = filters;
+    });
+
+    useEffect(() => () => window.clearTimeout(debounceRef.current), []);
+
+    const applyResult = useCallback((result: Awaited<ReturnType<typeof fetchEstablishments>>) => {
+        if (result.restaurants === null && result.hostPoints === null) {
+            setStatus("error");
+            return;
+        }
+        setItems([...(result.restaurants ?? []), ...(result.hostPoints ?? [])]);
+        setPartial(result.restaurants === null ? "restaurantes" : result.hostPoints === null ? "hospedagens" : null);
+        setStatus("ready");
+    }, []);
+
+    useEffect(() => {
+        let cancelled = false;
+        fetchEstablishments().then((result) => {
+            if (!cancelled) applyResult(result);
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, [applyResult]);
+
+    useEffect(() => {
+        let cancelled = false;
+        pageConfigService.getConfig("ESTABELECIMENTOS").then((cfg) => {
+            if (cancelled) return;
+            setHeroImage(cfg.imageUrl || null);
+            if (cfg.description) setHeroDescription(cfg.description);
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    function retry() {
+        setStatus("loading");
+        fetchEstablishments().then(applyResult);
+    }
+
+    function commit(next: EstablishmentFilters) {
+        window.clearTimeout(debounceRef.current);
+        setSearchParams((prev) => serializeFilters(next, prev), { replace: true });
+    }
+
+    function updateFilters(patch: Partial<EstablishmentFilters>) {
+        commit(sanitizeFilters({ ...filters, ...patch }));
+    }
+
+    function handleSearch(value: string) {
+        setSearchInput(value);
+        window.clearTimeout(debounceRef.current);
+        debounceRef.current = window.setTimeout(() => {
+            commit({ ...filtersRef.current, q: value.trim() });
+        }, SEARCH_DEBOUNCE_MS);
+    }
+
+    function clearSearch() {
+        setSearchInput("");
+        commit({ ...filters, q: "" });
+    }
+
+    function removeFilter(filter: ActiveFilter) {
+        if ("q" in filter.remove) clearSearch();
+        else updateFilters(filter.remove);
+    }
+
+    function clearAll() {
+        window.clearTimeout(debounceRef.current);
+        setSearchInput("");
+        commit(EMPTY_FILTERS);
+    }
+
+    function changeView(next: ViewMode) {
+        setView(next);
+        try {
+            localStorage.setItem(VIEW_KEY, next);
+        } catch {
+            /* preferência não persistida; segue só na sessão */
+        }
+    }
+
+    function handleToggleFavorite(item: Establishment) {
+        const nowFavorite = toggleFavorite(toFavoriteItem(item));
+        setFavoriteIds((prev) => {
+            const next = new Set(prev);
+            if (nowFavorite) next.add(item.id);
+            else next.delete(item.id);
+            return next;
+        });
+    }
+
+    const closeSheet = useCallback(() => setSheetOpen(false), []);
+
+    const cuisineOptions = useMemo(() => cuisineOptionsFrom(items), [items]);
+
+    const typeCounts = useMemo(() => {
+        const counts = { Todos: items.length, Restaurante: 0, Hotel: 0, Pousada: 0, Hostel: 0 } as Record<
+            EstablishmentType | "Todos",
+            number
+        >;
+        for (const e of items) counts[e.type] += 1;
+        return counts;
+    }, [items]);
+
+    const results = useMemo(() => sortEstablishments(applyFilters(items, filters), sort), [items, filters, sort]);
+
+    const activeFilters: ActiveFilter[] = [];
+    if (filters.q) activeFilters.push({ key: "q", label: filters.q, quoted: true, remove: { q: "" } });
+    if (filters.tipo) activeFilters.push({ key: "tipo", label: filters.tipo, remove: { tipo: null } });
+    for (const slug of filters.culinaria) {
+        activeFilters.push({
+            key: `culinaria-${slug}`,
+            label: cuisineOptions.find((c) => c.slug === slug)?.label ?? humanizeSlug(slug),
+            remove: { culinaria: filters.culinaria.filter((s) => s !== slug) },
+        });
+    }
+    if (filters.reserva) activeFilters.push({ key: "reserva", label: "Aceita reservas", remove: { reserva: false } });
+    if (filters.avaliacao) activeFilters.push({ key: "avaliacao", label: "4★ ou mais", remove: { avaliacao: false } });
+    if (filters.online) activeFilters.push({ key: "online", label: "Reserva online", remove: { online: false } });
+    if (filters.quartos) {
+        const range = ROOM_RANGES.find((r) => r.key === filters.quartos);
+        activeFilters.push({ key: "quartos", label: `${range?.label ?? ""} quartos`, remove: { quartos: "" } });
+    }
+
+    const loading = status === "loading";
+    const ready = status === "ready";
+    const countLabel = `${results.length} ${results.length === 1 ? "estabelecimento" : "estabelecimentos"}`;
+    const endLabel =
+        results.length === 1 ? "Você viu o único resultado" : `Você viu todos os ${results.length} resultados`;
+
+    const panelProps = { filters, typeCounts, cuisineOptions, onChange: updateFilters };
+
+    return (
+        <div className="estab-page">
+            <Header />
+            <main>
+                <PageHero
+                    image={heroImage}
+                    breadcrumb={[{ label: "Início", to: "/" }, { label: "Estabelecimentos" }]}
+                    eyebrow="Onde comer e dormir"
+                    title="Sabores e pousos da"
+                    accent="serra"
+                    description={heroDescription}
+                />
+
+                {status !== "error" && (
+                    <div className="estab-mobilebar">
+                        <div className="ui-container">
+                            {loading ? (
+                                <div className="estab-mobilebar__inner" aria-hidden="true">
+                                    <Skeleton height={44} radius={50} />
+                                    <div className="estab-mobilebar__chips">
+                                        <Skeleton width={70} height={36} radius={50} />
+                                        <Skeleton width={110} height={36} radius={50} />
+                                        <Skeleton width={80} height={36} radius={50} />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="estab-mobilebar__inner">
+                                    <div className="estab-mobilebar__row">
+                                        <SearchField
+                                            compact
+                                            className="estab-mobilebar__search"
+                                            value={searchInput}
+                                            onChange={handleSearch}
+                                            onClear={clearSearch}
+                                            ariaLabel="Buscar estabelecimento"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="estab-mobilebar__filters"
+                                            aria-haspopup="dialog"
+                                            aria-expanded={sheetOpen}
+                                            onClick={() => setSheetOpen(true)}
+                                        >
+                                            <Icon name="tune" />
+                                            Filtros
+                                            {activeFilters.length > 0 && (
+                                                <span className="estab-mobilebar__badge">{activeFilters.length}</span>
+                                            )}
+                                        </button>
+                                    </div>
+                                    <div className="estab-mobilebar__chips" role="group" aria-label="Tipo">
+                                        {(["Todos", ...ESTABLISHMENT_TYPES] as const).map((t) => (
+                                            <FilterChip
+                                                key={t}
+                                                label={t}
+                                                count={typeCounts[t]}
+                                                selected={(filters.tipo ?? "Todos") === t}
+                                                onClick={() => updateFilters({ tipo: t === "Todos" ? null : t })}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
-                </section>
+                )}
 
-                <div className="est-body">
-
-                    <button
-                        type="button"
-                        className="est-filter-toggle"
-                        onClick={() => setSidebarOpen(!sidebarOpen)}
-                        aria-expanded={sidebarOpen}
-                        aria-controls="est-sidebar"
-                    >
-                        <span className="material-symbols-outlined" aria-hidden="true">tune</span>
-                        Filtros
-                        {activeCount > 0 && (
-                            <span className="est-filter-badge">{activeCount}</span>
+                <div className="estab-body">
+                    <div className={`ui-container estab-layout${status === "error" ? " estab-layout--single" : ""}`}>
+                        {status !== "error" && (
+                            <aside className="estab-sidebar" aria-label="Filtros">
+                                {loading ? (
+                                    <div className="estab-sidebar__skeleton" aria-hidden="true">
+                                        <Skeleton height={48} radius={50} />
+                                        {Array.from({ length: 5 }, (_, i) => (
+                                            <Skeleton key={i} height={44} radius={12} />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <FiltersPanel
+                                        {...panelProps}
+                                        variant="sidebar"
+                                        search={searchInput}
+                                        onSearch={handleSearch}
+                                        onSearchClear={clearSearch}
+                                    />
+                                )}
+                            </aside>
                         )}
-                        <span className="material-symbols-outlined est-toggle-arrow" aria-hidden="true">
-                            {sidebarOpen ? "expand_less" : "expand_more"}
-                        </span>
-                    </button>
 
-                    <aside
-                        id="est-sidebar"
-                        className={`est-sidebar${sidebarOpen ? " is-open" : ""}`}
-                        aria-label="Filtros"
-                    >
-                        <div className="est-sidebar__section">
-                            <p className="est-sidebar__label">Buscar</p>
-                            <div className="est-search__wrap">
-                                <span className="material-symbols-outlined est-search__icon" aria-hidden="true">search</span>
-                                <input
-                                    type="search"
-                                    placeholder="Nome ou endereço..."
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    className="est-search__input"
-                                    aria-label="Buscar estabelecimento"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="est-sidebar__section">
-                            <p className="est-sidebar__label">Tipo</p>
-                            <div className="est-filter-group">
-                                {types.map((t) => (
-                                    <button
-                                        key={t}
-                                        type="button"
-                                        className={`est-pill${activeType === t ? " is-active" : ""}`}
-                                        onClick={() => setActiveType(t)}
-                                    >
-                                        {t}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {activeCount > 0 && (
-                            <button type="button" className="est-sidebar__clear" onClick={clearAll}>
-                                <span className="material-symbols-outlined" aria-hidden="true">filter_alt_off</span>
-                                Limpar filtros ({activeCount})
-                            </button>
-                        )}
-                    </aside>
-
-                    <div className="est-content">
-
-                        <div className="est-topbar">
-                            <p className="est-count">
-                                <strong>{filtered.length}</strong>{" "}
-                                {filtered.length === 1 ? "estabelecimento" : "estabelecimentos"} encontrados
-                            </p>
-                            <div className="est-sort">
-                                <label htmlFor="est-sort-select" className="est-sort__label">Ordenar:</label>
-                                <select
-                                    id="est-sort-select"
-                                    value={sort}
-                                    onChange={(e) => setSort(e.target.value as typeof sort)}
-                                    className="est-sort__select"
+                        <section className="estab-results" aria-label="Resultados" aria-busy={loading}>
+                            {invalidType && (
+                                <StateBlock variant="notice" icon="info" title={`Não temos a categoria “${invalidType}”.`}>
+                                    Mostrando todos os estabelecimentos. Para outras experiências, veja{" "}
+                                    <Link to="/pontos-turisticos">Atrativos</Link>.
+                                </StateBlock>
+                            )}
+                            {ready && partial && (
+                                <StateBlock
+                                    variant="notice"
+                                    icon="info"
+                                    title={
+                                        partial === "restaurantes"
+                                            ? "Não conseguimos carregar os restaurantes agora."
+                                            : "Não conseguimos carregar as hospedagens agora."
+                                    }
                                 >
-                                    <option value="relevance">Relevância</option>
-                                    <option value="name">Nome A–Z</option>
-                                </select>
-                            </div>
-                        </div>
+                                    {partial === "restaurantes"
+                                        ? "Estamos mostrando só as hospedagens."
+                                        : "Estamos mostrando só os restaurantes."}{" "}
+                                    Atualize a página para tentar de novo.
+                                </StateBlock>
+                            )}
 
-                        {loading ? (
-                            <div className="est-empty">
-                                <span className="material-symbols-outlined est-empty__icon">hourglass_top</span>
-                                <p className="est-empty__msg">Carregando estabelecimentos...</p>
-                            </div>
-                        ) : filtered.length > 0 ? (
-                            <div className="est-grid">
-                                {filtered.map((e) => (
-                                    <Link key={e.id} to={`/estabelecimentos/${e.id}?apiType=${e.apiType}`} style={{ textDecoration: "none", color: "inherit" }}>
-                                    <article className="est-card" data-type={e.type}>
-                                        <div className="est-card__img-wrap">
-                                            {e.img ? (
-                                                <img src={e.img} alt={e.name} className="est-card__img" loading="lazy" />
-                                            ) : (
-                                                <div className="est-card__img est-card__img--placeholder" aria-hidden="true" />
-                                            )}
-                                            <span className="est-card__type-badge">{e.type}</span>
-                                            {formatPrice(e.avgPrice) && (
-                                                <span className="est-card__price-badge">{formatPrice(e.avgPrice)}</span>
-                                            )}
+                            {status === "error" && (
+                                <StateBlock
+                                    variant="error"
+                                    icon="wifi_off"
+                                    title="Não conseguimos carregar os estabelecimentos"
+                                    actions={
+                                        <Button large icon="refresh" onClick={retry}>
+                                            Tentar de novo
+                                        </Button>
+                                    }
+                                >
+                                    A conexão na serra pode oscilar. Verifique o sinal e tente de novo.
+                                </StateBlock>
+                            )}
+
+                            {loading && (
+                                <>
+                                    <div className="estab-toolbar" aria-hidden="true">
+                                        <Skeleton width={180} height={28} />
+                                    </div>
+                                    <div className={effectiveView === "list" ? "estab-list" : "estab-grid"}>
+                                        {Array.from({ length: effectiveView === "list" ? 4 : 6 }, (_, i) => (
+                                            <EstablishmentCardSkeleton key={i} view={effectiveView} />
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+
+                            {ready && (
+                                <>
+                                    <h2 className="ui-sr-only">Resultados</h2>
+                                    <div className="estab-toolbar">
+                                        <p className="estab-count" aria-live="polite" aria-atomic="true">
+                                            {countLabel}
+                                        </p>
+                                        <div className="estab-toolbar__controls">
+                                            <label className="estab-sort">
+                                                <span className="estab-sort__label">Ordenar</span>
+                                                <select
+                                                    className="estab-sort__select"
+                                                    value={sort}
+                                                    onChange={(e) => setSort(e.target.value as SortKey)}
+                                                >
+                                                    <option value="relevance">Relevância</option>
+                                                    <option value="name">Nome A–Z</option>
+                                                </select>
+                                            </label>
+                                            <div className="estab-view" role="group" aria-label="Visualização">
+                                                <button
+                                                    type="button"
+                                                    className={`estab-view__btn${view === "grid" ? " estab-view__btn--on" : ""}`}
+                                                    aria-label="Grade"
+                                                    aria-pressed={view === "grid"}
+                                                    onClick={() => changeView("grid")}
+                                                >
+                                                    <Icon name="grid_view" />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className={`estab-view__btn${view === "list" ? " estab-view__btn--on" : ""}`}
+                                                    aria-label="Lista"
+                                                    aria-pressed={view === "list"}
+                                                    onClick={() => changeView("list")}
+                                                >
+                                                    <Icon name="view_agenda" />
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div className="est-card__body">
-                                            <h3 className="est-card__name">{e.name}</h3>
-                                            <p className="est-card__city">
-                                                <span className="material-symbols-outlined" aria-hidden="true">location_on</span>
-                                                {e.address}
-                                            </p>
-                                            <p className="est-card__desc">{e.description}</p>
-                                            <div className="est-card__features">
-                                                {e.features.slice(0, 3).map((f) => (
-                                                    <span key={f} className="est-card__feature">{f}</span>
+                                    </div>
+
+                                    {activeFilters.length > 0 && (
+                                        <div className="estab-applied">
+                                            {activeFilters.map((f) => (
+                                                <AppliedChip
+                                                    key={f.key}
+                                                    label={f.label}
+                                                    quoted={f.quoted}
+                                                    onRemove={() => removeFilter(f)}
+                                                />
+                                            ))}
+                                            <button type="button" className="estab-applied__clear" onClick={clearAll}>
+                                                Limpar filtros
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {results.length === 0 ? (
+                                        <StateBlock
+                                            variant="empty"
+                                            icon="search_off"
+                                            title={
+                                                activeFilters.length > 0
+                                                    ? "Nenhum estabelecimento com esses filtros"
+                                                    : "Ainda não há estabelecimentos cadastrados"
+                                            }
+                                            actions={activeFilters.map((f) => (
+                                                <AppliedChip
+                                                    key={f.key}
+                                                    variant="outline"
+                                                    label={f.label}
+                                                    quoted={f.quoted}
+                                                    onRemove={() => removeFilter(f)}
+                                                />
+                                            ))}
+                                        >
+                                            {activeFilters.length > 0
+                                                ? "Remova um deles para ver mais opções:"
+                                                : "Volte em breve para conhecer os lugares da serra."}
+                                        </StateBlock>
+                                    ) : (
+                                        <>
+                                            <div className={effectiveView === "list" ? "estab-list" : "estab-grid"}>
+                                                {results.map((item) => (
+                                                    <EstablishmentCard
+                                                        key={`${item.apiType}-${item.id}`}
+                                                        item={item}
+                                                        view={effectiveView}
+                                                        favorite={favoriteIds.has(item.id)}
+                                                        onToggleFavorite={handleToggleFavorite}
+                                                    />
                                                 ))}
                                             </div>
-                                            {e.openingHours && (
-                                                <div className="est-card__footer">
-                                                    <span className="est-card__hours">
-                                                        <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
-                                                        {e.openingHours}
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </article>
-                                    </Link>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="est-empty">
-                                <span className="material-symbols-outlined est-empty__icon">search_off</span>
-                                <p className="est-empty__msg">
-                                    Nenhum estabelecimento encontrado para essa busca.
-                                </p>
-                                <button type="button" className="est-empty__reset" onClick={clearAll}>
-                                    Limpar filtros
-                                </button>
-                            </div>
-                        )}
+                                            <div className="estab-end">
+                                                <span className="estab-end__bar" aria-hidden="true" />
+                                                <span className="estab-end__text">{endLabel}</span>
+                                            </div>
+                                        </>
+                                    )}
+                                </>
+                            )}
+                        </section>
                     </div>
                 </div>
 
-                <section className="est-cta">
-                    <div className="est-cta__inner">
-                        <h2 className="est-cta__title">Quer Cadastrar seu Estabelecimento?</h2>
-                        <p className="est-cta__desc">
-                            Faça parte da rede de parceiros do Parque Nacional de Ubajara e aumente
-                            sua visibilidade para turistas de todo o Brasil.
-                        </p>
-                        <div className="est-cta__btns">
-                            <Link to="/cadastro-empresa" className="est-cta__btn">Cadastrar Estabelecimento</Link>
-                            <a href="#" className="est-cta__btn est-cta__btn--outline">Falar com a Equipe</a>
+                <section className="estab-cta">
+                    <div className="ui-container estab-cta__inner">
+                        <div className="estab-cta__text">
+                            <span className="estab-cta__eyebrow">Para donos de negócio</span>
+                            <h2 className="estab-cta__title">Tem restaurante ou pousada na serra?</h2>
+                            <p className="estab-cta__desc">
+                                Cadastre grátis. A equipe revisa e publica seu estabelecimento aqui.
+                            </p>
+                        </div>
+                        <div className="estab-cta__actions">
+                            <ButtonLink to="/cadastro-empresa" variant="gold" large>
+                                Cadastre seu negócio
+                            </ButtonLink>
+                            <ButtonLink to="/contato" variant="outline" large iconAfter="arrow_forward">
+                                Falar com a equipe
+                            </ButtonLink>
                         </div>
                     </div>
                 </section>
-
             </main>
             <Footer />
+
+            <BottomSheet
+                open={sheetOpen}
+                onClose={closeSheet}
+                title="Filtros"
+                footer={
+                    <>
+                        <button type="button" className="estab-sheet__clear" onClick={clearAll}>
+                            Limpar
+                        </button>
+                        <Button large onClick={closeSheet}>
+                            {results.length === 1 ? "Ver 1 resultado" : `Ver ${results.length} resultados`}
+                        </Button>
+                    </>
+                }
+            >
+                <FiltersPanel {...panelProps} variant="sheet" />
+            </BottomSheet>
         </div>
     );
 }

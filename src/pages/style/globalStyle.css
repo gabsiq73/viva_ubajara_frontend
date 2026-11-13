@@ -97,7 +97,6 @@ img {
 
 /* Skeleton placeholder for image containers before src loads */
 .point-card__img--placeholder,
-.est-card__img--placeholder,
 .evd-rel-card__img--placeholder {
     background: linear-gradient(90deg, #e8f0eb 25%, #d4e4d9 50%, #e8f0eb 75%);
     background-size: 200% 100%;
