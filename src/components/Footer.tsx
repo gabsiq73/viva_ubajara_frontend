@@ -9,7 +9,7 @@ import { useMediaQuery } from "../hooks/useMediaQuery";
 
 type SocialKey = "instagram" | "facebook" | "youtube" | "tiktok";
 
-// Preencher com as URLs oficiais; redes sem URL aparecem esmaecidas e sem ação.
+// Preencher com as URLs oficiais; só as redes com URL são exibidas (sem nenhuma, a fileira some).
 const SOCIAL_LINKS: Record<SocialKey, string> = {
     instagram: "",
     facebook: "",
@@ -43,6 +43,7 @@ const SOCIAL_NETWORKS: { key: SocialKey; label: string; path: string }[] = [
 interface FooterLink {
     label: string;
     to: string;
+    cta?: boolean;
 }
 
 interface FooterGroupData {
@@ -68,7 +69,7 @@ const BUSINESS: FooterGroupData = {
     id: "negocios",
     title: "Para negócios",
     links: [
-        { label: "Cadastre seu negócio", to: "/cadastro-empresa" },
+        { label: "Cadastre seu negócio", to: "/cadastro-empresa", cta: true },
         { label: "Área do parceiro", to: "/empresa/estabelecimento" },
         { label: "Seja um guia", to: "/contato" },
     ],
@@ -113,13 +114,18 @@ function FooterGroup({ group, accordion, open, onToggle, className }: FooterGrou
                     group.title
                 )}
             </h2>
-            <ul className="site-footer__list" id={listId} hidden={collapsed}>
-                {group.links.map((link) => (
-                    <li key={link.label}>
-                        <Link to={link.to}>{link.label}</Link>
-                    </li>
-                ))}
-            </ul>
+            <div className={`site-footer__panel${collapsed ? " is-collapsed" : ""}`} id={listId}>
+                <ul className="site-footer__list">
+                    {group.links.map((link) => (
+                        <li key={link.label}>
+                            <Link to={link.to} className={link.cta ? "site-footer__cta" : undefined}>
+                                {link.label}
+                                {link.cta && <Icon name="arrow_forward" />}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     );
 }
@@ -128,6 +134,7 @@ export default function Footer(): JSX.Element {
     const isDesktop = useMediaQuery("(min-width: 1024px)");
     const [openGroup, setOpenGroup] = useState<string | null>(null);
     const toggleGroup = (id: string) => setOpenGroup((current) => (current === id ? null : id));
+    const socials = SOCIAL_NETWORKS.filter(({ key }) => SOCIAL_LINKS[key]);
 
     return (
         <footer className="site-footer">
@@ -139,36 +146,25 @@ export default function Footer(): JSX.Element {
                             <Link to="/" className="site-footer__logo-link">
                                 <SiteLogo className="site-footer__logo" />
                             </Link>
-                            <p className="site-footer__tagline">
-                                Natureza, sabores e experiências na Serra da Ibiapaba.
-                            </p>
                         </div>
-                        <div className="site-footer__social">
-                            {SOCIAL_NETWORKS.map(({ key, label, path }) => {
-                                const icon = (
-                                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true">
-                                        <path d={path} />
-                                    </svg>
-                                );
-                                const url = SOCIAL_LINKS[key];
-                                return url ? (
+                        {socials.length > 0 && (
+                            <div className="site-footer__social">
+                                {socials.map(({ key, label, path }) => (
                                     <a
                                         key={key}
-                                        href={url}
+                                        href={SOCIAL_LINKS[key]}
                                         className="site-footer__social-btn"
                                         aria-label={label}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >
-                                        {icon}
+                                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden="true">
+                                            <path d={path} />
+                                        </svg>
                                     </a>
-                                ) : (
-                                    <span key={key} className="site-footer__social-btn is-disabled" aria-hidden="true">
-                                        {icon}
-                                    </span>
-                                );
-                            })}
-                        </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div className="site-footer__links">
@@ -179,14 +175,26 @@ export default function Footer(): JSX.Element {
 
                     <div className="site-footer__service">
                         <h2 className="site-footer__heading">Atendimento ao turista</h2>
-                        <div className="site-footer__phone-block">
-                            <a href="tel:+558836341234" className="site-footer__phone">(88) 3634-1234</a>
-                            <span className="site-footer__hours">Seg a sex, 8h às 17h</span>
-                        </div>
-                        <a href="mailto:contato@vivaubajara.com.br" className="site-footer__email">contato@vivaubajara.com.br</a>
-                        <address className="site-footer__address">
-                            Centro Administrativo Municipal<br />Ubajara – CE
-                        </address>
+                        <ul className="site-footer__contact">
+                            <li>
+                                <Icon name="call" />
+                                <a href="tel:+558836341234" className="site-footer__phone">(88) 3634-1234</a>
+                            </li>
+                            <li>
+                                <Icon name="mail" />
+                                <a href="mailto:contato@vivaubajara.com.br" className="site-footer__email">contato@vivaubajara.com.br</a>
+                            </li>
+                            <li>
+                                <Icon name="location_on" />
+                                <address className="site-footer__address">
+                                    Centro Administrativo Municipal<br />Ubajara – CE
+                                </address>
+                            </li>
+                            <li>
+                                <Icon name="schedule" />
+                                <span className="site-footer__hours">Seg a sex, 8h às 17h</span>
+                            </li>
+                        </ul>
                     </div>
 
                 </div>
