@@ -3,18 +3,26 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../admin/hooks/useAuth';
 import { decodePayload } from '../admin/services/jwtUtils';
 import { usersService } from '../admin/services/usersService';
+import { Button, ButtonLink } from '../components/ui/Button';
+import StateBlock from '../components/ui/StateBlock';
 import { consumeReturnTo } from '../utils/returnTo';
+import { useDocumentTitle } from '../utils/useDocumentTitle';
 import type { UserRole } from '../admin/types';
+import '../components/ui/ui.css';
+import './style/PageState.css';
 
 export function LoginSuccessPage() {
+  useDocumentTitle('Entrando');
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { applyAuthResponse, isAuthenticated, isAdmin, isCompany } = useAuth();
+  const { applyAuthResponse, logout, isAuthenticated, isAdmin, isCompany } = useAuth();
   const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const returnTarget = useRef<string | null | undefined>(undefined);
+  const token = params.get('token');
 
   useEffect(() => {
-    const token = params.get('token');
     if (!token) { navigate('/admin/login', { replace: true }); return; }
 
     const payload = decodePayload(token);
@@ -23,6 +31,7 @@ export function LoginSuccessPage() {
     const email = String(payload.sub ?? payload.email ?? '');
     const name = payload.name ? String(payload.name) : undefined;
     const photo = payload.photo ? String(payload.photo) : undefined;
+    let cancelled = false;
 
     try {
       // O JWT do login social não carrega claim de role (JwtService.generateToken
@@ -32,15 +41,23 @@ export function LoginSuccessPage() {
 
       usersService.getMe()
         .then((data) => {
+          if (cancelled) return;
           const realName = [data.firstName, data.lastName].filter(Boolean).join(' ') || name;
           applyAuthResponse({ token, email: data.email, role: data.role, name: realName, photo: data.photoUrl ?? photo });
+          setReady(true);
         })
-        .catch(() => {})
-        .finally(() => setReady(true));
+        .catch(() => {
+          if (cancelled) return;
+          // Sem o papel real, seguir com o provisório mandaria admin/empresa para o perfil comum.
+          logout();
+          setFailed(true);
+        });
     } catch {
       navigate('/admin/login', { replace: true });
     }
-  }, []);
+
+    return () => { cancelled = true; };
+  }, [token, attempt, navigate, applyAuthResponse, logout]);
 
   useEffect(() => {
     if (!ready || !isAuthenticated) return;
@@ -49,9 +66,33 @@ export function LoginSuccessPage() {
     navigate(returnTarget.current ?? (isCompany ? '/empresa/estabelecimento' : '/dashboard'), { replace: true });
   }, [ready, isAuthenticated, isAdmin, isCompany, navigate]);
 
+  const retry = () => {
+    setFailed(false);
+    setAttempt((n) => n + 1);
+  };
+
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'Inter, sans-serif', color: '#6b7280' }}>
-      Autenticando...
-    </div>
+    <main className="pg-fullscreen" id="conteudo" tabIndex={-1}>
+      {failed ? (
+        <StateBlock
+          variant="error"
+          icon="wifi_off"
+          title="Não conseguimos concluir seu login"
+          actions={
+            <>
+              <Button icon="refresh" onClick={retry}>Tentar de novo</Button>
+              <ButtonLink to="/admin/login" variant="outline">Voltar ao login</ButtonLink>
+            </>
+          }
+        >
+          Não foi possível confirmar seu perfil de acesso. Verifique a conexão e tente de novo.
+        </StateBlock>
+      ) : (
+        <div className="pg-loading pg-loading--page" role="status">
+          <span className="pg-spinner" aria-hidden="true" />
+          Autenticando…
+        </div>
+      )}
+    </main>
   );
 }

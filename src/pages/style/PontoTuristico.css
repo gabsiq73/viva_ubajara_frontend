@@ -645,6 +645,14 @@
     align-items: center;
     gap: 6px;
     flex-wrap: wrap;
+    list-style: none;
+}
+
+.pt-breadcrumb__item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
 }
 
 .pt-breadcrumb__link {
@@ -743,4 +751,80 @@
 
 .pt-related__all:hover .material-symbols-outlined {
     transform: translateX(4px);
+}
+
+/* ─── Locais vinculados ─── */
+.pt-linked {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 24px;
+    list-style: none;
+}
+
+.pt-linked__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #cfe3d7;
+    color: #003016;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    transition: background-color 0.2s;
+}
+
+.pt-linked__link:hover {
+    background: #e4f1ea;
+}
+
+.pt-linked__pin {
+    font-size: 18px;
+}
+
+.pt-linked__arrow {
+    font-size: 16px;
+    color: #006b32;
+}
+
+.pt-link {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.pt-hero__fav-btn:focus-visible,
+.pt-breadcrumb__link:focus-visible,
+.pt-linked__link:focus-visible,
+.pt-link:focus-visible,
+.pt-visit-card__cta:focus-visible,
+.pt-how__maps-btn:focus-visible,
+.pt-related__all:focus-visible {
+    outline: 3px solid #6bcf91;
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pt-hero__fav-btn,
+    .pt-gallery__main img,
+    .pt-gallery__thumb img,
+    .pt-breadcrumb__link,
+    .pt-visit-card__cta,
+    .pt-how__maps-btn,
+    .pt-related__all,
+    .pt-related__all .material-symbols-outlined,
+    .pt-linked__link {
+        transition: none;
+    }
+
+    .pt-hero__fav-btn:hover,
+    .pt-gallery__main:hover img,
+    .pt-gallery__thumb:hover img,
+    .pt-visit-card__cta:hover,
+    .pt-how__maps-btn:hover {
+        transform: none;
+    }
 }

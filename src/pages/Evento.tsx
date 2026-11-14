@@ -1,136 +1,81 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Icon from "../components/ui/Icon";
+import Breadcrumb from "./Breadcrumb";
+import { DetailStatePage } from "./PageState";
 import { eventsService } from "../admin/services/eventsService";
 import type { EventResponse } from "../admin/types";
+import { formatDay, formatLongDate, formatMonthShort, formatTime, parseBackendDate, toIsoDate } from "../utils/dates";
+import { isNotFoundError, requireUuid, useAsyncData } from "../utils/useAsyncData";
+import { useDocumentTitle } from "../utils/useDocumentTitle";
 import heroFallback from "../assets/images/foto-capa-parque-ubajara.png";
+import "../components/ui/ui.css";
 import "./style/Evento.css";
 
-const PT_MONTHS_LONG = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-
-function parseDate(raw: string): Date {
-    if (!raw) return new Date(NaN);
-    if (raw.includes("/")) {
-        const [d, t = "00:00:00"] = raw.split(" ");
-        const [day, mon, yr] = d.split("/");
-        return new Date(`${yr}-${mon}-${day}T${t}`);
-    }
-    return new Date(raw);
-}
-
-function formatTime(raw: string): string {
-    const d = parseDate(raw);
-    if (isNaN(d.getTime())) return "";
-    return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-}
-
 function RelatedCard({ ev }: { ev: EventResponse }) {
-    const start = parseDate(ev.startDateTime);
-    const day = isNaN(start.getTime()) ? "" : String(start.getDate()).padStart(2, "0");
-    const month = isNaN(start.getTime()) ? "" : PT_MONTHS_LONG[start.getMonth()].slice(0, 3);
+    const start = parseBackendDate(ev.startDateTime);
     const heroImg = ev.photos?.[0]?.url ?? heroFallback;
 
     return (
         <Link to={`/eventos/${ev.id}`} className="evd-rel-card">
             <div className="evd-rel-card__img-wrap">
-                <img src={heroImg} alt={ev.name} className="evd-rel-card__img" loading="lazy" />
-                <div className="evd-rel-card__date-badge">
-                    <strong>{day}</strong>
-                    <span>{month}</span>
-                </div>
+                <img src={heroImg} alt="" className="evd-rel-card__img" width={400} height={220} loading="lazy" decoding="async" />
+                {start && (
+                    <div className="evd-rel-card__date-badge">
+                        <strong>{formatDay(start)}</strong>
+                        <span>{formatMonthShort(start)}</span>
+                    </div>
+                )}
             </div>
             <div className="evd-rel-card__body">
                 <h3 className="evd-rel-card__title">{ev.name}</h3>
                 <p className="evd-rel-card__place">
-                    <span className="material-symbols-outlined" aria-hidden="true">location_on</span>
+                    <Icon name="location_on" />
                     {ev.location}
                 </p>
                 <p className="evd-rel-card__desc">{ev.description}</p>
                 <span className="evd-rel-card__cta" aria-hidden="true">
                     Ver Evento
-                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                    <Icon name="arrow_forward" />
                 </span>
             </div>
         </Link>
     );
 }
 
-export default function Evento() {
-    const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
-    const [ev, setEv] = useState<EventResponse | null>(null);
-    const [related, setRelated] = useState<EventResponse[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        if (!id) { navigate("/eventos"); return; }
-        Promise.allSettled([
-            eventsService.getById(id),
-            eventsService.getAll(0, 10, true),
-        ]).then(([evResult, allResult]) => {
-            if (evResult.status === "fulfilled") {
-                setEv(evResult.value);
-                if (allResult.status === "fulfilled") {
-                    setRelated(allResult.value.content.filter(e => e.id !== id).slice(0, 3));
-                }
-            } else {
-                navigate("/eventos");
-            }
-        }).finally(() => setLoading(false));
-    }, [id]);
-
-    if (loading) {
-        return (
-            <div className="evd-page">
-                <Header solid />
-                <main className="evd-main" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
-                    <span className="adm-spinner adm-spinner--lg" />
-                </main>
-                <Footer />
-            </div>
-        );
-    }
-
-    if (!ev) return null;
+function EventoView({ ev, related }: { ev: EventResponse; related: EventResponse[] }) {
+    useDocumentTitle(ev.name);
 
     const heroImg = ev.photos?.[0]?.url ?? heroFallback;
-    const start = parseDate(ev.startDateTime);
-    const day = isNaN(start.getTime()) ? "" : String(start.getDate()).padStart(2, "0");
-    const monthLong = isNaN(start.getTime()) ? "" : PT_MONTHS_LONG[start.getMonth()];
-    const year = isNaN(start.getTime()) ? "" : start.getFullYear();
-    const timeStr = formatTime(ev.startDateTime);
-    const endTimeStr = formatTime(ev.endDateTime);
-    const timeDisplay = timeStr ? (endTimeStr ? `${timeStr} – ${endTimeStr}` : timeStr) : "";
+    const start = parseBackendDate(ev.startDateTime);
+    const end = parseBackendDate(ev.endDateTime);
+    const dateLabel = start ? formatLongDate(start) : "";
+    const timeDisplay = start ? (end ? `${formatTime(start)} – ${formatTime(end)}` : formatTime(start)) : "";
 
     return (
         <div className="evd-page">
             <Header />
-            <main className="evd-main">
+            <main className="evd-main" id="conteudo" tabIndex={-1}>
 
                 {/* ── Hero ── */}
                 <section className="evd-hero" aria-labelledby="evd-hero-title">
-                    <img src={heroImg} alt={ev.name} className="evd-hero__bg" fetchPriority="high" decoding="async" />
+                    <img src={heroImg} alt="" className="evd-hero__bg" fetchPriority="high" decoding="async" />
                     <div className="evd-hero__overlay" aria-hidden="true" />
 
-                    <nav className="evd-breadcrumb" aria-label="Navegação">
-                        <div className="evd-breadcrumb__inner">
-                            <Link to="/" className="evd-breadcrumb__link">Início</Link>
-                            <span className="evd-breadcrumb__sep" aria-hidden="true">›</span>
-                            <Link to="/eventos" className="evd-breadcrumb__link">Eventos</Link>
-                            <span className="evd-breadcrumb__sep" aria-hidden="true">›</span>
-                            <span className="evd-breadcrumb__current">{ev.name}</span>
-                        </div>
-                    </nav>
+                    <Breadcrumb
+                        prefix="evd"
+                        items={[{ label: "Início", to: "/" }, { label: "Eventos", to: "/eventos" }, { label: ev.name }]}
+                    />
 
                     <div className="evd-hero__content">
                         <div className="evd-hero__inner">
                             <span className="evd-hero__cat">Evento</span>
                             <h1 id="evd-hero-title" className="evd-hero__title">{ev.name}</h1>
-                            {day && (
+                            {start && (
                                 <div className="evd-hero__date-row">
-                                    <span className="material-symbols-outlined" aria-hidden="true">calendar_month</span>
-                                    {day} de {monthLong} de {year}
+                                    <Icon name="calendar_month" />
+                                    <time dateTime={toIsoDate(start)}>{dateLabel}</time>
                                 </div>
                             )}
                         </div>
@@ -139,21 +84,21 @@ export default function Evento() {
                     <div className="evd-hero__infobar">
                         <div className="evd-hero__infobar-inner">
                             <span className="evd-info-item">
-                                <span className="material-symbols-outlined" aria-hidden="true">location_on</span>
+                                <Icon name="location_on" />
                                 {ev.location}
                             </span>
                             {timeDisplay && (
                                 <>
                                     <span className="evd-info-sep" aria-hidden="true">|</span>
                                     <span className="evd-info-item">
-                                        <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
+                                        <Icon name="schedule" />
                                         {timeDisplay}
                                     </span>
                                 </>
                             )}
                             <span className="evd-info-sep" aria-hidden="true">|</span>
                             <span className="evd-info-item">
-                                <span className="material-symbols-outlined" aria-hidden="true">check_circle</span>
+                                <Icon name="check_circle" />
                                 {ev.active ? "Confirmado" : "A Confirmar"}
                             </span>
                         </div>
@@ -168,30 +113,26 @@ export default function Evento() {
                             <span className="evd-content__kicker">SOBRE O EVENTO</span>
                             <h2 className="evd-content__title">{ev.name}</h2>
                             <p className="evd-content__desc">{ev.description}</p>
-                            <p className="evd-content__desc">
-                                Um evento imperdível para moradores e visitantes que desejam vivenciar
-                                a cultura, a natureza e a hospitalidade única da Serra da Ibiapaba.
-                            </p>
                         </div>
 
-                        <aside className="evd-info-card" aria-label="Detalhes do Evento">
+                        <aside className="evd-info-card" aria-labelledby="evd-info-title">
                             <div className="evd-info-card__header">
-                                <h3 className="evd-info-card__title">Detalhes do Evento</h3>
+                                <h3 id="evd-info-title" className="evd-info-card__title">Detalhes do Evento</h3>
                             </div>
                             <div className="evd-info-card__body">
                                 <ul className="evd-info-list">
-                                    {day && (
+                                    {start && (
                                         <li className="evd-info-list__item">
-                                            <span className="material-symbols-outlined evd-info-list__icon" aria-hidden="true">calendar_month</span>
+                                            <Icon name="calendar_month" className="evd-info-list__icon" />
                                             <div>
                                                 <span className="evd-info-list__label">Data</span>
-                                                <span className="evd-info-list__value">{day} de {monthLong} de {year}</span>
+                                                <span className="evd-info-list__value">{dateLabel}</span>
                                             </div>
                                         </li>
                                     )}
                                     {timeDisplay && (
                                         <li className="evd-info-list__item">
-                                            <span className="material-symbols-outlined evd-info-list__icon" aria-hidden="true">schedule</span>
+                                            <Icon name="schedule" className="evd-info-list__icon" />
                                             <div>
                                                 <span className="evd-info-list__label">Horário</span>
                                                 <span className="evd-info-list__value">{timeDisplay}</span>
@@ -199,7 +140,7 @@ export default function Evento() {
                                         </li>
                                     )}
                                     <li className="evd-info-list__item">
-                                        <span className="material-symbols-outlined evd-info-list__icon" aria-hidden="true">location_on</span>
+                                        <Icon name="location_on" className="evd-info-list__icon" />
                                         <div>
                                             <span className="evd-info-list__label">Local</span>
                                             <span className="evd-info-list__value">{ev.location}</span>
@@ -207,10 +148,10 @@ export default function Evento() {
                                     </li>
                                     {ev.registrationUrl && (
                                         <li className="evd-info-list__item">
-                                            <span className="material-symbols-outlined evd-info-list__icon" aria-hidden="true">link</span>
+                                            <Icon name="link" className="evd-info-list__icon" />
                                             <div>
                                                 <span className="evd-info-list__label">Inscrições</span>
-                                                <a href={ev.registrationUrl} target="_blank" rel="noopener noreferrer" className="evd-info-list__value" style={{ color: "var(--adm-green)" }}>
+                                                <a href={ev.registrationUrl} target="_blank" rel="noopener noreferrer" className="evd-info-list__value evd-info-list__link">
                                                     Acessar link
                                                 </a>
                                             </div>
@@ -223,7 +164,7 @@ export default function Evento() {
                                     rel="noopener noreferrer"
                                     className="evd-info-card__maps-btn"
                                 >
-                                    <span className="material-symbols-outlined" aria-hidden="true">map</span>
+                                    <Icon name="map" />
                                     Ver no Google Maps
                                 </a>
                             </div>
@@ -243,11 +184,11 @@ export default function Evento() {
                                 </div>
                                 <Link to="/eventos" className="evd-related__all">
                                     Ver todos
-                                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                                    <Icon name="arrow_forward" />
                                 </Link>
                             </div>
                             <div className="evd-related__grid">
-                                {related.map(e => (
+                                {related.map((e) => (
                                     <RelatedCard key={e.id} ev={e} />
                                 ))}
                             </div>
@@ -259,4 +200,34 @@ export default function Evento() {
             <Footer />
         </div>
     );
+}
+
+export default function Evento() {
+    const { id = "" } = useParams<{ id: string }>();
+    const data = useAsyncData(async () => {
+        requireUuid(id);
+        const related = eventsService
+            .getAll(0, 10, true)
+            .then((page) => page.content.filter((e) => e.id !== id).slice(0, 3))
+            .catch((): EventResponse[] => []);
+        return { ev: await eventsService.getById(id), related: await related };
+    }, id);
+
+    useDocumentTitle(data.status === "ready" ? null : "Evento");
+
+    if (data.status === "loading") return <DetailStatePage kind="loading" />;
+    if (data.status === "error") {
+        return (
+            <DetailStatePage
+                kind={isNotFoundError(data.error) ? "not-found" : "error"}
+                heroTitle="Evento"
+                breadcrumb={[{ label: "Início", to: "/" }, { label: "Eventos", to: "/eventos" }]}
+                noun="este evento"
+                backTo="/eventos"
+                backLabel="Ver todos os eventos"
+                onRetry={data.retry}
+            />
+        );
+    }
+    return <EventoView key={data.data.ev.id} ev={data.data.ev} related={data.data.related} />;
 }

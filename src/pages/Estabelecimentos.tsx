@@ -13,6 +13,7 @@ import SearchField from "../components/ui/SearchField";
 import { EstablishmentCardSkeleton, Skeleton } from "../components/ui/Skeleton";
 import StateBlock from "../components/ui/StateBlock";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { useDocumentTitle } from "../utils/useDocumentTitle";
 import { restaurantsService } from "../admin/services/restaurantsService";
 import { hostPointsService } from "../admin/services/hostPointsService";
 import { pageConfigService } from "../admin/services/pageConfigService";
@@ -76,6 +77,7 @@ async function fetchEstablishments() {
 }
 
 export default function Estabelecimentos() {
+    useDocumentTitle("Estabelecimentos");
     const [searchParams, setSearchParams] = useSearchParams();
     const { filters: urlFilters, invalidType } = useMemo(() => parseFilters(searchParams), [searchParams]);
 
@@ -242,7 +244,7 @@ export default function Estabelecimentos() {
     return (
         <div className="estab-page">
             <Header />
-            <main>
+            <main id="conteudo" tabIndex={-1}>
                 <PageHero
                     image={heroImage}
                     breadcrumb={[{ label: "Início", to: "/" }, { label: "Estabelecimentos" }]}

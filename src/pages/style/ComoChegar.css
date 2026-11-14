@@ -449,3 +449,27 @@
     font-size: 22px;
   }
 }
+
+.cg-card__badge-icon {
+  font-size: 14px;
+}
+
+.cg-btn-maps:focus-visible,
+.cg-cta__btn:focus-visible {
+  outline: 3px solid #2d8a54;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-card,
+  .cg-app-card,
+  .cg-btn-maps,
+  .cg-cta__btn {
+    transition: none;
+  }
+
+  .cg-card:hover,
+  .cg-cta__btn:hover {
+    transform: none;
+  }
+}

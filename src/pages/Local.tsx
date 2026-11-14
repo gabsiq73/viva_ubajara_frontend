@@ -1,69 +1,46 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Icon from "../components/ui/Icon";
+import Breadcrumb from "./Breadcrumb";
+import { DetailStatePage } from "./PageState";
 import { touristSpotsService } from "../admin/services/touristSpotsService";
 import type { TouristSpotResponse } from "../admin/types";
+import { mailHref, telHref } from "../utils/establishmentDetail";
+import { truncateAtWord } from "../utils/text";
+import { isNotFoundError, requireUuid, useAsyncData } from "../utils/useAsyncData";
+import { useDocumentTitle } from "../utils/useDocumentTitle";
 import heroFallback from "../assets/images/foto-capa-parque-ubajara.png";
+import "../components/ui/ui.css";
 import "../components/Sections/style/Content.components.css";
 import "./style/PontoTuristico.css";
 
-export default function Local() {
-    const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
-    const [spot, setSpot] = useState<TouristSpotResponse | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        if (!id) { navigate("/pontos-turisticos"); return; }
-        touristSpotsService.getById(id)
-            .then(setSpot)
-            .catch(() => navigate("/pontos-turisticos"))
-            .finally(() => setLoading(false));
-    }, [id]);
-
-    if (loading) {
-        return (
-            <div className="pt-page">
-                <Header solid />
-                <main className="pt-main" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
-                    <span className="adm-spinner adm-spinner--lg" />
-                </main>
-                <Footer />
-            </div>
-        );
-    }
-
-    if (!spot) return null;
+function LocalView({ spot }: { spot: TouristSpotResponse }) {
+    useDocumentTitle(spot.name);
 
     const heroImg = spot.photos?.[0]?.url ?? heroFallback;
 
     return (
         <div className="pt-page">
             <Header />
-            <main className="pt-main">
+            <main className="pt-main" id="conteudo" tabIndex={-1}>
 
                 {/* ── Hero ── */}
                 <section className="pt-hero" aria-labelledby="local-hero-title">
-                    <img src={heroImg} alt={spot.name} className="pt-hero__bg" fetchPriority="high" decoding="async" />
+                    <img src={heroImg} alt="" className="pt-hero__bg" fetchPriority="high" decoding="async" />
                     <div className="pt-hero__overlay" aria-hidden="true" />
 
-                    <nav className="pt-breadcrumb" aria-label="Navegação">
-                        <div className="pt-breadcrumb__inner">
-                            <Link to="/" className="pt-breadcrumb__link">Início</Link>
-                            <span className="pt-breadcrumb__sep" aria-hidden="true">›</span>
-                            <Link to="/pontos-turisticos" className="pt-breadcrumb__link">Pontos Turísticos</Link>
-                            <span className="pt-breadcrumb__sep" aria-hidden="true">›</span>
-                            <span className="pt-breadcrumb__current">{spot.name}</span>
-                        </div>
-                    </nav>
+                    <Breadcrumb
+                        prefix="pt"
+                        items={[{ label: "Início", to: "/" }, { label: "Pontos Turísticos", to: "/pontos-turisticos" }, { label: spot.name }]}
+                    />
 
                     <div className="pt-hero__content">
                         <div className="pt-hero__inner">
                             <span className="pt-hero__tag">Ponto Turístico</span>
                             <h1 id="local-hero-title" className="pt-hero__title">{spot.name}</h1>
                             {spot.description && (
-                                <p className="pt-hero__subtitle">{spot.description.slice(0, 160)}</p>
+                                <p className="pt-hero__subtitle">{truncateAtWord(spot.description, 160)}</p>
                             )}
                         </div>
                     </div>
@@ -72,9 +49,7 @@ export default function Local() {
                         <div className="pt-hero__infobar">
                             <div className="pt-hero__infobar-inner">
                                 <span className={`pt-hero__info-item${spot.active ? " pt-hero__info-item--status" : " pt-hero__info-item--closed"}`}>
-                                    <span className="material-symbols-outlined" aria-hidden="true">
-                                        {spot.active ? "check_circle" : "cancel"}
-                                    </span>
+                                    <Icon name={spot.active ? "check_circle" : "cancel"} />
                                     {spot.active ? "Aberto ao Público" : "Temporariamente Fechado"}
                                 </span>
                             </div>
@@ -87,13 +62,13 @@ export default function Local() {
                     <section className="pt-gallery" aria-label="Galeria de fotos">
                         <div className="pt-gallery__inner">
                             <div className="pt-gallery__main">
-                                <img src={spot.photos[0].url} alt={spot.name} />
+                                <img src={spot.photos[0].url} alt={spot.name} width={1280} height={720} loading="lazy" decoding="async" />
                             </div>
                             {spot.photos.length > 1 && (
                                 <div className="pt-gallery__secondary">
-                                    {spot.photos.slice(1, 3).map((ph, i) => (
+                                    {spot.photos.slice(1, 3).map((ph) => (
                                         <div key={ph.id} className="pt-gallery__thumb">
-                                            <img src={ph.url} alt={`${spot.name} — foto ${i + 2}`} aria-hidden="true" />
+                                            <img src={ph.url} alt="" width={800} height={600} loading="lazy" decoding="async" />
                                         </div>
                                     ))}
                                 </div>
@@ -118,7 +93,7 @@ export default function Local() {
                                 <ul className="pt-visit-card__list">
                                     {spot.address && (
                                         <li className="pt-visit-item">
-                                            <span className="material-symbols-outlined pt-visit-item__icon" aria-hidden="true">location_on</span>
+                                            <Icon name="location_on" className="pt-visit-item__icon" />
                                             <div>
                                                 <strong>Endereço</strong>
                                                 <p>{spot.address}</p>
@@ -127,19 +102,19 @@ export default function Local() {
                                     )}
                                     {spot.phone && (
                                         <li className="pt-visit-item">
-                                            <span className="material-symbols-outlined pt-visit-item__icon" aria-hidden="true">call</span>
+                                            <Icon name="call" className="pt-visit-item__icon" />
                                             <div>
                                                 <strong>Telefone</strong>
-                                                <p>{spot.phone}</p>
+                                                <p><a className="pt-link" href={telHref(spot.phone)}>{spot.phone}</a></p>
                                             </div>
                                         </li>
                                     )}
                                     {spot.email && (
                                         <li className="pt-visit-item">
-                                            <span className="material-symbols-outlined pt-visit-item__icon" aria-hidden="true">mail</span>
+                                            <Icon name="mail" className="pt-visit-item__icon" />
                                             <div>
                                                 <strong>E-mail</strong>
-                                                <p>{spot.email}</p>
+                                                <p>{mailHref(spot.email) ? <a className="pt-link" href={mailHref(spot.email)}>{spot.email}</a> : spot.email}</p>
                                             </div>
                                         </li>
                                     )}
@@ -167,8 +142,8 @@ export default function Local() {
                                 {spot.phone && (
                                     <ul className="pt-how__routes">
                                         <li className="pt-how__route-item">
-                                            <span className="material-symbols-outlined" aria-hidden="true">call</span>
-                                            Informações: {spot.phone}
+                                            <Icon name="call" />
+                                            Informações: <a className="pt-link" href={telHref(spot.phone)}>{spot.phone}</a>
                                         </li>
                                     </ul>
                                 )}
@@ -178,12 +153,12 @@ export default function Local() {
                                     rel="noopener noreferrer"
                                     className="pt-how__maps-btn"
                                 >
-                                    <span className="material-symbols-outlined" aria-hidden="true">map</span>
+                                    <Icon name="map" />
                                     Abrir no Google Maps
                                 </a>
                             </div>
                             <div className="pt-how__right">
-                                <img src={heroImg} alt={spot.name} className="pt-how__img" />
+                                <img src={heroImg} alt="" className="pt-how__img" width={800} height={600} loading="lazy" decoding="async" />
                             </div>
                         </div>
                     </section>
@@ -193,4 +168,30 @@ export default function Local() {
             <Footer />
         </div>
     );
+}
+
+export default function Local() {
+    const { id = "" } = useParams<{ id: string }>();
+    const data = useAsyncData(async () => {
+        requireUuid(id);
+        return touristSpotsService.getById(id);
+    }, id);
+
+    useDocumentTitle(data.status === "ready" ? null : "Ponto turístico");
+
+    if (data.status === "loading") return <DetailStatePage kind="loading" />;
+    if (data.status === "error") {
+        return (
+            <DetailStatePage
+                kind={isNotFoundError(data.error) ? "not-found" : "error"}
+                heroTitle="Ponto turístico"
+                breadcrumb={[{ label: "Início", to: "/" }, { label: "Pontos Turísticos", to: "/pontos-turisticos" }]}
+                noun="este local"
+                backTo="/pontos-turisticos"
+                backLabel="Ver todos os pontos turísticos"
+                onRetry={data.retry}
+            />
+        );
+    }
+    return <LocalView key={data.data.id} spot={data.data} />;
 }

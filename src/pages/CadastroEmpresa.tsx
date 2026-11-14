@@ -13,6 +13,7 @@ import { authService } from "../admin/services/authService";
 import { cnpjRaw, formatCnpj, validateCnpj } from "../utils/cnpj";
 import { consumeReturnTo } from "../utils/returnTo";
 import { getRoleLabel } from "../utils/roles";
+import { useDocumentTitle } from "../utils/useDocumentTitle";
 import { validateEmail } from "../company/utils/fields";
 import heroImg from "../assets/images/mercado.png";
 import "../components/ui/ui.css";
@@ -101,6 +102,7 @@ function parseApiError(err: unknown): ApiFailure {
 }
 
 export default function CadastroEmpresa() {
+    useDocumentTitle("Cadastro de empresa");
     const navigate = useNavigate();
     const { applyAuthResponse, activateCompany, logout, isAuthenticated, isCompany, user } = useAuth();
     const activationMode = isAuthenticated && user?.role === "USER";
@@ -204,7 +206,7 @@ export default function CadastroEmpresa() {
     return (
         <div className="ce-page">
             <Header />
-            <main>
+            <main id="conteudo" tabIndex={-1}>
                 <PageHero
                     image={heroImg}
                     breadcrumb={[{ label: "Início", to: "/" }, { label: "Cadastro de empresa" }]}

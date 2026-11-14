@@ -1,24 +1,26 @@
-import { useState, useMemo, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useMemo, useEffect, useId } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Icon from "../components/ui/Icon";
+import StateBlock from "../components/ui/StateBlock";
+import { Button } from "../components/ui/Button";
 import { eventsService } from "../admin/services/eventsService";
 import { pageConfigService } from "../admin/services/pageConfigService";
 import type { EventResponse } from "../admin/types";
+import {
+    formatDay,
+    formatMonthLong,
+    formatMonthShort,
+    formatTime,
+    formatYear,
+    parseBackendDate,
+    toMonthKey,
+} from "../utils/dates";
+import { useAsyncData } from "../utils/useAsyncData";
+import { useDocumentTitle } from "../utils/useDocumentTitle";
+import "../components/ui/ui.css";
 import "./style/Eventos.css";
-
-const PT_MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-const PT_MONTHS_LONG = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-
-function parseEventDate(raw: string): Date {
-    if (!raw) return new Date(NaN);
-    if (raw.includes("/")) {
-        const [datePart, timePart = "00:00:00"] = raw.split(" ");
-        const [d, m, y] = datePart.split("/");
-        return new Date(`${y}-${m}-${d}T${timePart}`);
-    }
-    return new Date(raw);
-}
 
 interface EventCard {
     id: string;
@@ -26,40 +28,40 @@ interface EventCard {
     title: string;
     desc: string;
     place: string;
-    day: string;
-    month: string;
-    monthNum: number;
-    year: string;
-    time: string;
+    start: Date | null;
+    end: Date | null;
+    monthKey: string | null;
     raw: EventResponse;
 }
 
+type SortKey = "date" | "name";
+
 function mapEvent(ev: EventResponse): EventCard {
-    const date = parseEventDate(ev.startDateTime);
-    const day = isNaN(date.getTime()) ? "—" : String(date.getDate()).padStart(2, "0");
-    const monthNum = isNaN(date.getTime()) ? 0 : date.getMonth();
-    const month = isNaN(date.getTime()) ? "—" : PT_MONTHS[monthNum];
-    const year = isNaN(date.getTime()) ? "—" : String(date.getFullYear());
-    const time = isNaN(date.getTime())
-        ? "—"
-        : date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    const start = parseBackendDate(ev.startDateTime);
     return {
         id: ev.id,
         img: ev.photos?.[0]?.url ?? "",
         title: ev.name,
         desc: ev.description,
         place: ev.location,
-        day,
-        month,
-        monthNum,
-        year,
-        time,
+        start,
+        end: parseBackendDate(ev.endDateTime),
+        monthKey: start ? toMonthKey(start) : null,
         raw: ev,
     };
 }
 
-function sortKey(e: EventCard) {
-    return parseInt(e.year) * 100 + e.monthNum;
+/** Em andamento ou futuros primeiro (o mais próximo antes), depois os já realizados (o mais recente antes), por fim os sem data. */
+function compareByProximity(now: number) {
+    const group = (e: EventCard) => (!e.start ? 2 : (e.end ?? e.start).getTime() >= now ? 0 : 1);
+    return (a: EventCard, b: EventCard) => {
+        const ga = group(a);
+        const gb = group(b);
+        if (ga !== gb) return ga - gb;
+        if (ga === 0) return a.start!.getTime() - b.start!.getTime();
+        if (ga === 1) return b.start!.getTime() - a.start!.getTime();
+        return a.title.localeCompare(b.title, "pt-BR");
+    };
 }
 
 function EventCardItem({ ev }: { ev: EventCard }) {
@@ -67,15 +69,17 @@ function EventCardItem({ ev }: { ev: EventCard }) {
         <article className="ev-card">
             <div className="ev-card__img-wrap">
                 {ev.img ? (
-                    <img src={ev.img} alt="" className="ev-card__img" loading="lazy" />
+                    <img src={ev.img} alt="" className="ev-card__img" width={400} height={200} loading="lazy" decoding="async" />
                 ) : (
                     <div className="ev-card__img ev-card__img--placeholder" aria-hidden="true" />
                 )}
-                <div className="ev-card__date-badge">
-                    <strong className="ev-card__date-day">{ev.day}</strong>
-                    <span className="ev-card__date-month">{ev.month}</span>
-                    <span className="ev-card__date-year">{ev.year}</span>
-                </div>
+                {ev.start && (
+                    <div className="ev-card__date-badge">
+                        <strong className="ev-card__date-day">{formatDay(ev.start)}</strong>
+                        <span className="ev-card__date-month">{formatMonthShort(ev.start)}</span>
+                        <span className="ev-card__date-year">{formatYear(ev.start)}</span>
+                    </div>
+                )}
             </div>
             <div className="ev-card__body">
                 <h3 className="ev-card__title">
@@ -86,18 +90,20 @@ function EventCardItem({ ev }: { ev: EventCard }) {
                 <p className="ev-card__desc">{ev.desc}</p>
                 <div className="ev-card__meta">
                     <span className="ev-card__meta-item">
-                        <span className="material-symbols-outlined" aria-hidden="true">location_on</span>
+                        <Icon name="location_on" />
                         <span className="ev-card__meta-text">{ev.place}</span>
                     </span>
-                    <span className="ev-card__meta-item">
-                        <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
-                        {ev.time}
-                    </span>
+                    {ev.start && (
+                        <span className="ev-card__meta-item">
+                            <Icon name="schedule" />
+                            {formatTime(ev.start)}
+                        </span>
+                    )}
                 </div>
                 <div className="ev-card__footer">
                     <span className="ev-card__cta" aria-hidden="true">
                         Ver evento
-                        <span className="material-symbols-outlined">arrow_forward</span>
+                        <Icon name="arrow_forward" />
                     </span>
                     {ev.raw.registrationUrl && (
                         <a
@@ -107,7 +113,7 @@ function EventCardItem({ ev }: { ev: EventCard }) {
                             className="ev-card__register"
                         >
                             Inscrever-se
-                            <span className="material-symbols-outlined" aria-hidden="true">open_in_new</span>
+                            <Icon name="open_in_new" />
                         </a>
                     )}
                 </div>
@@ -117,65 +123,89 @@ function EventCardItem({ ev }: { ev: EventCard }) {
 }
 
 export default function Eventos() {
-    const [events, setEvents] = useState<EventCard[]>([]);
-    const [loading, setLoading] = useState(true);
+    useDocumentTitle("Eventos");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const sidebarId = useId();
+    const periodLabelId = useId();
+
+    const data = useAsyncData(async () => {
+        const page = await eventsService.getAll(0, 100, true);
+        return { events: page.content.map(mapEvent), now: Date.now() };
+    }, "events");
     const [coverImg, setCoverImg] = useState<string | null>(null);
     const [heroDesc, setHeroDesc] = useState("Festivais, feiras, trilhas guiadas e muito mais aguardam você em Ubajara.");
-    const [search, setSearch] = useState("");
-    const [activeMonth, setActiveMonth] = useState<string>("Todos");
-    const [sort, setSort] = useState<"date" | "name">("date");
+    const [search, setSearch] = useState(searchParams.get("q") ?? "");
     const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    const monthParam = searchParams.get("mes") ?? "";
+    const sort: SortKey = searchParams.get("ordem") === "nome" ? "name" : "date";
 
     useEffect(() => {
         pageConfigService.getConfig('EVENTOS').then((cfg) => {
             if (cfg.imageUrl) setCoverImg(cfg.imageUrl);
             if (cfg.description) setHeroDesc(cfg.description);
         });
-        eventsService.getAll(0, 100, true)
-            .then(page => setEvents(page.content.map(mapEvent)))
-            .catch(() => setEvents([]))
-            .finally(() => setLoading(false));
     }, []);
 
+    const events = useMemo(() => (data.status === "ready" ? data.data.events : []), [data]);
+    const now = data.status === "ready" ? data.data.now : 0;
+
+    function updateParams(changes: Record<string, string | null>) {
+        setSearchParams((prev) => {
+            const params = new URLSearchParams(prev);
+            for (const [key, value] of Object.entries(changes)) {
+                if (value) params.set(key, value);
+                else params.delete(key);
+            }
+            return params;
+        }, { replace: true });
+    }
+
     const monthOptions = useMemo(() => {
-        const seen = new Set<string>();
-        return [...events]
-            .sort((a, b) => sortKey(a) - sortKey(b))
-            .filter(e => {
-                const key = `${e.monthNum}/${e.year}`;
-                if (seen.has(key)) return false;
-                seen.add(key);
-                return true;
-            })
-            .map(e => ({ label: `${PT_MONTHS_LONG[e.monthNum]} ${e.year}`, value: `${e.monthNum}/${e.year}` }));
+        const seen = new Map<string, string>();
+        for (const e of [...events].sort((a, b) => (a.start?.getTime() ?? 0) - (b.start?.getTime() ?? 0))) {
+            if (e.start && e.monthKey && !seen.has(e.monthKey)) {
+                seen.set(e.monthKey, `${formatMonthLong(e.start)} ${formatYear(e.start)}`);
+            }
+        }
+        return [...seen].map(([value, label]) => ({ value, label }));
     }, [events]);
 
+    const activeMonth = monthOptions.some((o) => o.value === monthParam) ? monthParam : "";
+
     const filtered = useMemo(() => {
-        const list = events.filter(e => {
-            const q = search.toLowerCase();
+        const q = search.trim().toLowerCase();
+        const list = events.filter((e) => {
             if (q && !e.title.toLowerCase().includes(q) && !e.place.toLowerCase().includes(q)) return false;
-            if (activeMonth !== "Todos" && `${e.monthNum}/${e.year}` !== activeMonth) return false;
+            if (activeMonth && e.monthKey !== activeMonth) return false;
             return true;
         });
         return sort === "date"
-            ? [...list].sort((a, b) => sortKey(a) - sortKey(b))
+            ? [...list].sort(compareByProximity(now))
             : [...list].sort((a, b) => a.title.localeCompare(b.title, "pt-BR"));
-    }, [events, search, activeMonth, sort]);
+    }, [events, search, activeMonth, sort, now]);
 
-    const activeCount = (search ? 1 : 0) + (activeMonth !== "Todos" ? 1 : 0);
+    const activeCount = (search.trim() ? 1 : 0) + (activeMonth ? 1 : 0);
+
+    function handleSearch(value: string) {
+        setSearch(value);
+        updateParams({ q: value.trim() ? value : null });
+    }
 
     function clearAll() {
         setSearch("");
-        setActiveMonth("Todos");
+        updateParams({ q: null, mes: null });
     }
+
+    const hasEvents = data.status === "ready" && events.length > 0;
 
     return (
         <div className="ev-page">
             <Header />
-            <main className="ev-main">
+            <main className="ev-main" id="conteudo" tabIndex={-1}>
 
                 <section className="ev-hero" aria-labelledby="ev-hero-title">
-                    {coverImg && <img src={coverImg} alt="" className="ev-hero__bg" aria-hidden />}
+                    {coverImg && <img src={coverImg} alt="" className="ev-hero__bg" fetchPriority="high" decoding="async" />}
                     <div className="ev-hero__overlay" aria-hidden="true" />
                     <div className="ev-hero__content">
                         <div className="ev-hero__inner">
@@ -186,111 +216,138 @@ export default function Eventos() {
                     </div>
                 </section>
 
-                <div className="ev-body">
+                <div className={`ev-body${hasEvents ? "" : " ev-body--single"}`}>
 
-                    <button
-                        type="button"
-                        className="ev-filter-toggle"
-                        onClick={() => setSidebarOpen(!sidebarOpen)}
-                        aria-expanded={sidebarOpen}
-                    >
-                        <span className="material-symbols-outlined" aria-hidden="true">tune</span>
-                        Filtros
-                        {activeCount > 0 && (
-                            <span className="ev-filter-badge">{activeCount}</span>
-                        )}
-                        <span className="material-symbols-outlined ev-toggle-arrow" aria-hidden="true">
-                            {sidebarOpen ? "expand_less" : "expand_more"}
-                        </span>
-                    </button>
-
-                    <aside className={`ev-sidebar${sidebarOpen ? " is-open" : ""}`} aria-label="Filtros">
-
-                        <div className="ev-sidebar__section">
-                            <p className="ev-sidebar__label">Buscar</p>
-                            <div className="ev-search__wrap">
-                                <span className="material-symbols-outlined ev-search__icon" aria-hidden="true">search</span>
-                                <input
-                                    type="search"
-                                    className="ev-search__input"
-                                    placeholder="Nome ou local..."
-                                    value={search}
-                                    onChange={e => setSearch(e.target.value)}
-                                    aria-label="Buscar eventos"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="ev-sidebar__section">
-                            <p className="ev-sidebar__label">Período</p>
-                            <div className="ev-filter-group">
-                                <button
-                                    type="button"
-                                    className={`ev-pill${activeMonth === "Todos" ? " is-active" : ""}`}
-                                    onClick={() => setActiveMonth("Todos")}
-                                >
-                                    Todos
-                                </button>
-                                {monthOptions.map(opt => (
-                                    <button
-                                        key={opt.value}
-                                        type="button"
-                                        className={`ev-pill${activeMonth === opt.value ? " is-active" : ""}`}
-                                        onClick={() => setActiveMonth(opt.value)}
-                                    >
-                                        {opt.label}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {activeCount > 0 && (
-                            <button type="button" className="ev-sidebar__clear" onClick={clearAll}>
-                                <span className="material-symbols-outlined" aria-hidden="true">close</span>
-                                Limpar filtros
+                    {hasEvents && (
+                        <>
+                            <button
+                                type="button"
+                                className="ev-filter-toggle"
+                                onClick={() => setSidebarOpen(!sidebarOpen)}
+                                aria-expanded={sidebarOpen}
+                                aria-controls={sidebarId}
+                            >
+                                <Icon name="tune" />
+                                Filtros
+                                {activeCount > 0 && (
+                                    <span className="ev-filter-badge">{activeCount}</span>
+                                )}
+                                <Icon name={sidebarOpen ? "expand_less" : "expand_more"} className="ev-toggle-arrow" />
                             </button>
-                        )}
-                    </aside>
+
+                            <aside id={sidebarId} className={`ev-sidebar${sidebarOpen ? " is-open" : ""}`} aria-label="Filtros">
+
+                                <div className="ev-sidebar__section">
+                                    <p className="ev-sidebar__label">Buscar</p>
+                                    <div className="ev-search__wrap">
+                                        <Icon name="search" className="ev-search__icon" />
+                                        <input
+                                            type="search"
+                                            name="q"
+                                            className="ev-search__input"
+                                            placeholder="Nome ou local…"
+                                            value={search}
+                                            onChange={(e) => handleSearch(e.target.value)}
+                                            autoComplete="off"
+                                            spellCheck={false}
+                                            aria-label="Buscar eventos"
+                                        />
+                                    </div>
+                                </div>
+
+                                {monthOptions.length > 0 && (
+                                    <div className="ev-sidebar__section">
+                                        <p id={periodLabelId} className="ev-sidebar__label">Período</p>
+                                        <div className="ev-filter-group" role="group" aria-labelledby={periodLabelId}>
+                                            <button
+                                                type="button"
+                                                className={`ev-pill${activeMonth === "" ? " is-active" : ""}`}
+                                                aria-pressed={activeMonth === ""}
+                                                onClick={() => updateParams({ mes: null })}
+                                            >
+                                                Todos
+                                            </button>
+                                            {monthOptions.map((opt) => (
+                                                <button
+                                                    key={opt.value}
+                                                    type="button"
+                                                    className={`ev-pill${activeMonth === opt.value ? " is-active" : ""}`}
+                                                    aria-pressed={activeMonth === opt.value}
+                                                    onClick={() => updateParams({ mes: opt.value })}
+                                                >
+                                                    {opt.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeCount > 0 && (
+                                    <button type="button" className="ev-sidebar__clear" onClick={clearAll}>
+                                        <Icon name="close" />
+                                        Limpar filtros
+                                    </button>
+                                )}
+                            </aside>
+                        </>
+                    )}
 
                     <div className="ev-content">
-                        <div className="ev-topbar">
-                            <p className="ev-count">
-                                <strong>{filtered.length}</strong>{" "}
-                                {filtered.length === 1 ? "evento encontrado" : "eventos encontrados"}
-                            </p>
-                            <div className="ev-sort">
-                                <span className="ev-sort__label">Ordenar:</span>
-                                <select
-                                    className="ev-sort__select"
-                                    value={sort}
-                                    onChange={e => setSort(e.target.value as "date" | "name")}
-                                    aria-label="Ordenar eventos"
-                                >
-                                    <option value="date">Data mais próxima</option>
-                                    <option value="name">Nome A–Z</option>
-                                </select>
+                        {hasEvents && (
+                            <div className="ev-topbar">
+                                <p className="ev-count" aria-live="polite">
+                                    <strong>{filtered.length}</strong>{" "}
+                                    {filtered.length === 1 ? "evento encontrado" : "eventos encontrados"}
+                                </p>
+                                <div className="ev-sort">
+                                    <label className="ev-sort__label" htmlFor="ev-sort">Ordenar:</label>
+                                    <select
+                                        id="ev-sort"
+                                        name="ordem"
+                                        className="ev-sort__select"
+                                        value={sort}
+                                        onChange={(e) => updateParams({ ordem: e.target.value === "name" ? "nome" : null })}
+                                    >
+                                        <option value="date">Data mais próxima</option>
+                                        <option value="name">Nome A–Z</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
+                        )}
 
-                        {loading ? (
-                            <div className="ev-empty">
-                                <span className="material-symbols-outlined ev-empty__icon" aria-hidden="true">hourglass_top</span>
-                                <p className="ev-empty__msg">Carregando eventos...</p>
+                        <h2 className="ui-sr-only">Lista de eventos</h2>
+
+                        {data.status === "loading" ? (
+                            <div className="ev-empty" role="status">
+                                <Icon name="hourglass_top" className="ev-empty__icon" />
+                                <p className="ev-empty__msg">Carregando eventos…</p>
                             </div>
+                        ) : data.status === "error" ? (
+                            <StateBlock
+                                variant="error"
+                                icon="wifi_off"
+                                title="Não conseguimos carregar os eventos"
+                                actions={<Button icon="refresh" onClick={data.retry}>Tentar de novo</Button>}
+                            >
+                                A conexão na serra pode oscilar. Verifique o sinal e tente de novo.
+                            </StateBlock>
+                        ) : events.length === 0 ? (
+                            <StateBlock variant="empty" icon="event_busy" title="Ainda não há eventos programados">
+                                Volte em breve para conferir a agenda de Ubajara.
+                            </StateBlock>
                         ) : filtered.length > 0 ? (
                             <div className="ev-grid">
-                                {filtered.map(ev => (
+                                {filtered.map((ev) => (
                                     <EventCardItem key={ev.id} ev={ev} />
                                 ))}
                             </div>
                         ) : (
-                            <div className="ev-empty">
-                                <span className="material-symbols-outlined ev-empty__icon" aria-hidden="true">event_busy</span>
-                                <p className="ev-empty__msg">Nenhum evento encontrado com os filtros selecionados.</p>
-                                <button type="button" className="ev-empty__reset" onClick={clearAll}>
-                                    Limpar filtros
-                                </button>
-                            </div>
+                            <StateBlock
+                                variant="empty"
+                                icon="event_busy"
+                                title="Nenhum evento encontrado com os filtros selecionados"
+                                actions={<Button variant="outline" onClick={clearAll}>Limpar filtros</Button>}
+                            />
                         )}
                     </div>
 

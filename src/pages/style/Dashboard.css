@@ -481,7 +481,7 @@
   padding: 14px 16px;
   border: 1px solid #d1d5db;
   border-radius: 10px;
-  font-size: 15px;
+  font-size: max(16px, 1em);
   font-family: 'Inter', sans-serif;
   color: #1f2937;
   resize: vertical;
@@ -489,10 +489,14 @@
   box-sizing: border-box;
 }
 
-.dash-textarea:focus {
-  outline: none;
+.dash-textarea:focus-visible {
+  outline: 3px solid #2d8a54;
+  outline-offset: 2px;
   border-color: #153a27;
-  box-shadow: 0 0 0 3px rgba(21, 58, 39, 0.08);
+}
+
+.dash-textarea[aria-invalid="true"] {
+  border-color: #dc2626;
 }
 
 .dash-char-count {
@@ -547,7 +551,7 @@
   margin-bottom: 20px;
 }
 
-.dash-dep-sent h3 {
+.dash-dep-sent h2 {
   font-family: 'Merriweather', serif;
   font-size: 22px;
   font-weight: 700;
@@ -612,6 +616,40 @@
 .dash-avatar-camera:disabled {
   opacity: 0.7;
   cursor: wait;
+}
+
+.dash-avatar-camera .ui-icon {
+  font-size: 16px;
+}
+
+.dash-avatar-camera--remove {
+  bottom: 0;
+  right: -32px;
+  background: var(--dash-red, #ef4444);
+}
+
+.dash-avatar-camera--remove:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.dash-spin {
+  animation: dash-spin 0.7s linear infinite;
+}
+
+.dash-photo-notice {
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  max-width: 420px;
+}
+
+.dash-photo-notice--ok {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.dash-photo-notice--error {
+  color: #fecaca;
 }
 
 @keyframes dash-spin {
@@ -736,7 +774,7 @@
   padding: 12px 14px;
   border: 1px solid #d1d5db;
   border-radius: 10px;
-  font-size: 14px;
+  font-size: max(16px, 1em);
   font-family: 'Inter', sans-serif;
   color: #1f2937;
   transition: border-color 0.15s, box-shadow 0.15s;
@@ -744,10 +782,10 @@
   background: #fff;
 }
 
-.dash-input:focus {
-  outline: none;
+.dash-input:focus-visible {
+  outline: 3px solid #2d8a54;
+  outline-offset: 2px;
   border-color: #153a27;
-  box-shadow: 0 0 0 3px rgba(21, 58, 39, 0.08);
 }
 
 /* ── Responsive ───────────────────────────────────────────────────────────── */
@@ -785,5 +823,63 @@
 
   .dash-edit-card {
     padding: 20px;
+  }
+}
+
+/* ── Foco visível ─────────────────────────────────────────────────────────── */
+
+.dash-tab:focus-visible,
+.dash-stat:focus-visible,
+.dash-action-btn:focus-visible,
+.dash-avatar-camera:focus-visible,
+.dash-empty__cta:focus-visible,
+.dash-fav-card__name:focus-visible,
+.dash-fav-card__remove:focus-visible,
+.dash-star:focus-visible,
+.dash-submit-btn:focus-visible,
+.dash-dep-reset:focus-visible {
+  outline: 3px solid #2d8a54;
+  outline-offset: 2px;
+}
+
+.dash-profile-hero .dash-stat:focus-visible,
+.dash-profile-hero .dash-action-btn:focus-visible,
+.dash-profile-hero .dash-avatar-camera:focus-visible {
+  outline-color: #ffffff;
+}
+
+.dash-tab-content:focus-visible {
+  outline: 3px solid #2d8a54;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-action-btn,
+  .dash-tab,
+  .dash-empty__cta,
+  .dash-fav-card,
+  .dash-fav-card__img-wrap img,
+  .dash-fav-card__remove,
+  .dash-msg-item,
+  .dash-star,
+  .dash-submit-btn,
+  .dash-dep-reset,
+  .dash-avatar-camera {
+    transition: none;
+  }
+
+  .dash-action-btn:hover,
+  .dash-fav-card:hover,
+  .dash-fav-card:hover .dash-fav-card__img-wrap img,
+  .dash-fav-card__remove:hover,
+  .dash-star:hover,
+  .dash-submit-btn:hover:not(:disabled),
+  .dash-avatar-camera:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .dash-spin {
+    animation-duration: 2.1s;
   }
 }

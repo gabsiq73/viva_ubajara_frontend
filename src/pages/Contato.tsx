@@ -1,9 +1,13 @@
 import type { JSX } from 'react';
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Icon from "../components/ui/Icon";
 import heroImg from "../assets/images/foto-capa-parque-ubajara.png";
 import { contactMessagesService } from "../admin/services/contactMessagesService";
+import { mailHref, telHref } from "../utils/establishmentDetail";
+import { useDocumentTitle } from "../utils/useDocumentTitle";
+import "../components/ui/ui.css";
 import "../components/Sections/style/Content.components.css";
 import "./style/Contato.css";
 
@@ -34,11 +38,44 @@ const SUBJECTS = [
     "Outros",
 ] as const;
 
+const SENT_MESSAGES_KEY = "ubajara-sent-messages";
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 function cleanPhone(phone: string) {
     return phone.replace(/\D/g, "");
 }
 
+/** O histórico local é só um extra do perfil: a mensagem já foi enviada, então falha aqui não pode virar erro de envio. */
+function rememberSentMessage(entry: { subject: string; message: string; sentAt: string }) {
+    try {
+        let sent: unknown[] = [];
+        try {
+            const parsed: unknown = JSON.parse(localStorage.getItem(SENT_MESSAGES_KEY) ?? "[]");
+            if (Array.isArray(parsed)) sent = parsed;
+        } catch {
+            // valor corrompido: recomeça o histórico
+        }
+        sent.push(entry);
+        localStorage.setItem(SENT_MESSAGES_KEY, JSON.stringify(sent));
+    } catch {
+        // armazenamento indisponível
+    }
+}
+
+type FieldName = "name" | "email" | "message";
+type FieldErrors = Partial<Record<FieldName, string>>;
+
+function validate(name: string, email: string, message: string): FieldErrors {
+    const errors: FieldErrors = {};
+    if (!name.trim()) errors.name = "Informe seu nome.";
+    if (!email.trim()) errors.email = "Informe seu e-mail.";
+    else if (!EMAIL_PATTERN.test(email.trim())) errors.email = "Digite um e-mail válido, como maria@exemplo.com.";
+    if (!message.trim()) errors.message = "Escreva sua mensagem.";
+    return errors;
+}
+
 export default function Contato(): JSX.Element {
+    useDocumentTitle("Contato");
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [subject, setSubject] = useState<string>(SUBJECTS[0]);
@@ -46,26 +83,39 @@ export default function Contato(): JSX.Element {
     const [submitting, setSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+    const nameRef = useRef<HTMLInputElement>(null);
+    const emailRef = useRef<HTMLInputElement>(null);
+    const messageRef = useRef<HTMLTextAreaElement>(null);
+
+    useEffect(() => {
+        if (!success) return;
+        const timer = window.setTimeout(() => setSuccess(false), 5000);
+        return () => window.clearTimeout(timer);
+    }, [success]);
+
+    const clearFieldError = (field: FieldName) => {
+        if (fieldErrors[field]) setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
+    };
 
     const handleSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();
-        if (!name.trim() || !email.trim() || !message.trim()) {
-            setError("Preencha todos os campos obrigatórios.");
-            return;
-        }
         setError(null);
+        setSuccess(false);
+        const errors = validate(name, email, message);
+        setFieldErrors(errors);
+        if (errors.name) { nameRef.current?.focus(); return; }
+        if (errors.email) { emailRef.current?.focus(); return; }
+        if (errors.message) { messageRef.current?.focus(); return; }
         setSubmitting(true);
         try {
             await contactMessagesService.create({ name: name.trim(), email: email.trim(), subject, message: message.trim() });
-            const sent = JSON.parse(localStorage.getItem("ubajara-sent-messages") ?? "[]");
-            sent.push({ subject, message: message.trim(), sentAt: new Date().toISOString() });
-            localStorage.setItem("ubajara-sent-messages", JSON.stringify(sent));
+            rememberSentMessage({ subject, message: message.trim(), sentAt: new Date().toISOString() });
             setSuccess(true);
             setName("");
             setEmail("");
             setSubject(SUBJECTS[0]);
             setMessage("");
-            setTimeout(() => setSuccess(false), 5000);
         } catch {
             setError("Não foi possível enviar a mensagem. Tente novamente em instantes.");
         } finally {
@@ -77,8 +127,9 @@ export default function Contato(): JSX.Element {
         <div className="ct-page">
             <Header />
 
-            <section className="ct-hero" aria-label="Capa da página de contato">
-                <img src={heroImg} alt="Parque Nacional de Ubajara" className="ct-hero__img" />
+            <main id="conteudo" tabIndex={-1}>
+            <section className="ct-hero">
+                <img src={heroImg} alt="" className="ct-hero__img" fetchPriority="high" decoding="async" />
                 <div className="ct-hero__overlay" aria-hidden="true" />
                 <div className="ct-hero__content">
                     <span className="ct-hero__label">Atendimento</span>
@@ -109,14 +160,14 @@ export default function Contato(): JSX.Element {
                                 <span className="contact-section__info-icon material-symbols-outlined" aria-hidden="true">mail</span>
                                 <div className="contact-section__info-text">
                                     <strong>E-mail</strong>
-                                    <span>contato@vivaubajara.com.br</span>
+                                    <span><a className="ct-link" href={mailHref("contato@vivaubajara.com.br")}>contato@vivaubajara.com.br</a></span>
                                 </div>
                             </li>
                             <li className="contact-section__info-item">
                                 <span className="contact-section__info-icon material-symbols-outlined" aria-hidden="true">call</span>
                                 <div className="contact-section__info-text">
                                     <strong>Telefone</strong>
-                                    <span>(88) 3634-1234</span>
+                                    <span><a className="ct-link" href={telHref("(88) 3634-1234")}>(88) 3634-1234</a></span>
                                 </div>
                             </li>
                             <li className="contact-section__info-item">
@@ -132,7 +183,7 @@ export default function Contato(): JSX.Element {
                     <div className="contact-section__form-wrap">
                         {success && (
                             <div className="contact-section__alert contact-section__alert--success" role="status">
-                                <span className="material-symbols-outlined">check_circle</span>
+                                <Icon name="check_circle" />
                                 Mensagem enviada com sucesso! Retornaremos em breve.
                             </div>
                         )}
@@ -140,33 +191,47 @@ export default function Contato(): JSX.Element {
                             <div className="contact-section__field">
                                 <label htmlFor="ct-name" className="contact-section__label">Nome Completo</label>
                                 <input
+                                    ref={nameRef}
                                     id="ct-name"
+                                    name="name"
                                     type="text"
+                                    autoComplete="name"
                                     className="contact-section__input"
-                                    placeholder="Como podemos te chamar?"
+                                    placeholder="Ex.: Maria da Silva…"
                                     value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    onChange={(e) => { setName(e.target.value); clearFieldError("name"); }}
                                     disabled={submitting}
                                     required
+                                    aria-invalid={fieldErrors.name ? true : undefined}
+                                    aria-describedby={fieldErrors.name ? "ct-name-error" : undefined}
                                 />
+                                {fieldErrors.name && <p id="ct-name-error" className="ct-field-error">{fieldErrors.name}</p>}
                             </div>
                             <div className="contact-section__field">
                                 <label htmlFor="ct-email" className="contact-section__label">E-mail</label>
                                 <input
+                                    ref={emailRef}
                                     id="ct-email"
+                                    name="email"
                                     type="email"
+                                    autoComplete="email"
+                                    spellCheck={false}
                                     className="contact-section__input"
-                                    placeholder="seu@email.com"
+                                    placeholder="maria@exemplo.com…"
                                     value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    onChange={(e) => { setEmail(e.target.value); clearFieldError("email"); }}
                                     disabled={submitting}
                                     required
+                                    aria-invalid={fieldErrors.email ? true : undefined}
+                                    aria-describedby={fieldErrors.email ? "ct-email-error" : undefined}
                                 />
+                                {fieldErrors.email && <p id="ct-email-error" className="ct-field-error">{fieldErrors.email}</p>}
                             </div>
                             <div className="contact-section__field">
                                 <label htmlFor="ct-subject" className="contact-section__label">Assunto</label>
                                 <select
                                     id="ct-subject"
+                                    name="subject"
                                     className="contact-section__select"
                                     value={subject}
                                     onChange={(e) => setSubject(e.target.value)}
@@ -180,19 +245,25 @@ export default function Contato(): JSX.Element {
                             <div className="contact-section__field">
                                 <label htmlFor="ct-msg" className="contact-section__label">Mensagem</label>
                                 <textarea
+                                    ref={messageRef}
                                     id="ct-msg"
+                                    name="message"
+                                    autoComplete="off"
                                     className="contact-section__textarea"
-                                    placeholder="Em que podemos te ajudar?"
+                                    placeholder="Conte em que podemos ajudar…"
                                     rows={4}
                                     value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
+                                    onChange={(e) => { setMessage(e.target.value); clearFieldError("message"); }}
                                     disabled={submitting}
                                     required
+                                    aria-invalid={fieldErrors.message ? true : undefined}
+                                    aria-describedby={fieldErrors.message ? "ct-msg-error" : undefined}
                                 />
+                                {fieldErrors.message && <p id="ct-msg-error" className="ct-field-error">{fieldErrors.message}</p>}
                             </div>
                             {error && (
                                 <div className="contact-section__alert contact-section__alert--error" role="alert">
-                                    <span className="material-symbols-outlined">error</span>
+                                    <Icon name="error" />
                                     {error}
                                 </div>
                             )}
@@ -278,6 +349,8 @@ export default function Contato(): JSX.Element {
                     </div>
                 </div>
             </section>
+
+            </main>
 
             <Footer />
         </div>

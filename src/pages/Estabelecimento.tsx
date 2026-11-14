@@ -257,7 +257,7 @@ export default function Estabelecimento() {
     return (
         <div className={`estd-page${hasBottomBar ? " estd-page--bar" : ""}`}>
             <Header />
-            <main className="estd-main-wrap">
+            <main className="estd-main-wrap" id="conteudo" tabIndex={-1}>
                 {result === null && <DetailSkeleton />}
                 {result?.status === "ready" && <DetailView key={result.data.id} detail={result.data} />}
                 {result?.status === "not-found" && (

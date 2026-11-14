@@ -184,20 +184,26 @@
 
 .ptl-search__input {
   font-family: "Inter", sans-serif;
-  font-size: 14px;
+  font-size: max(16px, 1em);
   color: #00210c;
   background: #f4f9f6;
   border: 1.5px solid #d4eadb;
   border-radius: 50px;
   padding: 8px 16px 8px 40px;
   width: 220px;
-  outline: none;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.ptl-search__input:focus {
+.ptl-search__input:focus-visible {
   border-color: #006b32;
   background: #ffffff;
+  outline: 3px solid #2d8a54;
+  outline-offset: 2px;
+}
+
+.ptl-cta__btn:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
 }
 
 .ptl-search__input::-webkit-search-cancel-button {
@@ -406,5 +412,16 @@
   .ptl-filter-btn {
     padding: 6px 14px;
     font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ptl-search__input,
+  .ptl-cta__btn {
+    transition: none;
+  }
+
+  .ptl-cta__btn:hover {
+    transform: none;
   }
 }

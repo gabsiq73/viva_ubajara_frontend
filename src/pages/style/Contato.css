@@ -248,3 +248,55 @@
     .ct-card          { padding: 16px 14px; }
     .ct-card__phone   { font-size: 22px; }
 }
+
+.ct-page .contact-section__input,
+.ct-page .contact-section__select,
+.ct-page .contact-section__textarea {
+    font-size: max(16px, 1em);
+}
+
+.ct-page .contact-section__input:focus-visible,
+.ct-page .contact-section__select:focus-visible,
+.ct-page .contact-section__textarea:focus-visible,
+.ct-page .contact-section__submit:focus-visible,
+.ct-card:focus-visible,
+.ct-link:focus-visible {
+    outline: 3px solid var(--pub-green-mid);
+    outline-offset: 2px;
+}
+
+.ct-page .contact-section__input[aria-invalid="true"],
+.ct-page .contact-section__textarea[aria-invalid="true"] {
+    border-color: #b91c1c;
+}
+
+.ct-field-error {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #b91c1c;
+}
+
+.ct-link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: rgba(0, 107, 50, 0.4);
+    text-underline-offset: 3px;
+}
+
+.ct-link:hover {
+    color: #006b32;
+    text-decoration-color: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ct-card,
+    .ct-page .contact-section__submit {
+        transition: none;
+    }
+
+    .ct-card:hover {
+        transform: none;
+    }
+}

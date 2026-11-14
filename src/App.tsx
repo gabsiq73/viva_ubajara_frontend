@@ -1,5 +1,7 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import type { MouseEvent } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import "./pages/style/globalStyle.css";
+import "./pages/style/SkipLink.css";
 import { AuthProvider } from "./admin/contexts/AuthContext";
 
 import Index from "./pages/Index";
@@ -15,15 +17,36 @@ import ComoChegar from "./pages/ComoChegar";
 import Depoimentos from "./pages/Depoimentos";
 import Contato from "./pages/Contato";
 import Dashboard from "./pages/Dashboard";
+import NotFound from "./pages/NotFound";
 import { LoginSuccessPage } from "./pages/LoginSuccessPage";
 import { AdminRouter } from "./admin/AdminRouter";
 import { CompanyRouter } from "./company/CompanyRouter";
 import ScrollToTop from "./components/ScrollToTop";
 
+function SkipLink() {
+  const { pathname } = useLocation();
+  if (pathname.startsWith("/admin") || pathname.startsWith("/empresa")) return null;
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    const target = document.getElementById("conteudo");
+    if (!target) return;
+    event.preventDefault();
+    target.focus();
+    target.scrollIntoView();
+  };
+
+  return (
+    <a href="#conteudo" className="skip-link" onClick={handleClick}>
+      Ir para o conteúdo
+    </a>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <SkipLink />
         <ScrollToTop />
         <Routes>
           {/* ─── Rotas públicas ─── */}
@@ -51,6 +74,8 @@ function App() {
 
           {/* ─── Área self-service da empresa ─── */}
           <Route path="/empresa/*" element={<CompanyRouter />} />
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
