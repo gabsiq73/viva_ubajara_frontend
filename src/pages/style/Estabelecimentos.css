@@ -226,8 +226,8 @@
 
 .estab-sidebar {
     position: sticky;
-    top: 112px;
-    max-height: calc(100vh - 136px);
+    top: calc(var(--site-header-h, 64px) + 24px);
+    max-height: calc(100vh - var(--site-header-h, 64px) - 48px);
     margin: -4px;
     padding: 4px;
     overflow-y: auto;
@@ -615,7 +615,7 @@
     .estab-mobilebar {
         display: block;
         position: sticky;
-        top: 70px;
+        top: var(--site-header-h, 64px);
         z-index: 20;
         border-bottom: 1px solid var(--ui-line);
         background: #ffffff;

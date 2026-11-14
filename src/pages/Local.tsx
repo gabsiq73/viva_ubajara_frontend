@@ -25,7 +25,7 @@ export default function Local() {
     if (loading) {
         return (
             <div className="pt-page">
-                <Header />
+                <Header solid />
                 <main className="pt-main" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
                     <span className="adm-spinner adm-spinner--lg" />
                 </main>

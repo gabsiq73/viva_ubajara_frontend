@@ -541,7 +541,7 @@ export default function Content() {
 
                     {/* Guias Turísticos */}
                     <div className="tour-guides-wrap">
-                        <section className="tour-guides" aria-labelledby="tour-guides-title">
+                        <section id="guias-de-turismo" className="tour-guides" aria-labelledby="tour-guides-title">
                             <div className="tour-guides__inner">
                                 <header className="tour-guides__header reveal">
                                     <span className="tour-guides__kicker">Seu passeio em boas mãos</span>

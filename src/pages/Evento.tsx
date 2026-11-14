@@ -83,7 +83,7 @@ export default function Evento() {
     if (loading) {
         return (
             <div className="evd-page">
-                <Header />
+                <Header solid />
                 <main className="evd-main" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
                     <span className="adm-spinner adm-spinner--lg" />
                 </main>
