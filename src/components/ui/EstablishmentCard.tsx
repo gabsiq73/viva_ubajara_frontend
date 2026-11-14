@@ -23,7 +23,7 @@ function Rating({ value }: { value: number }) {
 
 function Media({ item }: { item: Establishment }) {
     return item.photo ? (
-        <img src={item.photo} alt="" className="ui-card__img" loading="lazy" />
+        <img src={item.photo} alt="" className="ui-card__img" width={640} height={400} loading="lazy" decoding="async" />
     ) : (
         <div className="ui-card__placeholder" aria-hidden="true">
             <Icon name={TYPE_ICONS[item.type]} />

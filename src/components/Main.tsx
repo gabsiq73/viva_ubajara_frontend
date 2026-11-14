@@ -2,22 +2,25 @@ import "./styles/Main.components.css";
 import Content from "./Sections/Content";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 
 const HERO_WORDS = ["Inesquecível", "Memorável", "Incrível"] as const;
 
 export default function Main(){
     const [wordIdx, setWordIdx] = useState(0);
+    const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
     useEffect(() => {
+        if (reduceMotion) return;
         const t = setInterval(
             () => setWordIdx(i => (i + 1) % HERO_WORDS.length),
             3400
         );
         return () => clearInterval(t);
-    }, []);
+    }, [reduceMotion]);
 
     return(
-        <main className="main">
+        <main className="main" id="conteudo" tabIndex={-1}>
             <section className="welcome" aria-label="Capa do site">
                 <div className="hero-inner">
                     <span className="hero-kicker">
@@ -27,7 +30,8 @@ export default function Main(){
                     <h1 className="hero-title">
                         <span className="hero-title__lead">Tenha uma experiência</span>
                         <span className="hero-title--gold">
-                            <span key={wordIdx} className="hero-rotating-word" aria-live="polite">
+                            <span className="ui-sr-only">{HERO_WORDS[0]}</span>
+                            <span key={wordIdx} className="hero-rotating-word" aria-hidden="true">
                                 {HERO_WORDS[wordIdx]}
                             </span>
                         </span>

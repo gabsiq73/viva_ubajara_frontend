@@ -128,7 +128,8 @@ function CompanyPanel({ detail }: { detail: EstablishmentDetail }) {
 
     if (state.status === "loading") {
         return (
-            <div className="estd-claim__loading" aria-busy="true" aria-label="Verificando sua conta">
+            <div className="estd-claim__loading" aria-busy="true">
+                <span className="ui-sr-only">Verificando sua conta…</span>
                 <Skeleton height={18} width="70%" />
                 <Skeleton height={18} width="90%" />
                 <Skeleton height={44} width={200} radius={50} />
@@ -301,6 +302,8 @@ function CompanyPanel({ detail }: { detail: EstablishmentDetail }) {
                     {(control) => (
                         <textarea
                             {...control}
+                            name="message"
+                            autoComplete="off"
                             className="ui-input"
                             rows={5}
                             maxLength={MESSAGE_MAX}
@@ -317,9 +320,11 @@ function CompanyPanel({ detail }: { detail: EstablishmentDetail }) {
                         <input
                             {...control}
                             className="ui-input"
+                            name="phone"
                             type="tel"
                             inputMode="tel"
                             autoComplete="tel-national"
+                            spellCheck={false}
                             placeholder="(88) 99999-9999"
                             value={phone}
                             onChange={(event) => {

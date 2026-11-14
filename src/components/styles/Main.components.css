@@ -221,4 +221,9 @@ section.welcome {
 
 @media (prefers-reduced-motion: reduce) {
     .hero-rotating-word { animation: none; }
+
+    .hero-btn--primary:hover,
+    .hero-btn--ghost:hover {
+        transform: none;
+    }
 }

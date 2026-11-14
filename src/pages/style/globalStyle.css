@@ -1,9 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:wght@300;400;500;600;700&display=swap');
-
 * {
     box-sizing: border-box;
     padding: 0;
     margin: 0;
+}
+
+html {
+    scroll-padding-top: var(--site-header-h, 84px);
+    color-scheme: light;
+    -webkit-tap-highlight-color: transparent;
+}
+
+a,
+button,
+[role="button"],
+input,
+select,
+textarea {
+    touch-action: manipulation;
+}
+
+h1,
+h2,
+h3 {
+    text-wrap: balance;
+}
+
+input,
+select,
+textarea {
+    font-size: max(16px, 1em);
 }
 
 :root {
@@ -100,6 +125,30 @@ img {
     background: linear-gradient(90deg, #e8f0eb 25%, #d4e4d9 50%, #e8f0eb 75%);
     background-size: 200% 100%;
     animation: img-shimmer 1.4s ease-in-out infinite !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    img,
+    .evd-rel-card__img--placeholder {
+        animation: none !important;
+    }
+
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        transition-delay: 0s !important;
+        animation-duration: 0.01ms !important;
+        animation-delay: 0s !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* Spinners seguem girando, devagar: parados, o carregamento pareceria travado. */
+    [class*="spin"] {
+        animation-duration: 2.4s !important;
+        animation-iteration-count: infinite !important;
+    }
 }
 
 /*Responsive*/

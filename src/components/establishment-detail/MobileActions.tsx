@@ -40,6 +40,7 @@ export function QuickActions({ detail, favorite, onToggleFavorite, onOpenSheet }
                         <Icon name="language" />
                     </span>
                     Site
+                    <span className="ui-sr-only"> (abre em nova aba)</span>
                 </a>
             )}
             {detail.bookingUrl && (
@@ -48,6 +49,7 @@ export function QuickActions({ detail, favorite, onToggleFavorite, onOpenSheet }
                         <Icon name="event_available" />
                     </span>
                     Reservar
+                    <span className="ui-sr-only"> (abre em nova aba)</span>
                 </a>
             )}
             <button

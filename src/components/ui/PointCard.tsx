@@ -11,7 +11,7 @@ export default function PointCard({ item }: { item: AttractionResponse }) {
         <article className="ui-point">
             <div className="ui-point__media">
                 {photo ? (
-                    <img src={photo} alt="" className="ui-point__img" loading="lazy" />
+                    <img src={photo} alt="" className="ui-point__img" width={400} height={480} loading="lazy" decoding="async" />
                 ) : (
                     <div className="ui-point__placeholder" aria-hidden="true">
                         <Icon name={ATTRACTION_CATEGORY_ICONS[item.category] ?? "landscape"} />
@@ -33,7 +33,7 @@ export default function PointCard({ item }: { item: AttractionResponse }) {
                     {item.averageVisitDuration != null && (
                         <span className="ui-point__chip">
                             <Icon name="schedule" />
-                            {item.averageVisitDuration} min
+                            {item.averageVisitDuration}&nbsp;min
                         </span>
                     )}
                     <span className="ui-point__cta" aria-hidden="true">

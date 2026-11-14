@@ -1,6 +1,5 @@
 import { useEffect, useRef, type RefObject } from "react";
-
-const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+import { FOCUSABLE_SELECTOR } from "./focusable";
 
 interface ModalBehaviorOptions {
     panelRef: RefObject<HTMLElement | null>;
@@ -30,7 +29,7 @@ export function useModalBehavior({ panelRef, onClose, initialFocusRef, returnFoc
                 return;
             }
             if (event.key !== "Tab" || !panelRef.current) return;
-            const focusables = panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE);
+            const focusables = panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
             if (focusables.length === 0) return;
             const first = focusables[0];
             const last = focusables[focusables.length - 1];

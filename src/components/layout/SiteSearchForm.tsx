@@ -27,7 +27,9 @@ export default function SiteSearchForm({ variant, inputRef }: SiteSearchFormProp
                 <input
                     ref={inputRef}
                     type="search"
+                    name="q"
                     className="site-search__input"
+                    spellCheck={false}
                     placeholder="Buscar restaurantes e pousadas…"
                     aria-label="Buscar restaurantes e pousadas"
                     enterKeyHint="search"

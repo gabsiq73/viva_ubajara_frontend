@@ -24,7 +24,10 @@ import type {
 } from "../../admin/types";
 import { ArrowRight } from "lucide-react";
 import EstablishmentCard from "../ui/EstablishmentCard";
+import { Button } from "../ui/Button";
 import { FilterChip } from "../ui/Chip";
+import StateBlock from "../ui/StateBlock";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 import PointCard from "../ui/PointCard";
 import { Skeleton, EstablishmentCardSkeleton, PointCardSkeleton } from "../ui/Skeleton";
 import {
@@ -68,10 +71,10 @@ const GASTRO_SLIDES_FALLBACK: GastronomySlide[] = [
 ];
 
 const AIRPORTS = [
-    { code: "JJD", name: "Aeroporto de Jericoacoara", dist: "165 km de distância" },
-    { code: "THE", name: "Aeroporto de Teresina", dist: "280 km de distância" },
-    { code: "FOR", name: "Aeroporto de Fortaleza", dist: "320 km de distância" },
-    { code: "PHB", name: "Aeroporto de Parnaíba", dist: "190 km de distância" },
+    { code: "JJD", name: "Aeroporto de Jericoacoara", dist: "165\u00A0km de distância" },
+    { code: "THE", name: "Aeroporto de Teresina", dist: "280\u00A0km de distância" },
+    { code: "FOR", name: "Aeroporto de Fortaleza", dist: "320\u00A0km de distância" },
+    { code: "PHB", name: "Aeroporto de Parnaíba", dist: "190\u00A0km de distância" },
 ];
 
 interface FaqItem {
@@ -84,7 +87,7 @@ const FAQ_ITEMS: FaqItem[] = [
     {
         id: "onde-fica",
         question: "Onde fica o Parque Nacional de Ubajara?",
-        answer: <p>O Parque está localizado na Serra da Ibiapaba, a cerca de 320 km de Fortaleza. A entrada principal fica no município de Ubajara, no estado do Ceará.</p>,
+        answer: <p>O Parque está localizado na Serra da Ibiapaba, a cerca de 320&nbsp;km de Fortaleza. A entrada principal fica no município de Ubajara, no estado do Ceará.</p>,
     },
     {
         id: "teleferico",
@@ -126,7 +129,7 @@ const FAQ_ITEMS: FaqItem[] = [
         question: "Tenho um restaurante ou pousada. Como divulgo meu negócio?",
         answer: (
             <>
-                <p>Faça o cadastro da sua empresa no Viva Ubajara. Depois de enviado, o cadastro passa pela análise da nossa equipe antes de ser publicado no site.</p>
+                <p>Faça o cadastro da sua empresa no <span translate="no">Viva Ubajara</span>. Depois de enviado, o cadastro passa pela análise da nossa equipe antes de ser publicado no site.</p>
                 <p><Link to="/cadastro-empresa" className="faq__link">Cadastrar minha empresa</Link></p>
             </>
         ),
@@ -136,7 +139,7 @@ const FAQ_ITEMS: FaqItem[] = [
         question: "Como falo com a equipe do parque?",
         answer: (
             <>
-                <p>Ligue para <a href="tel:+558836341234" className="faq__link">(88) 3634-1234</a> ou escreva para <a href="mailto:contato@vivaubajara.com.br" className="faq__link">contato@vivaubajara.com.br</a>. Você também pode enviar uma mensagem pela página de contato.</p>
+                <p>Ligue para <a href="tel:+558836341234" className="faq__link">(88)&nbsp;3634-1234</a> ou escreva para <a href="mailto:contato@vivaubajara.com.br" className="faq__link">contato@vivaubajara.com.br</a>. Você também pode enviar uma mensagem pela página de contato.</p>
                 <p><Link to="/contato" className="faq__link">Ir para a página de contato</Link></p>
             </>
         ),
@@ -209,16 +212,44 @@ const ReviewSkeleton = () => (
 );
 
 // ── Type helpers ───────────────────────────────────────────────
-const PT_MONTHS = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+const DAY_FORMAT = new Intl.DateTimeFormat("pt-BR", { day: "2-digit" });
+const MONTH_FORMAT = new Intl.DateTimeFormat("pt-BR", { month: "short" });
+const DAY_MONTH_LONG_FORMAT = new Intl.DateTimeFormat("pt-BR", { day: "numeric", month: "long" });
 
+// O backend manda dd/MM/yyyy HH:mm:ss; montar a data por partes evita o parse em UTC de "YYYY-MM-DD".
 function parseDate(raw: string): Date {
     if (!raw) return new Date(NaN);
-    if (raw.includes("/")) {
-        const [d, t = "00:00:00"] = raw.split(" ");
-        const [day, mon, yr] = d.split("/");
-        return new Date(`${yr}-${mon}-${day}T${t}`);
+    const br = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (br) {
+        const [, day, mon, yr, hh = "0", mm = "0", ss = "0"] = br;
+        const date = new Date(+yr, +mon - 1, +day, +hh, +mm, +ss);
+        return date.getMonth() === +mon - 1 ? date : new Date(NaN);
     }
+    const isoDate = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (isoDate) return new Date(+isoDate[1], +isoDate[2] - 1, +isoDate[3]);
     return new Date(raw);
+}
+
+function SectionState({ failed, emptyTitle, emptyIcon, emptyVariant = "empty", onRetry }: {
+    failed: boolean;
+    emptyTitle: string;
+    emptyIcon: string;
+    emptyVariant?: "empty" | "notice";
+    onRetry: () => void;
+}) {
+    if (failed) {
+        return (
+            <StateBlock
+                variant="error"
+                icon="cloud_off"
+                title="Não foi possível carregar esta seção."
+                actions={<Button variant="outline" icon="refresh" onClick={onRetry}>Tentar de novo</Button>}
+            >
+                Verifique sua conexão e tente novamente.
+            </StateBlock>
+        );
+    }
+    return <StateBlock variant={emptyVariant} icon={emptyIcon} title={emptyTitle} />;
 }
 
 const PUB_LIMIT = 8;
@@ -278,6 +309,11 @@ export default function Content() {
     const [pubItems, setPubItems] = useState<Establishment[]>([]);
     const [homeGuides, setHomeGuides] = useState<TourGuideResponse[]>([]);
     const [homeReviews, setHomeReviews] = useState<TestimonialResponse[]>([]);
+    const [failed, setFailed] = useState({ attractions: false, events: false, establishments: false, guides: false, reviews: false });
+    const [reloadKey, setReloadKey] = useState(0);
+    const [gastroHover, setGastroHover] = useState(false);
+    const [gastroFocus, setGastroFocus] = useState(false);
+    const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
     const [pubGuideFilter, setPubGuideFilter] = useState("Todos");
     const [favoriteIds, setFavoriteIds] = useState<Set<string>>(() => new Set(loadFavorites().map((f) => f.id)));
 
@@ -288,7 +324,9 @@ export default function Content() {
                 .map(item => ({ tag: item.name, src: item.imageUrl!, alt: item.name }));
             if (slides.length > 0) setGastroSlides(slides);
         }).catch(() => {});
+    }, []);
 
+    useEffect(() => {
         Promise.allSettled([
             attractionsService.getAll(0, 4, true),
             eventsService.getAll(0, 4, true),
@@ -307,16 +345,30 @@ export default function Content() {
             const hosts = hostR.status === "fulfilled"
                 ? hostR.value.content.filter(h => h.active).map(mapHostPoint) : [];
             setPubItems([...rests, ...hosts]);
+            setFailed({
+                attractions: attR.status === "rejected",
+                events: evR.status === "rejected",
+                establishments: restR.status === "rejected" && hostR.status === "rejected",
+                guides: guideR.status === "rejected",
+                reviews: testR.status === "rejected",
+            });
         }).finally(() => setLoading(false));
-    }, []);
+    }, [reloadKey]);
+
+    const retryLoad = () => {
+        setLoading(true);
+        setReloadKey((k) => k + 1);
+    };
+
+    const gastroPaused = reduceMotion || gastroHover || gastroFocus;
 
     useEffect(() => {
-        if (gastroSlides.length <= 1) return;
+        if (gastroSlides.length <= 1 || gastroPaused) return;
         const id = window.setInterval(() => {
             setGastroIndex((i) => (i + 1) % gastroSlides.length);
         }, 4500);
         return () => window.clearInterval(id);
-    }, [gastroSlides]);
+    }, [gastroSlides, gastroPaused, gastroIndex]);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -365,7 +417,7 @@ export default function Content() {
 
     return (
         <section className="section">
-            <div className="paper"><img src={paper} /></div>
+            <div className="paper"><img src={paper} alt="" width={3660} height={856} decoding="async" /></div>
             <div className="fundo">
 
                 {/* ── Quick nav cards ── */}
@@ -428,6 +480,8 @@ export default function Content() {
                             <ul className="ui-point-grid" aria-hidden="true">
                                 {Array.from({ length: 4 }).map((_, i) => <li key={i}><PointCardSkeleton /></li>)}
                             </ul>
+                        ) : failed.attractions || attractions.length === 0 ? (
+                            <SectionState failed={failed.attractions} emptyTitle="Nenhum ponto turístico cadastrado por enquanto." emptyIcon="landscape" onRetry={retryLoad} />
                         ) : (
                             <ul className="ui-point-grid grid-reveal">
                                 {attractions.map((pt) => (
@@ -441,11 +495,17 @@ export default function Content() {
                 {/* ── Gastronomia ── */}
                 <div className="top-n">
                     <div className="papel">
-                        <div className="paper1"><img src={paper} alt="papel" /></div>
-                        <div className="paper2"><img src={paper} alt="papel" /></div>
+                        <div className="paper1"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
+                        <div className="paper2"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
                     </div>
                     <div className="news">
-                        <div className="news-inner">
+                        <div
+                            className="news-inner"
+                            onPointerEnter={(e) => { if (e.pointerType === "mouse") setGastroHover(true); }}
+                            onPointerLeave={(e) => { if (e.pointerType === "mouse") setGastroHover(false); }}
+                            onFocus={() => setGastroFocus(true)}
+                            onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setGastroFocus(false); }}
+                        >
                             <div className="caixa">
                                 <GastronomyCarousel slides={gastroSlides} activeIndex={gastroIndex} onActiveChange={setGastroIndex} />
                             </div>
@@ -478,8 +538,8 @@ export default function Content() {
                         </div>
                     </div>
                     <div className="papel ptop">
-                        <div className="paper1"><img src={paper} alt="papel" /></div>
-                        <div className="paper2"><img src={paper} alt="papel" /></div>
+                        <div className="paper1"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
+                        <div className="paper2"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
                     </div>
                 </div>
 
@@ -495,7 +555,7 @@ export default function Content() {
                             subtitle="Os melhores lugares para comer, dormir e viver momentos inesquecíveis em nossa cidade."
                             cta={{ to: "/estabelecimentos", label: "Ver todos os estabelecimentos" }}
                         />
-                        {loading || pubItems.length === 0 ? (
+                        {loading ? (
                             <>
                                 <div className="pub-guide__filters" aria-hidden="true">
                                     {Array.from({ length: 4 }).map((_, i) => (
@@ -506,6 +566,8 @@ export default function Content() {
                                     {Array.from({ length: PUB_LIMIT }).map((_, i) => <EstablishmentCardSkeleton key={i} />)}
                                 </div>
                             </>
+                        ) : failed.establishments || pubItems.length === 0 ? (
+                            <SectionState failed={failed.establishments} emptyTitle="Nenhum estabelecimento cadastrado por enquanto." emptyIcon="storefront" onRetry={retryLoad} />
                         ) : (
                             <>
                                 <div className="pub-guide__filters" role="group" aria-label="Filtrar por tipo">
@@ -541,21 +603,24 @@ export default function Content() {
                             subtitle="Fique por dentro da programação cultural e dos festivais que movimentam a nossa serra."
                             cta={{ to: "/eventos", label: "Ver todos os eventos" }}
                         />
-                        {loading || homeEvents.length === 0 ? (
+                        {loading ? (
                             <div className="pub-events__grid">
                                 {Array.from({ length: 4 }).map((_, i) => <EventSkeleton key={i} />)}
                             </div>
+                        ) : failed.events || homeEvents.length === 0 ? (
+                            <SectionState failed={failed.events} emptyTitle="Nenhum evento agendado por enquanto." emptyIcon="event" onRetry={retryLoad} />
                         ) : (
                             <div className="pub-events__grid reveal grid-reveal">
                                 {homeEvents.map((ev) => {
                                     const d = parseDate(ev.startDateTime);
-                                    const day = isNaN(d.getTime()) ? "—" : String(d.getDate()).padStart(2, "0");
-                                    const month = isNaN(d.getTime()) ? "—" : PT_MONTHS[d.getMonth()];
+                                    const valid = !isNaN(d.getTime());
+                                    const day = valid ? DAY_FORMAT.format(d) : "—";
+                                    const month = valid ? MONTH_FORMAT.format(d).replace(".", "") : "—";
                                     return (
                                         <article key={ev.id} className="pub-event-card">
                                             <div className="pub-event-card__media">
                                                 {ev.photos?.[0]?.url
-                                                    ? <img src={ev.photos[0].url} alt="" loading="lazy" />
+                                                    ? <img src={ev.photos[0].url} alt="" width={640} height={480} loading="lazy" decoding="async" />
                                                     : <div className="pub-event-card__placeholder" aria-hidden="true" />
                                                 }
                                                 <div className="pub-event-card__date" aria-hidden="true">
@@ -567,7 +632,7 @@ export default function Content() {
                                                 <h3 className="pub-event-card__title">
                                                     <Link to={`/eventos/${ev.id}`} className="pub-event-card__link">
                                                         {ev.name}
-                                                        {!isNaN(d.getTime()) && <span className="ui-sr-only">, {day} de {month}</span>}
+                                                        {valid && <span className="ui-sr-only">, {DAY_MONTH_LONG_FORMAT.format(d)}</span>}
                                                     </Link>
                                                 </h3>
                                                 <p className="pub-event-card__desc">{ev.description}</p>
@@ -603,12 +668,14 @@ export default function Content() {
                             <div className="tour-guides__grid">
                                 {Array.from({ length: 4 }).map((_, i) => <GuideSkeleton key={i} />)}
                             </div>
+                        ) : failed.guides || homeGuides.length === 0 ? (
+                            <SectionState failed={failed.guides} emptyTitle="Nenhum guia cadastrado por enquanto." emptyIcon="hiking" onRetry={retryLoad} />
                         ) : (
                             <div className="tour-guides__grid reveal grid-reveal">
                                 {homeGuides.map((guide) => (
                                     <article key={guide.id} className="guide-card">
                                         <div className="guide-card__photo">
-                                            <img src={guide.photos?.[0]?.url || park} alt={guide.name} loading="lazy" />
+                                            <img src={guide.photos?.[0]?.url || park} alt={guide.name} width={640} height={480} loading="lazy" decoding="async" />
                                             {guide.languages && guide.languages.length > 0 && (
                                                 <span className="guide-card__lang">{guide.languages.join(" / ")}</span>
                                             )}
@@ -648,7 +715,7 @@ export default function Content() {
                                         <h3 className="transport-card__title">De Avião</h3>
                                         <p className="transport-card__desc">Voe para os aeroportos mais próximos e complete a viagem por terra em menos de 3 horas de carro.</p>
                                     </div>
-                                    <span className="transport-card__badge">A partir de 165 km</span>
+                                    <span className="transport-card__badge">A partir de 165&nbsp;km</span>
                                 </div>
                                 <div className="transport-card transport-card--bus">
                                     <div className="transport-card__icon-wrap"><span className="material-symbols-outlined" aria-hidden="true">directions_bus</span></div>
@@ -686,8 +753,8 @@ export default function Content() {
                 {/* ── Depoimentos ── */}
                 <div className="reviews-block">
                     <div className="papel">
-                        <div className="paper1"><img src={paper} alt="" /></div>
-                        <div className="paper2"><img src={paper} alt="" /></div>
+                        <div className="paper1"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
+                        <div className="paper2"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
                     </div>
                     <section className="reviews" aria-labelledby="reviews-title">
                         <div className="reviews__inner">
@@ -699,23 +766,29 @@ export default function Content() {
                                 cta={{ to: "/depoimentos", label: "Ver todos os depoimentos" }}
                                 onDark
                             />
-                            {loading || homeReviews.length === 0 ? (
+                            {loading ? (
                                 <div className="reviews__grid">
                                     {Array.from({ length: 3 }).map((_, i) => <ReviewSkeleton key={i} />)}
                                 </div>
+                            ) : failed.reviews || homeReviews.length === 0 ? (
+                                <SectionState failed={failed.reviews} emptyTitle="Ainda não há depoimentos publicados." emptyIcon="rate_review" emptyVariant="notice" onRetry={retryLoad} />
                             ) : (
                                 <div className="reviews__grid reveal grid-reveal">
                                     {homeReviews.map((r, i) => (
                                         <article key={r.id} className="review-card">
-                                            <div className="review-card__stars" aria-label={`${r.rating} de 5 estrelas`}>
-                                                {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}
+                                            <div className="review-card__stars" role="img" aria-label={`${r.rating} de 5 estrelas`}>
+                                                <span aria-hidden="true">{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</span>
                                             </div>
-                                            <p className="review-card__text">"{r.comment}"</p>
+                                            <p className="review-card__text">“{r.comment}”</p>
                                             <div className="review-card__author">
                                                 <img
                                                     src={r.userPhoto || FALLBACK_AVATARS[i % FALLBACK_AVATARS.length]}
                                                     alt={r.userName}
                                                     className="review-card__avatar"
+                                                    width={42}
+                                                    height={42}
+                                                    loading="lazy"
+                                                    decoding="async"
                                                 />
                                                 <div className="review-card__info">
                                                     <strong className="review-card__name">{r.userName}</strong>
@@ -729,8 +802,8 @@ export default function Content() {
                         </div>
                     </section>
                     <div className="papel ptop">
-                        <div className="paper1"><img src={paper} alt="" /></div>
-                        <div className="paper2"><img src={paper} alt="" /></div>
+                        <div className="paper1"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
+                        <div className="paper2"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
                     </div>
                 </div>
 

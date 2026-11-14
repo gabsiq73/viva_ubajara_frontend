@@ -16,7 +16,7 @@
 
 .estd-section,
 .estd-nearby {
-    scroll-margin-top: calc(var(--site-header-h, 64px) + 72px + 16px);
+    scroll-margin-top: calc(72px + 16px);
 }
 
 .estd-eyebrow {
@@ -879,6 +879,7 @@
     flex-direction: column;
     background: rgba(0, 20, 9, 0.95);
     color: #ffffff;
+    overscroll-behavior: contain;
 }
 
 .estd-lightbox__bar {
@@ -1255,7 +1256,7 @@
 .estd-claim {
     padding: 0 0 72px;
     background: #ffffff;
-    scroll-margin-top: calc(var(--site-header-h, 64px) + 72px + 16px);
+    scroll-margin-top: calc(72px + 16px);
 }
 
 .estd-nearby + .estd-claim {
@@ -1479,4 +1480,10 @@
     .estd-claim__spinner {
         animation-duration: 1.6s;
     }
+}
+
+/* ── Números tabulares ── */
+.estd-bottombar__value,
+.estd-lightbox__count {
+    font-variant-numeric: tabular-nums;
 }

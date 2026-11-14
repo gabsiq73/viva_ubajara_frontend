@@ -438,7 +438,7 @@
     appearance: none;
     -webkit-appearance: none;
     font-family: "Inter", sans-serif;
-    font-size: 15px;
+    font-size: max(16px, 1em);
     color: var(--pub-text);
 }
 
@@ -1404,6 +1404,7 @@
     border-radius: 24px 24px 0 0;
     background: #ffffff;
     animation: ui-slide-up 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
+    overscroll-behavior: contain;
 }
 
 .ui-sheet__handle {
@@ -1449,6 +1450,7 @@
 .ui-sheet__body {
     flex: 1;
     overflow-y: auto;
+    overscroll-behavior: contain;
     padding: 8px 20px 20px;
 }
 
@@ -1486,6 +1488,10 @@
     .ui-switch__track,
     .ui-switch__knob {
         transition: none;
+    }
+
+    .ui-fav:hover .ui-fav__disc {
+        transform: none;
     }
 }
 
@@ -1546,4 +1552,14 @@
     .ui-state__title {
         font-size: 22px;
     }
+}
+
+/* ── Números tabulares ── */
+.ui-chip__count,
+.estab-type__count,
+.ui-card__rating,
+.ui-card__price,
+.ui-card__price-full,
+.ui-point__chip {
+    font-variant-numeric: tabular-nums;
 }

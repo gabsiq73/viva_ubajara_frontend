@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { FilterChip } from "../ui/Chip";
 import Icon from "../ui/Icon";
 import SearchField from "../ui/SearchField";
@@ -33,6 +34,7 @@ export default function FiltersPanel({
     onSearch,
     onSearchClear,
 }: FiltersPanelProps) {
+    const uid = useId();
     const isSheet = variant === "sheet";
     const showRestaurantFilters = !filters.tipo || !LODGING_TYPES.includes(filters.tipo);
     const showLodgingFilters = filters.tipo !== "Restaurante";
@@ -52,13 +54,13 @@ export default function FiltersPanel({
                     value={search}
                     onChange={onSearch}
                     onClear={onSearchClear}
-                    placeholder="Nome, prato ou endereço"
+                    placeholder="Ex.: feijoada, pousada, centro…"
                     ariaLabel="Buscar estabelecimento"
                 />
             )}
 
-            <div className="estab-panel__group">
-                <span className="estab-panel__label">Tipo</span>
+            <div className="estab-panel__group" role="group" aria-labelledby={`${uid}-tipo`}>
+                <span id={`${uid}-tipo`} className="estab-panel__label">Tipo</span>
                 {isSheet ? (
                     <div className="estab-panel__chips">
                         {typeOptions.map((t) => (
@@ -95,8 +97,8 @@ export default function FiltersPanel({
             </div>
 
             {showRestaurantFilters && (
-                <div className="estab-panel__group estab-panel__group--section">
-                    <span className="estab-panel__label">{isSheet ? "Culinária" : "Restaurantes"}</span>
+                <div className="estab-panel__group estab-panel__group--section" role="group" aria-labelledby={`${uid}-rest`}>
+                    <span id={`${uid}-rest`} className="estab-panel__label">{isSheet ? "Culinária" : "Restaurantes"}</span>
                     {cuisineOptions.length > 0 && (
                         <>
                             {!isSheet && <span className="estab-panel__sublabel">Culinária</span>}
@@ -133,8 +135,8 @@ export default function FiltersPanel({
             )}
 
             {showLodgingFilters && (
-                <div className="estab-panel__group estab-panel__group--section">
-                    <span className="estab-panel__label">Hospedagem</span>
+                <div className="estab-panel__group estab-panel__group--section" role="group" aria-labelledby={`${uid}-hosp`}>
+                    <span id={`${uid}-hosp`} className="estab-panel__label">Hospedagem</span>
                     <span className="estab-panel__sublabel">Nº de quartos</span>
                     <div className="estab-panel__chips">
                         {ROOM_RANGES.map((range) => (

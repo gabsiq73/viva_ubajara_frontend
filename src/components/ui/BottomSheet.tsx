@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { FOCUSABLE_SELECTOR } from "../../hooks/focusable";
 import Icon from "./Icon";
 
 interface BottomSheetProps {
@@ -9,8 +10,6 @@ interface BottomSheetProps {
     footer?: ReactNode;
     children: ReactNode;
 }
-
-const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export default function BottomSheet({ open, onClose, title, footer, children }: BottomSheetProps) {
     const titleId = useId();
@@ -35,7 +34,7 @@ export default function BottomSheet({ open, onClose, title, footer, children }: 
                 return;
             }
             if (event.key !== "Tab" || !panelRef.current) return;
-            const focusables = panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE);
+            const focusables = panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
             if (focusables.length === 0) return;
             const first = focusables[0];
             const last = focusables[focusables.length - 1];

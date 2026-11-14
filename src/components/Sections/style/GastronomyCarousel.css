@@ -51,35 +51,53 @@
 /* ─── Dots ─── */
 .gastro-dots {
   position: absolute;
-  bottom: 18px;
+  bottom: 9px;
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: 0;
   z-index: 2;
 }
 
 .gastro-dots button {
-  height: 6px;
-  width: 6px;
+  position: relative;
+  height: 24px;
+  width: 24px;
   padding: 0;
-  border-radius: 9999px;
   border: none;
-  background: rgba(255, 255, 255, 0.45);
+  background: transparent;
   cursor: pointer;
-  transition: background 0.3s ease, width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   flex-shrink: 0;
 }
 
-.gastro-dots button.is-active {
+.gastro-dots button::before {
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.45);
+  transition: background 0.3s ease, width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gastro-dots button.is-active::before {
   background: #ffffff;
+  left: 0;
   width: 24px;
 }
 
-.gastro-dots button:hover:not(.is-active) {
+.gastro-dots button:hover:not(.is-active)::before {
   background: rgba(255, 255, 255, 0.75);
+}
+
+.gastro-dots button:focus-visible {
+  outline: 2px solid #f3c66b;
+  outline-offset: -2px;
+  border-radius: 9999px;
 }
 
 @media only screen and (max-width: 768px) {

@@ -199,6 +199,13 @@ body {
         animation: none;
     }
 
+    ul.list-cards li:hover,
+    .transport-card:hover,
+    .airport-card:hover,
+    .contact-section__submit:hover {
+        transform: none;
+    }
+
     .pub-event-card__media img,
     .ui-card__img {
         transition: none !important;
@@ -1964,7 +1971,7 @@ div.restaurant a:active {
     border-radius: 10px;
     padding: 12px 14px;
     font-family: "Inter", sans-serif;
-    font-size: 14px;
+    font-size: max(16px, 1em);
     color: #00210c;
     outline: none;
     width: 100%;
@@ -2115,4 +2122,14 @@ div.restaurant a:active {
         padding: 20px;
         border-radius: 14px;
     }
+}
+/* ── Números tabulares ── */
+.pub-event-card__date strong,
+.transport-card__badge,
+.airport-card__dist {
+    font-variant-numeric: tabular-nums;
+}
+
+.reviews__inner > .ui-state {
+    margin-bottom: 32px;
 }

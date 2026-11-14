@@ -24,7 +24,11 @@ export default function SearchField({
             <Icon name="search" className="ui-search__icon" />
             <input
                 type="search"
+                name="busca"
                 className="ui-search__input"
+                enterKeyHint="search"
+                autoComplete="off"
+                spellCheck={false}
                 value={value}
                 placeholder={placeholder}
                 aria-label={ariaLabel}

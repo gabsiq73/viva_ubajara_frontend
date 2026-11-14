@@ -21,7 +21,15 @@ export default function PageHero({ image, breadcrumb, eyebrow, title, accent, de
         <section className={`ui-hero${image ? " ui-hero--photo" : " ui-hero--plain"}`}>
             {image ? (
                 <>
-                    <img src={image} alt="" className="ui-hero__img" />
+                    <img
+                        src={image}
+                        alt=""
+                        className="ui-hero__img"
+                        width={1600}
+                        height={900}
+                        fetchPriority="high"
+                        decoding="async"
+                    />
                     <div className="ui-hero__shade" />
                 </>
             ) : (

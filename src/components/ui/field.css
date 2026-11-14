@@ -83,7 +83,7 @@
     font-family: "Inter", sans-serif;
     font-size: 16px;
     color: var(--pub-text);
-    scroll-margin-block: 96px;
+    scroll-margin-block: 24px 96px;
     transition: border-color 0.16s ease, box-shadow 0.16s ease;
 }
 

@@ -6,5 +6,5 @@ interface SiteLogoProps {
 
 /** O único asset do logo é branco; a cor final vem de `--site-logo-color` via máscara CSS. */
 export default function SiteLogo({ className = "" }: SiteLogoProps) {
-    return <span role="img" aria-label="Viva Ubajara" className={`site-logo ${className}`.trim()} />;
+    return <span role="img" aria-label="Viva Ubajara" translate="no" className={`site-logo ${className}`.trim()} />;
 }

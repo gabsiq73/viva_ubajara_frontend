@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../admin/hooks/useAuth";
+import { FOCUSABLE_SELECTOR } from "../../hooks/focusable";
 import { getRoleLabel } from "../../utils/roles";
 import Navbar from "../Navbar";
 import Icon from "../ui/Icon";
@@ -8,8 +9,6 @@ import SiteLogo from "./SiteLogo";
 import SiteSearchForm from "./SiteSearchForm";
 import UserAvatar from "./UserAvatar";
 import { getDisplayName } from "./userDisplay";
-
-const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled])';
 
 interface MobileMenuProps {
     id: string;
@@ -42,7 +41,7 @@ export default function MobileMenu({ id, open, focusSearch, onClose }: MobileMen
             }
             if (event.key !== "Tab") return;
             const panel = panelRef.current;
-            const nodes = panel?.querySelectorAll<HTMLElement>(FOCUSABLE);
+            const nodes = panel?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
             if (!panel || !nodes || nodes.length === 0) return;
             const first = nodes[0];
             const last = nodes[nodes.length - 1];

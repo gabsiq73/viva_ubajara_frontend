@@ -178,7 +178,7 @@ export default function Footer(): JSX.Element {
                         <ul className="site-footer__contact">
                             <li>
                                 <Icon name="call" />
-                                <a href="tel:+558836341234" className="site-footer__phone">(88) 3634-1234</a>
+                                <a href="tel:+558836341234" className="site-footer__phone">(88)&nbsp;3634-1234</a>
                             </li>
                             <li>
                                 <Icon name="mail" />
