@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Trash2, Search, Mail, MailOpen, Eye } from 'lucide-react';
+import { useUrlListState } from '../hooks/useUrlListState';
 import { contactMessagesService } from '../services/contactMessagesService';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
@@ -9,16 +10,17 @@ import type { ReactNode } from 'react';
 
 type ReadFilter = 'all' | 'unread' | 'read';
 
+const READ_FILTERS: readonly ReadFilter[] = ['all', 'unread', 'read'];
+
 export function ContactMessagesListPage() {
   const { showToast } = useToast();
 
   const [data, setData] = useState<ContactMessageResponse[]>([]);
-  const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState('');
-  const [readFilter, setReadFilter] = useState<ReadFilter>('all');
+  const { page, search, getFilter, setPage, setSearch, setFilter } = useUrlListState();
+  const readFilter = getFilter<ReadFilter>('read', READ_FILTERS, 'all');
   const [unreadCount, setUnreadCount] = useState(0);
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -30,6 +32,10 @@ export function ContactMessagesListPage() {
     try {
       const readParam = readFilter === 'all' ? undefined : readFilter === 'read';
       const result = await contactMessagesService.getAll(page, 10, readParam);
+      if (page > 0 && result.content.length === 0 && result.totalPages > 0) {
+        setPage(result.totalPages - 1, true);
+        return;
+      }
       setData(result.content);
       setTotalPages(result.totalPages);
       setTotalElements(result.totalElements);
@@ -38,7 +44,7 @@ export function ContactMessagesListPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, readFilter, showToast]);
+  }, [page, readFilter, setPage, showToast]);
 
   const fetchUnreadCount = useCallback(async () => {
     try {
@@ -100,8 +106,8 @@ export function ContactMessagesListPage() {
       width: '32px',
       accessor: (r: ContactMessageResponse): ReactNode =>
         r.read
-          ? <MailOpen size={16} style={{ color: 'var(--adm-text-muted)' }} />
-          : <Mail size={16} style={{ color: 'var(--adm-green)' }} />,
+          ? <MailOpen size={16} role="img" aria-label="Lida" style={{ color: 'var(--adm-text-muted)' }} />
+          : <Mail size={16} role="img" aria-label="Não lida" style={{ color: 'var(--adm-green)' }} />,
     },
     { header: 'Nome', accessor: 'name' as keyof ContactMessageResponse },
     { header: 'E-mail', accessor: 'email' as keyof ContactMessageResponse },
@@ -120,14 +126,16 @@ export function ContactMessagesListPage() {
             className="adm-btn adm-btn--ghost adm-btn--sm"
             onClick={() => handleView(r)}
             title="Ver mensagem"
+            aria-label={`Ver mensagem de ${r.name}`}
           >
-            <Eye size={14} />
+            <Eye size={14} aria-hidden="true" />
           </button>
           <button
             className="adm-btn adm-btn--danger adm-btn--sm"
             onClick={() => setDeleteId(r.id)}
+            aria-label={`Excluir mensagem de ${r.name}`}
           >
-            <Trash2 size={14} />
+            <Trash2 size={14} aria-hidden="true" />
           </button>
         </div>
       ),
@@ -160,11 +168,11 @@ export function ContactMessagesListPage() {
 
       <div className="adm-card">
         <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-          {(['all', 'unread', 'read'] as ReadFilter[]).map((f) => (
+          {READ_FILTERS.map((f) => (
             <button
               key={f}
               className={`adm-btn ${readFilter === f ? 'adm-btn--primary' : 'adm-btn--ghost'} adm-btn--sm`}
-              onClick={() => { setReadFilter(f); setPage(0); }}
+              onClick={() => setFilter('read', f, 'all')}
             >
               {f === 'all' ? 'Todas' : f === 'unread' ? 'Não lidas' : 'Lidas'}
             </button>
@@ -172,8 +180,13 @@ export function ContactMessagesListPage() {
         </div>
 
         <div className="adm-search">
-          <span className="adm-search__icon"><Search size={18} /></span>
+          <span className="adm-search__icon" aria-hidden="true"><Search size={18} aria-hidden="true" /></span>
           <input
+            type="search"
+            name="q"
+            aria-label="Buscar mensagens"
+            autoComplete="off"
+            spellCheck={false}
             placeholder="Buscar por nome, e-mail ou assunto…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -229,7 +242,7 @@ export function ContactMessagesListPage() {
               className="adm-btn adm-btn--danger"
               onClick={() => { setDeleteId(selectedMessage.id); setSelectedMessage(null); }}
             >
-              <Trash2 size={14} /> Deletar
+              <Trash2 size={14} aria-hidden="true" /> Deletar
             </button>
           )}
         </div>

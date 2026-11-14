@@ -47,34 +47,34 @@ export function AdminRouter() {
           <Route path="dashboard" element={<DashboardPage />} />
 
           <Route path="attractions" element={<AttractionsListPage />} />
-          <Route path="attractions/new" element={<AttractionFormPage />} />
-          <Route path="attractions/:id/edit" element={<AttractionFormPage />} />
+          <Route path="attractions/new" element={<AttractionFormPage key="new" />} />
+          <Route path="attractions/:id/edit" element={<AttractionFormPage key="edit" />} />
 
           <Route path="tourist-spots" element={<TouristSpotsListPage />} />
-          <Route path="tourist-spots/new" element={<TouristSpotFormPage />} />
-          <Route path="tourist-spots/:id/edit" element={<TouristSpotFormPage />} />
+          <Route path="tourist-spots/new" element={<TouristSpotFormPage key="new" />} />
+          <Route path="tourist-spots/:id/edit" element={<TouristSpotFormPage key="edit" />} />
 
           <Route path="events" element={<EventsListPage />} />
-          <Route path="events/new" element={<EventFormPage />} />
-          <Route path="events/:id/edit" element={<EventFormPage />} />
+          <Route path="events/new" element={<EventFormPage key="new" />} />
+          <Route path="events/:id/edit" element={<EventFormPage key="edit" />} />
 
           <Route path="restaurants" element={<RestaurantsListPage />} />
-          <Route path="restaurants/new" element={<RestaurantFormPage />} />
-          <Route path="restaurants/:id/edit" element={<RestaurantFormPage />} />
+          <Route path="restaurants/new" element={<RestaurantFormPage key="new" />} />
+          <Route path="restaurants/:id/edit" element={<RestaurantFormPage key="edit" />} />
 
           <Route path="host-points" element={<HostPointsListPage />} />
-          <Route path="host-points/new" element={<HostPointFormPage />} />
-          <Route path="host-points/:id/edit" element={<HostPointFormPage />} />
+          <Route path="host-points/new" element={<HostPointFormPage key="new" />} />
+          <Route path="host-points/:id/edit" element={<HostPointFormPage key="edit" />} />
 
           <Route path="claims" element={<ClaimsListPage />} />
 
           <Route path="tour-guides" element={<TourGuidesListPage />} />
-          <Route path="tour-guides/new" element={<TourGuideFormPage />} />
-          <Route path="tour-guides/:id/edit" element={<TourGuideFormPage />} />
+          <Route path="tour-guides/new" element={<TourGuideFormPage key="new" />} />
+          <Route path="tour-guides/:id/edit" element={<TourGuideFormPage key="edit" />} />
 
           <Route path="contacts" element={<ContactsListPage />} />
-          <Route path="contacts/new" element={<ContactFormPage />} />
-          <Route path="contacts/:id/edit" element={<ContactFormPage />} />
+          <Route path="contacts/new" element={<ContactFormPage key="new" />} />
+          <Route path="contacts/:id/edit" element={<ContactFormPage key="edit" />} />
 
           <Route path="contact-messages" element={<ContactMessagesListPage />} />
           <Route path="testimonials" element={<TestimonialsListPage />} />
@@ -82,8 +82,8 @@ export function AdminRouter() {
           <Route path="photos" element={<PhotosPage />} />
 
           <Route path="recommended-items" element={<RecommendedItemsListPage />} />
-          <Route path="recommended-items/new" element={<RecommendedItemFormPage />} />
-          <Route path="recommended-items/:id/edit" element={<RecommendedItemFormPage />} />
+          <Route path="recommended-items/new" element={<RecommendedItemFormPage key="new" />} />
+          <Route path="recommended-items/:id/edit" element={<RecommendedItemFormPage key="edit" />} />
 
           <Route path="gastronomy-items" element={<GastronomyItemsPage />} />
           <Route path="pages-config" element={<PagesConfigPage />} />

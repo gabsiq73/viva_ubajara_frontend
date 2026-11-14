@@ -1,3 +1,4 @@
+import type { RefObject } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -15,8 +16,11 @@ import {
   ChefHat,
   Settings,
   UserCheck,
+  X,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { useGuardedNavigate } from '../hooks/useGuardedNavigate';
+import { useUnsavedGuard } from '../../company/components/unsavedGuardContext';
 import logo from '../../assets/images/logo.webp';
 
 const NAV_ITEMS = [
@@ -37,21 +41,36 @@ const NAV_ITEMS = [
 ];
 
 interface SidebarProps {
-  isOpen?: boolean;
-  onClose?: () => void;
+  id: string;
+  drawerRef: RefObject<HTMLElement | null>;
+  closeButtonRef: RefObject<HTMLButtonElement | null>;
+  isMobile: boolean;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+export function Sidebar({ id, drawerRef, closeButtonRef, isMobile, isOpen, onClose }: SidebarProps) {
   const { user, logout } = useAuth();
+  const { requestLeave } = useUnsavedGuard();
+  const guardedNavigate = useGuardedNavigate();
 
   return (
-    <aside className={`adm-sidebar${isOpen ? ' open' : ''}`}>
-      <Link to="/" className="adm-sidebar__logo" onClick={onClose} title="Ir para o site público">
+    <aside
+      id={id}
+      ref={drawerRef}
+      className={`adm-sidebar${isOpen ? ' open' : ''}`}
+      inert={isMobile && !isOpen}
+      {...(isOpen ? { role: 'dialog', 'aria-modal': true, 'aria-label': 'Menu do painel' } : {})}
+    >
+      <button ref={closeButtonRef} type="button" className="adm-sidebar__close" aria-label="Fechar menu" onClick={onClose}>
+        <X size={20} aria-hidden="true" />
+      </button>
+      <Link to="/" className="adm-sidebar__logo" onClick={guardedNavigate('/', onClose)} title="Ir para o site público">
         <img src={logo} alt="Parque Nacional de Ubajara" className="adm-sidebar__logo-img" />
         <div className="adm-sidebar__logo-sub">Painel Administrativo</div>
       </Link>
 
-      <nav className="adm-sidebar__nav">
+      <nav className="adm-sidebar__nav" aria-label="Navegação do painel">
         {NAV_ITEMS.map((item) => (
           <div key={item.to}>
             {item.section && (
@@ -62,9 +81,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               className={({ isActive }) =>
                 `adm-sidebar__link${isActive ? ' active' : ''}`
               }
-              onClick={onClose}
+              onClick={guardedNavigate(item.to, onClose)}
             >
-              <span className="icon">{item.icon}</span>
+              <span className="icon" aria-hidden="true">{item.icon}</span>
               {item.label}
             </NavLink>
           </div>
@@ -73,11 +92,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       <div className="adm-sidebar__footer">
         <button
-          onClick={logout}
+          type="button"
+          onClick={() => requestLeave(logout)}
           className="adm-sidebar__link"
           style={{ width: '100%', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left' }}
         >
-          <span className="icon"><LogOut size={18} /></span>
+          <span className="icon" aria-hidden="true"><LogOut size={18} /></span>
           Sair do Sistema
         </button>
         {user && (

@@ -3,6 +3,7 @@ import { ImagePlus } from 'lucide-react';
 import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
 import { Spinner } from '../components/Spinner';
+import { RemovePhotoDialog } from '../components/RemovePhotoDialog';
 import type { PhotoResponse } from '../types';
 
 export function PhotosPage() {
@@ -13,6 +14,7 @@ export function PhotosPage() {
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
   const [description, setDescription] = useState('');
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
 
   const uploadFile = async (file: File) => {
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
@@ -54,6 +56,7 @@ export function PhotosPage() {
       showToast('Erro ao deletar foto.', 'error');
     } finally {
       setDeleting(null);
+      setConfirmId(null);
     }
   };
 
@@ -65,8 +68,8 @@ export function PhotosPage() {
 
       <div className="adm-card" style={{ marginBottom: 24 }}>
         <div className="adm-field" style={{ marginBottom: 16 }}>
-          <label>Descrição (opcional)</label>
-          <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descreva a imagem…" />
+          <label htmlFor="photo-description">Descrição (opcional)</label>
+          <input id="photo-description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descreva a imagem…" />
         </div>
 
         <div
@@ -85,7 +88,7 @@ export function PhotosPage() {
           ) : (
             <>
               <div className="adm-upload-zone__icon-wrap">
-                <ImagePlus size={28} />
+                <ImagePlus size={28} aria-hidden="true" />
               </div>
               <p>Arraste imagens aqui ou clique para selecionar</p>
               <p className="adm-upload-zone__hint">JPEG, PNG, WEBP — máximo 5MB por arquivo</p>
@@ -103,16 +106,25 @@ export function PhotosPage() {
                 <img src={p.url} alt={p.description ?? 'foto'} />
                 <button
                   className="adm-photo-item__del"
-                  onClick={() => handleDelete(p.id)}
+                  onClick={() => setConfirmId(p.id)}
                   disabled={deleting === p.id}
                   title="Deletar"
+                  aria-label={`Deletar foto${p.description ? ` ${p.description}` : ""}`}
                 >
-                  {deleting === p.id ? '…' : '✕'}
+                  <span aria-hidden="true">{deleting === p.id ? '…' : '✕'}</span>
                 </button>
               </div>
             ))}
           </div>
         </div>
+      )}
+
+      {confirmId && (
+        <RemovePhotoDialog
+          loading={deleting === confirmId}
+          onConfirm={() => handleDelete(confirmId)}
+          onCancel={() => setConfirmId(null)}
+        />
       )}
     </div>
   );

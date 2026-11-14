@@ -83,6 +83,27 @@
   transition: transform var(--adm-transition);
 }
 
+.adm-sidebar__close {
+  display: none;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: var(--adm-radius-sm);
+  background: none;
+  color: var(--adm-sidebar-text);
+  cursor: pointer;
+  z-index: 1;
+}
+
+.adm-sidebar__close:hover {
+  background: var(--adm-sidebar-hover);
+}
+
 .adm-sidebar__logo {
   flex-shrink: 0;
   padding: 20px 24px 12px;
@@ -90,6 +111,8 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
+  text-decoration: none;
+  color: inherit;
 }
 
 .adm-sidebar__logo-img {
@@ -579,7 +602,8 @@
   gap: 8px;
 }
 
-.adm-field label {
+.adm-field label,
+.adm-label {
   font-size: 13px;
   font-weight: 600;
   color: var(--adm-text);
@@ -587,7 +611,8 @@
 
 .adm-field input,
 .adm-field textarea,
-.adm-field select {
+.adm-field select,
+.adm-select {
   padding: 12px 16px;
   background: #fcfcfc;
   border: 1px solid var(--adm-border);
@@ -601,7 +626,8 @@
 
 .adm-field input:focus,
 .adm-field textarea:focus,
-.adm-field select:focus {
+.adm-field select:focus,
+.adm-select:focus {
   border-color: var(--adm-green);
   background: #fff;
   box-shadow: 0 0 0 3px var(--adm-green-dim);
@@ -609,13 +635,20 @@
 
 .adm-field input.error,
 .adm-field textarea.error,
-.adm-field select.error {
+.adm-field select.error,
+.adm-select.error {
   border-color: var(--adm-red);
 }
 
-.adm-field__error {
+.adm-field__error,
+.adm-error {
   font-size: 13px;
   color: var(--adm-red);
+}
+
+.adm-required {
+  color: var(--adm-red);
+  margin-left: 2px;
 }
 
 .adm-field textarea {
@@ -808,7 +841,9 @@
   border: 1px solid var(--adm-border);
   box-shadow: var(--adm-shadow-md);
   font-size: 14px;
-  min-width: 320px;
+  min-width: min(320px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  overflow-wrap: anywhere;
   animation: adm-slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -1472,12 +1507,15 @@
   }
 
   /* Overlay ao abrir sidebar */
-  .adm-root.sidebar-open::after {
-    content: '';
+  .adm-sidebar-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.45);
     z-index: 99;
+  }
+
+  .adm-sidebar__close {
+    display: flex;
   }
 
   /* Topbar */
@@ -1641,5 +1679,10 @@
 @media (max-width: 560px) {
   .adm-claim__grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adm-toast-container {
+    left: 16px;
+    right: 16px;
   }
 }

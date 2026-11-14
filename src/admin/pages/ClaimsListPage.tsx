@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { Eye, ExternalLink } from 'lucide-react';
+import { useUrlListState } from '../hooks/useUrlListState';
 import { claimsService } from '../services/claimsService';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
@@ -19,6 +20,8 @@ const FILTERS: { value: StatusFilter; label: string }[] = [
   { value: 'CANCELLED', label: 'Canceladas' },
   { value: 'ALL', label: 'Todas' },
 ];
+
+const FILTER_VALUES = FILTERS.map((f) => f.value);
 
 const BADGE_CLASS: Record<ClaimStatus, string> = {
   PENDING: 'adm-badge--gold',
@@ -46,11 +49,11 @@ export function ClaimsListPage() {
   const { showToast } = useToast();
 
   const [data, setData] = useState<EstablishmentClaimAdminResponse[]>([]);
-  const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [filter, setFilter] = useState<StatusFilter>('PENDING');
+  const { page, getFilter, setPage, setFilter } = useUrlListState();
+  const filter = getFilter<StatusFilter>('status', FILTER_VALUES, 'PENDING');
 
   const [selected, setSelected] = useState<EstablishmentClaimAdminResponse | null>(null);
   const [approveTarget, setApproveTarget] = useState<EstablishmentClaimAdminResponse | null>(null);
@@ -62,6 +65,10 @@ export function ClaimsListPage() {
     setLoading(true);
     try {
       const result = await claimsService.getAll(page, 10, filter === 'ALL' ? undefined : filter);
+      if (page > 0 && result.content.length === 0 && result.totalPages > 0) {
+        setPage(result.totalPages - 1, true);
+        return;
+      }
       setData(result.content);
       setTotalPages(result.totalPages);
       setTotalElements(result.totalElements);
@@ -70,7 +77,7 @@ export function ClaimsListPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, filter, showToast]);
+  }, [page, filter, setPage, showToast]);
 
   useEffect(() => {
     fetchData();
@@ -147,7 +154,7 @@ export function ClaimsListPage() {
       accessor: (r: EstablishmentClaimAdminResponse): ReactNode => (
         <div className="adm-table__actions">
           <button className="adm-btn adm-btn--ghost adm-btn--sm" onClick={() => setSelected(r)} title="Ver solicitação" aria-label={`Ver solicitação de ${r.spotName}`}>
-            <Eye size={14} />
+            <Eye size={14} aria-hidden="true" />
           </button>
         </div>
       ),
@@ -170,7 +177,7 @@ export function ClaimsListPage() {
               key={f.value}
               className={`adm-btn ${filter === f.value ? 'adm-btn--primary' : 'adm-btn--ghost'} adm-btn--sm`}
               aria-pressed={filter === f.value}
-              onClick={() => { setFilter(f.value); setPage(0); }}
+              onClick={() => setFilter('status', f.value, 'PENDING')}
             >
               {f.label}
             </button>
@@ -213,7 +220,7 @@ export function ClaimsListPage() {
               <Detail label="Responsável atual">{selected.spot.hasOwner ? 'Já possui responsável' : 'Sem responsável'}</Detail>
               <Detail label="Página pública">
                 <a href={claimSpotPath(selected.spot.id, selected.spot.type)} target="_blank" rel="noopener noreferrer" className="adm-claim__link">
-                  Abrir página <ExternalLink size={13} />
+                  Abrir página <ExternalLink size={13} aria-hidden="true" />
                 </a>
               </Detail>
             </dl>

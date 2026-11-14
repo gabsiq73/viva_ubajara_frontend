@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { Trash2, ImagePlus, Loader } from 'lucide-react';
 import { photosService } from '../services/photosService';
 import { useToast } from './Toast';
+import { RemovePhotoDialog } from './RemovePhotoDialog';
 import type { PhotoResponse } from '../types';
 
 interface Props {
@@ -15,6 +16,7 @@ export function PhotoManager({ entityPath, entityId, initialPhotos, title }: Pro
   const [photos, setPhotos] = useState<PhotoResponse[]>(initialPhotos);
   const [uploading, setUploading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToast();
 
@@ -44,6 +46,7 @@ export function PhotoManager({ entityPath, entityId, initialPhotos, title }: Pro
       showToast('Erro ao remover foto.', 'error');
     } finally {
       setDeletingId(null);
+      setConfirmId(null);
     }
   };
 
@@ -60,7 +63,7 @@ export function PhotoManager({ entityPath, entityId, initialPhotos, title }: Pro
           disabled={uploading}
           style={{ display: 'flex', alignItems: 'center', gap: 6 }}
         >
-          {uploading ? <Loader size={16} style={{ animation: 'adm-spin 0.6s linear infinite' }} /> : <ImagePlus size={16} />}
+          {uploading ? <Loader size={16} aria-hidden="true" style={{ animation: 'adm-spin 0.6s linear infinite' }} /> : <ImagePlus size={16} aria-hidden="true" />}
           {uploading ? 'Enviando…' : 'Adicionar Foto'}
         </button>
         <input
@@ -92,7 +95,7 @@ export function PhotoManager({ entityPath, entityId, initialPhotos, title }: Pro
               />
               <button
                 type="button"
-                onClick={() => handleDelete(photo.id)}
+                onClick={() => setConfirmId(photo.id)}
                 disabled={deletingId === photo.id}
                 aria-label="Remover foto"
                 style={{
@@ -103,13 +106,21 @@ export function PhotoManager({ entityPath, entityId, initialPhotos, title }: Pro
                 }}
               >
                 {deletingId === photo.id
-                  ? <Loader size={14} style={{ animation: 'adm-spin 0.6s linear infinite' }} />
-                  : <Trash2 size={14} />
+                  ? <Loader size={14} aria-hidden="true" style={{ animation: 'adm-spin 0.6s linear infinite' }} />
+                  : <Trash2 size={14} aria-hidden="true" />
                 }
               </button>
             </div>
           ))}
         </div>
+      )}
+
+      {confirmId && (
+        <RemovePhotoDialog
+          loading={deletingId === confirmId}
+          onConfirm={() => handleDelete(confirmId)}
+          onCancel={() => setConfirmId(null)}
+        />
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { attractionsService } from '../services/attractionsService';
 import { useCrudList } from '../hooks/useCrudList';
 import { useToast } from '../components/Toast';
@@ -9,7 +9,6 @@ import type { ReactNode } from 'react';
 import { Pencil, Trash2, Search, Plus } from 'lucide-react';
 
 export function AttractionsListPage() {
-  const navigate = useNavigate();
   const { showToast } = useToast();
 
   const {
@@ -43,11 +42,11 @@ export function AttractionsListPage() {
       header: 'Ações', width: '130px',
       accessor: (r: AttractionResponse): ReactNode => (
         <div className="adm-table__actions">
-          <button className="adm-btn adm-btn--ghost adm-btn--sm" onClick={() => navigate(`/admin/attractions/${r.id}/edit`)}>
-            <Pencil size={14} />
-          </button>
-          <button className="adm-btn adm-btn--danger adm-btn--sm" onClick={() => confirmDelete(r.id)}>
-            <Trash2 size={14} />
+          <Link className="adm-btn adm-btn--ghost adm-btn--sm" to={`/admin/attractions/${r.id}/edit`} aria-label={`Editar ${r.name}`}>
+            <Pencil size={14} aria-hidden="true" />
+          </Link>
+          <button className="adm-btn adm-btn--danger adm-btn--sm" onClick={() => confirmDelete(r.id)} aria-label={`Excluir ${r.name}`}>
+            <Trash2 size={14} aria-hidden="true" />
           </button>
         </div>
       ),
@@ -58,15 +57,15 @@ export function AttractionsListPage() {
     <div>
       <div className="adm-page-header">
         <h2 className="adm-page-title">Atrações <span>{totalElements} registros</span></h2>
-        <button className="adm-btn adm-btn--primary" onClick={() => navigate('/admin/attractions/new')}>
-          <Plus size={16} /> Nova Atração
-        </button>
+        <Link className="adm-btn adm-btn--primary" to="/admin/attractions/new">
+          <Plus size={16} aria-hidden="true" /> Nova Atração
+        </Link>
       </div>
 
       <div className="adm-card">
         <div className="adm-search">
-          <span className="adm-search__icon"><Search size={18} /></span>
-          <input placeholder="Buscar atrações…" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <span className="adm-search__icon" aria-hidden="true"><Search size={18} aria-hidden="true" /></span>
+          <input type="search" name="q" aria-label="Buscar atrações" autoComplete="off" spellCheck={false} placeholder="Buscar atrações…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
 
         <DataTable columns={columns} data={data} keyField="id" loading={loading} emptyMessage="Nenhuma atração cadastrada." />

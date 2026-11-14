@@ -74,7 +74,7 @@ interface PaginationProps {
 export function Pagination({ page, totalPages, totalElements, onPageChange }: PaginationProps) {
   if (totalPages <= 1) return null;
   return (
-    <div className="adm-pagination">
+    <nav className="adm-pagination" aria-label="Paginação">
       <button
         className="adm-btn adm-btn--ghost adm-btn--sm"
         disabled={page === 0}
@@ -82,7 +82,7 @@ export function Pagination({ page, totalPages, totalElements, onPageChange }: Pa
       >
         ← Anterior
       </button>
-      <span className="adm-pagination__info">
+      <span className="adm-pagination__info" aria-live="polite">
         Página {page + 1} de {totalPages} ({totalElements} registros)
       </span>
       <button
@@ -92,6 +92,6 @@ export function Pagination({ page, totalPages, totalElements, onPageChange }: Pa
       >
         Próxima →
       </button>
-    </div>
+    </nav>
   );
 }

@@ -138,7 +138,7 @@ export function LoginPage() {
           <div className="adm-login__form-stage">
 
             {/* ── LOGIN ── */}
-            <div className={`adm-login__form-panel${mode === 'login' ? ' is-active' : ' is-left'}`}>
+            <div className={`adm-login__form-panel${mode === 'login' ? ' is-active' : ' is-left'}`} inert={mode !== 'login'}>
               <form onSubmit={handleLogin} noValidate>
                 <div className="adm-float-field">
                   <input
@@ -221,7 +221,7 @@ export function LoginPage() {
             </div>
 
             {/* ── CADASTRO ── */}
-            <div className={`adm-login__form-panel${mode === 'register' ? ' is-active' : ' is-right'}`}>
+            <div className={`adm-login__form-panel${mode === 'register' ? ' is-active' : ' is-right'}`} inert={mode !== 'register'}>
               <form onSubmit={handleRegister} noValidate>
                 <div className="adm-float-field">
                   <input
