@@ -17,6 +17,19 @@ export function Skeleton({ width, height, radius, className = "" }: SkeletonProp
     );
 }
 
+export function PointCardSkeleton() {
+    return (
+        <div className="ui-point ui-point--skeleton" aria-hidden="true">
+            <div className="ui-point__body">
+                <Skeleton className="ui-point__skeleton-bar" width="70%" height={22} />
+                <Skeleton className="ui-point__skeleton-bar" width="100%" height={13} />
+                <Skeleton className="ui-point__skeleton-bar" width="55%" height={13} />
+                <Skeleton className="ui-point__skeleton-bar" width="40%" height={26} radius={50} />
+            </div>
+        </div>
+    );
+}
+
 export function EstablishmentCardSkeleton({ view = "grid" }: { view?: "grid" | "list" }) {
     if (view === "list") {
         return (

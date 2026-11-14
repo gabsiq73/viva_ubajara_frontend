@@ -714,11 +714,6 @@
     margin: 0 0 32px;
 }
 
-/* Override 4-col grid to 3-col */
-.pt-related__grid ul {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-}
-
 .pt-related__footer {
     text-align: center;
     margin-top: 32px;
@@ -748,16 +743,4 @@
 
 .pt-related__all:hover .material-symbols-outlined {
     transform: translateX(4px);
-}
-
-@media only screen and (max-width: 1024px) {
-    .pt-related__grid ul {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
-}
-
-@media only screen and (max-width: 480px) {
-    .pt-related__grid ul {
-        grid-template-columns: 1fr !important;
-    }
 }

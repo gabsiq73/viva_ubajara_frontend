@@ -1093,6 +1093,292 @@
     min-height: 180px;
 }
 
+/* ── Card de ponto turístico (imersivo) ── */
+.ui-point-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ui-point-grid > li {
+    min-width: 0;
+}
+
+.ui-point-grid--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ui-point-grid--3 .ui-point {
+    aspect-ratio: 4 / 5;
+}
+
+.ui-point {
+    position: relative;
+    z-index: 0;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    box-sizing: border-box;
+    aspect-ratio: 3 / 4;
+    border-radius: 14px;
+    background: var(--pub-green-dark);
+    box-shadow: var(--pub-shadow-sm);
+    transition: transform var(--pub-transition), box-shadow var(--pub-transition);
+}
+
+.ui-point:not(.ui-point--skeleton):hover,
+.ui-point:not(.ui-point--skeleton):has(.ui-point__link:focus-visible) {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0, 48, 22, 0.22);
+}
+
+.ui-point__media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    overflow: hidden;
+}
+
+.ui-point__img,
+.ui-point__placeholder {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.ui-point__img {
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.ui-point:hover .ui-point__img,
+.ui-point:has(.ui-point__link:focus-visible) .ui-point__img {
+    transform: scale(1.06);
+}
+
+.ui-point__placeholder {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 22%;
+    box-sizing: border-box;
+    background: linear-gradient(160deg, var(--pub-green-mid) 0%, var(--pub-green) 45%, var(--pub-green-dark) 100%);
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.ui-point__placeholder .ui-icon {
+    font-size: 72px;
+    font-variation-settings: "FILL" 0, "wght" 300;
+}
+
+.ui-point__shade {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 78%;
+    background: linear-gradient(
+        to top,
+        rgba(0, 20, 9, 0.94) 0%,
+        rgba(0, 20, 9, 0.84) 42%,
+        rgba(0, 20, 9, 0.4) 74%,
+        rgba(0, 20, 9, 0) 100%
+    );
+}
+
+.ui-point__tag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 1;
+}
+
+.ui-point__body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    padding: 0 18px 18px;
+}
+
+.ui-point__title {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-family: "Nunito", sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+}
+
+.ui-point__link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.ui-point__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: 14px;
+}
+
+.ui-point__link:focus-visible {
+    outline: none;
+}
+
+.ui-point__link:focus-visible::after {
+    outline: 3px solid var(--pub-green-mid);
+    outline-offset: 2px;
+}
+
+.ui-point__desc {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-family: "Inter", sans-serif;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
+    text-wrap: pretty;
+}
+
+.ui-point__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 28px;
+    margin-top: 4px;
+}
+
+.ui-point__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 28px;
+    padding: 0 10px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.14);
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: #ffffff;
+}
+
+.ui-point__chip .ui-icon {
+    font-size: 15px;
+}
+
+.ui-point__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    font-family: "Nunito", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: #ffffff;
+    transition: gap 0.2s ease;
+}
+
+.ui-point__cta .ui-icon {
+    font-size: 17px;
+}
+
+.ui-point:hover .ui-point__cta,
+.ui-point:has(.ui-point__link:focus-visible) .ui-point__cta {
+    gap: 8px;
+}
+
+/* Skeleton: mesmas dimensões do card */
+.ui-point--skeleton {
+    background: #dcebe2;
+    box-shadow: none;
+    animation: ui-pulse 1.4s ease-in-out infinite;
+}
+
+.ui-point--skeleton .ui-point__body {
+    gap: 10px;
+}
+
+.ui-point__skeleton-bar.ui-skeleton {
+    background: rgba(255, 255, 255, 0.7);
+    animation: none;
+}
+
+@media (max-width: 1199px) {
+    .ui-point-grid:not(.ui-point-grid--3) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ui-point-grid:not(.ui-point-grid--3) .ui-point {
+        aspect-ratio: 1 / 1;
+        max-height: 440px;
+    }
+}
+
+@media (max-width: 1099px) {
+    .ui-point-grid--3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ui-point-grid--3 .ui-point {
+        aspect-ratio: 1 / 1;
+        max-height: 440px;
+    }
+}
+
+@media (max-width: 639px) {
+    .ui-point-grid:not(.ui-point-grid--3),
+    .ui-point-grid--3 {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .ui-point-grid:not(.ui-point-grid--3) .ui-point,
+    .ui-point-grid--3 .ui-point {
+        max-height: 420px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ui-point,
+    .ui-point__img,
+    .ui-point__cta {
+        transition: none;
+    }
+
+    .ui-point:not(.ui-point--skeleton):hover,
+    .ui-point:not(.ui-point--skeleton):has(.ui-point__link:focus-visible),
+    .ui-point:hover .ui-point__img,
+    .ui-point:has(.ui-point__link:focus-visible) .ui-point__img {
+        transform: none;
+    }
+
+    .ui-point--skeleton {
+        animation: none;
+    }
+}
+
 /* ── Bottom sheet ── */
 .ui-sheet {
     position: fixed;

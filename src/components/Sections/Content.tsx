@@ -18,7 +18,6 @@ import { tourGuidesService } from "../../admin/services/tourGuidesService";
 import { testimonialsService } from "../../admin/services/testimonialsService";
 import type {
     AttractionResponse,
-    AttractionCategory,
     EventResponse,
     TourGuideResponse,
     TestimonialResponse,
@@ -26,7 +25,8 @@ import type {
 import { ArrowRight } from "lucide-react";
 import EstablishmentCard from "../ui/EstablishmentCard";
 import { FilterChip } from "../ui/Chip";
-import { Skeleton, EstablishmentCardSkeleton } from "../ui/Skeleton";
+import PointCard from "../ui/PointCard";
+import { Skeleton, EstablishmentCardSkeleton, PointCardSkeleton } from "../ui/Skeleton";
 import {
     ESTABLISHMENT_TYPES,
     mapHostPoint,
@@ -145,12 +145,6 @@ const FAQ_ITEMS: FaqItem[] = [
 
 // ── Skeleton cards ─────────────────────────────────────────────
 
-const PointSkeleton = () => (
-    <li className="point-skel" aria-hidden="true">
-        <Skeleton width="100%" height="100%" radius={0} />
-    </li>
-);
-
 const EventSkeleton = () => (
     <article className="pub-event-card pub-event-card--skeleton" aria-hidden="true">
         <div className="pub-event-card__media">
@@ -215,11 +209,6 @@ const ReviewSkeleton = () => (
 );
 
 // ── Type helpers ───────────────────────────────────────────────
-const CATEGORY_LABELS: Record<AttractionCategory, string> = {
-    PARK: "Parque", WATERFALL: "Cachoeira", MUSEUM: "Museu",
-    FARM: "Fazenda", ROUTE: "Rota", MARKET: "Mercado",
-};
-
 const PT_MONTHS = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
 
 function parseDate(raw: string): Date {
@@ -436,44 +425,15 @@ export default function Content() {
                             cta={{ to: "/pontos-turisticos", label: "Ver todos os pontos turísticos" }}
                         />
                         {loading ? (
-                            <div className="cards-points">
-                                <ul className="list-points">
-                                    {Array.from({ length: 4 }).map((_, i) => <PointSkeleton key={i} />)}
-                                </ul>
-                            </div>
+                            <ul className="ui-point-grid" aria-hidden="true">
+                                {Array.from({ length: 4 }).map((_, i) => <li key={i}><PointCardSkeleton /></li>)}
+                            </ul>
                         ) : (
-                            <div className="cards-points">
-                                <ul className="list-points grid-reveal">
-                                    {attractions.map((pt) => (
-                                        <li key={pt.id}>
-                                            <Link to={`/pontos/${pt.id}`} className="point-card__link" aria-label={pt.name}>
-                                                {pt.photos?.[0]?.url
-                                                    ? <img src={pt.photos[0].url} alt={pt.name} className="point-card__img" loading="lazy" />
-                                                    : <div className="point-card__img point-card__img--placeholder" aria-hidden="true" />
-                                                }
-                                                <div className="point-card__gradient" />
-                                                <span className="point-card__tag" aria-hidden="true">{CATEGORY_LABELS[pt.category] ?? pt.category}</span>
-                                                <div className="point-card__body">
-                                                    <h3 className="point-card__title">{pt.name}</h3>
-                                                    <p className="point-card__desc">{pt.shortDescription ?? pt.description}</p>
-                                                    <div className="point-card__meta">
-                                                        {pt.averageVisitDuration != null && (
-                                                            <span className="point-card__meta-item">
-                                                                <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
-                                                                {pt.averageVisitDuration} min
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <span className="point-card__cta" aria-hidden="true">
-                                                        <span className="material-symbols-outlined" aria-hidden="true">visibility</span>
-                                                        Saiba mais
-                                                    </span>
-                                                </div>
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
+                            <ul className="ui-point-grid grid-reveal">
+                                {attractions.map((pt) => (
+                                    <li key={pt.id}><PointCard item={pt} /></li>
+                                ))}
+                            </ul>
                         )}
                     </div>
                 </section>

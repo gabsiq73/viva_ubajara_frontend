@@ -215,11 +215,6 @@
   margin: 0 auto;
 }
 
-/* Override 4-col to 3-col for the listing page */
-.ptl-cards-override ul {
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-}
-
 /* ── Empty state ── */
 .ptl-empty {
   display: flex;
@@ -371,10 +366,6 @@
     min-height: 56vh;
     padding-top: 80px;
   }
-
-  .ptl-cards-override ul {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
 }
 
 @media only screen and (max-width: 768px) {
@@ -401,11 +392,6 @@
     width: 100%;
   }
 
-  .ptl-cards-override ul {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 14px;
-  }
-
   .ptl-stats__inner {
     grid-template-columns: repeat(2, 1fr);
     gap: 28px 16px;
@@ -413,11 +399,6 @@
 }
 
 @media only screen and (max-width: 480px) {
-  .ptl-cards-override ul {
-    grid-template-columns: 1fr !important;
-    gap: 12px;
-  }
-
   .ptl-filters {
     gap: 6px;
   }

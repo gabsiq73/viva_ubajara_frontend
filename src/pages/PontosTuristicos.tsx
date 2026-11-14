@@ -4,21 +4,14 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { attractionsService } from "../admin/services/attractionsService";
 import { pageConfigService } from "../admin/services/pageConfigService";
-import type { AttractionResponse, AttractionCategory } from "../admin/types";
+import type { AttractionResponse } from "../admin/types";
+import PointCard from "../components/ui/PointCard";
+import { ATTRACTION_CATEGORY_LABELS as CATEGORY_LABELS } from "../utils/attractionCategories";
 import heroFallback from "../assets/images/foto-capa-parque-ubajara.png";
 import "../components/Sections/style/Content.components.css";
 import "./style/PontosTuristicos.css";
 
 const ALL = "Todos";
-
-const CATEGORY_LABELS: Record<AttractionCategory, string> = {
-  PARK: "Parque",
-  WATERFALL: "Cachoeira",
-  MUSEUM: "Museu",
-  FARM: "Fazenda",
-  ROUTE: "Rota",
-  MARKET: "Mercado",
-};
 
 export default function PontosTuristicos() {
   const [items, setItems] = useState<AttractionResponse[]>([]);
@@ -118,56 +111,11 @@ export default function PontosTuristicos() {
                 <p className="ptl-empty__msg">Carregando pontos turísticos...</p>
               </div>
             ) : filtered.length > 0 ? (
-              <div className="cards-points ptl-cards-override">
-                <ul>
-                  {filtered.map((pt) => (
-                    <li key={pt.id}>
-                      <Link
-                        to={`/pontos/${pt.id}`}
-                        className="point-card__link"
-                        aria-label={`Ver detalhes de ${pt.name}`}
-                      >
-                        {pt.photos?.[0]?.url ? (
-                          <img
-                            src={pt.photos[0].url}
-                            alt={pt.name}
-                            className="point-card__img"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="point-card__img point-card__img--placeholder" aria-hidden="true" />
-                        )}
-                        <div className="point-card__gradient" />
-                        <span className="point-card__tag" aria-hidden="true">
-                          {CATEGORY_LABELS[pt.category] ?? pt.category}
-                        </span>
-                        <div className="point-card__body">
-                          <h3 className="point-card__title">{pt.name}</h3>
-                          <p className="point-card__desc">{pt.shortDescription ?? pt.description}</p>
-                          <div className="point-card__meta">
-                            {pt.averageVisitDuration != null && (
-                              <span className="point-card__meta-item">
-                                <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
-                                {pt.averageVisitDuration} min
-                              </span>
-                            )}
-                            {pt.openingHours && (
-                              <span className="point-card__meta-item">
-                                <span className="material-symbols-outlined" aria-hidden="true">calendar_today</span>
-                                {pt.openingHours}
-                              </span>
-                            )}
-                          </div>
-                          <span className="point-card__cta" aria-hidden="true">
-                            <span className="material-symbols-outlined" aria-hidden="true">visibility</span>
-                            Saiba mais
-                          </span>
-                        </div>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="ui-point-grid ui-point-grid--3">
+                {filtered.map((pt) => (
+                  <li key={pt.id}><PointCard item={pt} /></li>
+                ))}
+              </ul>
             ) : (
               <div className="ptl-empty">
                 <span className="material-symbols-outlined ptl-empty__icon">search_off</span>

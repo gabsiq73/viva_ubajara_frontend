@@ -3,15 +3,12 @@ import { useState, useEffect, useCallback } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { attractionsService } from "../admin/services/attractionsService";
-import type { AttractionResponse, AttractionCategory } from "../admin/types";
+import type { AttractionResponse } from "../admin/types";
+import PointCard from "../components/ui/PointCard";
+import { ATTRACTION_CATEGORY_LABELS as CATEGORY_LABELS } from "../utils/attractionCategories";
 import heroFallback from "../assets/images/foto-capa-parque-ubajara.png";
 import "../components/Sections/style/Content.components.css";
 import "./style/PontoTuristico.css";
-
-const CATEGORY_LABELS: Record<AttractionCategory, string> = {
-    PARK: "Parque", WATERFALL: "Cachoeira", MUSEUM: "Museu",
-    FARM: "Fazenda", ROUTE: "Rota", MARKET: "Mercado",
-};
 
 export default function PontoTuristico() {
     const { id } = useParams<{ id: string }>();
@@ -356,38 +353,11 @@ export default function PontoTuristico() {
                         <div className="pt-related__inner">
                             <h2 id="pt-related-title" className="pt-related__title">Pontos Recomendados</h2>
                             <p className="pt-related__subtitle">Continue explorando o Parque Nacional de Ubajara</p>
-                            <div className="cards-points pt-related__grid">
-                                <ul>
-                                    {related.map((pt) => (
-                                        <li key={pt.id}>
-                                            <Link to={`/pontos/${pt.id}`} className="point-card__link" aria-label={`Ver detalhes de ${pt.name}`}>
-                                                {pt.photos?.[0]?.url
-                                                    ? <img src={pt.photos[0].url} alt={pt.name} className="point-card__img" loading="lazy" />
-                                                    : <div className="point-card__img point-card__img--placeholder" aria-hidden="true" />
-                                                }
-                                                <div className="point-card__gradient" />
-                                                <span className="point-card__tag" aria-hidden="true">{CATEGORY_LABELS[pt.category] ?? pt.category}</span>
-                                                <div className="point-card__body">
-                                                    <h3 className="point-card__title">{pt.name}</h3>
-                                                    <p className="point-card__desc">{pt.shortDescription ?? pt.description}</p>
-                                                    {pt.averageVisitDuration != null && (
-                                                        <div className="point-card__meta">
-                                                            <span className="point-card__meta-item">
-                                                                <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
-                                                                {pt.averageVisitDuration} min
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                    <span className="point-card__cta" aria-hidden="true">
-                                                        <span className="material-symbols-outlined" aria-hidden="true">visibility</span>
-                                                        Saiba mais
-                                                    </span>
-                                                </div>
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
+                            <ul className="ui-point-grid ui-point-grid--3">
+                                {related.map((pt) => (
+                                    <li key={pt.id}><PointCard item={pt} /></li>
+                                ))}
+                            </ul>
                             <div className="pt-related__footer">
                                 <Link to="/pontos-turisticos" className="pt-related__all">
                                     Ver todos os pontos turísticos
