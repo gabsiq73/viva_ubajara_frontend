@@ -1,0 +1,26 @@
+.company-root { --company-forest: #123a29; --company-mint: #3cbd93; }
+.company-sidebar { background: var(--company-forest); }
+.company-brand { display: flex; min-height: 82px; flex-direction: column; justify-content: center; gap: 10px; padding: 20px 24px 15px; text-decoration: none; }
+.company-brand .adm-sidebar__logo-img { height: 32px; }
+.company-brand__tag { color: #c0e5d3; font-family: var(--adm-font-serif); font-size: 10px; letter-spacing: .05em; }
+.company-sidebar__caption { display: flex; align-items: center; gap: 9px; margin: 0 18px 15px; padding: 9px 12px; border: 1px solid #28724e; border-radius: 999px; color: #c2ebd8; background: #174a33; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.company-sidebar__caption > span { width: 7px; height: 7px; border-radius: 50%; background: #3cbd93; }
+.company-nav { padding: 12px 10px; }
+.company-nav .adm-sidebar__link { position: relative; min-height: 45px; margin: 3px 0; padding: 10px 13px; border: 1px solid transparent; border-radius: 10px; border-left: 1px solid transparent; gap: 11px; font-size: 12px; font-weight: 600; }
+.company-nav .adm-sidebar__link span.icon { display: flex; color: #49c398; font-size: unset; }
+.company-nav .adm-sidebar__link.active { border-color: #247650; border-left-color: #247650; background: #194b34; color: #fff; }
+.company-nav .adm-sidebar__link.active::after { position: absolute; top: 11px; right: 9px; width: 4px; height: 22px; border-radius: 5px; background: #48d3a3; content: ''; }
+.company-nav .company-nav__future { width: 100%; background: none; color: #a0bdb0; text-align: left; }
+.company-nav .company-nav__future:hover { background: #17442f; color: #c6d8cf; }
+.company-nav__soon { margin-left: auto; color: #84a596; font-size: 9px; font-weight: 500; }
+.company-sidebar__account { display: flex; align-items: center; gap: 10px; margin: 0 11px 7px; padding: 10px; border: 1px solid #28543d; border-radius: 11px; background: #16432f; }
+.company-avatar { position: relative; display: grid; width: 36px; height: 36px; flex: 0 0 auto; place-items: center; border-radius: 9px; background: #347657; color: #e8fff1; font-size: 12px; font-weight: 700; }
+.company-avatar > span { position: absolute; right: -2px; bottom: -2px; width: 9px; height: 9px; border: 2px solid #16432f; border-radius: 50%; background: #3ac996; }
+.company-account-copy { display: grid; min-width: 0; gap: 4px; }
+.company-account-copy strong, .company-account-copy small { overflow: hidden; color: #e6f5ec; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.company-account-copy small { color: #8fb9a3; font-size: 9px; }
+.company-sidebar__footer { padding: 5px 10px 12px; border: 0; }
+.company-sidebar__footer .adm-sidebar__link { padding: 10px 13px; border: 0; font-size: 11px; }
+.company-main { padding: 0 40px 42px; }
+@media (max-width: 1024px) { .company-main { padding-inline: 26px; } }
+@media (max-width: 768px) { .company-brand { padding-left: 18px; }.company-sidebar__caption { margin-inline: 12px; }.company-nav { padding-inline: 5px; }.company-nav .adm-sidebar__link { padding-inline: 9px; font-size: 11px; }.company-nav__soon { display: none; }.company-main { padding: 0 17px 30px; } }

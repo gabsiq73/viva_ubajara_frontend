@@ -39,6 +39,11 @@ export interface CompanyRegisterRequest {
   cnpj: string;
 }
 
+export interface CompanyActivationRequest {
+  companyName: string;
+  cnpj: string;
+}
+
 export type UserRole = 'ADMIN' | 'USER' | 'GUIDE' | 'EMPRESA';
 
 export interface AuthResponse {

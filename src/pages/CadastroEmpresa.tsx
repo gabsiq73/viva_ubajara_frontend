@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -24,7 +24,8 @@ function apiErrorMsg(err: unknown): string {
 
 export default function CadastroEmpresa() {
     const navigate = useNavigate();
-    const { applyAuthResponse } = useAuth();
+    const { applyAuthResponse, activateCompany, isAuthenticated, isCompany, user } = useAuth();
+    const activationMode = isAuthenticated && user?.role === "USER";
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -37,31 +38,44 @@ export default function CadastroEmpresa() {
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    useEffect(() => {
+        if (isCompany) navigate("/empresa", { replace: true });
+    }, [isCompany, navigate]);
+
     const handleSubmit = async (e: FormEvent): Promise<void> => {
         e.preventDefault();
         setError(null);
 
-        if (!firstName.trim() || !username.trim() || !email.trim() || !password.trim() || !companyName.trim() || !cnpj.trim()) {
+        if (!companyName.trim() || !cnpj.trim()
+            || (!activationMode
+                && (!firstName.trim() || !username.trim() || !email.trim() || !password.trim()))) {
             setError("Preencha todos os campos obrigatórios.");
             return;
         }
-        if (password.length < 6) {
+        if (!activationMode && password.length < 6) {
             setError("A senha deve ter no mínimo 6 caracteres.");
             return;
         }
 
         setSubmitting(true);
         try {
-            const response = await authService.registerCompany({
-                firstName: firstName.trim(),
-                lastName: lastName.trim() || undefined,
-                username: username.trim(),
-                email: email.trim(),
-                password,
-                companyName: companyName.trim(),
-                cnpj: cnpj.trim(),
-            });
-            applyAuthResponse(response);
+            if (activationMode) {
+                await activateCompany({
+                    companyName: companyName.trim(),
+                    cnpj: cnpj.trim(),
+                });
+            } else {
+                const response = await authService.registerCompany({
+                    firstName: firstName.trim(),
+                    lastName: lastName.trim() || undefined,
+                    username: username.trim(),
+                    email: email.trim(),
+                    password,
+                    companyName: companyName.trim(),
+                    cnpj: cnpj.trim(),
+                });
+                applyAuthResponse(response);
+            }
             navigate("/empresa", { replace: true });
         } catch (err) {
             setError(apiErrorMsg(err));
@@ -81,9 +95,13 @@ export default function CadastroEmpresa() {
                     <div className="est-hero__content">
                         <div className="est-hero__inner">
                             <span className="est-hero__kicker">PARQUE NACIONAL DE UBAJARA</span>
-                            <h1 className="est-hero__title">Cadastre seu Estabelecimento</h1>
+                            <h1 className="est-hero__title">
+                                {activationMode ? "Ative seu Acesso Empresarial" : "Cadastre seu Estabelecimento"}
+                            </h1>
                             <p className="est-hero__subtitle">
-                                Crie sua conta de empresa para divulgar seu restaurante ou hospedagem no Viva Ubajara.
+                                {activationMode
+                                    ? "Informe os dados da sua empresa para ativar o acesso empresarial na sua conta."
+                                    : "Crie sua conta de empresa para divulgar seu restaurante ou hospedagem no Viva Ubajara."}
                             </p>
                         </div>
                     </div>
@@ -96,7 +114,9 @@ export default function CadastroEmpresa() {
                                 Dados do Cadastro
                             </h2>
                             <p className="contact-section__desc" style={{ marginBottom: "20px" }}>
-                                Seu estabelecimento passará por uma análise da equipe do parque antes de ficar visível ao público.
+                                {activationMode
+                                    ? "Sua conta existente será mantida; nenhum novo usuário será criado."
+                                    : "Seu estabelecimento passará por uma análise da equipe do parque antes de ficar visível ao público."}
                             </p>
 
                             {error && (
@@ -107,7 +127,7 @@ export default function CadastroEmpresa() {
                             )}
 
                             <form className="contact-section__form" onSubmit={handleSubmit} noValidate>
-                                <div className="ce-form__row">
+                                {!activationMode && <div className="ce-form__row">
                                     <div className="contact-section__field">
                                         <label htmlFor="ce-firstName" className="contact-section__label">Nome</label>
                                         <input
@@ -131,9 +151,9 @@ export default function CadastroEmpresa() {
                                             disabled={submitting}
                                         />
                                     </div>
-                                </div>
+                                </div>}
 
-                                <div className="contact-section__field">
+                                {!activationMode && <div className="contact-section__field">
                                     <label htmlFor="ce-username" className="contact-section__label">Usuário</label>
                                     <input
                                         id="ce-username"
@@ -144,9 +164,9 @@ export default function CadastroEmpresa() {
                                         disabled={submitting}
                                         required
                                     />
-                                </div>
+                                </div>}
 
-                                <div className="contact-section__field">
+                                {!activationMode && <div className="contact-section__field">
                                     <label htmlFor="ce-email" className="contact-section__label">E-mail</label>
                                     <input
                                         id="ce-email"
@@ -157,9 +177,9 @@ export default function CadastroEmpresa() {
                                         disabled={submitting}
                                         required
                                     />
-                                </div>
+                                </div>}
 
-                                <div className="contact-section__field">
+                                {!activationMode && <div className="contact-section__field">
                                     <label htmlFor="ce-password" className="contact-section__label">Senha</label>
                                     <input
                                         id="ce-password"
@@ -171,7 +191,7 @@ export default function CadastroEmpresa() {
                                         required
                                         autoComplete="new-password"
                                     />
-                                </div>
+                                </div>}
 
                                 <div className="ce-form__row">
                                     <div className="contact-section__field">
@@ -201,7 +221,9 @@ export default function CadastroEmpresa() {
                                 </div>
 
                                 <button type="submit" className="contact-section__submit" disabled={submitting}>
-                                    {submitting ? "Criando conta…" : "Criar Conta de Empresa"}
+                                    {submitting
+                                        ? (activationMode ? "Ativando…" : "Criando conta…")
+                                        : (activationMode ? "Ativar Acesso Empresarial" : "Criar Conta de Empresa")}
                                 </button>
                             </form>
                         </div>
