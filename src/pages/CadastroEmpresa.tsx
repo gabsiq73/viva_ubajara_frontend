@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { flushSync } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
@@ -11,6 +11,7 @@ import { Button } from "../components/ui/Button";
 import { useAuth } from "../admin/hooks/useAuth";
 import { authService } from "../admin/services/authService";
 import { cnpjRaw, formatCnpj, validateCnpj } from "../utils/cnpj";
+import { consumeReturnTo } from "../utils/returnTo";
 import { getRoleLabel } from "../utils/roles";
 import { validateEmail } from "../company/utils/fields";
 import heroImg from "../assets/images/mercado.png";
@@ -115,9 +116,13 @@ export default function CadastroEmpresa() {
     const formRef = useRef<HTMLFormElement>(null);
     const alertRef = useRef<HTMLDivElement>(null);
 
+    // O destino só pode ser lido uma vez, mas o envio e o efeito abaixo disputam o redirecionamento.
+    const target = useRef<string | null>(null);
+    const resolveTarget = useCallback(() => (target.current ??= consumeReturnTo() ?? "/empresa"), []);
+
     useEffect(() => {
-        if (isCompany) navigate("/empresa", { replace: true });
-    }, [isCompany, navigate]);
+        if (isCompany) navigate(resolveTarget(), { replace: true });
+    }, [isCompany, navigate, resolveTarget]);
 
     const setFieldError = (name: FieldName, message: string | undefined) =>
         setErrors((current) => {
@@ -178,7 +183,7 @@ export default function CadastroEmpresa() {
                 });
                 applyAuthResponse(response);
             }
-            navigate("/empresa", { replace: true });
+            navigate(resolveTarget(), { replace: true });
         } catch (err) {
             const failure = parseApiError(err);
             flushSync(() => {

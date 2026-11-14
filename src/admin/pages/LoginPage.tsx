@@ -1,8 +1,9 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { BASE_URL } from '../services/api';
+import { consumeReturnTo } from '../../utils/returnTo';
 import logo from '../../assets/images/logo.webp';
 import cachoeira from '../../assets/images/cachoeira.png';
 import '../styles/admin.css';
@@ -33,6 +34,9 @@ export function LoginPage() {
   const location = useLocation();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/admin/dashboard';
 
+  // Efeitos rodam duas vezes no StrictMode e o destino só pode ser lido uma vez.
+  const returnTarget = useRef<string | null | undefined>(undefined);
+
   const [mode, setMode] = useState<Mode>('login');
   const [remember, setRemember] = useState(false);
 
@@ -48,11 +52,10 @@ export function LoginPage() {
   const [errorType, setErrorType] = useState<ErrorType>(null);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      if (isAdmin) navigate(from, { replace: true });
-      else if (isCompany) navigate('/empresa/estabelecimento', { replace: true });
-      else navigate('/dashboard', { replace: true });
-    }
+    if (!isAuthenticated) return;
+    if (isAdmin) { navigate(from, { replace: true }); return; }
+    if (returnTarget.current === undefined) returnTarget.current = consumeReturnTo();
+    navigate(returnTarget.current ?? (isCompany ? '/empresa/estabelecimento' : '/dashboard'), { replace: true });
   }, [isAuthenticated, isAdmin, isCompany, navigate, from]);
 
   const handleGoogleLogin = () => {

@@ -10,6 +10,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/events': 'Eventos',
   '/admin/restaurants': 'Restaurantes',
   '/admin/host-points': 'Hospedagem',
+  '/admin/claims': 'Reivindicações',
   '/admin/tour-guides': 'Guias Turísticos',
   '/admin/contacts': 'Contatos',
   '/admin/contact-messages': 'Mensagens',

@@ -290,6 +290,7 @@
   margin-left: var(--adm-sidebar-width);
   margin-top: var(--adm-topbar-h);
   flex: 1;
+  min-width: 0;
   padding: 40px 48px;
   min-height: calc(100vh - var(--adm-topbar-h));
 }
@@ -1570,4 +1571,75 @@
   font-size: 12px;
   color: var(--adm-text-dim);
   font-weight: 400;
+}
+/* ============ REIVINDICAÇÕES ============ */
+.adm-claim {
+  max-height: 62vh;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.adm-claim__status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--adm-text-muted);
+}
+
+.adm-claim__heading {
+  margin: 20px 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--adm-green);
+}
+
+.adm-claim__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 24px;
+  margin: 0;
+}
+
+.adm-claim__item {
+  min-width: 0;
+}
+
+.adm-claim__item dt {
+  font-size: 12px;
+  color: var(--adm-text-muted);
+}
+
+.adm-claim__item dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.adm-claim__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--adm-green);
+  font-weight: 600;
+}
+
+.adm-claim__message {
+  padding: 16px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+@media (max-width: 560px) {
+  .adm-claim__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

@@ -14,6 +14,7 @@ import {
   Users,
   ChefHat,
   Settings,
+  UserCheck,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import logo from '../../assets/images/logo.webp';
@@ -24,6 +25,7 @@ const NAV_ITEMS = [
   { to: '/admin/events',       label: 'Eventos',            icon: <Calendar size={18} />,        section: null },
   { to: '/admin/restaurants',  label: 'Restaurantes',       icon: <Utensils size={18} />,        section: null },
   { to: '/admin/host-points',  label: 'Hospedagem',         icon: <Hotel size={18} />,           section: null },
+  { to: '/admin/claims',       label: 'Reivindicações',     icon: <UserCheck size={18} />,       section: null },
   { to: '/admin/tour-guides',       label: 'Guias Turísticos',   icon: <Compass size={18} />,         section: null },
   { to: '/admin/recommended-items', label: 'Itens Recomendados', icon: <Bookmark size={18} />,        section: null },
   { to: '/admin/contacts',          label: 'Contatos',           icon: <Phone size={18} />,         section: null },

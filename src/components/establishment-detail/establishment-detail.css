@@ -1250,3 +1250,233 @@
         background: rgba(0, 0, 0, 0.45);
     }
 }
+
+/* ── Reivindicação: "Esse estabelecimento é seu?" ── */
+.estd-claim {
+    padding: 0 0 72px;
+    background: #ffffff;
+    scroll-margin-top: calc(var(--site-header-h, 64px) + 72px + 16px);
+}
+
+.estd-nearby + .estd-claim {
+    padding-top: 64px;
+}
+
+.estd-claim__card {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 48px;
+    align-items: start;
+    padding: 40px;
+    border: 1px solid #e4ede8;
+    border-radius: 24px;
+    background: #f4f9f6;
+}
+
+.estd-claim__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+}
+
+.estd-claim__lead,
+.estd-claim__text {
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #4a5c51;
+}
+
+.estd-claim__text {
+    color: #00210c;
+}
+
+.estd-claim__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+.estd-claim__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.estd-claim__form-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.estd-claim__form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.estd-claim__status:focus {
+    outline: none;
+}
+
+.estd-claim__loading {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.estd-claim__loading .ui-skeleton {
+    display: block;
+    max-width: 100%;
+}
+
+.estd-claim__notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px;
+    border: 1px solid #e4ede8;
+    border-radius: 16px;
+    background: #ffffff;
+}
+
+.estd-claim__notice-icon {
+    display: grid;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border-radius: 50%;
+    background: #e8f5ef;
+    color: #006b32;
+}
+
+.estd-claim__notice-text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.estd-claim__notice-title {
+    margin: 0;
+    font-family: "Nunito", sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    color: #003016;
+}
+
+.estd-claim__notice-desc {
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #4a5c51;
+    overflow-wrap: anywhere;
+}
+
+.estd-claim__notice-desc a {
+    font-weight: 600;
+    color: #006b32;
+}
+
+.estd-claim__notice .estd-claim__actions {
+    margin-top: 8px;
+}
+
+.estd-claim__privacy {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    color: #4a5c51;
+}
+
+.estd-claim__privacy .ui-icon {
+    font-size: 18px;
+    color: #006b32;
+}
+
+.estd-claim__error {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid #f3d3d3;
+    border-radius: 12px;
+    background: #fcebeb;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #8f2d2d;
+}
+
+.estd-claim__error .ui-icon {
+    margin-top: 1px;
+    font-size: 18px;
+    color: #d94848;
+}
+
+.estd-claim__spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: estd-claim-spin 0.7s linear infinite;
+}
+
+@keyframes estd-claim-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.estd-claim .ui-btn:focus-visible,
+.estd-claim a:focus-visible {
+    outline: 3px solid #2d8a54;
+    outline-offset: 2px;
+}
+
+@media (max-width: 900px) {
+    .estd-claim__card {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 24px;
+        padding: 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    .estd-claim {
+        padding-bottom: 40px;
+    }
+
+    .estd-nearby + .estd-claim {
+        padding-top: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .estd-claim__card {
+        padding: 20px 16px;
+    }
+
+    .estd-claim__actions .ui-btn {
+        flex: 1 1 100%;
+    }
+
+    .estd-claim__notice {
+        padding: 14px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .estd-claim__spinner {
+        animation-duration: 1.6s;
+    }
+}

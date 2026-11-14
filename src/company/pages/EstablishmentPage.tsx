@@ -2,9 +2,11 @@ import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNod
 import { flushSync } from 'react-dom';
 import axios from 'axios';
 import { companyService } from '../../admin/services/companyService';
+import { claimsService } from '../../admin/services/claimsService';
 import { useToast } from '../../admin/components/Toast';
 import { useUnsavedChangesWarning, useUnsavedGuard } from '../components/unsavedGuardContext';
 import { PhotoUploader } from '../components/PhotoUploader';
+import { ClaimHint, ClaimsPanel } from '../components/ClaimsPanel';
 import Field from '../../components/ui/Field';
 import Icon from '../../components/ui/Icon';
 import Badge from '../../components/ui/Badge';
@@ -17,8 +19,9 @@ import {
   formatPhone, maskPhoneInput, normalizeInstagram, normalizePrice, normalizeUrl,
   validateEmail, validateInstagram, validatePhone, validatePrice, validateUrl,
 } from '../utils/fields';
+import { claimErrorMessage } from '../../utils/claims';
 import { newPhotoId, validatePhotoFiles, type PendingPhoto } from '../utils/photos';
-import type { ApprovalStatus, CompanyEstablishmentRequest, CompanyEstablishmentResponse, CompanyEstablishmentUpdate, EstablishmentType, HostType } from '../../admin/types';
+import type { ApprovalStatus, CompanyEstablishmentRequest, EstablishmentClaimResponse, CompanyEstablishmentResponse, CompanyEstablishmentUpdate, EstablishmentType, HostType } from '../../admin/types';
 import '../../components/ui/ui.css';
 import './EstablishmentPage.css';
 
@@ -110,12 +113,17 @@ function buildPayload(form: FormState, type: EstablishmentType): FormState {
   return Object.fromEntries(keys.map((key) => [key, form[key]])) as unknown as FormState;
 }
 
+/** Campos opcionais vazios saem do corpo do cadastro novo; o backend os trata como ausentes. */
+function omitEmptyStrings(payload: FormState): FormState {
+  return Object.fromEntries(Object.entries(payload).map(([key, value]) => [key, value === '' ? undefined : value])) as FormState;
+}
+
 function uploadFailureMessage(error: unknown, name: string, position: number, total: number): string {
   const prefix = `Falha ao enviar "${name}" (foto ${position} de ${total}).`;
   if (axios.isAxiosError(error) && error.response) {
     const { status, data } = error.response;
     if (status === 413) return `${prefix} A foto é maior que o limite de 5 MB.`;
-    if (status >= 400 && status < 500 && typeof data?.message === 'string') return `${prefix} ${data.message}.`;
+    if (status >= 400 && status < 500 && typeof data?.message === 'string') return `${prefix} ${/[.!?]$/.test(data.message.trim()) ? data.message.trim() : `${data.message.trim()}.`}`;
     return `${prefix} O servidor não conseguiu salvar a foto agora. Tente novamente em instantes.`;
   }
   return `${prefix} Verifique sua conexão com a internet e tente novamente.`;
@@ -142,6 +150,7 @@ export function EstablishmentPage() {
   const [fetching, setFetching] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [establishment, setEstablishment] = useState<CompanyEstablishmentResponse | null>(null);
+  const [claims, setClaims] = useState<EstablishmentClaimResponse[] | null>([]);
   const [selectedType, setSelectedType] = useState<EstablishmentType | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [errors, setErrors] = useState<Errors>({});
@@ -160,13 +169,18 @@ export function EstablishmentPage() {
   const load = useCallback(() => {
     setFetching(true);
     setLoadError(false);
-    companyService.getMyEstablishment()
-      .then((data) => {
+    Promise.all([companyService.getMyEstablishment(), claimsService.getMine().catch(() => null)])
+      .then(([data, claimList]) => {
         setEstablishment(data);
+        setClaims(claimList);
         if (data) setForm(toForm(data));
       })
       .catch(() => setLoadError(true))
       .finally(() => setFetching(false));
+  }, []);
+
+  const reloadClaims = useCallback(() => {
+    claimsService.getMine().then(setClaims).catch(() => setClaims(null));
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -218,7 +232,8 @@ export function EstablishmentPage() {
     const { accepted, rejected } = validatePhotoFiles(files, photos.map((photo) => photo.file), establishment?.photos?.length ?? 0);
     setRejections(rejected);
     if (accepted.length) {
-      setPhotos((current) => [...current, ...accepted.map((file) => ({ id: newPhotoId(), file, preview: URL.createObjectURL(file) }))]);
+      const added = accepted.map((file) => ({ id: newPhotoId(), file, preview: URL.createObjectURL(file) }));
+      setPhotos((current) => [...current, ...added]);
     }
   };
 
@@ -285,7 +300,7 @@ export function EstablishmentPage() {
       const payload = buildPayload(normalized, type);
       const saved = isEdit
         ? await companyService.updateEstablishment(payload as CompanyEstablishmentUpdate)
-        : await companyService.createEstablishment({ type, ...payload } as CompanyEstablishmentRequest);
+        : await companyService.createEstablishment({ type, ...omitEmptyStrings(payload) } as CompanyEstablishmentRequest);
       setEstablishment(saved);
       setForm(toForm(saved));
       if (photos.length && !(await uploadPending(photos, saved.photos?.length ?? 0))) {
@@ -294,8 +309,13 @@ export function EstablishmentPage() {
         return;
       }
       showToast(isEdit ? 'Estabelecimento atualizado e enviado para aprovação.' : 'Cadastro enviado! Aguarde a aprovação da administração.', 'success');
-    } catch {
-      showToast('Não foi possível salvar o estabelecimento. Tente novamente.', 'error');
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 409) {
+        showToast(claimErrorMessage(error, 'Não foi possível salvar o estabelecimento. Tente novamente.'), 'error');
+        reloadClaims();
+      } else {
+        showToast('Não foi possível salvar o estabelecimento. Tente novamente.', 'error');
+      }
     } finally {
       setSaving(false);
     }
@@ -309,6 +329,7 @@ export function EstablishmentPage() {
   };
 
   const startNew = (newType: EstablishmentType) => {
+    if (newType === selectedType) return;
     setSelectedType(newType);
     setErrors({});
     setForm((current) => ({ ...current, ...SPECIFIC_DEFAULTS }));
@@ -353,6 +374,9 @@ export function EstablishmentPage() {
     );
   }
 
+  const pendingClaim = claims?.find((claim) => claim.status === 'PENDING');
+  const approvedClaim = establishment ? claims?.find((claim) => claim.status === 'APPROVED' && claim.spotId === establishment.id) : undefined;
+
   const sections = ['identity', 'contact', 'details', 'photos'] as const;
   const stepFor = (section: (typeof sections)[number]) => sections.indexOf(section) + 1 + (isEdit ? 0 : 1);
 
@@ -385,27 +409,59 @@ export function EstablishmentPage() {
         </div>
       )}
 
+      {approvedClaim && (
+        <div className="company-banner">
+          <StateBlock variant="notice" icon="verified" title="Solicitação aprovada">
+            Seu estabelecimento já está no painel. Revise as informações abaixo e mantenha-as atualizadas.
+          </StateBlock>
+        </div>
+      )}
+
       {!isEdit && !type ? (
-        <section className="company-card company-type-picker" aria-labelledby="type-heading">
-          <div className="company-card__body">
-            <div>
-              <h2 id="type-heading">Qual é o tipo do seu estabelecimento?</h2>
-              <p>Essa escolha não poderá ser alterada depois.</p>
+        <div className="company-stack">
+          {pendingClaim && (
+            <StateBlock variant="notice" icon="hourglass_top" title="Você tem uma solicitação em análise">
+              Enquanto ela estiver em análise, não é possível cadastrar um novo estabelecimento. Aguarde a resposta da administração ou cancele a solicitação abaixo.
+            </StateBlock>
+          )}
+          {!pendingClaim && (
+            <>
+              <section className="company-card company-type-picker" aria-labelledby="type-heading">
+                <div className="company-card__body">
+                  <div>
+                    <h2 id="type-heading">Qual é o tipo do seu estabelecimento?</h2>
+                    <p>Essa escolha não poderá ser alterada depois.</p>
+                  </div>
+                  <div className="company-type-grid">
+                    <button type="button" className="company-type-card" onClick={() => startNew('RESTAURANT')}>
+                      <span className="company-type-icon"><Icon name="restaurant" /></span>
+                      <span className="company-type-copy"><strong>Restaurante</strong><small>Restaurantes, cafés, lanchonetes e produtores locais.</small></span>
+                      <Icon name="chevron_right" className="company-type-arrow" />
+                    </button>
+                    <button type="button" className="company-type-card" onClick={() => startNew('HOST_POINT')}>
+                      <span className="company-type-icon"><Icon name="hotel" /></span>
+                      <span className="company-type-copy"><strong>Hospedagem</strong><small>Hotéis, pousadas, chalés e hostels da região.</small></span>
+                      <Icon name="chevron_right" className="company-type-arrow" />
+                    </button>
+                  </div>
+                </div>
+              </section>
+              <ClaimHint />
+            </>
+          )}
+          {claims === null && (
+            <div className="company-alert company-alert--warn" role="alert">
+              <Icon name="info" />
+              <div className="company-alert__body">
+                <strong>Não conseguimos carregar suas solicitações de titularidade.</strong>
+                <div className="company-alert__actions">
+                  <Button variant="outline" icon="refresh" onClick={reloadClaims}>Tentar de novo</Button>
+                </div>
+              </div>
             </div>
-            <div className="company-type-grid">
-              <button type="button" className="company-type-card" onClick={() => startNew('RESTAURANT')}>
-                <span className="company-type-icon"><Icon name="restaurant" /></span>
-                <span className="company-type-copy"><strong>Restaurante</strong><small>Restaurantes, cafés, lanchonetes e produtores locais.</small></span>
-                <Icon name="chevron_right" className="company-type-arrow" />
-              </button>
-              <button type="button" className="company-type-card" onClick={() => startNew('HOST_POINT')}>
-                <span className="company-type-icon"><Icon name="hotel" /></span>
-                <span className="company-type-copy"><strong>Hospedagem</strong><small>Hotéis, pousadas, chalés e hostels da região.</small></span>
-                <Icon name="chevron_right" className="company-type-arrow" />
-              </button>
-            </div>
-          </div>
-        </section>
+          )}
+          {claims && claims.length > 0 && <ClaimsPanel claims={claims} onChanged={reloadClaims} />}
+        </div>
       ) : (
         <form ref={formRef} className="company-form" onSubmit={handleSubmit} noValidate>
           {!isEdit && (

@@ -17,6 +17,7 @@ export interface EstablishmentDetail extends Establishment {
     bookingUrl: string;
     mapsUrl: string;
     instagram: { handle: string; url: string } | null;
+    claimable: boolean;
 }
 
 export type DetailLoadResult =
@@ -92,6 +93,7 @@ function detailFromRestaurant(r: RestaurantResponse): EstablishmentDetail {
         bookingUrl: "",
         mapsUrl: safeHttpUrl(r.mapsUrl),
         instagram: instagramFrom(r.instagramUrl),
+        claimable: r.claimable === true,
     };
 }
 
@@ -107,6 +109,7 @@ function detailFromHostPoint(h: HostPointResponse): EstablishmentDetail {
         bookingUrl: safeHttpUrl(h.bookingUrl),
         mapsUrl: safeHttpUrl(h.mapsUrl),
         instagram: instagramFrom(h.instagramUrl),
+        claimable: h.claimable === true,
     };
 }
 

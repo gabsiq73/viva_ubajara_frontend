@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../admin/hooks/useAuth';
 import { decodePayload } from '../admin/services/jwtUtils';
 import { usersService } from '../admin/services/usersService';
+import { consumeReturnTo } from '../utils/returnTo';
 import type { UserRole } from '../admin/types';
 
 export function LoginSuccessPage() {
@@ -10,6 +11,7 @@ export function LoginSuccessPage() {
   const navigate = useNavigate();
   const { applyAuthResponse, isAuthenticated, isAdmin, isCompany } = useAuth();
   const [ready, setReady] = useState(false);
+  const returnTarget = useRef<string | null | undefined>(undefined);
 
   useEffect(() => {
     const token = params.get('token');
@@ -42,9 +44,9 @@ export function LoginSuccessPage() {
 
   useEffect(() => {
     if (!ready || !isAuthenticated) return;
-    if (isAdmin) navigate('/admin/dashboard', { replace: true });
-    else if (isCompany) navigate('/empresa/estabelecimento', { replace: true });
-    else navigate('/dashboard', { replace: true });
+    if (isAdmin) { navigate('/admin/dashboard', { replace: true }); return; }
+    if (returnTarget.current === undefined) returnTarget.current = consumeReturnTo();
+    navigate(returnTarget.current ?? (isCompany ? '/empresa/estabelecimento' : '/dashboard'), { replace: true });
   }, [ready, isAuthenticated, isAdmin, isCompany, navigate]);
 
   return (

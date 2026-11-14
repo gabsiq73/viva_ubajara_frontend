@@ -282,6 +282,7 @@ export interface RestaurantResponse {
   starRating?: number;
   photos: PhotoResponse[];
   approvalStatus?: ApprovalStatus;
+  claimable?: boolean;
 }
 
 // ============================================================
@@ -338,6 +339,7 @@ export interface HostPointResponse {
   bookingUrl?: string;
   photos: PhotoResponse[];
   approvalStatus?: ApprovalStatus;
+  claimable?: boolean;
 }
 
 // ============================================================
@@ -634,6 +636,51 @@ export interface CompanyEstablishmentResponse {
   bookingUrl?: string;
 
   photos: PhotoResponse[];
+}
+
+// ============================================================
+// Reivindicação de estabelecimento
+// ============================================================
+export type ClaimStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
+
+export interface EstablishmentClaimRequest {
+  spotId: string;
+  message: string;
+  contactPhone: string;
+}
+
+export interface EstablishmentClaimResponse {
+  id: string;
+  spotId: string;
+  spotName: string;
+  spotType: EstablishmentType;
+  status: ClaimStatus;
+  message: string;
+  contactPhone: string;
+  createdAt: string;
+  reviewedAt?: string | null;
+  rejectionReason?: string | null;
+}
+
+export interface EstablishmentClaimAdminResponse extends EstablishmentClaimResponse {
+  claimant: {
+    id: string;
+    name: string;
+    email: string;
+    companyName?: string | null;
+    cnpj?: string | null;
+    role: UserRole;
+  };
+  spot: {
+    id: string;
+    name: string;
+    type: EstablishmentType;
+    address?: string | null;
+    active?: boolean | null;
+    approvalStatus: ApprovalStatus;
+    hasOwner: boolean;
+  };
+  reviewedByName?: string | null;
 }
 
 // ============================================================

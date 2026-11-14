@@ -18,6 +18,7 @@ import { TourGuidesListPage } from './pages/TourGuidesListPage';
 import { TourGuideFormPage } from './pages/TourGuideFormPage';
 import { ContactsListPage } from './pages/ContactsListPage';
 import { ContactFormPage } from './pages/ContactFormPage';
+import { ClaimsListPage } from './pages/ClaimsListPage';
 import { ContactMessagesListPage } from './pages/ContactMessagesListPage';
 import { TestimonialsListPage } from './pages/TestimonialsListPage';
 import { PhotosPage } from './pages/PhotosPage';
@@ -64,6 +65,8 @@ export function AdminRouter() {
           <Route path="host-points" element={<HostPointsListPage />} />
           <Route path="host-points/new" element={<HostPointFormPage />} />
           <Route path="host-points/:id/edit" element={<HostPointFormPage />} />
+
+          <Route path="claims" element={<ClaimsListPage />} />
 
           <Route path="tour-guides" element={<TourGuidesListPage />} />
           <Route path="tour-guides/new" element={<TourGuideFormPage />} />

@@ -7,6 +7,7 @@ import { Button, ButtonLink } from "../components/ui/Button";
 import PageHero from "../components/ui/PageHero";
 import StateBlock from "../components/ui/StateBlock";
 import AboutSection from "../components/establishment-detail/AboutSection";
+import ClaimSection from "../components/establishment-detail/ClaimSection";
 import ContactCard from "../components/establishment-detail/ContactCard";
 import DetailHero from "../components/establishment-detail/DetailHero";
 import DetailSkeleton from "../components/establishment-detail/DetailSkeleton";
@@ -188,6 +189,8 @@ function DetailView({ detail }: { detail: EstablishmentDetail }) {
                     onToggleFavorite={handleToggleFavorite}
                 />
             )}
+
+            <ClaimSection detail={detail} />
 
             {isMobile && <BottomBar detail={detail} onOpenSheet={openSheet} />}
 

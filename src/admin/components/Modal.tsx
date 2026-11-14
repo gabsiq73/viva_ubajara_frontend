@@ -32,13 +32,14 @@ interface ConfirmModalProps {
   title: string;
   message: string;
   confirmLabel?: string;
+  tone?: 'danger' | 'primary';
   onConfirm: () => void;
   onCancel: () => void;
   loading?: boolean;
 }
 
 export function ConfirmModal({
-  isOpen, title, message, confirmLabel = 'Deletar',
+  isOpen, title, message, confirmLabel = 'Deletar', tone = 'danger',
   onConfirm, onCancel, loading,
 }: ConfirmModalProps) {
   return (
@@ -48,7 +49,7 @@ export function ConfirmModal({
         <button className="adm-btn adm-btn--ghost" onClick={onCancel} disabled={loading}>
           Cancelar
         </button>
-        <button className="adm-btn adm-btn--danger" onClick={onConfirm} disabled={loading}>
+        <button className={`adm-btn adm-btn--${tone}`} onClick={onConfirm} disabled={loading}>
           {loading ? 'Aguarde…' : confirmLabel}
         </button>
       </div>
