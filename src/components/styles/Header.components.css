@@ -25,9 +25,24 @@
     height: 84px;
     box-sizing: border-box;
     color: #ffffff;
-    background: rgba(255, 255, 255, 0);
     box-shadow: 0 6px 24px rgba(0, 33, 12, 0);
-    transition: background 250ms var(--site-ease), height 250ms var(--site-ease), box-shadow 250ms var(--site-ease);
+    transition: height 250ms var(--site-ease), box-shadow 250ms var(--site-ease);
+}
+
+/* O blur fica num pseudo-elemento: backdrop-filter no próprio header criaria um
+   containing block e quebraria o .site-menu (position: fixed) dentro dele. */
+.site-header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    box-sizing: border-box;
+    background: rgba(0, 32, 16, 0.4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    pointer-events: none;
+    transition: background-color 250ms var(--site-ease), border-color 250ms var(--site-ease);
 }
 
 .site-header::before {
@@ -36,8 +51,8 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 120px;
-    background: linear-gradient(180deg, rgba(0, 20, 9, 0.65), rgba(0, 20, 9, 0));
+    height: 100%;
+    background: linear-gradient(180deg, rgba(0, 20, 9, 0.35), rgba(0, 20, 9, 0));
     pointer-events: none;
     opacity: 1;
     transition: opacity 250ms var(--site-ease);
@@ -48,12 +63,26 @@
     --site-logo-h: 42px;
     height: 64px;
     color: #00210c;
-    background: #ffffff;
     box-shadow: 0 6px 24px rgba(0, 33, 12, 0.08);
+}
+
+.site-header.is-solid::after {
+    background: rgba(255, 255, 255, 0.86);
+    border-bottom-color: rgba(0, 48, 22, 0.1);
 }
 
 .site-header.is-solid::before {
     opacity: 0;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .site-header::after {
+        background: rgba(0, 32, 16, 0.82);
+    }
+
+    .site-header.is-solid::after {
+        background: #ffffff;
+    }
 }
 
 .site-header__inner {
@@ -689,6 +718,7 @@
 @media (prefers-reduced-motion: reduce) {
     .site-header,
     .site-header::before,
+    .site-header::after,
     .site-header__icon-btn,
     .site-header__login,
     .site-user__button .site-avatar,

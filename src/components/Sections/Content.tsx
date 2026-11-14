@@ -1,6 +1,6 @@
 import "./style/Content.components.css"
 import { Link } from "react-router-dom"
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo, useRef, type KeyboardEvent, type ReactNode } from "react"
 import paper from "./../../assets/images/paper.png"
 import park from "./../../assets/images/parque.png";
 import food from "./../../assets/images/food.png";
@@ -65,11 +65,73 @@ const AIRPORTS = [
     { code: "PHB", name: "Aeroporto de Parnaíba", dist: "190 km de distância" },
 ];
 
-const FAQ_ITEMS = [
-    { id: 1, q: "Onde fica o Parque Nacional de Ubajara?", a: "O Parque está localizado na Serra da Ibiapaba, a cerca de 320 km de Fortaleza. A entrada principal fica no município de Ubajara, no estado do Ceará." },
-    { id: 2, q: "Qual o horário de funcionamento do teleférico?", a: "O teleférico opera de terça a domingo, das 8h às 17h. Às segundas-feiras o Parque permanece fechado para manutenção. Recomendamos chegar cedo para garantir sua entrada." },
-    { id: 3, q: "É necessário guia para visitar a gruta?", a: "Sim, a visita à Gruta de Ubajara é obrigatoriamente acompanhada por condutores locais credenciados pelo ICMBio, garantindo sua segurança e a preservação do ambiente." },
-    { id: 4, q: "É possível acampar dentro do Parque?", a: "O camping é permitido em áreas específicas e requer agendamento prévio junto ao ICMBio. Consulte o site oficial do parque ou entre em contato com nossa secretaria de turismo." },
+interface FaqItem {
+    id: string;
+    question: string;
+    answer: ReactNode;
+}
+
+const FAQ_ITEMS: FaqItem[] = [
+    {
+        id: "onde-fica",
+        question: "Onde fica o Parque Nacional de Ubajara?",
+        answer: <p>O Parque está localizado na Serra da Ibiapaba, a cerca de 320 km de Fortaleza. A entrada principal fica no município de Ubajara, no estado do Ceará.</p>,
+    },
+    {
+        id: "teleferico",
+        question: "Qual o horário de funcionamento do teleférico?",
+        answer: <p>O teleférico opera de terça a domingo, das 8h às 17h. Às segundas-feiras o Parque permanece fechado para manutenção. Recomendamos chegar cedo para garantir sua entrada.</p>,
+    },
+    {
+        id: "guia",
+        question: "É necessário guia para visitar a gruta?",
+        answer: <p>Sim, a visita à Gruta de Ubajara é obrigatoriamente acompanhada por condutores locais credenciados pelo ICMBio, garantindo sua segurança e a preservação do ambiente.</p>,
+    },
+    {
+        id: "camping",
+        question: "É possível acampar dentro do Parque?",
+        answer: <p>O camping é permitido em áreas específicas e requer agendamento prévio junto ao ICMBio. Consulte o site oficial do parque ou entre em contato com nossa secretaria de turismo.</p>,
+    },
+    {
+        id: "como-chegar",
+        question: "Como chego a Ubajara?",
+        answer: (
+            <>
+                <p>De avião, você pode voar até os aeroportos de Jericoacoara, Teresina, Fortaleza ou Parnaíba e completar a viagem por terra. De ônibus, há linhas regulares saindo de Fortaleza, Teresina e outras cidades da região. De carro, o acesso é pela BR-222 e pela CE-187, em estrada totalmente asfaltada e sinalizada.</p>
+                <p><Link to="/como-chegar" className="faq__link">Ver todas as rotas</Link></p>
+            </>
+        ),
+    },
+    {
+        id: "comer-hospedar",
+        question: "Onde posso comer e me hospedar?",
+        answer: (
+            <>
+                <p>Ubajara tem restaurantes com a gastronomia regional da Ibiapaba, além de pousadas e hotéis integrados à natureza. Veja a lista completa, com fotos e detalhes de cada lugar.</p>
+                <p><Link to="/estabelecimentos" className="faq__link">Ver estabelecimentos</Link></p>
+            </>
+        ),
+    },
+    {
+        id: "divulgar",
+        question: "Tenho um restaurante ou pousada. Como divulgo meu negócio?",
+        answer: (
+            <>
+                <p>Faça o cadastro da sua empresa no Viva Ubajara. Depois de enviado, o cadastro passa pela análise da nossa equipe antes de ser publicado no site.</p>
+                <p><Link to="/cadastro-empresa" className="faq__link">Cadastrar minha empresa</Link></p>
+            </>
+        ),
+    },
+    {
+        id: "contato",
+        question: "Como falo com a equipe do parque?",
+        answer: (
+            <>
+                <p>Ligue para <a href="tel:+558836341234" className="faq__link">(88) 3634-1234</a> ou escreva para <a href="mailto:contato@vivaubajara.com.br" className="faq__link">contato@vivaubajara.com.br</a>. Você também pode enviar uma mensagem pela página de contato.</p>
+                <p><Link to="/contato" className="faq__link">Ir para a página de contato</Link></p>
+            </>
+        ),
+    },
 ];
 
 // ── Skeleton cards ─────────────────────────────────────────────
@@ -191,7 +253,8 @@ const FALLBACK_AVATARS = [cac, farm, mercado];
 export default function Content() {
     const [gastroIndex, setGastroIndex] = useState(0);
     const [gastroSlides, setGastroSlides] = useState<GastronomySlide[]>(GASTRO_SLIDES_FALLBACK);
-    const [faqOpen, setFaqOpen] = useState<number | null>(1);
+    const [faqOpen, setFaqOpen] = useState<string | null>(null);
+    const faqListRef = useRef<HTMLDivElement>(null);
 
     // API state
     const [loading, setLoading] = useState(true);
@@ -261,6 +324,21 @@ export default function Content() {
         () => pubGuideFilter === "Todos" ? pubItems : pubItems.filter(i => i.category === pubGuideFilter),
         [pubItems, pubGuideFilter]
     );
+
+    const handleFaqKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+        const keys = ["ArrowDown", "ArrowUp", "Home", "End"];
+        if (!keys.includes(e.key) || !(e.target instanceof HTMLButtonElement)) return;
+        const buttons = Array.from(faqListRef.current?.querySelectorAll<HTMLButtonElement>(".faq__question") ?? []);
+        const current = buttons.indexOf(e.target);
+        if (current === -1) return;
+        e.preventDefault();
+        const next =
+            e.key === "Home" ? 0
+            : e.key === "End" ? buttons.length - 1
+            : e.key === "ArrowDown" ? (current + 1) % buttons.length
+            : (current - 1 + buttons.length) % buttons.length;
+        buttons[next].focus();
+    };
 
     return (
         <section className="section">
@@ -696,25 +774,52 @@ export default function Content() {
                 {/* ── FAQ ── */}
                 <section className="faq" aria-labelledby="faq-title">
                     <div className="faq__inner">
-                        <h2 id="faq-title" className="faq__title reveal">Dúvidas Frequentes</h2>
-                        <div className="faq__list reveal grid-reveal">
-                            {FAQ_ITEMS.map((item) => (
-                                <div key={item.id} className={`faq__item${faqOpen === item.id ? " faq__item--open" : ""}`}>
-                                    <button
-                                        type="button"
-                                        className="faq__question"
-                                        onClick={() => setFaqOpen(faqOpen === item.id ? null : item.id)}
-                                        aria-expanded={faqOpen === item.id}
-                                        aria-controls={`faq-answer-${item.id}`}
-                                    >
-                                        {item.q}
-                                        <span className="material-symbols-outlined faq__chevron" aria-hidden="true">expand_more</span>
-                                    </button>
-                                    <div id={`faq-answer-${item.id}`} className="faq__answer">
-                                        <div className="faq__answer-inner"><p>{item.a}</p></div>
+                        <header className="faq__intro reveal">
+                            <span className="faq__kicker">Tire suas dúvidas</span>
+                            <h2 id="faq-title" className="faq__title">Dúvidas Frequentes</h2>
+                            <p className="faq__lede">As respostas para as perguntas mais comuns de quem planeja visitar o Parque e a cidade de Ubajara.</p>
+                        </header>
+                        <div className="faq__list reveal" ref={faqListRef} onKeyDown={handleFaqKeyDown}>
+                            {FAQ_ITEMS.map((item) => {
+                                const open = faqOpen === item.id;
+                                return (
+                                    <div key={item.id} className={`faq__item${open ? " faq__item--open" : ""}`}>
+                                        <h3 className="faq__heading">
+                                            <button
+                                                type="button"
+                                                id={`faq-question-${item.id}`}
+                                                className="faq__question"
+                                                onClick={() => setFaqOpen(open ? null : item.id)}
+                                                aria-expanded={open}
+                                                aria-controls={`faq-answer-${item.id}`}
+                                            >
+                                                <span className="faq__question-text">{item.question}</span>
+                                                <span className="faq__icon" aria-hidden="true">
+                                                    <span className="material-symbols-outlined">add</span>
+                                                </span>
+                                            </button>
+                                        </h3>
+                                        <div
+                                            id={`faq-answer-${item.id}`}
+                                            className="faq__answer"
+                                            role="region"
+                                            aria-labelledby={`faq-question-${item.id}`}
+                                            inert={!open}
+                                        >
+                                            <div className="faq__answer-inner">
+                                                <div className="faq__answer-body">{item.answer}</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
+                        </div>
+                        <div className="faq__more reveal">
+                            <div className="faq__more-text">
+                                <strong>Não encontrou o que procurava?</strong>
+                                <span>Fale com a nossa equipe e tire sua dúvida.</span>
+                            </div>
+                            <Link to="/contato" className="faq__more-btn">Falar com a equipe</Link>
                         </div>
                     </div>
                 </section>

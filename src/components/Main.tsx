@@ -33,7 +33,7 @@ export default function Main(){
                         </span>
                     </h1>
                     <p className="hero-subtitle">
-                        Trilhas, teleférico e a famosa Gruta de Ubajara — venha viver as maravilhas da Serra da Ibiapaba.
+                        Trilhas, teleférico e a famosa Gruta de Ubajara. Venha viver as maravilhas da Serra da Ibiapaba.
                     </p>
                     <div className="hero-actions">
                         <Link to="/pontos-turisticos" className="hero-btn hero-btn--primary">
@@ -43,11 +43,6 @@ export default function Main(){
                             Como Chegar
                         </Link>
                     </div>
-                </div>
-
-                <div className="hero-scroll" aria-hidden="true">
-                    <span className="hero-scroll__line" />
-                    <span className="hero-scroll__label">Rolar</span>
                 </div>
             </section>
             <Content/>
