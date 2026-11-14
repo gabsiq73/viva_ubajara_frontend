@@ -20,13 +20,22 @@ import type {
     AttractionResponse,
     AttractionCategory,
     EventResponse,
-    RestaurantResponse,
-    HostPointResponse,
-    HostType,
     TourGuideResponse,
     TestimonialResponse,
 } from "../../admin/types";
 import { ArrowRight } from "lucide-react";
+import EstablishmentCard from "../ui/EstablishmentCard";
+import { FilterChip } from "../ui/Chip";
+import { Skeleton, EstablishmentCardSkeleton } from "../ui/Skeleton";
+import {
+    ESTABLISHMENT_TYPES,
+    mapHostPoint,
+    mapRestaurant,
+    toFavoriteItem,
+    type Establishment,
+} from "../../utils/establishments";
+import { loadFavorites, toggleFavorite } from "../../utils/favorites";
+import "../ui/ui.css";
 
 // ── Static icons ───────────────────────────────────────────────
 const IconFazer = () => (
@@ -137,49 +146,52 @@ const FAQ_ITEMS: FaqItem[] = [
 // ── Skeleton cards ─────────────────────────────────────────────
 
 const PointSkeleton = () => (
-    <li aria-hidden="true" style={{ cursor: "default" }}>
-        <div className="skel" style={{ height: "100%", width: "100%", borderRadius: 20 }} />
+    <li className="point-skel" aria-hidden="true">
+        <Skeleton width="100%" height="100%" radius={0} />
     </li>
 );
 
-const PubGuideSkeleton = () => (
-    <article className="pub-guide-card" aria-hidden="true" style={{ pointerEvents: "none" }}>
-        <div className="pub-guide-card__media">
-            <div className="skel" style={{ width: "100%", height: "100%", borderRadius: 0 }} />
-        </div>
-        <div className="pub-guide-card__body">
-            <div className="skel" style={{ height: 17, width: "65%" }} />
-            <div className="skel" style={{ height: 13, width: "100%" }} />
-            <div className="skel" style={{ height: 13, width: "80%" }} />
-            <div className="skel" style={{ height: 34, width: 110, borderRadius: 20, marginTop: 6 }} />
-        </div>
-    </article>
-);
-
 const EventSkeleton = () => (
-    <article className="pub-event-card" aria-hidden="true" style={{ pointerEvents: "none" }}>
-        <div className="pub-event-card__media" style={{ position: "relative" }}>
-            <div className="skel" style={{ position: "absolute", inset: 0, borderRadius: 0 }} />
+    <article className="pub-event-card pub-event-card--skeleton" aria-hidden="true">
+        <div className="pub-event-card__media">
+            <Skeleton className="pub-skel-fill" radius={0} />
         </div>
         <div className="pub-event-card__body">
-            <div className="skel" style={{ height: 17, width: "75%" }} />
-            <div className="skel" style={{ height: 13, width: "100%" }} />
-            <div className="skel" style={{ height: 13, width: "60%" }} />
-            <div className="skel" style={{ height: 36, width: 120, borderRadius: 20, marginTop: 4 }} />
+            <div className="pub-event-card__title">
+                <Skeleton width="80%" height={15} />
+                <Skeleton width="55%" height={15} />
+            </div>
+            <div className="pub-event-card__desc">
+                <Skeleton width="100%" height={12} />
+                <Skeleton width="70%" height={12} />
+            </div>
+            <div className="pub-event-card__loc">
+                <Skeleton width="45%" height={13} />
+            </div>
+            <div className="pub-event-card__footer">
+                <Skeleton width={96} height={14} />
+            </div>
         </div>
     </article>
 );
 
 const GuideSkeleton = () => (
-    <article className="guide-card" aria-hidden="true" style={{ pointerEvents: "none" }}>
+    <article className="guide-card guide-card--skeleton" aria-hidden="true">
         <div className="guide-card__photo">
-            <div className="skel" style={{ width: "100%", height: "100%", borderRadius: 0 }} />
+            <Skeleton className="pub-skel-fill" radius={0} />
         </div>
         <div className="guide-card__body">
-            <div className="skel" style={{ height: 17, width: "60%" }} />
-            <div className="skel" style={{ height: 12, width: "35%" }} />
-            <div className="skel" style={{ height: 13, width: "100%", marginTop: 4 }} />
-            <div className="skel" style={{ height: 13, width: "85%" }} />
+            <div className="guide-card__name">
+                <Skeleton width="60%" height={16} />
+            </div>
+            <div className="guide-card__specialty">
+                <Skeleton width="35%" height={11} />
+            </div>
+            <div className="guide-card__desc">
+                <Skeleton width="100%" height={12} />
+                <Skeleton width="100%" height={12} />
+                <Skeleton width="75%" height={12} />
+            </div>
         </div>
     </article>
 );
@@ -208,10 +220,6 @@ const CATEGORY_LABELS: Record<AttractionCategory, string> = {
     FARM: "Fazenda", ROUTE: "Rota", MARKET: "Mercado",
 };
 
-const HOST_TYPE_LABELS: Record<HostType, string> = {
-    HOTEL: "Hotel", ROOST: "Pousada", HOSTEL: "Hostel",
-};
-
 const PT_MONTHS = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
 
 function parseDate(raw: string): Date {
@@ -224,28 +232,46 @@ function parseDate(raw: string): Date {
     return new Date(raw);
 }
 
-interface PubItem {
+const PUB_LIMIT = 8;
+
+function pickPubItems(items: Establishment[], filter: string): Establishment[] {
+    if (filter !== "Todos") return items.filter((i) => i.type === filter).slice(0, PUB_LIMIT);
+    const restaurants = items.filter((i) => i.type === "Restaurante");
+    const lodging = items.filter((i) => i.type !== "Restaurante");
+    const mixed: Establishment[] = [];
+    for (let i = 0; mixed.length < PUB_LIMIT && (i < restaurants.length || i < lodging.length); i++) {
+        if (restaurants[i]) mixed.push(restaurants[i]);
+        if (lodging[i] && mixed.length < PUB_LIMIT) mixed.push(lodging[i]);
+    }
+    return mixed;
+}
+
+interface SectionHeaderProps {
     id: string;
-    apiType: "restaurant" | "hostpoint";
-    category: string;
+    kicker: string;
     title: string;
-    desc: string;
-    img: string;
+    subtitle?: string;
+    cta?: { to: string; label: string; text?: string };
+    onDark?: boolean;
 }
 
-function mapRestaurantPub(r: RestaurantResponse): PubItem {
-    return { id: r.id, apiType: "restaurant", category: "Restaurante", title: r.name, desc: r.description, img: r.photos?.[0]?.url ?? "" };
+function SectionHeader({ id, kicker, title, subtitle, cta, onDark }: SectionHeaderProps) {
+    return (
+        <header className={`sec-head reveal${onDark ? " sec-head--on-dark" : ""}`}>
+            <div className="sec-head__text">
+                <span className="sec-head__kicker">{kicker}</span>
+                <h2 id={id} className="sec-head__title">{title}</h2>
+                {subtitle && <p className="sec-head__sub">{subtitle}</p>}
+            </div>
+            {cta && (
+                <Link to={cta.to} className="sec-head__cta" aria-label={cta.label}>
+                    {cta.text ?? "Ver todos"}
+                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                </Link>
+            )}
+        </header>
+    );
 }
-function mapHostPub(h: HostPointResponse): PubItem {
-    return { id: h.id, apiType: "hostpoint", category: HOST_TYPE_LABELS[h.hostType] ?? "Hospedagem", title: h.name, desc: h.description, img: h.photos?.[0]?.url ?? "" };
-}
-
-const PUB_GUIDE_TAG_COLORS: Record<string, string> = {
-    Restaurante: "#006B32",
-    Hotel: "#304FCD",
-    Pousada: "#304FCD",
-    Hostel: "#0d7a6f",
-};
 
 // ── Fallback review avatars ───────────────────────────────────
 const FALLBACK_AVATARS = [cac, farm, mercado];
@@ -260,10 +286,11 @@ export default function Content() {
     const [loading, setLoading] = useState(true);
     const [attractions, setAttractions] = useState<AttractionResponse[]>([]);
     const [homeEvents, setHomeEvents] = useState<EventResponse[]>([]);
-    const [pubItems, setPubItems] = useState<PubItem[]>([]);
+    const [pubItems, setPubItems] = useState<Establishment[]>([]);
     const [homeGuides, setHomeGuides] = useState<TourGuideResponse[]>([]);
     const [homeReviews, setHomeReviews] = useState<TestimonialResponse[]>([]);
     const [pubGuideFilter, setPubGuideFilter] = useState("Todos");
+    const [favoriteIds, setFavoriteIds] = useState<Set<string>>(() => new Set(loadFavorites().map((f) => f.id)));
 
     useEffect(() => {
         gastronomyItemsService.getActive().then((items) => {
@@ -276,8 +303,8 @@ export default function Content() {
         Promise.allSettled([
             attractionsService.getAll(0, 4, true),
             eventsService.getAll(0, 4, true),
-            restaurantsService.getAll(0, 6),
-            hostPointsService.getAll(0, 6),
+            restaurantsService.getAll(0, PUB_LIMIT),
+            hostPointsService.getAll(0, PUB_LIMIT),
             tourGuidesService.getAll(0, 4, true),
             testimonialsService.listApproved(),
         ]).then(([attR, evR, restR, hostR, guideR, testR]) => {
@@ -287,9 +314,9 @@ export default function Content() {
             if (testR.status === "fulfilled") setHomeReviews(testR.value.slice(0, 3));
 
             const rests = restR.status === "fulfilled"
-                ? restR.value.content.filter(r => r.active).map(mapRestaurantPub) : [];
+                ? restR.value.content.filter(r => r.active).map(mapRestaurant) : [];
             const hosts = hostR.status === "fulfilled"
-                ? hostR.value.content.filter(h => h.active).map(mapHostPub) : [];
+                ? hostR.value.content.filter(h => h.active).map(mapHostPoint) : [];
             setPubItems([...rests, ...hosts]);
         }).finally(() => setLoading(false));
     }, []);
@@ -316,14 +343,21 @@ export default function Content() {
     }, [loading]);
 
     const pubCategories = useMemo(() => {
-        const cats = Array.from(new Set(pubItems.map(i => i.category)));
-        return ["Todos", ...cats];
+        const present = new Set(pubItems.map(i => i.type));
+        return ["Todos", ...ESTABLISHMENT_TYPES.filter(t => present.has(t))];
     }, [pubItems]);
 
-    const filteredPub = useMemo(
-        () => pubGuideFilter === "Todos" ? pubItems : pubItems.filter(i => i.category === pubGuideFilter),
-        [pubItems, pubGuideFilter]
-    );
+    const filteredPub = useMemo(() => pickPubItems(pubItems, pubGuideFilter), [pubItems, pubGuideFilter]);
+
+    const handleToggleFavorite = (item: Establishment) => {
+        const nowFavorite = toggleFavorite(toFavoriteItem(item));
+        setFavoriteIds((prev) => {
+            const next = new Set(prev);
+            if (nowFavorite) next.add(item.id);
+            else next.delete(item.id);
+            return next;
+        });
+    };
 
     const handleFaqKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
         const keys = ["ArrowDown", "ArrowUp", "Home", "End"];
@@ -392,15 +426,15 @@ export default function Content() {
                 </div>
 
                 {/* ── Pontos Turísticos ── */}
-                <div className="point">
+                <section className="point" aria-labelledby="pontos-title">
                     <div className="point-container">
-                        <div className="section-header reveal">
-                            <div className="title-group">
-                                <span className="subtitle">Experiências Únicas</span>
-                                <h1>Pontos Turísticos</h1>
-                            </div>
-                            <div id="more"><Link to="/pontos-turisticos">Ver Todos</Link></div>
-                        </div>
+                        <SectionHeader
+                            id="pontos-title"
+                            kicker="Experiências Únicas"
+                            title="Pontos Turísticos"
+                            subtitle="Cachoeiras, trilhas, fazendas e mercados para viver a serra de perto."
+                            cta={{ to: "/pontos-turisticos", label: "Ver todos os pontos turísticos" }}
+                        />
                         {loading ? (
                             <div className="cards-points">
                                 <ul className="list-points">
@@ -438,14 +472,11 @@ export default function Content() {
                                             </Link>
                                         </li>
                                     ))}
-                                    {Array.from({ length: Math.max(0, 4 - attractions.length) }).map((_, i) => (
-                                        <PointSkeleton key={`pad-${i}`} />
-                                    ))}
                                 </ul>
                             </div>
                         )}
                     </div>
-                </div>
+                </section>
 
                 {/* ── Gastronomia ── */}
                 <div className="top-n">
@@ -459,8 +490,8 @@ export default function Content() {
                                 <GastronomyCarousel slides={gastroSlides} activeIndex={gastroIndex} onActiveChange={setGastroIndex} />
                             </div>
                             <div className="text-n">
-                                <h2>Sabores da Ibiapaba</h2>
-                                <h1>Gastronomia Regional</h1>
+                                <span className="text-n__kicker">Sabores da Ibiapaba</span>
+                                <h2 className="text-n__title">Gastronomia Regional</h2>
                                 <div className="protect">
                                     <ul>
                                         {gastroSlides.map((slide, i) => (
@@ -492,84 +523,64 @@ export default function Content() {
                     </div>
                 </div>
 
-                {/* ── Guia + Eventos + Guias ── */}
+                {/* ── Guia + Eventos ── */}
                 <div className="pub-landing-blocks">
 
                     {/* Estabelecimentos */}
                     <section className="pub-guide" aria-labelledby="pub-guide-title">
-                        <header className="pub-guide__header reveal">
-                            <h2 id="pub-guide-title" className="pub-guide__title">Guia de Estabelecimentos</h2>
-                            <p className="pub-guide__subtitle">Os melhores lugares para comer, dormir e viver momentos inesquecíveis em nossa cidade.</p>
-                        </header>
+                        <SectionHeader
+                            id="pub-guide-title"
+                            kicker="Onde comer e dormir"
+                            title="Guia de Estabelecimentos"
+                            subtitle="Os melhores lugares para comer, dormir e viver momentos inesquecíveis em nossa cidade."
+                            cta={{ to: "/estabelecimentos", label: "Ver todos os estabelecimentos" }}
+                        />
                         {loading || pubItems.length === 0 ? (
-                            <div className="pub-guide__grid">
-                                {Array.from({ length: 4 }).map((_, i) => <PubGuideSkeleton key={i} />)}
-                            </div>
+                            <>
+                                <div className="pub-guide__filters" aria-hidden="true">
+                                    {Array.from({ length: 4 }).map((_, i) => (
+                                        <Skeleton key={i} width={88} height={36} radius={50} />
+                                    ))}
+                                </div>
+                                <div className="pub-guide__grid">
+                                    {Array.from({ length: PUB_LIMIT }).map((_, i) => <EstablishmentCardSkeleton key={i} />)}
+                                </div>
+                            </>
                         ) : (
                             <>
-                                <div className="pub-guide__filters" role="toolbar" aria-label="Filtrar por tipo">
+                                <div className="pub-guide__filters" role="group" aria-label="Filtrar por tipo">
                                     {pubCategories.map((label) => (
-                                        <button
+                                        <FilterChip
                                             key={label}
-                                            type="button"
-                                            className={pubGuideFilter === label ? "pub-guide__filter pub-guide__filter--active" : "pub-guide__filter"}
+                                            label={label}
+                                            selected={pubGuideFilter === label}
                                             onClick={() => setPubGuideFilter(label)}
-                                            aria-pressed={pubGuideFilter === label}
-                                        >
-                                            {label}
-                                        </button>
+                                        />
                                     ))}
                                 </div>
                                 <div className="pub-guide__grid reveal grid-reveal">
                                     {filteredPub.map((item) => (
-                                        <article key={item.id} className="pub-guide-card">
-                                            <div className="pub-guide-card__media">
-                                                {item.img
-                                                    ? <img src={item.img} alt={item.title} />
-                                                    : <div style={{ background: "#e5e7eb", height: "100%" }} aria-hidden="true" />
-                                                }
-                                                <span
-                                                    className="pub-guide-card__tag"
-                                                    style={{ background: PUB_GUIDE_TAG_COLORS[item.category] ?? "#006B32" }}
-                                                >
-                                                    {item.category.toUpperCase()}
-                                                </span>
-                                            </div>
-                                            <div className="pub-guide-card__body">
-                                                <h3 className="pub-guide-card__name">{item.title}</h3>
-                                                <p className="pub-guide-card__desc">{item.desc}</p>
-                                                <Link
-                                                    to={`/estabelecimentos/${item.id}?apiType=${item.apiType}`}
-                                                    className="pub-guide-card__cta"
-                                                >
-                                                    Ver Detalhes
-                                                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
-                                                </Link>
-                                            </div>
-                                        </article>
+                                        <EstablishmentCard
+                                            key={`${item.apiType}-${item.id}`}
+                                            item={item}
+                                            favorite={favoriteIds.has(item.id)}
+                                            onToggleFavorite={handleToggleFavorite}
+                                        />
                                     ))}
-                                    {filteredPub.length > 0 && filteredPub.length < 4 && (
-                                        Array.from({ length: 4 - filteredPub.length }).map((_, i) => (
-                                            <PubGuideSkeleton key={`pad-${i}`} />
-                                        ))
-                                    )}
                                 </div>
                             </>
                         )}
-                        <div className="pub-guide__footer reveal">
-                            <Link to="/estabelecimentos" className="pub-guide__all">Ver todos os Estabelecimentos</Link>
-                        </div>
                     </section>
 
                     {/* Eventos */}
                     <section className="pub-events" aria-labelledby="pub-events-title">
-                        <header className="pub-events__header reveal">
-                            <div className="pub-events__head-left">
-                                <span className="pub-events__kicker">Experiências Inesquecíveis</span>
-                                <h2 id="pub-events-title" className="pub-events__title">Próximos Eventos</h2>
-                            </div>
-                            <p className="pub-events__lede">Fique por dentro da programação cultural e festivais que movimentam a nossa serra.</p>
-                        </header>
+                        <SectionHeader
+                            id="pub-events-title"
+                            kicker="Experiências Inesquecíveis"
+                            title="Próximos Eventos"
+                            subtitle="Fique por dentro da programação cultural e dos festivais que movimentam a nossa serra."
+                            cta={{ to: "/eventos", label: "Ver todos os eventos" }}
+                        />
                         {loading || homeEvents.length === 0 ? (
                             <div className="pub-events__grid">
                                 {Array.from({ length: 4 }).map((_, i) => <EventSkeleton key={i} />)}
@@ -584,89 +595,88 @@ export default function Content() {
                                         <article key={ev.id} className="pub-event-card">
                                             <div className="pub-event-card__media">
                                                 {ev.photos?.[0]?.url
-                                                    ? <img src={ev.photos[0].url} alt={ev.name} />
-                                                    : <div style={{ background: "#e5e7eb", height: "100%" }} aria-hidden="true" />
+                                                    ? <img src={ev.photos[0].url} alt="" loading="lazy" />
+                                                    : <div className="pub-event-card__placeholder" aria-hidden="true" />
                                                 }
-                                                <div className="pub-event-card__date" aria-label={`${day} de ${month}`}>
+                                                <div className="pub-event-card__date" aria-hidden="true">
                                                     <strong>{day}</strong>
                                                     <span>{month}</span>
                                                 </div>
                                             </div>
                                             <div className="pub-event-card__body">
-                                                <h3 className="pub-event-card__title">{ev.name}</h3>
+                                                <h3 className="pub-event-card__title">
+                                                    <Link to={`/eventos/${ev.id}`} className="pub-event-card__link">
+                                                        {ev.name}
+                                                        {!isNaN(d.getTime()) && <span className="ui-sr-only">, {day} de {month}</span>}
+                                                    </Link>
+                                                </h3>
                                                 <p className="pub-event-card__desc">{ev.description}</p>
                                                 <div className="pub-event-card__loc">
-                                                    <span className="material-symbols-outlined" aria-hidden>location_on</span>
-                                                    {ev.location}
+                                                    <span className="material-symbols-outlined" aria-hidden="true">location_on</span>
+                                                    <span className="pub-event-card__loc-text">{ev.location}</span>
                                                 </div>
-                                                <Link to={`/eventos/${ev.id}`} className="pub-event-card__cta">
-                                                    <span className="material-symbols-outlined" aria-hidden>calendar_month</span>
-                                                    Ver evento
-                                                </Link>
+                                                <div className="pub-event-card__footer">
+                                                    <span className="pub-event-card__cta" aria-hidden="true">
+                                                        Ver evento
+                                                        <span className="material-symbols-outlined">arrow_forward</span>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </article>
                                     );
                                 })}
-                                {Array.from({ length: Math.max(0, 4 - homeEvents.length) }).map((_, i) => (
-                                    <EventSkeleton key={`pad-${i}`} />
+                            </div>
+                        )}
+                    </section>
+                </div>
+
+                {/* ── Guias Turísticos ── */}
+                <div className="tour-guides-wrap">
+                    <section id="guias-de-turismo" className="tour-guides" aria-labelledby="tour-guides-title">
+                        <SectionHeader
+                            id="tour-guides-title"
+                            kicker="Seu passeio em boas mãos"
+                            title="Nossos Guias Turísticos"
+                            subtitle="Conheça os profissionais credenciados que vão transformar sua visita em uma experiência inesquecível."
+                        />
+                        {loading ? (
+                            <div className="tour-guides__grid">
+                                {Array.from({ length: 4 }).map((_, i) => <GuideSkeleton key={i} />)}
+                            </div>
+                        ) : (
+                            <div className="tour-guides__grid reveal grid-reveal">
+                                {homeGuides.map((guide) => (
+                                    <article key={guide.id} className="guide-card">
+                                        <div className="guide-card__photo">
+                                            <img src={guide.photos?.[0]?.url || park} alt={guide.name} loading="lazy" />
+                                            {guide.languages && guide.languages.length > 0 && (
+                                                <span className="guide-card__lang">{guide.languages.join(" / ")}</span>
+                                            )}
+                                        </div>
+                                        <div className="guide-card__body">
+                                            <h3 className="guide-card__name" title={guide.name}>{guide.name}</h3>
+                                            <span className="guide-card__specialty">Guia Turístico</span>
+                                            <p className="guide-card__desc">{guide.description}</p>
+                                        </div>
+                                    </article>
                                 ))}
                             </div>
                         )}
-                        <div className="pub-events__footer reveal">
-                            <Link to="/eventos" className="pub-events__all">Ver todos os Eventos</Link>
-                        </div>
                     </section>
-
-                    {/* Guias Turísticos */}
-                    <div className="tour-guides-wrap">
-                        <section id="guias-de-turismo" className="tour-guides" aria-labelledby="tour-guides-title">
-                            <div className="tour-guides__inner">
-                                <header className="tour-guides__header reveal">
-                                    <span className="tour-guides__kicker">Seu passeio em boas mãos</span>
-                                    <h2 id="tour-guides-title" className="tour-guides__title">Nossos Guias Turísticos</h2>
-                                    <p className="tour-guides__subtitle">Conheça os profissionais credenciados que vão transformar sua visita em uma experiência inesquecível.</p>
-                                </header>
-                                {loading ? (
-                                    <div className="tour-guides__grid">
-                                        {Array.from({ length: 4 }).map((_, i) => <GuideSkeleton key={i} />)}
-                                    </div>
-                                ) : (
-                                    <div className="tour-guides__grid reveal grid-reveal">
-                                        {homeGuides.map((guide) => (
-                                            <article key={guide.id} className="guide-card">
-                                                <div className="guide-card__photo">
-                                                    {guide.photos?.[0]?.url
-                                                        ? <img src={guide.photos[0].url} alt={guide.name} />
-                                                        : <img src={park} alt={guide.name} />
-                                                    }
-                                                    {guide.languages && guide.languages.length > 0 && (
-                                                        <span className="guide-card__lang">{guide.languages.join(" / ")}</span>
-                                                    )}
-                                                </div>
-                                                <div className="guide-card__body">
-                                                    <h3 className="guide-card__name">{guide.name}</h3>
-                                                    <span className="guide-card__specialty">Guia Turístico</span>
-                                                    <p className="guide-card__desc">{guide.description}</p>
-                                                </div>
-                                            </article>
-                                        ))}
-                                        {Array.from({ length: Math.max(0, 4 - homeGuides.length) }).map((_, i) => (
-                                            <GuideSkeleton key={`pad-${i}`} />
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </section>
-                    </div>
                 </div>
 
                 {/* ── Como Chegar ── */}
                 <section className="como-chegar" aria-labelledby="como-chegar-title">
                     <div className="como-chegar__banner" style={{ backgroundImage: `url(${park})` }}>
                         <div className="como-chegar__banner-inner">
-                            <span className="como-chegar__kicker">Planejando sua visita</span>
-                            <h2 id="como-chegar-title" className="como-chegar__title">Como Chegar</h2>
-                            <p className="como-chegar__desc">Ubajara fica na Serra da Ibiapaba, acessível por diversas rotas aéreas e terrestres. Escolha seu ponto de partida e venha viver essa experiência única.</p>
+                            <SectionHeader
+                                id="como-chegar-title"
+                                kicker="Planejando sua visita"
+                                title="Como Chegar"
+                                subtitle="Ubajara fica na Serra da Ibiapaba, acessível por diversas rotas aéreas e terrestres. Escolha seu ponto de partida e venha viver essa experiência única."
+                                cta={{ to: "/como-chegar", label: "Encontrar rotas até Ubajara", text: "Encontrar rotas" }}
+                                onDark
+                            />
                         </div>
                     </div>
                     <div className="como-chegar__body">
@@ -709,12 +719,6 @@ export default function Content() {
                                     ))}
                                 </div>
                             </div>
-                            <div className="como-chegar__cta-row reveal">
-                                <Link to="/como-chegar" className="como-chegar__cta">
-                                    <span className="material-symbols-outlined" aria-hidden="true">map</span>
-                                    Encontrar Rotas
-                                </Link>
-                            </div>
                         </div>
                     </div>
                 </section>
@@ -727,9 +731,14 @@ export default function Content() {
                     </div>
                     <section className="reviews" aria-labelledby="reviews-title">
                         <div className="reviews__inner">
-                            <span className="reviews__kicker">Quem já visitou recomenda</span>
-                            <h2 id="reviews-title" className="reviews__title">O que dizem os visitantes</h2>
-                            <p className="reviews__subtitle">Experiências reais de quem já se encantou com as belezas de Ubajara.</p>
+                            <SectionHeader
+                                id="reviews-title"
+                                kicker="Quem já visitou recomenda"
+                                title="O que dizem os visitantes"
+                                subtitle="Experiências reais de quem já se encantou com as belezas de Ubajara."
+                                cta={{ to: "/depoimentos", label: "Ver todos os depoimentos" }}
+                                onDark
+                            />
                             {loading || homeReviews.length === 0 ? (
                                 <div className="reviews__grid">
                                     {Array.from({ length: 3 }).map((_, i) => <ReviewSkeleton key={i} />)}
@@ -755,14 +764,8 @@ export default function Content() {
                                             </div>
                                         </article>
                                     ))}
-                                    {Array.from({ length: Math.max(0, 3 - homeReviews.length) }).map((_, i) => (
-                                        <ReviewSkeleton key={`pad-${i}`} />
-                                    ))}
                                 </div>
                             )}
-                            <div className="reviews__footer reveal">
-                                <Link to="/depoimentos" className="reviews__all">Ver todos os depoimentos</Link>
-                            </div>
                         </div>
                     </section>
                     <div className="papel ptop">

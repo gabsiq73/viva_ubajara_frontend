@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { eventsService } from "../admin/services/eventsService";
@@ -66,7 +67,7 @@ function EventCardItem({ ev }: { ev: EventCard }) {
         <article className="ev-card">
             <div className="ev-card__img-wrap">
                 {ev.img ? (
-                    <img src={ev.img} alt={ev.title} className="ev-card__img" loading="lazy" />
+                    <img src={ev.img} alt="" className="ev-card__img" loading="lazy" />
                 ) : (
                     <div className="ev-card__img ev-card__img--placeholder" aria-hidden="true" />
                 )}
@@ -77,31 +78,39 @@ function EventCardItem({ ev }: { ev: EventCard }) {
                 </div>
             </div>
             <div className="ev-card__body">
-                <h3 className="ev-card__title">{ev.title}</h3>
+                <h3 className="ev-card__title">
+                    <Link to={`/eventos/${ev.id}`} className="ev-card__link">
+                        {ev.title}
+                    </Link>
+                </h3>
                 <p className="ev-card__desc">{ev.desc}</p>
                 <div className="ev-card__meta">
                     <span className="ev-card__meta-item">
                         <span className="material-symbols-outlined" aria-hidden="true">location_on</span>
-                        {ev.place}
+                        <span className="ev-card__meta-text">{ev.place}</span>
                     </span>
                     <span className="ev-card__meta-item">
                         <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
                         {ev.time}
                     </span>
                 </div>
-                {ev.raw.registrationUrl && (
-                    <div className="ev-card__footer">
+                <div className="ev-card__footer">
+                    <span className="ev-card__cta" aria-hidden="true">
+                        Ver evento
+                        <span className="material-symbols-outlined">arrow_forward</span>
+                    </span>
+                    {ev.raw.registrationUrl && (
                         <a
                             href={ev.raw.registrationUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="ev-card__cta"
+                            className="ev-card__register"
                         >
                             Inscrever-se
-                            <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                            <span className="material-symbols-outlined" aria-hidden="true">open_in_new</span>
                         </a>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </article>
     );
@@ -142,7 +151,7 @@ export default function Eventos() {
     }, [events]);
 
     const filtered = useMemo(() => {
-        let list = events.filter(e => {
+        const list = events.filter(e => {
             const q = search.toLowerCase();
             if (q && !e.title.toLowerCase().includes(q) && !e.place.toLowerCase().includes(q)) return false;
             if (activeMonth !== "Todos" && `${e.monthNum}/${e.year}` !== activeMonth) return false;
