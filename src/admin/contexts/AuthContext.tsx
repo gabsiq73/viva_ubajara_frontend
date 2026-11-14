@@ -4,7 +4,12 @@ import { socialAuthService } from '../services/socialAuthService';
 import { TOKEN_KEY, USER_KEY, FORBIDDEN_EVENT, UNAUTHORIZED_EVENT } from '../services/api';
 import { isTokenExpired, secondsUntilExpiry } from '../services/jwtUtils';
 import { usersService } from '../services/usersService';
-import type { AuthResponse, LoginRequest, UserRequest } from '../types';
+import type {
+  AuthResponse,
+  CompanyActivationRequest,
+  LoginRequest,
+  UserRequest,
+} from '../types';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -35,6 +40,7 @@ interface AuthContextData {
   roleSynced: boolean;
   login: (data: LoginRequest) => Promise<void>;
   register: (data: UserRequest) => Promise<void>;
+  activateCompany: (data: CompanyActivationRequest) => Promise<void>;
   loginWithGoogle: (accessToken: string) => Promise<void>;
   loginWithGitHub: (code: string) => Promise<void>;
   logout: () => void;
@@ -124,6 +130,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       const response = await authService.register(data);
+      applyAuthResponse(response);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [applyAuthResponse]);
+
+  const activateCompany = useCallback(async (data: CompanyActivationRequest) => {
+    setIsLoading(true);
+    try {
+      const response = await authService.activateCompany(data);
       applyAuthResponse(response);
     } finally {
       setIsLoading(false);
@@ -264,6 +280,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         roleSynced,
         login,
         register,
+        activateCompany,
         loginWithGoogle,
         loginWithGitHub,
         logout,

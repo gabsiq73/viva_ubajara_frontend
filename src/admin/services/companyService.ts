@@ -1,5 +1,6 @@
 import axios from 'axios';
 import api from './api';
+import type { PhotoResponse } from '../types';
 import type {
   CompanyEstablishmentRequest,
   CompanyEstablishmentUpdate,
@@ -27,6 +28,14 @@ export const companyService = {
 
   updateEstablishment: async (data: CompanyEstablishmentUpdate): Promise<CompanyEstablishmentResponse> => {
     const response = await api.put<CompanyEstablishmentResponse>('/companies/me/establishment', data);
+    return response.data;
+  },
+
+  uploadMyEstablishmentPhoto: async (file: File, displayOrder: number): Promise<PhotoResponse> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('displayOrder', String(displayOrder));
+    const response = await api.post<PhotoResponse>('/companies/me/establishment/photos', formData);
     return response.data;
   },
 

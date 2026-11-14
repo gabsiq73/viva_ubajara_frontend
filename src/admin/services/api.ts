@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { isTokenExpired } from './jwtUtils';
 
-export const BASE_URL = 'https://parque-ubajara-api.onrender.com/api/v1';
+export const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'https://parque-ubajara-api.onrender.com/api/v1';
 
 /** Chaves do localStorage — centralizadas para evitar typos */
 export const TOKEN_KEY = 'ubajara_admin_token';
@@ -57,4 +58,3 @@ api.interceptors.response.use(
 );
 
 export default api;
-

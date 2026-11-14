@@ -1,74 +1,37 @@
-import { Outlet, Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Store, Utensils, LogOut } from 'lucide-react';
+import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
+import { Building2, Images, LogOut, Settings, Star, Utensils } from 'lucide-react';
 import { useAuth } from '../../admin/hooks/useAuth';
 import logo from '../../assets/images/logo.webp';
 import '../../admin/styles/admin.css';
-
-const PAGE_TITLES: Record<string, string> = {
-  '/empresa/estabelecimento': 'Meu Estabelecimento',
-  '/empresa/cardapio': 'Cardápio',
-};
+import './CompanyLayout.css';
 
 export function CompanyLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const title = PAGE_TITLES[pathname] ?? 'Meu Estabelecimento';
-
-  const handleLogout = () => {
-    logout();
-    navigate('/admin/login');
-  };
+  const handleLogout = () => { logout(); navigate('/admin/login'); };
+  const initials = (user?.name || user?.email || 'Empresa').slice(0, 2).toUpperCase();
 
   return (
-    <div className="adm-root">
-      <aside className="adm-sidebar">
-        <Link to="/" className="adm-sidebar__logo" title="Ir para o site público">
+    <div className="adm-root company-root">
+      <aside className="adm-sidebar company-sidebar">
+        <Link to="/" className="company-brand" title="Ir para o site público">
           <img src={logo} alt="Viva Ubajara" className="adm-sidebar__logo-img" />
-          <div className="adm-sidebar__logo-sub">Painel da Empresa</div>
+          <span className="company-brand__tag">Portal oficial de turismo</span>
         </Link>
-
-        <nav className="adm-sidebar__nav">
-          <NavLink
-            to="/empresa/estabelecimento"
-            className={({ isActive }) => `adm-sidebar__link${isActive ? ' active' : ''}`}
-          >
-            <span className="icon"><Store size={18} /></span>
-            Meu Estabelecimento
-          </NavLink>
-          <NavLink
-            to="/empresa/cardapio"
-            className={({ isActive }) => `adm-sidebar__link${isActive ? ' active' : ''}`}
-          >
-            <span className="icon"><Utensils size={18} /></span>
-            Cardápio
-          </NavLink>
+        <div className="company-sidebar__caption"><span /> Painel do parceiro</div>
+        <nav className="adm-sidebar__nav company-nav" aria-label="Navegação da empresa">
+          <NavLink to="/empresa/estabelecimento" className={({ isActive }) => `adm-sidebar__link${isActive ? ' active' : ''}`}><span className="icon"><Building2 size={18} /></span>Meu estabelecimento</NavLink>
+          <NavLink to="/empresa/cardapio" className={({ isActive }) => `adm-sidebar__link${isActive ? ' active' : ''}`}><span className="icon"><Utensils size={18} /></span>Cardápio</NavLink>
+          <button type="button" className="adm-sidebar__link company-nav__future" aria-disabled="true"><span className="icon"><Images size={18} /></span>Fotos e galeria</button>
+          <button type="button" className="adm-sidebar__link company-nav__future" aria-disabled="true"><span className="icon"><Star size={18} /></span>Avaliações</button>
+          <button type="button" className="adm-sidebar__link company-nav__future" aria-disabled="true"><span className="icon"><Settings size={18} /></span>Configurações</button>
         </nav>
-
-        <div className="adm-sidebar__footer">
-          <button
-            onClick={handleLogout}
-            className="adm-sidebar__link"
-            style={{ width: '100%', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left' }}
-          >
-            <span className="icon"><LogOut size={18} /></span>
-            Sair do Sistema
-          </button>
-          {user && (
-            <div style={{ padding: '8px 24px', fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
-              {user.email}
-            </div>
-          )}
+        <div className="company-sidebar__account"><div className="company-avatar">{initials}<span /></div><div className="company-account-copy"><strong>{user?.name || 'Conta empresarial'}</strong><small>{user?.email}</small></div></div>
+        <div className="adm-sidebar__footer company-sidebar__footer">
+          <button onClick={handleLogout} className="adm-sidebar__link"><span className="icon"><LogOut size={18} /></span>Sair do sistema</button>
         </div>
       </aside>
-
-      <header className="adm-topbar">
-        <h1 className="adm-topbar__title">{title}</h1>
-      </header>
-
-      <main className="adm-main">
-        <Outlet />
-      </main>
+      <main className="adm-main company-main"><Outlet /></main>
     </div>
   );
 }
