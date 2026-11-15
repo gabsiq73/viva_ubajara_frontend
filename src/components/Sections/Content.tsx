@@ -25,6 +25,7 @@ import type {
 import { ArrowRight } from "lucide-react";
 import EstablishmentCard from "../ui/EstablishmentCard";
 import { Button } from "../ui/Button";
+import TornDivider from "../ui/TornDivider";
 import { FilterChip } from "../ui/Chip";
 import StateBlock from "../ui/StateBlock";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
@@ -493,11 +494,8 @@ export default function Content() {
                 </section>
 
                 {/* ── Gastronomia ── */}
-                <div className="top-n">
-                    <div className="papel">
-                        <div className="paper1"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
-                        <div className="paper2"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
-                    </div>
+                <div className="top-n torn-host">
+                    <TornDivider edge="top" fill="#c58b24" />
                     <div className="news">
                         <div
                             className="news-inner"
@@ -537,10 +535,7 @@ export default function Content() {
                             </div>
                         </div>
                     </div>
-                    <div className="papel ptop">
-                        <div className="paper1"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
-                        <div className="paper2"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
-                    </div>
+                    <TornDivider edge="bottom" fill="#c58b24" />
                 </div>
 
                 {/* ── Guia + Eventos ── */}
@@ -751,11 +746,8 @@ export default function Content() {
                 </section>
 
                 {/* ── Depoimentos ── */}
-                <div className="reviews-block">
-                    <div className="papel">
-                        <div className="paper1"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
-                        <div className="paper2"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
-                    </div>
+                <div className="reviews-block torn-host">
+                    <TornDivider edge="top" fill="#002a27" />
                     <section className="reviews" aria-labelledby="reviews-title">
                         <div className="reviews__inner">
                             <SectionHeader
@@ -801,10 +793,7 @@ export default function Content() {
                             )}
                         </div>
                     </section>
-                    <div className="papel ptop">
-                        <div className="paper1"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
-                        <div className="paper2"><img src={paper} alt="" width={3660} height={856} loading="lazy" decoding="async" /></div>
-                    </div>
+                    <TornDivider edge="bottom" fill="#002a27" />
                 </div>
 
                 {/* ── FAQ ── */}

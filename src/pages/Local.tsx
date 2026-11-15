@@ -1,12 +1,16 @@
 import { useParams, Link } from "react-router-dom";
+import { useMemo, useRef, useState, type MouseEvent } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Icon from "../components/ui/Icon";
+import PhotoGallery from "../components/ui/PhotoGallery";
+import PhotoLightbox from "../components/establishment-detail/PhotoLightbox";
 import Breadcrumb from "./Breadcrumb";
 import { DetailStatePage } from "./PageState";
 import { touristSpotsService } from "../admin/services/touristSpotsService";
 import type { TouristSpotResponse } from "../admin/types";
-import { mailHref, telHref } from "../utils/establishmentDetail";
+import { hasMeaningfulText, mailHref, telHref } from "../utils/establishmentDetail";
+import { buildSpotGallery } from "../utils/spotPhotos";
 import { truncateAtWord } from "../utils/text";
 import { isNotFoundError, requireUuid, useAsyncData } from "../utils/useAsyncData";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
@@ -18,7 +22,22 @@ import "./style/PontoTuristico.css";
 function LocalView({ spot }: { spot: TouristSpotResponse }) {
     useDocumentTitle(spot.name);
 
-    const heroImg = spot.photos?.[0]?.url ?? heroFallback;
+    const [galleryIndex, setGalleryIndex] = useState<number | null>(null);
+    const openerRef = useRef<HTMLElement | null>(null);
+
+    const gallery = useMemo(() => buildSpotGallery(spot.name, spot.photos), [spot.name, spot.photos]);
+    const hasGallery = gallery.length >= 2;
+
+    const heroImg = gallery[0]?.url ?? spot.photos?.[0]?.url ?? heroFallback;
+    const paragraphs = (spot.description ?? "")
+        .split(/\r?\n+/)
+        .map((p) => p.trim())
+        .filter(hasMeaningfulText);
+
+    function openGallery(index: number, event: MouseEvent<HTMLElement>) {
+        openerRef.current = event.currentTarget;
+        setGalleryIndex(index);
+    }
 
     return (
         <div className="pt-page">
@@ -42,6 +61,12 @@ function LocalView({ spot }: { spot: TouristSpotResponse }) {
                             {spot.description && (
                                 <p className="pt-hero__subtitle">{truncateAtWord(spot.description, 160)}</p>
                             )}
+                            {hasGallery && (
+                                <button type="button" className="pt-hero__gallery-btn" onClick={(event) => openGallery(0, event)}>
+                                    <Icon name="photo_library" />
+                                    Ver {gallery.length} fotos
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -57,34 +82,16 @@ function LocalView({ spot }: { spot: TouristSpotResponse }) {
                     )}
                 </section>
 
-                {/* ── Galeria ── */}
-                {spot.photos && spot.photos.length > 0 && (
-                    <section className="pt-gallery" aria-label="Galeria de fotos">
-                        <div className="pt-gallery__inner">
-                            <div className="pt-gallery__main">
-                                <img src={spot.photos[0].url} alt={spot.name} width={1280} height={720} loading="lazy" decoding="async" />
-                            </div>
-                            {spot.photos.length > 1 && (
-                                <div className="pt-gallery__secondary">
-                                    {spot.photos.slice(1, 3).map((ph) => (
-                                        <div key={ph.id} className="pt-gallery__thumb">
-                                            <img src={ph.url} alt="" width={800} height={600} loading="lazy" decoding="async" />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </section>
-                )}
-
                 {/* ── Conteúdo + Contato ── */}
                 <section className="pt-content" aria-labelledby="local-content-title">
                     <div className="pt-content__inner">
 
                         <div className="pt-content__left">
                             <span className="pt-content__kicker">PONTO TURÍSTICO</span>
-                            <h2 id="local-content-title" className="pt-content__title">{spot.name}</h2>
-                            <p className="pt-content__p">{spot.description}</p>
+                            <h2 id="local-content-title" className="pt-content__title">Sobre o local</h2>
+                            {paragraphs.map((paragraph, i) => (
+                                <p key={i} className="pt-content__p">{paragraph}</p>
+                            ))}
                         </div>
 
                         <aside className="pt-content__right" aria-label="Informações de Contato">
@@ -130,10 +137,21 @@ function LocalView({ spot }: { spot: TouristSpotResponse }) {
                     </div>
                 </section>
 
+                {/* ── Fotos ── */}
+                {hasGallery && (
+                    <section id="fotos" className="pt-photos" aria-labelledby="local-photos-title">
+                        <div className="pt-photos__inner">
+                            <p className="estd-eyebrow">Galeria</p>
+                            <h2 id="local-photos-title" className="estd-h2">Fotos</h2>
+                            <PhotoGallery title={spot.name} photos={gallery} onOpen={openGallery} />
+                        </div>
+                    </section>
+                )}
+
                 {/* ── Como Chegar ── */}
                 {spot.address && (
                     <section className="pt-how" aria-labelledby="local-how-title">
-                        <div className="pt-how__inner">
+                        <div className="pt-how__inner pt-how__inner--single">
                             <div className="pt-how__left">
                                 <h2 id="local-how-title" className="pt-how__title">Como Chegar</h2>
                                 <p className="pt-how__desc">
@@ -157,15 +175,23 @@ function LocalView({ spot }: { spot: TouristSpotResponse }) {
                                     Abrir no Google Maps
                                 </a>
                             </div>
-                            <div className="pt-how__right">
-                                <img src={heroImg} alt="" className="pt-how__img" width={800} height={600} loading="lazy" decoding="async" />
-                            </div>
                         </div>
                     </section>
                 )}
 
             </main>
             <Footer />
+
+            {galleryIndex !== null && (
+                <PhotoLightbox
+                    title={spot.name}
+                    photos={gallery}
+                    index={galleryIndex}
+                    onIndexChange={setGalleryIndex}
+                    onClose={() => setGalleryIndex(null)}
+                    returnFocusRef={openerRef}
+                />
+            )}
         </div>
     );
 }

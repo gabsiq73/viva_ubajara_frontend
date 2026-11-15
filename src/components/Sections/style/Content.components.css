@@ -262,24 +262,6 @@ div.paper img {
     left: 0;
 }
 
-div.papel {
-    display: flex;
-    position: relative;
-    top: 90px;
-}
-
-div.papel.ptop {
-    top: -90px;
-}
-
-div.paper1 img,
-div.paper2 img {
-    filter: brightness(0) saturate(100%) invert(52%) sepia(94%) saturate(398%) hue-rotate(360deg) brightness(92%) contrast(85%);
-    height: 115px;
-    width: 50vw;
-    position: relative;
-}
-
 div.fundo {
     width: calc(100% + 20px);
     margin-left: -10px;
@@ -314,6 +296,8 @@ div.cards {
     box-sizing: border-box;
     padding-top: 8px;
     margin-top: 0;
+    position: relative;
+    z-index: 2;
 }
 
 ul.list-cards {
@@ -452,7 +436,6 @@ ul.list-cards li#chegar { background: linear-gradient(145deg, #005225, #003016);
     top: 0;
     margin-top: 8px;
     box-sizing: border-box;
-    background: #ffffff;
 }
 
 .point-container {
@@ -468,8 +451,8 @@ div.news {
     max-width: none;
     margin-left: 0;
     margin-right: 0;
-    margin-top: 35px;
-    margin-bottom: 50px;
+    margin-top: 0;
+    margin-bottom: 0;
     background: #C58B24;
     background: linear-gradient(to bottom, #c58b24 0%, #a97318 40%, #9e6c14 60%, #c58b24 100%);
     padding: 0;
@@ -496,18 +479,12 @@ div.news-inner {
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
-    padding: clamp(36px, 5vw, 60px) var(--home-gutter);
+    padding: clamp(36px, 5vw, 60px) var(--home-gutter) clamp(60px, 8vw, 100px);
     display: grid;
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
     gap: clamp(32px, 5vw, 64px);
     align-items: center;
     box-sizing: border-box;
-}
-
-div.top-n {
-    position: relative;
-    top: -70px;
-    margin-bottom: -160px;
 }
 
 div.caixa {
@@ -733,13 +710,6 @@ div.restaurant a:active {
     .point {
         padding: 18px 0 var(--home-section-y);
         box-sizing: border-box;
-    }
-
-    /* Seção gastronomia */
-    div.top-n {
-        position: relative;
-        top: -60px;
-        margin-bottom: -150px;
     }
 
     div.text-n {
@@ -1362,19 +1332,9 @@ div.restaurant a:active {
     .como-chegar__transport { max-width: 100%; }
 }
 
-.reviews-block {
-    margin-top: -90px;
-    margin-bottom: -90px;
-}
-
 .reviews {
     background: #002a27;
     padding: clamp(48px, 6vw, 80px) 0;
-}
-
-.reviews-block .paper1 img,
-.reviews-block .paper2 img {
-    filter: brightness(0) saturate(100%) invert(12%) sepia(90%) saturate(900%) hue-rotate(140deg) brightness(80%);
 }
 
 .reviews__inner {
@@ -1452,11 +1412,6 @@ div.restaurant a:active {
 }
 
 @media only screen and (max-width: 768px) {
-    .reviews-block {
-        margin-top: -90px;
-        margin-bottom: -90px;
-    }
-
     .reviews__inner {
         padding: 24px 16px 48px;
     }

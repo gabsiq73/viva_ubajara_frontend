@@ -1,16 +1,19 @@
 import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
+import { useMemo, useRef, useState, type MouseEvent } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Icon from "../components/ui/Icon";
+import PhotoGallery from "../components/ui/PhotoGallery";
+import PhotoLightbox from "../components/establishment-detail/PhotoLightbox";
 import Breadcrumb from "./Breadcrumb";
 import { DetailStatePage } from "./PageState";
 import { attractionsService } from "../admin/services/attractionsService";
 import type { AttractionResponse } from "../admin/types";
 import PointCard from "../components/ui/PointCard";
 import { ATTRACTION_CATEGORY_LABELS as CATEGORY_LABELS } from "../utils/attractionCategories";
-import { telHref } from "../utils/establishmentDetail";
+import { hasMeaningfulText, telHref } from "../utils/establishmentDetail";
 import { loadFavorites, toggleFavorite } from "../utils/favorites";
+import { buildSpotGallery } from "../utils/spotPhotos";
 import { isNotFoundError, requireUuid, useAsyncData } from "../utils/useAsyncData";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
 import heroFallback from "../assets/images/foto-capa-parque-ubajara.png";
@@ -33,12 +36,24 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
         }));
     };
 
-    const getPhotoByRole = (role: string) =>
-        attraction.photos?.find(p => p.description === role)?.url;
+    const [galleryIndex, setGalleryIndex] = useState<number | null>(null);
+    const openerRef = useRef<HTMLElement | null>(null);
 
-    const heroImg = getPhotoByRole('cover') ?? attraction.photos?.[0]?.url ?? heroFallback;
-    const howToGetImg = getPhotoByRole('how_to_get') ?? heroImg;
+    const gallery = useMemo(() => buildSpotGallery(attraction.name, attraction.photos), [attraction.name, attraction.photos]);
+    const hasGallery = gallery.length >= 2;
+
+    const heroImg = gallery[0]?.url ?? attraction.photos?.[0]?.url ?? heroFallback;
+    const howToGetImg = attraction.photos?.find((p) => p.description === "how_to_get")?.url;
     const catLabel = CATEGORY_LABELS[attraction.category] ?? attraction.category;
+    const paragraphs = (attraction.description ?? "")
+        .split(/\r?\n+/)
+        .map((p) => p.trim())
+        .filter(hasMeaningfulText);
+
+    function openGallery(index: number, event: MouseEvent<HTMLElement>) {
+        openerRef.current = event.currentTarget;
+        setGalleryIndex(index);
+    }
 
     return (
         <div className="pt-page">
@@ -73,6 +88,12 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
                                 <p className="pt-hero__subtitle">
                                     {attraction.shortDescription || attraction.description}
                                 </p>
+                            )}
+                            {hasGallery && (
+                                <button type="button" className="pt-hero__gallery-btn" onClick={(event) => openGallery(0, event)}>
+                                    <Icon name="photo_library" />
+                                    Ver {gallery.length} fotos
+                                </button>
                             )}
                         </div>
                     </div>
@@ -116,34 +137,16 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
                     </div>
                 </section>
 
-                {/* ── Galeria ── */}
-                {attraction.photos && attraction.photos.length > 0 && (
-                    <section className="pt-gallery" aria-label="Galeria de fotos">
-                        <div className="pt-gallery__inner">
-                            <div className="pt-gallery__main">
-                                <img src={attraction.photos[0].url} alt={attraction.name} width={1280} height={720} loading="lazy" decoding="async" />
-                            </div>
-                            {attraction.photos.length > 1 && (
-                                <div className="pt-gallery__secondary">
-                                    {attraction.photos.slice(1, 3).map((ph) => (
-                                        <div key={ph.id} className="pt-gallery__thumb">
-                                            <img src={ph.url} alt="" width={800} height={600} loading="lazy" decoding="async" />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </section>
-                )}
-
                 {/* ── Conteúdo + Planeje sua Visita ── */}
                 <section className="pt-content" aria-labelledby="pt-content-title">
                     <div className="pt-content__inner">
 
                         <div className="pt-content__left">
                             <span className="pt-content__kicker">{catLabel.toUpperCase()}</span>
-                            <h2 id="pt-content-title" className="pt-content__title">{attraction.name}</h2>
-                            <p className="pt-content__p">{attraction.description}</p>
+                            <h2 id="pt-content-title" className="pt-content__title">Sobre o local</h2>
+                            {paragraphs.map((paragraph, i) => (
+                                <p key={i} className="pt-content__p">{paragraph}</p>
+                            ))}
                             <div className="pt-content__stats">
                                 {attraction.entryPrice != null && (
                                     <div className="pt-stat-pill">
@@ -223,10 +226,21 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
                     </div>
                 </section>
 
+                {/* ── Fotos ── */}
+                {hasGallery && (
+                    <section id="fotos" className="pt-photos" aria-labelledby="pt-photos-title">
+                        <div className="pt-photos__inner">
+                            <p className="estd-eyebrow">Galeria</p>
+                            <h2 id="pt-photos-title" className="estd-h2">Fotos</h2>
+                            <PhotoGallery title={attraction.name} photos={gallery} onOpen={openGallery} />
+                        </div>
+                    </section>
+                )}
+
                 {/* ── Como Chegar ── */}
                 {attraction.address && (
                     <section className="pt-how" aria-labelledby="pt-how-title">
-                        <div className="pt-how__inner">
+                        <div className={`pt-how__inner${howToGetImg ? "" : " pt-how__inner--single"}`}>
                             <div className="pt-how__left">
                                 <h2 id="pt-how-title" className="pt-how__title">Como Chegar</h2>
                                 <p className="pt-how__desc">
@@ -250,9 +264,11 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
                                     Abrir no Google Maps
                                 </a>
                             </div>
-                            <div className="pt-how__right">
-                                <img src={howToGetImg} alt="" className="pt-how__img" width={800} height={600} loading="lazy" decoding="async" />
-                            </div>
+                            {howToGetImg && (
+                                <div className="pt-how__right">
+                                    <img src={howToGetImg} alt="" className="pt-how__img" width={800} height={600} loading="lazy" decoding="async" />
+                                </div>
+                            )}
                         </div>
                     </section>
                 )}
@@ -301,6 +317,17 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
 
             </main>
             <Footer />
+
+            {galleryIndex !== null && (
+                <PhotoLightbox
+                    title={attraction.name}
+                    photos={gallery}
+                    index={galleryIndex}
+                    onIndexChange={setGalleryIndex}
+                    onClose={() => setGalleryIndex(null)}
+                    returnFocusRef={openerRef}
+                />
+            )}
         </div>
     );
 }

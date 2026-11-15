@@ -206,71 +206,50 @@
     flex-shrink: 0;
 }
 
-/* ─── Gallery ─── */
-.pt-gallery {
-    background: #f0f7f3;
-    padding: clamp(20px, 3vw, 36px) 0;
+/* ─── Botão "Ver N fotos" (hero) ─── */
+.pt-hero__gallery-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    margin-top: 24px;
+    padding: 0 18px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #ffffff;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
 }
 
-.pt-gallery__inner {
+.pt-hero__gallery-btn:hover {
+    background: rgba(255, 255, 255, 0.26);
+}
+
+.pt-hero__gallery-btn .ui-icon {
+    font-size: 20px;
+}
+
+/* ─── Fotos ─── */
+.pt-photos {
+    background: #ffffff;
+    padding: 0 0 clamp(40px, 5vw, 72px);
+    scroll-margin-top: 96px;
+}
+
+.pt-photos__inner {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 16px;
-    align-items: stretch;
 }
 
-.pt-gallery__inner:has(.pt-gallery__main:only-child),
-.pt-gallery__inner:not(:has(.pt-gallery__secondary)) {
-    grid-template-columns: 1fr;
-}
-
-.pt-gallery__main {
-    border-radius: 20px;
-    overflow: hidden;
-    aspect-ratio: 16 / 9;
-}
-
-.pt-gallery__main img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-    transition: transform 0.55s ease;
-}
-
-.pt-gallery__main:hover img {
-    transform: scale(1.05);
-}
-
-.pt-gallery__secondary {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.pt-gallery__thumb {
-    flex: 1;
-    border-radius: 20px;
-    overflow: hidden;
-    min-height: 180px;
-    aspect-ratio: 4 / 3;
-}
-
-.pt-gallery__thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-    transition: transform 0.55s ease;
-}
-
-.pt-gallery__thumb:hover img {
-    transform: scale(1.06);
+.pt-photos__inner .estd-h2 {
+    margin-bottom: 24px;
 }
 
 /* ─── Content + Planeje sua Visita ─── */
@@ -310,6 +289,7 @@
 }
 
 .pt-content__p {
+    overflow-wrap: anywhere;
     font-family: "Inter", sans-serif;
     font-size: 15px;
     line-height: 1.8;
@@ -479,6 +459,14 @@
     align-items: center;
 }
 
+.pt-how__inner--single {
+    grid-template-columns: 1fr;
+}
+
+.pt-how__inner--single .pt-how__left {
+    max-width: 640px;
+}
+
 .pt-how__title {
     font-family: "Nunito", sans-serif;
     font-weight: 900;
@@ -580,21 +568,6 @@
         min-height: 80vh;
         padding-top: 70px;
     }
-    .pt-gallery__inner {
-        grid-template-columns: 1fr;
-    }
-    .pt-gallery__main {
-        aspect-ratio: 16 / 9;
-    }
-    .pt-gallery__secondary {
-        flex-direction: row;
-        gap: 12px;
-    }
-    .pt-gallery__thumb {
-        flex: 1;
-        min-height: 0;
-        aspect-ratio: 4 / 3;
-    }
     .pt-how__inner {
         grid-template-columns: 1fr;
     }
@@ -614,14 +587,6 @@
 @media only screen and (max-width: 480px) {
     .pt-content__stats {
         gap: 28px;
-    }
-    .pt-gallery__secondary {
-        flex-direction: column;
-        height: auto;
-    }
-    .pt-gallery__secondary .pt-gallery__thumb {
-        height: 160px;
-        flex: none;
     }
     .pt-hero__title {
         font-size: clamp(28px, 8vw, 48px);
@@ -797,6 +762,7 @@
 }
 
 .pt-hero__fav-btn:focus-visible,
+.pt-hero__gallery-btn:focus-visible,
 .pt-breadcrumb__link:focus-visible,
 .pt-linked__link:focus-visible,
 .pt-link:focus-visible,
@@ -809,8 +775,7 @@
 
 @media (prefers-reduced-motion: reduce) {
     .pt-hero__fav-btn,
-    .pt-gallery__main img,
-    .pt-gallery__thumb img,
+    .pt-hero__gallery-btn,
     .pt-breadcrumb__link,
     .pt-visit-card__cta,
     .pt-how__maps-btn,
@@ -821,8 +786,6 @@
     }
 
     .pt-hero__fav-btn:hover,
-    .pt-gallery__main:hover img,
-    .pt-gallery__thumb:hover img,
     .pt-visit-card__cta:hover,
     .pt-how__maps-btn:hover {
         transform: none;
