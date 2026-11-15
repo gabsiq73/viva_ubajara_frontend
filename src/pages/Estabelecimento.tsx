@@ -16,6 +16,7 @@ import DirectionsSheet from "../components/establishment-detail/DirectionsSheet"
 import { BottomBar, QuickActions } from "../components/establishment-detail/MobileActions";
 import NearbySection from "../components/establishment-detail/NearbySection";
 import PhotoLightbox from "../components/establishment-detail/PhotoLightbox";
+import ReviewsSection from "../components/reviews/ReviewsSection";
 import SectionBar, { type SectionAnchor } from "../components/establishment-detail/SectionBar";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { useScrollSpy } from "../hooks/useScrollSpy";
@@ -110,6 +111,7 @@ function DetailView({ detail }: { detail: EstablishmentDetail }) {
     const anchors: SectionAnchor[] = [];
     if (hasAbout) anchors.push({ id: "sobre", label: "Sobre" });
     if (hasAddress) anchors.push({ id: "como-chegar", label: "Como chegar" });
+    anchors.push({ id: "avaliacoes", label: "Avaliações" });
     if (nearby.length > 0) anchors.push({ id: "perto-daqui", label: "Perto daqui" });
     const activeId = useScrollSpy(anchors.map((a) => a.id));
 
@@ -149,7 +151,7 @@ function DetailView({ detail }: { detail: EstablishmentDetail }) {
 
     return (
         <>
-            <DetailHero detail={detail} onOpenGallery={openGallery} onShare={handleShare} />
+            <DetailHero detail={detail} onOpenGallery={openGallery} onShare={handleShare} onGoToReviews={() => scrollToSection("avaliacoes")} />
 
             {isMobile ? (
                 <QuickActions
@@ -176,6 +178,7 @@ function DetailView({ detail }: { detail: EstablishmentDetail }) {
                         {hasAddress && (
                             <DirectionsSection detail={detail} links={links} isMobile={isMobile} onOpenSheet={openSheet} />
                         )}
+                        <ReviewsSection spotId={detail.id} spotName={detail.name} />
                     </div>
                     <ContactCard detail={detail} onGoToDirections={() => scrollToSection("como-chegar")} />
                 </div>

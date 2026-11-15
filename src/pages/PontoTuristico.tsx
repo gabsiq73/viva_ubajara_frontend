@@ -10,8 +10,10 @@ import Breadcrumb from "./Breadcrumb";
 import { DetailStatePage } from "./PageState";
 import { attractionsService } from "../admin/services/attractionsService";
 import type { AttractionResponse } from "../admin/types";
+import ReviewsSection from "../components/reviews/ReviewsSection";
 import PointCard from "../components/ui/PointCard";
 import { ATTRACTION_CATEGORY_LABELS as CATEGORY_LABELS } from "../utils/attractionCategories";
+import { formatRating, reviewsLabel } from "../utils/rating";
 import { hasMeaningfulText } from "../utils/establishmentDetail";
 import { loadFavorites, toggleFavorite } from "../utils/favorites";
 import { buildSpotGallery } from "../utils/spotPhotos";
@@ -21,6 +23,10 @@ import heroFallback from "../assets/images/capa-pagina.webp";
 import "../components/ui/ui.css";
 import "../components/Sections/style/Content.components.css";
 import "./style/PontoTuristico.css";
+
+function reduceMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 function PontoTuristicoView({ attraction, related }: { attraction: AttractionResponse; related: AttractionResponse[] }) {
     useDocumentTitle(attraction.name);
@@ -46,6 +52,8 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
     const heroImg = gallery[0]?.url ?? attraction.photos?.[0]?.url ?? heroFallback;
     const howToGetImg = attraction.photos?.find((p) => p.description === "how_to_get")?.url;
     const catLabel = CATEGORY_LABELS[attraction.category] ?? attraction.category;
+    const reviewCount = attraction.reviewCount ?? 0;
+    const hasRating = reviewCount > 0 && attraction.averageRating != null;
     const paragraphs = (attraction.description ?? "")
         .split(/\r?\n+/)
         .map((p) => p.trim())
@@ -107,9 +115,26 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
                                     {attraction.openToPublic ? "Aberto ao Público" : "Temporariamente Fechado"}
                                 </span>
                             )}
-                            {attraction.openingHours && (
+                            {hasRating && (
                                 <>
                                     {attraction.openToPublic != null && <span className="pt-hero__info-sep" aria-hidden="true">|</span>}
+                                    <a
+                                        href="#avaliacoes"
+                                        className="pt-hero__info-item pt-hero__info-item--link"
+                                        onClick={(event) => {
+                                            event.preventDefault();
+                                            document.getElementById("avaliacoes")?.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
+                                        }}
+                                    >
+                                        <Icon name="star" filled className="pt-hero__info-star" />
+                                        <span aria-hidden="true">{formatRating(attraction.averageRating!)} ({reviewCount})</span>
+                                        <span className="ui-sr-only">Nota {formatRating(attraction.averageRating!)} de 5, {reviewsLabel(reviewCount)}. Ir para as avaliações</span>
+                                    </a>
+                                </>
+                            )}
+                            {attraction.openingHours && (
+                                <>
+                                    {(attraction.openToPublic != null || hasRating) && <span className="pt-hero__info-sep" aria-hidden="true">|</span>}
                                     <span className="pt-hero__info-item">
                                         <Icon name="schedule" />
                                         {attraction.openingHours}
@@ -248,6 +273,9 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
                         photoUrl={howToGetImg}
                     />
                 )}
+
+                {/* ── Avaliações ── */}
+                <ReviewsSection spotId={attraction.id} spotName={attraction.name} className="rv--page" />
 
                 {/* ── Pontos Turísticos Vinculados ── */}
                 {attraction.linkedSpots && attraction.linkedSpots.length > 0 && (

@@ -25,6 +25,7 @@ const ContactFormPage = lazy(() => import('./pages/ContactFormPage').then((m) =>
 const ClaimsListPage = lazy(() => import('./pages/ClaimsListPage').then((m) => ({ default: m.ClaimsListPage })));
 const ContactMessagesListPage = lazy(() => import('./pages/ContactMessagesListPage').then((m) => ({ default: m.ContactMessagesListPage })));
 const TestimonialsListPage = lazy(() => import('./pages/TestimonialsListPage').then((m) => ({ default: m.TestimonialsListPage })));
+const ReviewsListPage = lazy(() => import('./pages/ReviewsListPage').then((m) => ({ default: m.ReviewsListPage })));
 const PhotosPage = lazy(() => import('./pages/PhotosPage').then((m) => ({ default: m.PhotosPage })));
 const RecommendedItemsListPage = lazy(() => import('./pages/RecommendedItemsListPage').then((m) => ({ default: m.RecommendedItemsListPage })));
 const RecommendedItemFormPage = lazy(() => import('./pages/RecommendedItemFormPage').then((m) => ({ default: m.RecommendedItemFormPage })));
@@ -82,6 +83,7 @@ export function AdminRouter() {
 
             <Route path="contact-messages" element={<ContactMessagesListPage />} />
             <Route path="testimonials" element={<TestimonialsListPage />} />
+            <Route path="reviews" element={<ReviewsListPage key="reviews" />} />
 
             <Route path="photos" element={<PhotosPage />} />
 

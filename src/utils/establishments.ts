@@ -1,5 +1,6 @@
 import type { HostPointResponse, HostType, RestaurantResponse } from "../admin/types";
 import type { FavoriteItem } from "./favorites";
+import { effectiveRating } from "./rating";
 
 export type EstablishmentType = "Restaurante" | "Hotel" | "Pousada" | "Hostel";
 export type ApiType = "restaurant" | "hostpoint";
@@ -42,7 +43,8 @@ export interface Establishment {
     cuisine: string;
     cuisineSlug: string;
     acceptsReservation: boolean;
-    starRating: number | null;
+    rating: number | null;
+    reviewCount: number;
     numOfRooms: number | null;
     hasOnlineBooking: boolean;
 }
@@ -124,7 +126,7 @@ export function mapRestaurant(r: RestaurantResponse): Establishment {
         cuisine,
         cuisineSlug: slugify(cuisine),
         acceptsReservation: !!r.acceptsReservation,
-        starRating: r.starRating && r.starRating > 0 ? r.starRating : null,
+        ...effectiveRating(r.starRating, r.averageRating, r.reviewCount),
         numOfRooms: null,
         hasOnlineBooking: false,
     };
@@ -145,7 +147,7 @@ export function mapHostPoint(h: HostPointResponse): Establishment {
         cuisine: "",
         cuisineSlug: "",
         acceptsReservation: false,
-        starRating: null,
+        ...effectiveRating(null, h.averageRating, h.reviewCount),
         numOfRooms: h.numOfRooms && h.numOfRooms > 0 ? h.numOfRooms : null,
         hasOnlineBooking: !!h.bookingUrl?.trim(),
     };
@@ -251,7 +253,7 @@ export function applyFilters(items: Establishment[], filters: EstablishmentFilte
         const isRestaurant = e.type === "Restaurante";
         if (filters.culinaria.length && !(isRestaurant && filters.culinaria.includes(e.cuisineSlug))) return false;
         if (filters.reserva && !(isRestaurant && e.acceptsReservation)) return false;
-        if (filters.avaliacao && !(isRestaurant && (e.starRating ?? 0) >= 4)) return false;
+        if (filters.avaliacao && !(isRestaurant && (e.rating ?? 0) >= 4)) return false;
         if (filters.online && !(!isRestaurant && e.hasOnlineBooking)) return false;
         if (range && !(!isRestaurant && e.numOfRooms !== null && range.test(e.numOfRooms))) return false;
         return true;

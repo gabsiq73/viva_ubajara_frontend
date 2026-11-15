@@ -186,13 +186,6 @@
   flex-shrink: 0;
 }
 
-/* ── Stars display ── */
-.dep-stars {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-}
-
 /* ── Form section ── */
 .dep-form-section {
   background: #fff;
@@ -245,31 +238,6 @@
   gap: 16px;
 }
 
-/* Star picker */
-.dep-star-picker {
-  display: flex;
-  gap: 4px;
-}
-
-.dep-star-picker__btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #e5e7eb;
-  padding: 2px;
-  transition: color 0.12s, transform 0.12s;
-  display: flex;
-  align-items: center;
-}
-
-.dep-star-picker__btn.filled {
-  color: #FFB527;
-}
-
-.dep-star-picker__btn:hover {
-  transform: scale(1.15);
-}
-
 .dep-form__rating-label {
   font-size: 14px;
   font-weight: 600;
@@ -315,7 +283,6 @@
 
 /* ── Foco visível ── */
 .dep-summary__bar-row:focus-visible,
-.dep-star-picker__btn:focus-visible,
 .dep-clear-filter:focus-visible,
 .dep-form__submit:focus-visible,
 .dep-login-cta__btn:focus-visible {
@@ -655,15 +622,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   .dep-card,
-  .dep-star-picker__btn,
   .dep-summary__bar-row,
   .dep-form__submit,
   .dep-login-cta__btn {
     transition: none;
   }
 
-  .dep-card:hover,
-  .dep-star-picker__btn:hover {
+  .dep-card:hover {
     transform: none;
   }
 

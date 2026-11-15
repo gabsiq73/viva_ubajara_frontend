@@ -10,6 +10,7 @@ import Breadcrumb from "./Breadcrumb";
 import { DetailStatePage } from "./PageState";
 import { touristSpotsService } from "../admin/services/touristSpotsService";
 import type { TouristSpotResponse } from "../admin/types";
+import ReviewsSection from "../components/reviews/ReviewsSection";
 import { hasMeaningfulText, mailHref, telHref } from "../utils/establishmentDetail";
 import { buildSpotGallery } from "../utils/spotPhotos";
 import { truncateAtWord } from "../utils/text";
@@ -159,6 +160,9 @@ function LocalView({ spot }: { spot: TouristSpotResponse }) {
                         photoUrl={howToGetImg}
                     />
                 )}
+
+                {/* ── Avaliações ── */}
+                <ReviewsSection spotId={spot.id} spotName={spot.name} className="rv--page" />
 
             </main>
             <Footer />

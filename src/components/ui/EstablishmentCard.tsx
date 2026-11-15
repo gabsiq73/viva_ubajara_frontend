@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Badge from "./Badge";
 import FavoriteButton from "./FavoriteButton";
 import Icon from "./Icon";
+import Rating from "./Rating";
 import { TYPE_ICONS, establishmentPath, roomsLabel, shortPrice, type Establishment } from "../../utils/establishments";
 
 interface EstablishmentCardProps {
@@ -9,16 +10,6 @@ interface EstablishmentCardProps {
     view?: "grid" | "list";
     favorite: boolean;
     onToggleFavorite: (item: Establishment) => void;
-}
-
-function Rating({ value }: { value: number }) {
-    const label = value.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-    return (
-        <span className="ui-card__rating" role="img" aria-label={`${label.replace(",0", "")} de 5 estrelas`}>
-            <Icon name="star" filled />
-            {label}
-        </span>
-    );
 }
 
 function Media({ item }: { item: Establishment }) {
@@ -59,7 +50,7 @@ export default function EstablishmentCard({ item, view = "grid", favorite, onTog
                     </h3>
                     {item.description && <p className="ui-card__desc">{item.description}</p>}
                     <div className="ui-card__meta">
-                        {item.starRating !== null && <Rating value={item.starRating} />}
+                        {item.rating !== null && <Rating value={item.rating} count={item.reviewCount} />}
                         {tag && (
                             <span className="ui-card__meta-item ui-card__meta-item--check">
                                 <Icon name="check_circle" />
@@ -109,7 +100,7 @@ export default function EstablishmentCard({ item, view = "grid", favorite, onTog
                             {item.name}
                         </Link>
                     </h3>
-                    {item.starRating !== null && <Rating value={item.starRating} />}
+                    {item.rating !== null && <Rating value={item.rating} count={item.reviewCount} />}
                 </div>
                 {subtitle && <p className="ui-card__sub">{subtitle}</p>}
                 {price && <p className="ui-card__price">{price}</p>}

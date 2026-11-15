@@ -1,133 +1,26 @@
 import type { JSX } from 'react';
-import { useState, useEffect, useRef, useId, type KeyboardEvent } from "react";
+import { useState, useEffect, useRef, useId } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Icon from "../components/ui/Icon";
 import StateBlock from "../components/ui/StateBlock";
 import { Button } from "../components/ui/Button";
+import { Stars, StarPicker, type StarValue } from "../components/ui/Stars";
 import { useAuth } from "../admin/hooks/useAuth";
 import { testimonialsService } from "../admin/services/testimonialsService";
 import { pageConfigService } from "../admin/services/pageConfigService";
 import type { TestimonialResponse } from "../admin/types";
 import { formatLongDate, parseIsoDate, toIsoDate } from "../utils/dates";
+import { RATING_LABELS, averageFormat, reviewsLabel } from "../utils/rating";
 import { useAsyncData } from "../utils/useAsyncData";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
 import "../components/ui/ui.css";
 import "./style/Depoimentos.css";
 
-type Rating = 1 | 2 | 3 | 4 | 5;
-
-const STAR_PATH = "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z";
-const averageFormat = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-
-function reviewsLabel(count: number): string {
-  return `${count} ${count === 1 ? "avaliação" : "avaliações"}`;
-}
-
-function parseRating(raw: string | null): 0 | Rating {
+function parseRating(raw: string | null): 0 | StarValue {
   const n = Number(raw);
-  return Number.isInteger(n) && n >= 1 && n <= 5 ? (n as Rating) : 0;
-}
-
-// ─── Componente de estrelas (exibição) ─────────────────────────────────────
-function Stars({ value, size = 18 }: { value: number; size?: number }) {
-  return (
-    <span className="dep-stars" role="img" aria-label={`${value} de 5 estrelas`}>
-      {[1, 2, 3, 4, 5].map((s) => (
-        <svg
-          key={s}
-          width={size}
-          height={size}
-          viewBox="0 0 24 24"
-          fill={s <= value ? "#FFB527" : "#e5e7eb"}
-          aria-hidden="true"
-        >
-          <path d={STAR_PATH} />
-        </svg>
-      ))}
-    </span>
-  );
-}
-
-// ─── Componente de estrelas (interativo) ───────────────────────────────────
-interface StarPickerProps {
-  value: number;
-  onChange: (v: Rating) => void;
-  labelledBy: string;
-  describedBy?: string;
-  invalid?: boolean;
-  disabled?: boolean;
-  groupRef?: React.Ref<HTMLDivElement>;
-}
-
-function StarPicker({ value, onChange, labelledBy, describedBy, invalid, disabled, groupRef }: StarPickerProps) {
-  const [hovered, setHovered] = useState(0);
-  const buttons = useRef<(HTMLButtonElement | null)[]>([]);
-  const active = hovered || value;
-
-  const select = (next: number) => {
-    const clamped = Math.min(5, Math.max(1, next)) as Rating;
-    onChange(clamped);
-    buttons.current[clamped - 1]?.focus();
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const current = value || 0;
-    switch (event.key) {
-      case "ArrowRight":
-      case "ArrowUp":
-        event.preventDefault();
-        select(current + 1);
-        break;
-      case "ArrowLeft":
-      case "ArrowDown":
-        event.preventDefault();
-        select(current === 0 ? 1 : current - 1);
-        break;
-      case "Home":
-        event.preventDefault();
-        select(1);
-        break;
-      case "End":
-        event.preventDefault();
-        select(5);
-        break;
-    }
-  };
-
-  return (
-    <div
-      ref={groupRef}
-      className="dep-star-picker"
-      role="radiogroup"
-      aria-labelledby={labelledBy}
-      aria-describedby={describedBy}
-      aria-invalid={invalid || undefined}
-      onKeyDown={handleKeyDown}
-    >
-      {[1, 2, 3, 4, 5].map((s) => (
-        <button
-          key={s}
-          ref={(el) => { buttons.current[s - 1] = el; }}
-          type="button"
-          role="radio"
-          aria-checked={value === s}
-          tabIndex={value === s || (value === 0 && s === 1) ? 0 : -1}
-          className={`dep-star-picker__btn${active >= s ? " filled" : ""}`}
-          onClick={() => onChange(s as Rating)}
-          onMouseEnter={() => setHovered(s)}
-          onMouseLeave={() => setHovered(0)}
-          disabled={disabled}
-          aria-label={`${s} estrela${s > 1 ? "s" : ""}`}
-        >
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d={STAR_PATH} />
-          </svg>
-        </button>
-      ))}
-    </div>
-  );
+  return Number.isInteger(n) && n >= 1 && n <= 5 ? (n as StarValue) : 0;
 }
 
 // ─── Card de depoimento ────────────────────────────────────────────────────
@@ -154,15 +47,6 @@ function TestimonialCard({ t }: { t: TestimonialResponse }) {
     </article>
   );
 }
-
-// ─── Label textual da avaliação ────────────────────────────────────────────
-const RATING_LABELS: Record<number, string> = {
-  1: "Ruim",
-  2: "Regular",
-  3: "Bom",
-  4: "Muito bom",
-  5: "Excelente!",
-};
 
 // ─── Página principal ──────────────────────────────────────────────────────
 export default function Depoimentos(): JSX.Element {
@@ -199,7 +83,7 @@ export default function Depoimentos(): JSX.Element {
     return () => window.clearTimeout(timer);
   }, [submitSuccess]);
 
-  const setFilter = (next: 0 | Rating) => {
+  const setFilter = (next: 0 | StarValue) => {
     setSearchParams((prev) => {
       const params = new URLSearchParams(prev);
       if (next) params.set("nota", String(next));
@@ -214,7 +98,7 @@ export default function Depoimentos(): JSX.Element {
   const avgRating = all.length ? all.reduce((s, t) => s + t.rating, 0) / all.length : 0;
 
   const countByRating = [5, 4, 3, 2, 1].map((star) => ({
-    star: star as Rating,
+    star: star as StarValue,
     count: all.filter((t) => t.rating === star).length,
   }));
 

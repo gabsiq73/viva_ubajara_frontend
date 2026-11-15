@@ -2,6 +2,7 @@ import type { MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import Icon from "../ui/Icon";
 import { roomsLabel, shortPrice } from "../../utils/establishments";
+import { formatRating, reviewsLabel } from "../../utils/rating";
 import type { EstablishmentDetail } from "../../utils/establishmentDetail";
 import "./establishment-detail.css";
 
@@ -9,19 +10,18 @@ interface DetailHeroProps {
     detail: EstablishmentDetail;
     onOpenGallery: (event: MouseEvent<HTMLElement>) => void;
     onShare: () => void;
+    onGoToReviews: () => void;
 }
 
-export default function DetailHero({ detail, onOpenGallery, onShare }: DetailHeroProps) {
+export default function DetailHero({ detail, onOpenGallery, onShare, onGoToReviews }: DetailHeroProps) {
     const photo = detail.photos[0]?.url;
     const photoCount = detail.photos.length;
     const eyebrow = [detail.type, detail.type === "Restaurante" ? detail.cuisine : roomsLabel(detail.numOfRooms)]
         .filter(Boolean)
         .join(" · ");
     const price = shortPrice(detail.avgPrice);
-    const rating =
-        detail.starRating !== null
-            ? detail.starRating.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-            : "";
+    const rating = detail.rating !== null ? formatRating(detail.rating) : "";
+    const spoken = `${rating.replace(",0", "")} de 5 estrelas${detail.reviewCount > 0 ? `, ${reviewsLabel(detail.reviewCount)}` : ""}`;
 
     return (
         <section className={`estd-hero${photo ? "" : " estd-hero--plain"}`}>
@@ -57,10 +57,22 @@ export default function DetailHero({ detail, onOpenGallery, onShare }: DetailHer
                     {(price || detail.neighborhood || rating) && (
                         <ul className="estd-hero__pills">
                             {rating && (
-                                <li className="estd-pill">
-                                    <Icon name="star" filled className="estd-pill__star" />
-                                    <span aria-hidden="true">{rating}</span>
-                                    <span className="ui-sr-only">{rating.replace(",0", "")} de 5 estrelas</span>
+                                <li className="estd-pill estd-pill--link">
+                                    <a
+                                        href="#avaliacoes"
+                                        className="estd-pill__link"
+                                        onClick={(event) => {
+                                            event.preventDefault();
+                                            onGoToReviews();
+                                        }}
+                                    >
+                                        <Icon name="star" filled className="estd-pill__star" />
+                                        <span aria-hidden="true">
+                                            {rating}
+                                            {detail.reviewCount > 0 && ` (${detail.reviewCount})`}
+                                        </span>
+                                        <span className="ui-sr-only">{spoken}. Ir para as avaliações</span>
+                                    </a>
                                 </li>
                             )}
                             {price && <li className="estd-pill">{price}</li>}

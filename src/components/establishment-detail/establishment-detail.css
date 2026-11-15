@@ -125,6 +125,32 @@
     color: #f3c66b;
 }
 
+.estd-pill--link {
+    padding: 0;
+}
+
+.estd-pill__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    padding: 0 12px;
+    border-radius: 50px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.estd-pill__link::after {
+    content: "";
+    position: absolute;
+    inset: -6px -4px;
+}
+
+.estd-pill--link:hover {
+    background: rgba(255, 255, 255, 0.26);
+}
+
 .estd-hero__gallery {
     display: inline-flex;
     align-items: center;

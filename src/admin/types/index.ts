@@ -150,6 +150,8 @@ export interface AttractionResponse {
   category: AttractionCategory;
   photos: PhotoResponse[];
   linkedSpots?: TouristSpotSummary[];
+  averageRating?: number | null;
+  reviewCount?: number;
 }
 
 // ============================================================
@@ -188,6 +190,8 @@ export interface TouristSpotResponse {
   instagramUrl?: string;
   active: boolean;
   photos: PhotoResponse[];
+  averageRating?: number | null;
+  reviewCount?: number;
 }
 
 // ============================================================
@@ -283,6 +287,8 @@ export interface RestaurantResponse {
   photos: PhotoResponse[];
   approvalStatus?: ApprovalStatus;
   claimable?: boolean;
+  averageRating?: number | null;
+  reviewCount?: number;
 }
 
 // ============================================================
@@ -340,6 +346,8 @@ export interface HostPointResponse {
   photos: PhotoResponse[];
   approvalStatus?: ApprovalStatus;
   claimable?: boolean;
+  averageRating?: number | null;
+  reviewCount?: number;
 }
 
 // ============================================================
@@ -508,6 +516,42 @@ export interface TestimonialResponse {
   comment: string;
   approved: boolean;
   createdDate: string;
+}
+
+// ============================================================
+// Reviews (avaliações de visitantes)
+// ============================================================
+export interface ReviewRequest {
+  rating: number;
+  comment?: string | null;
+}
+
+export interface ReviewResponse {
+  id: string;
+  rating: number;
+  comment: string | null;
+  authorName: string;
+  authorPhoto?: string | null;
+  status: ApprovalStatus;
+  createdDate: string;
+}
+
+export type ReviewSpotType = 'RESTAURANT' | 'HOST_POINT' | 'ATTRACTION' | 'SPOT';
+
+export interface ReviewAdminResponse {
+  id: string;
+  rating: number;
+  comment: string | null;
+  status: ApprovalStatus;
+  createdDate: string;
+  spot: { id: string; name: string; type: ReviewSpotType };
+  author: { id: string; name: string; email: string };
+}
+
+export interface ReviewSummary {
+  average: number | null;
+  count: number;
+  distribution: Record<string, number>;
 }
 
 // ============================================================

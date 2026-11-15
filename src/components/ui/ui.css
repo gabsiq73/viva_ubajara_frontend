@@ -910,6 +910,12 @@
     color: var(--ui-star);
 }
 
+.ui-card__rating-count {
+    margin-left: 2px;
+    font-weight: 500;
+    color: var(--ui-text-secondary);
+}
+
 .ui-card__sub {
     margin: 0;
     overflow: hidden;
@@ -1285,6 +1291,17 @@
 
 .ui-point__chip .ui-icon {
     font-size: 15px;
+}
+
+.ui-point__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+}
+
+.ui-point__chip--rating .ui-icon {
+    color: #ffb527;
 }
 
 .ui-point__cta {

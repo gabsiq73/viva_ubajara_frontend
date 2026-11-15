@@ -2,11 +2,14 @@ import { Link } from "react-router-dom";
 import Badge from "./Badge";
 import Icon from "./Icon";
 import type { AttractionResponse } from "../../admin/types";
+import { formatRating, reviewsLabel } from "../../utils/rating";
 import { ATTRACTION_CATEGORY_ICONS, ATTRACTION_CATEGORY_LABELS } from "../../utils/attractionCategories";
 
 
 export default function PointCard({ item }: { item: AttractionResponse }) {
     const photo = item.photos?.[0]?.url;
+    const reviewCount = item.reviewCount ?? 0;
+    const hasRating = reviewCount > 0 && item.averageRating != null;
     return (
         <article className="ui-point">
             <div className="ui-point__media">
@@ -30,11 +33,25 @@ export default function PointCard({ item }: { item: AttractionResponse }) {
                 </h3>
                 <p className="ui-point__desc">{item.shortDescription ?? item.description}</p>
                 <div className="ui-point__foot">
-                    {item.averageVisitDuration != null && (
-                        <span className="ui-point__chip">
-                            <Icon name="schedule" />
-                            {item.averageVisitDuration}&nbsp;min
-                        </span>
+                    {(item.averageVisitDuration != null || hasRating) && (
+                        <div className="ui-point__chips">
+                            {hasRating && (
+                                <span
+                                    className="ui-point__chip ui-point__chip--rating"
+                                    role="img"
+                                    aria-label={`Nota ${formatRating(item.averageRating!)} de 5, ${reviewsLabel(reviewCount)}`}
+                                >
+                                    <Icon name="star" filled />
+                                    {formatRating(item.averageRating!)}&nbsp;({reviewCount})
+                                </span>
+                            )}
+                            {item.averageVisitDuration != null && (
+                                <span className="ui-point__chip">
+                                    <Icon name="schedule" />
+                                    {item.averageVisitDuration}&nbsp;min
+                                </span>
+                            )}
+                        </div>
                     )}
                     <span className="ui-point__cta" aria-hidden="true">
                         Saiba mais
