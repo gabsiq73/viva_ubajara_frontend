@@ -12,7 +12,7 @@ import PointCard from "../components/ui/PointCard";
 import { ATTRACTION_CATEGORY_LABELS as CATEGORY_LABELS } from "../utils/attractionCategories";
 import { useAsyncData } from "../utils/useAsyncData";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
-import heroFallback from "../assets/images/foto-capa-parque-ubajara.png";
+import heroFallback from "../assets/images/capa-pagina.webp";
 import "../components/ui/ui.css";
 import "../components/Sections/style/Content.components.css";
 import "./style/PontosTuristicos.css";

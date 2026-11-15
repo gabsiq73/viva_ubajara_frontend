@@ -6,9 +6,9 @@ import StateBlock from "../components/ui/StateBlock";
 import "../components/ui/ui.css";
 import "./style/PageState.css";
 
-export function PageLoading({ label = "Carregando…" }: { label?: string }) {
+export function PageLoading({ label = "Carregando…", fullPage = false }: { label?: string; fullPage?: boolean }) {
     return (
-        <div className="pg-loading" role="status">
+        <div className={fullPage ? "pg-loading pg-loading--page" : "pg-loading"} role="status">
             <span className="pg-spinner" aria-hidden="true" />
             {label}
         </div>

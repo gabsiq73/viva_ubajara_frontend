@@ -9,7 +9,7 @@ import type { EventResponse } from "../admin/types";
 import { formatDay, formatLongDate, formatMonthShort, formatTime, parseBackendDate, toIsoDate } from "../utils/dates";
 import { isNotFoundError, requireUuid, useAsyncData } from "../utils/useAsyncData";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
-import heroFallback from "../assets/images/foto-capa-parque-ubajara.png";
+import heroFallback from "../assets/images/capa-pagina.webp";
 import "../components/ui/ui.css";
 import "./style/Evento.css";
 

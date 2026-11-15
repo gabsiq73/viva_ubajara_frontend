@@ -1,8 +1,8 @@
-import food from "../assets/images/food.png";
-import farm from "../assets/images/fazenda.png";
-import mercado from "../assets/images/mercado.png";
-import park from "../assets/images/parque.png";
-import museum from "../assets/images/museu.png";
+import food from "../assets/images/food.webp";
+import farm from "../assets/images/fazenda.webp";
+import mercado from "../assets/images/mercado.webp";
+import park from "../assets/images/parque.webp";
+import museum from "../assets/images/museu.webp";
 
 export type EstabType = "Restaurante" | "Pousada" | "Hotel" | "Cafeteria" | "Artesanato";
 

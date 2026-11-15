@@ -280,7 +280,7 @@ div.fundo::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: url("./../../../assets/images/fundo.png");
+    background: url("./../../../assets/images/fundo.webp");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

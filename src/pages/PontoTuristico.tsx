@@ -16,7 +16,7 @@ import { loadFavorites, toggleFavorite } from "../utils/favorites";
 import { buildSpotGallery } from "../utils/spotPhotos";
 import { isNotFoundError, requireUuid, useAsyncData } from "../utils/useAsyncData";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
-import heroFallback from "../assets/images/foto-capa-parque-ubajara.png";
+import heroFallback from "../assets/images/capa-pagina.webp";
 import "../components/ui/ui.css";
 import "../components/Sections/style/Content.components.css";
 import "./style/PontoTuristico.css";

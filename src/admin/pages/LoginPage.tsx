@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { BASE_URL } from '../services/api';
 import { consumeReturnTo } from '../../utils/returnTo';
 import logo from '../../assets/images/logo.webp';
-import cachoeira from '../../assets/images/cachoeira.png';
+import cachoeira from '../../assets/images/cachoeira.webp';
 import '../styles/admin.css';
 
 type ErrorType = 'credentials' | 'social' | 'unknown' | null;

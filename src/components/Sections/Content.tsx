@@ -1,13 +1,15 @@
 import "./style/Content.components.css"
 import { Link } from "react-router-dom"
 import { useEffect, useState, useMemo, useRef, type KeyboardEvent, type ReactNode } from "react"
-import paper from "./../../assets/images/paper.png"
-import park from "./../../assets/images/parque.png";
-import food from "./../../assets/images/food.png";
-import cac from "./../../assets/images/cachoeira.png";
-import farm from "./../../assets/images/fazenda.png";
-import mercado from "./../../assets/images/mercado.png";
-import museum from "./../../assets/images/museu.png";
+import paper from "./../../assets/images/paper.webp"
+import park from "./../../assets/images/parque.webp";
+import food from "./../../assets/images/food.webp";
+import cachoeiraAvatar from "./../../assets/images/cachoeira-avatar.webp";
+import farm from "./../../assets/images/fazenda.webp";
+import fazendaAvatar from "./../../assets/images/fazenda-avatar.webp";
+import mercado from "./../../assets/images/mercado.webp";
+import mercadoAvatar from "./../../assets/images/mercado-avatar.webp";
+import museum from "./../../assets/images/museu.webp";
 import { GastronomyCarousel, type GastronomySlide } from "./GastronomyCarousel";
 import { gastronomyItemsService } from "../../admin/services/gastronomyItemsService";
 import { attractionsService } from "../../admin/services/attractionsService";
@@ -295,7 +297,7 @@ function SectionHeader({ id, kicker, title, subtitle, cta, onDark }: SectionHead
 }
 
 // ── Fallback review avatars ───────────────────────────────────
-const FALLBACK_AVATARS = [cac, farm, mercado];
+const FALLBACK_AVATARS = [cachoeiraAvatar, fazendaAvatar, mercadoAvatar];
 
 export default function Content() {
     const [gastroIndex, setGastroIndex] = useState(0);

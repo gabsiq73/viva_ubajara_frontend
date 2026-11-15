@@ -15,7 +15,7 @@ import { consumeReturnTo } from "../utils/returnTo";
 import { getRoleLabel } from "../utils/roles";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
 import { validateEmail } from "../company/utils/fields";
-import heroImg from "../assets/images/mercado.png";
+import heroImg from "../assets/images/mercado.webp";
 import "../components/ui/ui.css";
 import "./style/CadastroEmpresa.css";
 

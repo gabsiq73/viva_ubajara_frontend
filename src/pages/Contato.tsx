@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Icon from "../components/ui/Icon";
-import heroImg from "../assets/images/foto-capa-parque-ubajara.png";
+import heroImg from "../assets/images/capa-pagina.webp";
 import { contactMessagesService } from "../admin/services/contactMessagesService";
 import { mailHref, telHref } from "../utils/establishmentDetail";
 import { useDocumentTitle } from "../utils/useDocumentTitle";

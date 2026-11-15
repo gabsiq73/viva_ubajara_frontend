@@ -1,10 +1,10 @@
-import food from "../assets/images/food.png";
-import park from "../assets/images/parque.png";
-import route from "../assets/images/route.png";
-import mercado from "../assets/images/mercado.png";
-import farm from "../assets/images/fazenda.png";
-import museum from "../assets/images/museu.png";
-import cac from "../assets/images/cachoeira.png";
+import food from "../assets/images/food.webp";
+import park from "../assets/images/parque.webp";
+import route from "../assets/images/route.webp";
+import mercado from "../assets/images/mercado.webp";
+import farm from "../assets/images/fazenda.webp";
+import museum from "../assets/images/museu.webp";
+import cac from "../assets/images/cachoeira.webp";
 
 export type EventCategory = "Festival" | "Cultura" | "Esporte" | "Gastronomia" | "Natureza";
 

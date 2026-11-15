@@ -1,7 +1,7 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Icon from "../components/ui/Icon";
-import heroImg from "../assets/images/foto-capa-parque-ubajara.png";
+import heroImg from "../assets/images/capa-pagina.webp";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
 import "../components/ui/ui.css";
 import "./style/ComoChegar.css";

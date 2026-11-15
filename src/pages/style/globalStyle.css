@@ -33,7 +33,6 @@ textarea {
 
 :root {
     /* ── Foto do hero ── */
-    --hero-photo: url('./../../assets/images/foto-capa-parque-ubajara (1).png');
     --hero-position-desktop: 30% 40%;
     --hero-position-mobile: center center;
 
@@ -74,34 +73,49 @@ textarea {
     position: relative;
 }
 
-.container::before {
-    content: "";
+.hero-bg {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 115vh; /* Delimita a capa apenas na parte superior */
-    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)), var(--hero-photo);
-    background-size: cover;
-    background-position: var(--hero-position-desktop);
-    background-repeat: no-repeat;
     z-index: 0;
+    overflow: hidden;
 }
 
+.hero-bg picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.hero-bg img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--hero-position-desktop);
+    animation: none;
+}
+
+.hero-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5));
+}
 
 @media screen and (max-width: 480px) {
-    :root {
-        --hero-photo: url('./../../assets/images/foto-capa-parque-ubajara(mobile).png');
+    .hero-bg img {
+        object-position: var(--hero-position-mobile);
     }
-    .container::before {
-        background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), var(--hero-photo);
-        background-position: var(--hero-position-mobile);
-        background-repeat: no-repeat;
+    .hero-bg::after {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4));
     }
 }
 
-/* Garante que o conteúdo fique na frente do pseudo-elemento */
-.container > *:not(header) {
+/* Garante que o conteúdo fique na frente da capa (.hero-bg) */
+.container > *:not(header):not(.hero-bg) {
     position: relative;
     z-index: 1;
 }
