@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Icon from "../components/ui/Icon";
 import PhotoGallery from "../components/ui/PhotoGallery";
+import HowToGetSection from "../components/ui/HowToGetSection";
 import PhotoLightbox from "../components/establishment-detail/PhotoLightbox";
 import Breadcrumb from "./Breadcrumb";
 import { DetailStatePage } from "./PageState";
@@ -29,6 +30,7 @@ function LocalView({ spot }: { spot: TouristSpotResponse }) {
     const hasGallery = gallery.length >= 2;
 
     const heroImg = gallery[0]?.url ?? spot.photos?.[0]?.url ?? heroFallback;
+    const howToGetImg = spot.photos?.find((p) => p.description === "how_to_get")?.url;
     const paragraphs = (spot.description ?? "")
         .split(/\r?\n+/)
         .map((p) => p.trim())
@@ -149,34 +151,13 @@ function LocalView({ spot }: { spot: TouristSpotResponse }) {
                 )}
 
                 {/* ── Como Chegar ── */}
-                {spot.address && (
-                    <section className="pt-how" aria-labelledby="local-how-title">
-                        <div className="pt-how__inner pt-how__inner--single">
-                            <div className="pt-how__left">
-                                <h2 id="local-how-title" className="pt-how__title">Como Chegar</h2>
-                                <p className="pt-how__desc">
-                                    Localizado em {spot.address}.
-                                </p>
-                                {spot.phone && (
-                                    <ul className="pt-how__routes">
-                                        <li className="pt-how__route-item">
-                                            <Icon name="call" />
-                                            Informações: <a className="pt-link" href={telHref(spot.phone)}>{spot.phone}</a>
-                                        </li>
-                                    </ul>
-                                )}
-                                <a
-                                    href={`https://maps.google.com/maps?q=${encodeURIComponent(spot.address)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="pt-how__maps-btn"
-                                >
-                                    <Icon name="map" />
-                                    Abrir no Google Maps
-                                </a>
-                            </div>
-                        </div>
-                    </section>
+                {spot.address?.trim() && (
+                    <HowToGetSection
+                        name={spot.name}
+                        address={spot.address.trim()}
+                        phone={spot.phone}
+                        photoUrl={howToGetImg}
+                    />
                 )}
 
             </main>

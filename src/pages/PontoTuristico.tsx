@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Icon from "../components/ui/Icon";
 import PhotoGallery from "../components/ui/PhotoGallery";
+import HowToGetSection from "../components/ui/HowToGetSection";
 import PhotoLightbox from "../components/establishment-detail/PhotoLightbox";
 import Breadcrumb from "./Breadcrumb";
 import { DetailStatePage } from "./PageState";
@@ -11,7 +12,7 @@ import { attractionsService } from "../admin/services/attractionsService";
 import type { AttractionResponse } from "../admin/types";
 import PointCard from "../components/ui/PointCard";
 import { ATTRACTION_CATEGORY_LABELS as CATEGORY_LABELS } from "../utils/attractionCategories";
-import { hasMeaningfulText, telHref } from "../utils/establishmentDetail";
+import { hasMeaningfulText } from "../utils/establishmentDetail";
 import { loadFavorites, toggleFavorite } from "../utils/favorites";
 import { buildSpotGallery } from "../utils/spotPhotos";
 import { isNotFoundError, requireUuid, useAsyncData } from "../utils/useAsyncData";
@@ -238,39 +239,14 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
                 )}
 
                 {/* ── Como Chegar ── */}
-                {attraction.address && (
-                    <section className="pt-how" aria-labelledby="pt-how-title">
-                        <div className={`pt-how__inner${howToGetImg ? "" : " pt-how__inner--single"}`}>
-                            <div className="pt-how__left">
-                                <h2 id="pt-how-title" className="pt-how__title">Como Chegar</h2>
-                                <p className="pt-how__desc">
-                                    Localizado em {attraction.address}.
-                                </p>
-                                {attraction.phone && (
-                                    <ul className="pt-how__routes">
-                                        <li className="pt-how__route-item">
-                                            <Icon name="call" />
-                                            Informações: <a className="pt-link" href={telHref(attraction.phone)}>{attraction.phone}</a>
-                                        </li>
-                                    </ul>
-                                )}
-                                <a
-                                    href={attraction.mapsUrl || `https://maps.google.com/maps?q=${encodeURIComponent(attraction.address)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="pt-how__maps-btn"
-                                >
-                                    <Icon name="map" />
-                                    Abrir no Google Maps
-                                </a>
-                            </div>
-                            {howToGetImg && (
-                                <div className="pt-how__right">
-                                    <img src={howToGetImg} alt="" className="pt-how__img" width={800} height={600} loading="lazy" decoding="async" />
-                                </div>
-                            )}
-                        </div>
-                    </section>
+                {attraction.address?.trim() && (
+                    <HowToGetSection
+                        name={attraction.name}
+                        address={attraction.address.trim()}
+                        mapsUrl={attraction.mapsUrl}
+                        phone={attraction.phone}
+                        photoUrl={howToGetImg}
+                    />
                 )}
 
                 {/* ── Pontos Turísticos Vinculados ── */}

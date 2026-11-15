@@ -453,18 +453,9 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(40px, 5vw, 72px);
-    align-items: center;
-}
-
-.pt-how__inner--single {
-    grid-template-columns: 1fr;
-}
-
-.pt-how__inner--single .pt-how__left {
-    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
 }
 
 .pt-how__title {
@@ -472,72 +463,40 @@
     font-weight: 900;
     font-size: clamp(28px, 3.5vw, 44px);
     color: #00210c;
-    margin: 0 0 16px;
+    margin: 0;
     line-height: 1.1;
 }
 
-.pt-how__desc {
-    font-family: "Inter", sans-serif;
-    font-size: 15px;
-    line-height: 1.75;
-    color: #4a5c51;
-    margin: 0 0 28px;
+.pt-how__card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    background: #ffffff;
+    border: 1px solid #e4ede8;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 33, 12, 0.08);
 }
 
-.pt-how__routes {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.pt-how__route-item {
+.pt-how__phone {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin: 0;
     font-family: "Inter", sans-serif;
     font-size: 14px;
     color: #3c4a42;
 }
 
-.pt-how__route-item .material-symbols-outlined {
+.pt-how__phone .ui-icon {
     font-size: 20px;
     color: #006b32;
     flex-shrink: 0;
-    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-}
-
-.pt-how__maps-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #003016;
-    color: #ffffff;
-    font-family: "Nunito", sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    padding: 13px 28px;
-    border-radius: 50px;
-    text-decoration: none;
-    transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.pt-how__maps-btn .material-symbols-outlined {
-    font-size: 18px;
-    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-}
-
-.pt-how__maps-btn:hover {
-    background: #006b32;
-    transform: translateY(-2px);
 }
 
 .pt-how__right {
     border-radius: 24px;
     overflow: hidden;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 21 / 9;
     box-shadow: 0 20px 60px rgba(0, 33, 12, 0.15);
 }
 
@@ -563,13 +522,22 @@
     }
 }
 
+@media only screen and (max-width: 860px) {
+    .pt-how__card {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .pt-how .pt-how__map {
+        min-height: 240px;
+    }
+    .pt-how .estd-map-card__info {
+        padding: 20px;
+    }
+}
+
 @media only screen and (max-width: 768px) {
     .pt-hero {
         min-height: 80vh;
         padding-top: 70px;
-    }
-    .pt-how__inner {
-        grid-template-columns: 1fr;
     }
     .pt-how__right {
         aspect-ratio: 16 / 9;
@@ -767,9 +735,15 @@
 .pt-linked__link:focus-visible,
 .pt-link:focus-visible,
 .pt-visit-card__cta:focus-visible,
-.pt-how__maps-btn:focus-visible,
 .pt-related__all:focus-visible {
     outline: 3px solid #6bcf91;
+    outline-offset: 2px;
+}
+
+.pt-how .estd-route:focus-visible,
+.pt-how .estd-copy:focus-visible,
+.pt-how .estd-map__expand:focus-visible {
+    outline: 3px solid #2d8a54;
     outline-offset: 2px;
 }
 
@@ -778,7 +752,6 @@
     .pt-hero__gallery-btn,
     .pt-breadcrumb__link,
     .pt-visit-card__cta,
-    .pt-how__maps-btn,
     .pt-related__all,
     .pt-related__all .material-symbols-outlined,
     .pt-linked__link {
@@ -786,8 +759,7 @@
     }
 
     .pt-hero__fav-btn:hover,
-    .pt-visit-card__cta:hover,
-    .pt-how__maps-btn:hover {
+    .pt-visit-card__cta:hover {
         transform: none;
     }
 }
