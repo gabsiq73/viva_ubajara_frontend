@@ -60,6 +60,7 @@
   color: var(--adm-text);
   min-height: 100vh;
   display: flex;
+  line-height: normal; /* painel tem ritmo próprio: não herda o line-height do site público */
 }
 
 /* Tipografia especial para títulos */
@@ -436,8 +437,10 @@
 
 .adm-page-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  gap: 12px 16px;
   margin-bottom: 32px;
 }
 
@@ -1526,6 +1529,16 @@
 
   .adm-topbar__menu-btn {
     display: flex;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .adm-page-header {
+    margin-bottom: 20px;
+  }
+
+  .adm-page-title {
+    font-size: 22px;
   }
 
   /* Main */
@@ -1674,6 +1687,21 @@
   overflow-wrap: anywhere;
   line-height: 1.7;
   font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .adm-topbar__user-info {
+    display: none;
+  }
+
+  .adm-topbar__user {
+    padding-left: 12px;
+  }
+
+  .adm-topbar__right {
+    min-width: 0;
+    gap: 12px;
+  }
 }
 
 @media (max-width: 560px) {

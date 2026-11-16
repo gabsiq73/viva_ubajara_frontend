@@ -11,7 +11,7 @@
 .site-footer__inner {
     max-width: 1248px;
     margin: 0 auto;
-    padding: 72px 24px 56px;
+    padding: 72px var(--gutter) 56px;
     box-sizing: border-box;
     display: grid;
     grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
@@ -251,7 +251,7 @@
     max-width: 1248px;
     min-height: 68px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 var(--gutter);
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -278,7 +278,7 @@
         flex-direction: column;
         gap: 28px;
         max-width: 720px;
-        padding: 40px 20px 32px;
+        padding: 40px var(--gutter) 32px;
     }
 
     .site-footer__brand {
@@ -395,6 +395,13 @@
         font-size: 20px;
     }
 
+    .site-footer__phone,
+    .site-footer__email {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+    }
+
     .site-footer__hours,
     .site-footer__address {
         font-size: 14px;
@@ -406,7 +413,7 @@
 
     .site-footer__legal-inner {
         max-width: 720px;
-        padding: 20px 20px 24px;
+        padding: 20px var(--gutter) 24px;
         flex-direction: column;
         align-items: center;
         gap: 8px;

@@ -15,7 +15,7 @@ section.welcome {
     align-items: center;
     text-align: center;
     color: #ffffff;
-    padding: 136px 24px 100px;
+    padding: 136px var(--gutter) 100px;
     position: relative;
     user-select: none;
     -webkit-user-select: none;
@@ -37,9 +37,9 @@ section.welcome {
     align-items: center;
     gap: 8px;
     font-family: 'Inter', sans-serif;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.88);
     background: rgba(255, 255, 255, 0.12);
@@ -126,8 +126,8 @@ section.welcome {
     align-items: center;
     justify-content: center;
     font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--fs-btn);
+    font-weight: var(--fw-btn);
     letter-spacing: 0.02em;
     padding: 13px 28px;
     border-radius: 50px;
@@ -177,7 +177,7 @@ section.welcome {
 @media screen and (max-width: 768px) {
     section.welcome {
         min-height: 65vh;
-        padding: 112px 20px 88px;
+        padding: 112px var(--gutter) 88px;
     }
     .hero-title__lead {
         font-size: clamp(22px, 4vw, 46px);
@@ -185,15 +185,12 @@ section.welcome {
     .hero-title--gold {
         font-size: clamp(46px, 8vw, 90px);
     }
-    .hero-kicker {
-        font-size: 10px;
-    }
 }
 
 @media screen and (max-width: 480px) {
     section.welcome {
         min-height: 60vh;
-        padding: 100px 18px 80px;
+        padding: 100px var(--gutter) 80px;
     }
     .hero-title__lead {
         font-size: clamp(20px, 5.5vw, 46px);
@@ -202,14 +199,12 @@ section.welcome {
         font-size: clamp(40px, 10.5vw, 90px);
     }
     .hero-kicker {
-        font-size: 9.5px;
         padding: 5px 13px;
     }
     .hero-btn {
         flex: 1 1 0;
         min-width: 0;
         min-height: 46px;
-        font-size: 13.5px;
         padding: 12px 10px;
     }
     .hero-actions {

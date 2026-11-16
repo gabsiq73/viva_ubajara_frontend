@@ -31,19 +31,20 @@
 
 .estd-h2 {
     margin: 0;
-    font-family: "Nunito", sans-serif;
-    font-weight: 800;
-    font-size: 28px;
-    line-height: 1.2;
+    font-family: var(--font-display);
+    font-weight: var(--fw-heading);
+    font-size: var(--fs-h2-sub);
+    line-height: var(--lh-h2);
     color: #003016;
 }
 
 .estd-h2--sm {
-    font-size: 22px;
+    font-size: var(--fs-h3);
+    line-height: var(--lh-h3);
 }
 
 .estd-h2--lg {
-    font-size: 32px;
+    font-size: var(--fs-h2-sub);
 }
 
 .estd-label {
@@ -732,14 +733,14 @@
 
 /* ── Perto daqui ── */
 .estd-nearby {
-    padding: 64px 0;
+    padding: var(--section-y) 0;
     background: #f4f9f6;
 }
 
 .estd-nearby__inner {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 .estd-nearby__head {
@@ -1109,8 +1110,8 @@
         -webkit-line-clamp: 3;
         line-clamp: 3;
         overflow: hidden;
-        font-size: 34px;
-        line-height: 1.1;
+        font-size: var(--fs-h1);
+        line-height: var(--lh-h1);
         letter-spacing: -0.01em;
     }
 
@@ -1179,8 +1180,8 @@
     }
 
     .estd-lead {
-        font-size: 18px;
-        line-height: 1.5;
+        font-size: var(--fs-lead);
+        line-height: var(--lh-lead);
     }
 
     .estd-body {
@@ -1193,10 +1194,6 @@
 
     .estd-facts__item {
         padding: 14px 16px;
-    }
-
-    .estd-h2 {
-        font-size: 22px;
     }
 
     .estd-directions {
@@ -1230,35 +1227,28 @@
         padding: 0;
     }
 
-    .estd-nearby {
-        padding: 40px 0;
-    }
-
-    .estd-nearby__inner {
-        gap: 16px;
-    }
-
     .estd-nearby__all {
         display: none;
     }
 
     .estd-nearby__grid {
         display: flex;
-        gap: 12px;
-        margin: 0 -16px;
-        padding: 0 16px 8px;
+        gap: var(--space-3);
+        margin: 0 calc(var(--gutter) * -1);
+        padding: 0 var(--gutter) var(--space-2);
         overflow-x: auto;
+        scroll-padding-inline: var(--gutter);
         scroll-snap-type: x mandatory;
         scrollbar-width: none;
     }
 
     .estd-nearby__cell {
-        flex: 0 0 220px;
+        flex: 0 0 min(260px, var(--scroller-peek));
         scroll-snap-align: start;
     }
 
-    .estd-h2--lg {
-        font-size: 22px;
+    .estd-copy:not(.estd-copy--block) {
+        height: 44px;
     }
 
     .estd-skel__bar {

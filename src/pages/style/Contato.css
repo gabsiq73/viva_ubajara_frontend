@@ -36,10 +36,10 @@
 .ct-hero__content {
     position: relative;
     z-index: 1;
-    max-width: 1200px;
+    max-width: var(--container-max);
     width: 100%;
     margin: 0 auto;
-    padding: 0 20px 56px;
+    padding: 0 var(--gutter) 56px;
 }
 
 .ct-hero__label {
@@ -60,8 +60,8 @@
 
 .ct-hero__title {
     font-family: 'Nunito', sans-serif;
-    font-weight: 900;
-    font-size: clamp(36px, 5vw, 60px);
+    font-weight: var(--fw-heading);
+    font-size: clamp(32px, 5vw, 60px);
     color: #fff;
     margin: 0 0 14px;
     line-height: 1.1;
@@ -78,13 +78,13 @@
 
 .ct-uteis {
     background: #f4f9f6;
-    padding: clamp(52px, 6vw, 84px) 0;
+    padding: var(--section-y-lg) 0;
 }
 
 .ct-uteis__inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
     box-sizing: border-box;
 }
 
@@ -106,16 +106,16 @@
 
 .ct-uteis__title {
     font-family: 'Nunito', sans-serif;
-    font-weight: 900;
-    font-size: clamp(28px, 3.5vw, 42px);
+    font-weight: var(--fw-heading);
+    font-size: var(--fs-h2);
     color: #00210c;
     margin: 0;
-    line-height: 1.15;
+    line-height: var(--lh-h2);
 }
 
 .ct-uteis__desc {
     font-family: 'Inter', sans-serif;
-    font-size: clamp(14px, 1.5vw, 16px);
+    font-size: clamp(var(--fs-sm), 1.5vw, 16px);
     color: #5c6670;
     margin: 0;
     max-width: 520px;
@@ -132,9 +132,9 @@
 
 .ct-group__label {
     font-family: 'Inter', sans-serif;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     margin: 0 0 18px;
     display: flex;
@@ -236,8 +236,7 @@
 
 @media (max-width: 768px) {
     .ct-hero         { height: 360px; }
-    .ct-hero__content { padding: 0 16px 44px; }
-    .ct-uteis__inner  { padding: 0 16px; }
+    .ct-hero__content { padding-bottom: 44px; }
     .ct-grid          { gap: 12px; }
 }
 

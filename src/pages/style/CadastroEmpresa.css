@@ -285,11 +285,11 @@
 
 @media (max-width: 560px) {
     .ce-section {
-        padding: 32px 0 56px;
+        padding: var(--section-y) 0 var(--section-y-lg);
     }
 
     .ce-card {
-        padding: 24px 16px;
+        padding: var(--space-6) var(--space-4);
     }
 
     .ce-card__title {
@@ -301,7 +301,7 @@
     }
 
     .ui-container.ce-layout {
-        padding-inline: 12px;
+        padding-inline: var(--gutter);
     }
 }
 

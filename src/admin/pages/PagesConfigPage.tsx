@@ -131,7 +131,7 @@ export function PagesConfigPage() {
 
       <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: 24 }}>
         {PAGES.map(({ key, label, hint }) => {
           const s = states[key];
           const descChanged = s.description !== s.savedDescription;

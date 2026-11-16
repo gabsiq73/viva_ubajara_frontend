@@ -61,9 +61,9 @@
 }
 
 .pt-hero__inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
 }
 
 .pt-hero__tag {
@@ -72,7 +72,7 @@
     background: rgba(0, 107, 50, 0.82);
     color: #ffffff;
     font-family: "Inter", sans-serif;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -93,8 +93,8 @@
 
 .pt-hero__title {
     font-family: "Nunito", sans-serif;
-    font-weight: 900;
-    font-size: clamp(34px, 5.5vw, 68px);
+    font-weight: var(--fw-heading);
+    font-size: clamp(var(--fs-h1), 5.5vw, 68px);
     color: #ffffff;
     line-height: 1.08;
     margin: 0;
@@ -168,9 +168,9 @@
 }
 
 .pt-hero__infobar-inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -268,14 +268,14 @@
 /* ─── Fotos ─── */
 .pt-photos {
     background: #ffffff;
-    padding: 0 0 clamp(40px, 5vw, 72px);
+    padding: 0 0 var(--section-y);
     scroll-margin-top: 96px;
 }
 
 .pt-photos__inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
 }
 
 .pt-photos__inner .estd-h2 {
@@ -284,14 +284,14 @@
 
 /* ─── Content + Planeje sua Visita ─── */
 .pt-content {
-    padding: clamp(36px, 5vw, 68px) 0;
+    padding: var(--section-y) 0;
     background: #ffffff;
 }
 
 .pt-content__inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
     display: grid;
     grid-template-columns: 1fr 400px;
     gap: clamp(40px, 5vw, 80px);
@@ -300,9 +300,9 @@
 
 .pt-content__kicker {
     font-family: "Inter", sans-serif;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: #006b32;
     display: block;
@@ -311,18 +311,18 @@
 
 .pt-content__title {
     font-family: "Nunito", sans-serif;
-    font-weight: 900;
-    font-size: clamp(26px, 3vw, 40px);
+    font-weight: var(--fw-heading);
+    font-size: var(--fs-h2);
     color: #00210c;
-    line-height: 1.15;
+    line-height: var(--lh-h2);
     margin: 0 0 28px;
 }
 
 .pt-content__p {
     overflow-wrap: anywhere;
     font-family: "Inter", sans-serif;
-    font-size: 15px;
-    line-height: 1.8;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
     color: #4a5c51;
     margin: 0 0 16px;
 }
@@ -365,7 +365,7 @@
 .pt-stat-pill__lbl {
     display: block;
     font-family: "Inter", sans-serif;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     font-weight: 500;
     color: #7a9080;
     text-transform: uppercase;
@@ -476,13 +476,13 @@
 /* ─── Como Chegar ─── */
 .pt-how {
     background: #f4f9f6;
-    padding: clamp(36px, 5vw, 68px) 0;
+    padding: var(--section-y) 0;
 }
 
 .pt-how__inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -490,11 +490,11 @@
 
 .pt-how__title {
     font-family: "Nunito", sans-serif;
-    font-weight: 900;
-    font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: var(--fw-heading);
+    font-size: var(--fs-h2);
     color: #00210c;
     margin: 0;
-    line-height: 1.1;
+    line-height: var(--lh-h2);
 }
 
 .pt-how__card {
@@ -587,7 +587,7 @@
         gap: 28px;
     }
     .pt-hero__title {
-        font-size: clamp(28px, 8vw, 48px);
+        font-size: clamp(var(--fs-h1), 8vw, 48px);
     }
 }
 
@@ -601,9 +601,9 @@
 }
 
 .pt-breadcrumb__inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -655,27 +655,38 @@
     .pt-breadcrumb__current {
         max-width: 160px;
     }
+    .pt-breadcrumb__link {
+        position: relative;
+    }
+    .pt-breadcrumb__link::after {
+        content: "";
+        position: absolute;
+        inset: -15px -7px;
+    }
+    .pt-related__all {
+        min-height: 44px;
+    }
 }
 
 /* ─── Pontos Recomendados ─── */
 .pt-related {
     background: #f0f7f3;
-    padding: clamp(40px, 5vw, 72px) 0;
+    padding: var(--section-y) 0;
 }
 
 .pt-related__inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
 }
 
 .pt-related__title {
     font-family: "Nunito", sans-serif;
-    font-weight: 900;
-    font-size: clamp(26px, 3vw, 38px);
+    font-weight: var(--fw-heading);
+    font-size: var(--fs-h2);
     color: #00210c;
     margin: 0 0 6px;
-    line-height: 1.15;
+    line-height: var(--lh-h2);
 }
 
 .pt-related__subtitle {

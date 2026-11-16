@@ -24,7 +24,7 @@
 
 .dash-profile-hero {
   background: linear-gradient(135deg, #153a27 0%, #1e5237 100%);
-  padding: 130px 20px 52px;
+  padding: 130px var(--gutter) 52px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -62,7 +62,7 @@
   font-size: 28px;
   font-weight: 700;
   color: #ffffff;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   letter-spacing: -0.5px;
 }
 
@@ -72,9 +72,9 @@
 }
 
 .dash-profile-name {
-  font-family: 'Merriweather', serif;
-  font-size: clamp(22px, 3vw, 30px);
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: clamp(var(--fs-h3), 3vw, 30px);
+  font-weight: var(--fw-heading);
   color: #ffffff;
   margin: 0 0 4px;
   line-height: 1.2;
@@ -113,8 +113,8 @@
   gap: 6px;
   padding: 10px 20px;
   border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--fs-btn);
+  font-weight: var(--fw-btn);
   cursor: pointer;
   transition: opacity 0.15s, transform 0.15s;
   text-decoration: none;
@@ -146,9 +146,9 @@
 /* ── Container ────────────────────────────────────────────────────────────── */
 
 .dash-container {
-  max-width: 1200px;
+  max-width: var(--container-max);
   margin: 0 auto;
-  padding: 0 20px 80px;
+  padding: 0 var(--gutter) 80px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -215,7 +215,7 @@
 }
 
 .dash-empty__title {
-  font-family: 'Merriweather', serif;
+  font-family: var(--font-display);
   font-size: 20px;
   font-weight: 700;
   color: #153a27;
@@ -305,7 +305,7 @@
 
 .dash-fav-card__type {
   display: inline-block;
-  font-size: 10px;
+  font-size: var(--fs-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -426,7 +426,7 @@
 }
 
 .dash-dep-form__title {
-  font-family: 'Merriweather', serif;
+  font-family: var(--font-display);
   font-size: 22px;
   font-weight: 700;
   color: #153a27;
@@ -482,7 +482,7 @@
   border: 1px solid #d1d5db;
   border-radius: 10px;
   font-size: max(16px, 1em);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   color: #1f2937;
   resize: vertical;
   transition: border-color 0.15s, box-shadow 0.15s;
@@ -552,7 +552,7 @@
 }
 
 .dash-dep-sent h2 {
-  font-family: 'Merriweather', serif;
+  font-family: var(--font-display);
   font-size: 22px;
   font-weight: 700;
   color: #153a27;
@@ -738,7 +738,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: 'Merriweather', serif;
+  font-family: var(--font-display);
   font-size: 17px;
   font-weight: 700;
   color: #153a27;
@@ -775,7 +775,7 @@
   border: 1px solid #d1d5db;
   border-radius: 10px;
   font-size: max(16px, 1em);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   color: #1f2937;
   transition: border-color 0.15s, box-shadow 0.15s;
   box-sizing: border-box;
@@ -811,6 +811,27 @@
     white-space: nowrap;
     padding: 10px 14px;
     font-size: 13px;
+    min-height: 44px;
+  }
+
+  .dash-action-btn {
+    min-height: 44px;
+  }
+
+  .dash-stat {
+    position: relative;
+  }
+
+  .dash-stat::after {
+    content: "";
+    position: absolute;
+    inset: -12px -4px;
+  }
+
+  .dash-avatar-camera::after {
+    content: "";
+    position: absolute;
+    inset: -10px;
   }
 
   .dash-fav-grid {

@@ -4,20 +4,13 @@
 
 body {
     margin: 0;
-    overflow-x: hidden;
 }
 
 :root {
     --kicker-size: clamp(22px, 2.4vw, 28px);
-    --section-title-size: clamp(26px, 3vw, 38px);
-    --home-section-y: clamp(40px, 5vw, 64px);
-    --home-gutter: 20px;
-}
-
-@media only screen and (max-width: 768px) {
-    :root {
-        --home-gutter: 16px;
-    }
+    --section-title-size: var(--fs-h2);
+    --home-section-y: var(--section-y);
+    --home-gutter: var(--gutter);
 }
 
 /* ── Cabeçalho de seção (padrão único) ──────────────────────────────────── */
@@ -47,9 +40,9 @@ body {
 
 .sec-head__title {
     font-family: "Nunito", sans-serif;
-    font-weight: 900;
+    font-weight: var(--fw-heading);
     font-size: var(--section-title-size);
-    line-height: 1.15;
+    line-height: var(--lh-h2);
     letter-spacing: -0.01em;
     color: #00210c;
     margin: 0;
@@ -310,7 +303,7 @@ ul.list-cards {
     width: 100%;
     margin: 0 auto -120px;
     gap: 18px;
-    padding: 10px 20px 0;
+    padding: 10px var(--gutter) 0;
     box-sizing: border-box;
 }
 
@@ -943,7 +936,7 @@ div.restaurant a:active {
 
 .pub-event-card__date span {
     font-family: "Inter", sans-serif;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -1474,7 +1467,7 @@ div.restaurant a:active {
     background: rgba(0, 107, 50, 0.9);
     color: #ffffff;
     font-family: "Inter", sans-serif;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     font-weight: 700;
     letter-spacing: 0.04em;
     padding: 5px 10px;
@@ -1538,7 +1531,7 @@ div.restaurant a:active {
 .faq__inner {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
     box-sizing: border-box;
     display: grid;
     grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
@@ -1793,14 +1786,14 @@ div.restaurant a:active {
 }
 
 .contact-section {
-    padding: clamp(40px, 5vw, 72px) 0 clamp(48px, 6vw, 88px);
+    padding: var(--section-y) 0 clamp(var(--section-y), 6vw, 88px);
     background: #ffffff;
 }
 
 .contact-section__inner {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: clamp(32px, 5vw, 72px);
@@ -1911,7 +1904,7 @@ div.restaurant a:active {
 
 .contact-section__label {
     font-family: "Inter", sans-serif;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     font-weight: 700;
     letter-spacing: 0.07em;
     text-transform: uppercase;

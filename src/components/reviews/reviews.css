@@ -6,14 +6,14 @@
 }
 
 .rv--page {
-    padding: clamp(40px, 5vw, 72px) 0;
+    padding: var(--section-y) 0;
     background: #ffffff;
 }
 
 .rv--page .rv__inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
 }
 
 .rv__inner {

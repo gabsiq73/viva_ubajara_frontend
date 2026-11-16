@@ -30,10 +30,33 @@
 
 .ui-container {
     width: 100%;
-    max-width: 1248px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 var(--gutter);
     box-sizing: border-box;
+}
+
+/* Contrato: só dentro de um pai com padding-inline: var(--gutter) (ex.: .ui-container), pois a margem negativa depende dele. */
+.ui-scroller {
+    display: flex;
+    gap: var(--space-3);
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 0 var(--gutter) var(--space-2);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: var(--gutter);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+.ui-scroller::-webkit-scrollbar {
+    display: none;
+}
+
+.ui-scroller > * {
+    flex: 0 0 min(260px, var(--scroller-peek));
+    min-width: 0;
+    scroll-snap-align: start;
 }
 
 .ui-sr-only {
@@ -182,7 +205,7 @@
 
 .ui-hero__eyebrow {
     font-family: "Inter", sans-serif;
-    font-size: 12px;
+    font-size: var(--fs-xs);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -192,7 +215,7 @@
 .ui-hero__title {
     margin: 0;
     font-family: "Nunito", sans-serif;
-    font-weight: 800;
+    font-weight: var(--fw-heading);
     font-size: 60px;
     line-height: 1.02;
     letter-spacing: -0.01em;
@@ -225,8 +248,8 @@
     border-radius: 50px;
     box-sizing: border-box;
     font-family: "Inter", sans-serif;
-    font-size: 15px;
-    font-weight: 600;
+    font-size: var(--fs-btn);
+    font-weight: var(--fw-btn);
     text-decoration: none;
     white-space: nowrap;
     cursor: pointer;
@@ -312,6 +335,11 @@
     inset: -4px 0;
 }
 
+/* O chip tem borda de 1px e o inset é relativo à área de padding. */
+.ui-chip::before {
+    inset: -5px 0;
+}
+
 .ui-chip {
     gap: 6px;
     height: 36px;
@@ -320,7 +348,7 @@
     border-radius: 50px;
     background: #ffffff;
     color: var(--pub-text);
-    font-size: 14px;
+    font-size: var(--fs-sm);
     font-weight: 500;
     transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
 }
@@ -491,7 +519,7 @@
     border-radius: 6px;
     background: rgba(255, 255, 255, 0.95);
     color: var(--pub-green-dark);
-    font-size: 11px;
+    font-size: var(--fs-xs);
     font-weight: 600;
 }
 
@@ -1535,10 +1563,6 @@
 }
 
 @media (max-width: 768px) {
-    .ui-container {
-        padding: 0 16px;
-    }
-
     .ui-hero {
         min-height: 250px;
         padding: 70px 0 20px;
@@ -1553,13 +1577,9 @@
         display: none;
     }
 
-    .ui-hero__eyebrow {
-        font-size: 11px;
-    }
-
     .ui-hero__title {
-        font-size: 32px;
-        line-height: 1.05;
+        font-size: var(--fs-h1);
+        line-height: var(--lh-h1);
     }
 
     .ui-state--empty {
