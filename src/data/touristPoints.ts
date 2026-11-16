@@ -1,9 +1,9 @@
-import cac from "../assets/images/cachoeira.png";
-import farm from "../assets/images/fazenda.png";
-import mercado from "../assets/images/mercado.png";
-import museum from "../assets/images/museu.png";
-import park from "../assets/images/parque.png";
-import route from "../assets/images/route.png";
+import cac from "../assets/images/cachoeira.webp";
+import farm from "../assets/images/fazenda.webp";
+import mercado from "../assets/images/mercado.webp";
+import museum from "../assets/images/museu.webp";
+import park from "../assets/images/parque.webp";
+import route from "../assets/images/route.webp";
 
 export interface TouristPoint {
     id: number;

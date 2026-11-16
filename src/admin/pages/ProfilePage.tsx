@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../components/Toast';
 import { FormInput } from '../components/FormField';
 import { Spinner } from '../components/Spinner';
+import { RemovePhotoDialog } from '../components/RemovePhotoDialog';
 import { ShieldCheck, User, UserCog, Save, KeyRound, Camera, Loader, Trash2 } from 'lucide-react';
 import type { UserResponse } from '../types';
 
@@ -34,6 +35,7 @@ export function ProfilePage() {
   const [pwdError, setPwdError] = useState('');
 
   const [removingPhoto, setRemovingPhoto] = useState(false);
+  const [confirmRemovePhoto, setConfirmRemovePhoto] = useState(false);
 
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
@@ -119,6 +121,7 @@ export function ProfilePage() {
       showToast('Erro ao remover foto.', 'error');
     } finally {
       setRemovingPhoto(false);
+      setConfirmRemovePhoto(false);
     }
   };
 
@@ -161,6 +164,7 @@ export function ProfilePage() {
               onClick={() => photoInputRef.current?.click()}
               disabled={uploadingPhoto}
               title="Alterar foto de perfil"
+              aria-label="Alterar foto de perfil"
               style={{
                 position: 'absolute', bottom: 0, right: 0,
                 width: 28, height: 28, borderRadius: '50%',
@@ -172,7 +176,7 @@ export function ProfilePage() {
             >
               {uploadingPhoto
                 ? <Loader size={13} style={{ animation: 'adm-spin 0.6s linear infinite' }} />
-                : <Camera size={13} />
+                : <Camera size={13} aria-hidden="true" />
               }
             </button>
             <input
@@ -205,11 +209,11 @@ export function ProfilePage() {
             <button
               type="button"
               className="adm-btn adm-btn--danger adm-btn--sm"
-              onClick={handleRemovePhoto}
+              onClick={() => setConfirmRemovePhoto(true)}
               disabled={removingPhoto}
               style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}
             >
-              {removingPhoto ? <Loader size={12} style={{ animation: 'adm-spin 0.6s linear infinite' }} /> : <Trash2 size={12} />}
+              {removingPhoto ? <Loader size={12} aria-hidden="true" style={{ animation: 'adm-spin 0.6s linear infinite' }} /> : <Trash2 size={12} aria-hidden="true" />}
               Remover foto
             </button>
           )}
@@ -223,12 +227,12 @@ export function ProfilePage() {
         </h3>
         <form className="adm-form" onSubmit={handleInfoSubmit}>
           <div className="adm-form-row">
-            <FormInput label="Nome" value={firstName} onChange={(e) => setFirstName(e.target.value)} maxLength={20} />
-            <FormInput label="Sobrenome" value={lastName} onChange={(e) => setLastName(e.target.value)} maxLength={20} />
+            <FormInput label="Nome" autoComplete="given-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} maxLength={20} />
+            <FormInput label="Sobrenome" autoComplete="family-name" value={lastName} onChange={(e) => setLastName(e.target.value)} maxLength={20} />
           </div>
           <div className="adm-form-row">
-            <FormInput label="Username" value={username} onChange={(e) => setUsername(e.target.value)} maxLength={30} hint="Máx. 30 caracteres" />
-            <FormInput label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <FormInput label="Username" autoComplete="username" spellCheck={false} value={username} onChange={(e) => setUsername(e.target.value)} maxLength={30} hint="Máx. 30 caracteres" />
+            <FormInput label="Email" type="email" inputMode="email" autoComplete="email" spellCheck={false} value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="adm-form-actions">
             <button type="submit" className="adm-btn adm-btn--primary" disabled={savingInfo} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -281,6 +285,14 @@ export function ProfilePage() {
           </div>
         </form>
       </div>
+
+      {confirmRemovePhoto && (
+        <RemovePhotoDialog
+          loading={removingPhoto}
+          onConfirm={handleRemovePhoto}
+          onCancel={() => setConfirmRemovePhoto(false)}
+        />
+      )}
     </div>
   );
 }

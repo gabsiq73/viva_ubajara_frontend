@@ -60,6 +60,7 @@
   color: var(--adm-text);
   min-height: 100vh;
   display: flex;
+  line-height: normal; /* painel tem ritmo próprio: não herda o line-height do site público */
 }
 
 /* Tipografia especial para títulos */
@@ -83,6 +84,27 @@
   transition: transform var(--adm-transition);
 }
 
+.adm-sidebar__close {
+  display: none;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: var(--adm-radius-sm);
+  background: none;
+  color: var(--adm-sidebar-text);
+  cursor: pointer;
+  z-index: 1;
+}
+
+.adm-sidebar__close:hover {
+  background: var(--adm-sidebar-hover);
+}
+
 .adm-sidebar__logo {
   flex-shrink: 0;
   padding: 20px 24px 12px;
@@ -90,6 +112,8 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
+  text-decoration: none;
+  color: inherit;
 }
 
 .adm-sidebar__logo-img {
@@ -290,6 +314,7 @@
   margin-left: var(--adm-sidebar-width);
   margin-top: var(--adm-topbar-h);
   flex: 1;
+  min-width: 0;
   padding: 40px 48px;
   min-height: calc(100vh - var(--adm-topbar-h));
 }
@@ -412,8 +437,10 @@
 
 .adm-page-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  gap: 12px 16px;
   margin-bottom: 32px;
 }
 
@@ -578,7 +605,8 @@
   gap: 8px;
 }
 
-.adm-field label {
+.adm-field label,
+.adm-label {
   font-size: 13px;
   font-weight: 600;
   color: var(--adm-text);
@@ -586,7 +614,8 @@
 
 .adm-field input,
 .adm-field textarea,
-.adm-field select {
+.adm-field select,
+.adm-select {
   padding: 12px 16px;
   background: #fcfcfc;
   border: 1px solid var(--adm-border);
@@ -600,7 +629,8 @@
 
 .adm-field input:focus,
 .adm-field textarea:focus,
-.adm-field select:focus {
+.adm-field select:focus,
+.adm-select:focus {
   border-color: var(--adm-green);
   background: #fff;
   box-shadow: 0 0 0 3px var(--adm-green-dim);
@@ -608,13 +638,20 @@
 
 .adm-field input.error,
 .adm-field textarea.error,
-.adm-field select.error {
+.adm-field select.error,
+.adm-select.error {
   border-color: var(--adm-red);
 }
 
-.adm-field__error {
+.adm-field__error,
+.adm-error {
   font-size: 13px;
   color: var(--adm-red);
+}
+
+.adm-required {
+  color: var(--adm-red);
+  margin-left: 2px;
 }
 
 .adm-field textarea {
@@ -807,7 +844,9 @@
   border: 1px solid var(--adm-border);
   box-shadow: var(--adm-shadow-md);
   font-size: 14px;
-  min-width: 320px;
+  min-width: min(320px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  overflow-wrap: anywhere;
   animation: adm-slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -1471,12 +1510,15 @@
   }
 
   /* Overlay ao abrir sidebar */
-  .adm-root.sidebar-open::after {
-    content: '';
+  .adm-sidebar-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.45);
     z-index: 99;
+  }
+
+  .adm-sidebar__close {
+    display: flex;
   }
 
   /* Topbar */
@@ -1487,6 +1529,16 @@
 
   .adm-topbar__menu-btn {
     display: flex;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .adm-page-header {
+    margin-bottom: 20px;
+  }
+
+  .adm-page-title {
+    font-size: 22px;
   }
 
   /* Main */
@@ -1570,4 +1622,95 @@
   font-size: 12px;
   color: var(--adm-text-dim);
   font-weight: 400;
+}
+/* ============ REIVINDICAÇÕES ============ */
+.adm-claim {
+  max-height: 62vh;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.adm-claim__status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--adm-text-muted);
+}
+
+.adm-claim__heading {
+  margin: 20px 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--adm-green);
+}
+
+.adm-claim__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 24px;
+  margin: 0;
+}
+
+.adm-claim__item {
+  min-width: 0;
+}
+
+.adm-claim__item dt {
+  font-size: 12px;
+  color: var(--adm-text-muted);
+}
+
+.adm-claim__item dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.adm-claim__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--adm-green);
+  font-weight: 600;
+}
+
+.adm-claim__message {
+  padding: 16px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .adm-topbar__user-info {
+    display: none;
+  }
+
+  .adm-topbar__user {
+    padding-left: 12px;
+  }
+
+  .adm-topbar__right {
+    min-width: 0;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 560px) {
+  .adm-claim__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adm-toast-container {
+    left: 16px;
+    right: 16px;
+  }
 }

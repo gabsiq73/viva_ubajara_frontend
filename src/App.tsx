@@ -1,30 +1,58 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { lazy, Suspense, type MouseEvent } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import "./pages/style/globalStyle.css";
+import "./pages/style/SkipLink.css";
 import { AuthProvider } from "./admin/contexts/AuthContext";
 
 import Index from "./pages/Index";
-import PontoTuristico from "./pages/PontoTuristico";
-import PontosTuristicos from "./pages/PontosTuristicos";
-import Local from "./pages/Local";
-import Estabelecimentos from "./pages/Estabelecimentos";
-import Estabelecimento from "./pages/Estabelecimento";
-import CadastroEmpresa from "./pages/CadastroEmpresa";
-import Eventos from "./pages/Eventos";
-import Evento from "./pages/Evento";
-import ComoChegar from "./pages/ComoChegar";
-import Depoimentos from "./pages/Depoimentos";
-import Contato from "./pages/Contato";
-import Dashboard from "./pages/Dashboard";
-import { LoginSuccessPage } from "./pages/LoginSuccessPage";
-import { AdminRouter } from "./admin/AdminRouter";
-import { CompanyRouter } from "./company/CompanyRouter";
+import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
+import ChunkErrorBoundary from "./components/ChunkErrorBoundary";
+import { PageLoading } from "./pages/PageState";
 
-function App() {
+const PontoTuristico = lazy(() => import("./pages/PontoTuristico"));
+const PontosTuristicos = lazy(() => import("./pages/PontosTuristicos"));
+const Local = lazy(() => import("./pages/Local"));
+const Estabelecimentos = lazy(() => import("./pages/Estabelecimentos"));
+const Estabelecimento = lazy(() => import("./pages/Estabelecimento"));
+const CadastroEmpresa = lazy(() => import("./pages/CadastroEmpresa"));
+const Eventos = lazy(() => import("./pages/Eventos"));
+const Evento = lazy(() => import("./pages/Evento"));
+const ComoChegar = lazy(() => import("./pages/ComoChegar"));
+const Depoimentos = lazy(() => import("./pages/Depoimentos"));
+const Contato = lazy(() => import("./pages/Contato"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const LoginSuccessPage = lazy(() =>
+  import("./pages/LoginSuccessPage").then((m) => ({ default: m.LoginSuccessPage })),
+);
+const AdminRouter = lazy(() => import("./admin/AdminRouter").then((m) => ({ default: m.AdminRouter })));
+const CompanyRouter = lazy(() => import("./company/CompanyRouter").then((m) => ({ default: m.CompanyRouter })));
+
+function SkipLink() {
+  const { pathname } = useLocation();
+  if (pathname.startsWith("/admin") || pathname.startsWith("/empresa")) return null;
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    const target = document.getElementById("conteudo");
+    if (!target) return;
+    event.preventDefault();
+    target.focus();
+    target.scrollIntoView();
+  };
+
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <ScrollToTop />
+    <a href="#conteudo" className="skip-link" onClick={handleClick}>
+      Ir para o conteúdo
+    </a>
+  );
+}
+
+function AppRoutes() {
+  const { pathname } = useLocation();
+
+  return (
+    <ChunkErrorBoundary resetKey={pathname}>
+      <Suspense fallback={<PageLoading fullPage />}>
         <Routes>
           {/* ─── Rotas públicas ─── */}
           <Route path="/" element={<Index />} />
@@ -51,7 +79,21 @@ function App() {
 
           {/* ─── Área self-service da empresa ─── */}
           <Route path="/empresa/*" element={<CompanyRouter />} />
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
+      </Suspense>
+    </ChunkErrorBoundary>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <SkipLink />
+        <ScrollToTop />
+        <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
   );

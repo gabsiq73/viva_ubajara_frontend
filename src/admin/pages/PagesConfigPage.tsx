@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { pageConfigService } from '../services/pageConfigService';
 import { useToast } from '../components/Toast';
 import { Spinner } from '../components/Spinner';
+import { RemovePhotoDialog } from '../components/RemovePhotoDialog';
 import { Upload, Trash2, Save } from 'lucide-react';
 
 interface PageCard {
@@ -35,6 +36,7 @@ const EMPTY_STATE: PageState = {
 
 export function PagesConfigPage() {
   const { showToast } = useToast();
+  const [removeKey, setRemoveKey] = useState<string | null>(null);
   const [states, setStates] = useState<Record<string, PageState>>(
     Object.fromEntries(PAGES.map(p => [p.key, { ...EMPTY_STATE }]))
   );
@@ -97,7 +99,7 @@ export function PagesConfigPage() {
     } catch (err) {
       const msg = apiErrorMsg(err);
       showToast(`Erro ao remover imagem de "${label}"${msg ? `: ${msg}` : '.'}`, 'error');
-    } finally { update(key, { imageLoading: false }); }
+    } finally { update(key, { imageLoading: false }); setRemoveKey(null); }
   };
 
   const handleSaveDescription = async (key: string) => {
@@ -129,7 +131,7 @@ export function PagesConfigPage() {
 
       <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))', gap: 24 }}>
         {PAGES.map(({ key, label, hint }) => {
           const s = states[key];
           const descChanged = s.description !== s.savedDescription;
@@ -142,7 +144,7 @@ export function PagesConfigPage() {
                   <img src={s.imageUrl} alt={label} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--adm-text-muted)', fontSize: 13, flexDirection: 'column', gap: 8 }}>
-                    <Upload size={28} style={{ opacity: 0.4 }} />
+                    <Upload size={28} aria-hidden="true" style={{ opacity: 0.4 }} />
                     <span>Sem imagem de capa</span>
                   </div>
                 )}
@@ -160,21 +162,22 @@ export function PagesConfigPage() {
                 {/* Image actions */}
                 <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
                   <button className="adm-btn adm-btn--primary adm-btn--sm" onClick={() => triggerUpload(key)} disabled={s.imageLoading}>
-                    <Upload size={14} /> {s.imageUrl ? 'Trocar capa' : 'Enviar capa'}
+                    <Upload size={14} aria-hidden="true" /> {s.imageUrl ? 'Trocar capa' : 'Enviar capa'}
                   </button>
                   {s.imageUrl && (
-                    <button className="adm-btn adm-btn--danger adm-btn--sm" onClick={() => handleRemoveImage(key)} disabled={s.imageLoading}>
-                      <Trash2 size={14} />
+                    <button className="adm-btn adm-btn--danger adm-btn--sm" onClick={() => setRemoveKey(key)} disabled={s.imageLoading} aria-label={`Remover capa de ${label}`}>
+                      <Trash2 size={14} aria-hidden="true" />
                     </button>
                   )}
                 </div>
 
                 {/* Description */}
                 <div style={{ marginBottom: 10 }}>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--adm-text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <label htmlFor={`page-desc-${key}`} style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--adm-text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     Descrição da página
                   </label>
                   <textarea
+                    id={`page-desc-${key}`}
                     value={s.description}
                     onChange={(e) => update(key, { description: e.target.value })}
                     placeholder="Texto exibido no subtítulo da página..."
@@ -203,13 +206,21 @@ export function PagesConfigPage() {
                   onClick={() => handleSaveDescription(key)}
                   disabled={s.descSaving || !descChanged}
                 >
-                  <Save size={14} /> {s.descSaving ? 'Salvando…' : 'Salvar descrição'}
+                  <Save size={14} aria-hidden="true" /> {s.descSaving ? 'Salvando…' : 'Salvar descrição'}
                 </button>
               </div>
             </div>
           );
         })}
       </div>
+
+      {removeKey && (
+        <RemovePhotoDialog
+          loading={states[removeKey].imageLoading}
+          onConfirm={() => handleRemoveImage(removeKey)}
+          onCancel={() => setRemoveKey(null)}
+        />
+      )}
     </div>
   );
 }

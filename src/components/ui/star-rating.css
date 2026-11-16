@@ -1,0 +1,44 @@
+.ui-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ui-star-picker {
+  display: flex;
+  gap: 4px;
+}
+
+.ui-star-picker__btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #e5e7eb;
+  padding: 2px;
+  transition: color 0.12s, transform 0.12s;
+  display: flex;
+  align-items: center;
+}
+
+.ui-star-picker__btn.filled {
+  color: #FFB527;
+}
+
+.ui-star-picker__btn:hover {
+  transform: scale(1.15);
+}
+
+.ui-star-picker__btn:focus-visible {
+  outline: 3px solid #2d8a54;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-star-picker__btn {
+    transition: none;
+  }
+
+  .ui-star-picker__btn:hover {
+    transform: none;
+  }
+}

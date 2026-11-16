@@ -1,160 +1,177 @@
 import type { JSX } from 'react';
-import { useState, useEffect, useRef } from "react";
-import Navbar from "./Navbar";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import "./styles/Header.components.css";
-import logo from './../assets/images/logo.webp';
-import { Link } from "react-router-dom";
-import { Heart, LogOut, LayoutDashboard, User } from 'lucide-react';
+import "./ui/ui.css";
+import Navbar from "./Navbar";
+import Icon from "./ui/Icon";
 import { useAuth } from '../admin/hooks/useAuth';
+import MobileMenu from "./layout/MobileMenu";
+import SiteLogo from "./layout/SiteLogo";
+import SiteSearchForm from "./layout/SiteSearchForm";
+import UserMenu from "./layout/UserMenu";
+import { useFavoritesCount } from "./layout/useFavoritesCount";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 
-const ROLE_LABELS: Record<string, string> = {
-    ADMIN: 'Administrador',
-    USER: 'Usuário',
-    GUIDE: 'Guia Turístico',
-};
+const SCROLL_THRESHOLD = 80;
 
-export default function Header(): JSX.Element {
+interface HeaderProps {
+    /** Páginas sem hero: o header já nasce no estado "rolado" (branco). */
+    solid?: boolean;
+}
+
+export default function Header({ solid = false }: HeaderProps): JSX.Element {
+    const location = useLocation();
+    const { isAuthenticated } = useAuth();
+    const favoritesCount = useFavoritesCount();
+    const isDesktop = useMediaQuery("(min-width: 1024px)");
+    const menuId = useId();
+    const searchPanelId = useId();
+
     const [scrolled, setScrolled] = useState(false);
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const { isAuthenticated, user, logout } = useAuth();
-    const dropdownRef = useRef<HTMLDivElement>(null);
+    const [menuKey, setMenuKey] = useState<string | null>(null);
+    const [menuFocusSearch, setMenuFocusSearch] = useState(false);
+    const [searchKey, setSearchKey] = useState<string | null>(null);
 
-    const displayName = user?.name || user?.email?.split('@')[0] || '';
-    const initials = displayName.slice(0, 2).toUpperCase();
-    const roleLabel = user?.role ? (ROLE_LABELS[user.role] ?? user.role) : '';
+    // Menu e busca ficam atrelados à navegação atual: mudar de rota os fecha sem efeito colateral.
+    const menuOpen = !isDesktop && menuKey === location.key;
+    const searchOpen = isDesktop && searchKey === location.key;
+
+    // Ao cruzar o breakpoint, menu/busca abertos não podem reaparecer ao voltar.
+    const [prevDesktop, setPrevDesktop] = useState(isDesktop);
+    if (prevDesktop !== isDesktop) {
+        setPrevDesktop(isDesktop);
+        setMenuKey(null);
+        setSearchKey(null);
+    }
+
+    const menuToggleRef = useRef<HTMLButtonElement>(null);
+    const searchButtonRef = useRef<HTMLButtonElement>(null);
+    const searchPanelRef = useRef<HTMLDivElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        const handler = (e: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-                setDropdownOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, []);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.scrollY > 50) {
-                setScrolled(true);
-            } else {
-                setScrolled(false);
-            }
-        };
-        window.addEventListener("scroll", handleScroll);
+        const handleScroll = () => setScrolled(window.scrollY > SCROLL_THRESHOLD);
+        // Lido só na montagem: durante o render o scrollY ainda é o da página anterior.
+        handleScroll();
+        window.addEventListener("scroll", handleScroll, { passive: true });
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    return(
-        <header className={`header ${scrolled ? 'scrolled' : ''}`}>
-            <input type="checkbox" name="menu-mobile" id="menu-mobile" />
-            <label
-                htmlFor="menu-mobile"
-                className="menu-backdrop"
-                aria-label="Fechar menu"
-            />
+    useEffect(() => {
+        if (!searchOpen) return;
+        searchInputRef.current?.focus();
 
-            <div className="header-container">
-                <label htmlFor="menu-mobile" id="check">
-                    <div className="menu-hamburguer">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                setSearchKey(null);
+                searchButtonRef.current?.focus();
+            }
+        };
+        const onPointerDown = (event: MouseEvent) => {
+            const target = event.target as Node;
+            if (!searchPanelRef.current?.contains(target) && !searchButtonRef.current?.contains(target)) {
+                setSearchKey(null);
+            }
+        };
+        document.addEventListener("keydown", onKeyDown);
+        document.addEventListener("mousedown", onPointerDown);
+        return () => {
+            document.removeEventListener("keydown", onKeyDown);
+            document.removeEventListener("mousedown", onPointerDown);
+        };
+    }, [searchOpen]);
+
+    const openMenu = (focusSearch: boolean) => {
+        setMenuFocusSearch(focusSearch);
+        setMenuKey(location.key);
+    };
+
+    const closeMenu = useCallback(() => {
+        setMenuKey(null);
+        menuToggleRef.current?.focus();
+    }, []);
+
+    const isSolid = solid || scrolled || searchOpen;
+    const favoritesLabel = favoritesCount > 0 ? `Favoritos (${favoritesCount})` : "Favoritos";
+
+    return (
+        <header className={`site-header${isSolid ? " is-solid" : ""}${menuOpen ? " is-menu-open" : ""}`}>
+            <div className="site-header__inner">
+                <Link to="/" className="site-header__logo">
+                    <SiteLogo />
+                </Link>
+
+                {isDesktop && (
+                    <div className="site-header__nav">
+                        <Navbar />
                     </div>
-                </label>
+                )}
 
-                <div className="logo grid-l">
-                    <div className="img">
-                        <Link to="/">
-                            <img src={logo} alt="Logo" />
-                        </Link>
-                    </div>
-                </div>
-
-                <div className="nav">
-                    <Navbar/>
-                </div>
-
-                <div className="icon-position">
-                    {isAuthenticated && user ? (
-                        <div className="header-auth" ref={dropdownRef}>
-                            <Link to="/dashboard?tab=favorites" className="header-favorites" title="Meus Favoritos" aria-label="Meus Favoritos">
-                                <Heart size={20} />
-                            </Link>
-
+                <div className="site-header__actions">
+                    {isDesktop ? (
+                        <>
                             <button
-                                className="header-user-btn"
-                                onClick={() => setDropdownOpen(v => !v)}
-                                aria-label="Menu do usuário"
-                                aria-expanded={dropdownOpen}
+                                ref={searchButtonRef}
+                                type="button"
+                                className="site-header__icon-btn"
+                                aria-label="Buscar"
+                                aria-expanded={searchOpen}
+                                aria-controls={searchOpen ? searchPanelId : undefined}
+                                onClick={() => setSearchKey(searchOpen ? null : location.key)}
                             >
-                                <div className="header-user-btn__avatar">
-                                    {user.photo
-                                        ? <img src={user.photo} alt={displayName} />
-                                        : <span>{initials}</span>
-                                    }
-                                </div>
-                                <span className="header-user-btn__dot" aria-hidden="true" />
+                                <Icon name="search" />
                             </button>
-
-                            {dropdownOpen && (
-                                <div className="header-user__dropdown" role="menu">
-                                    <div className="header-user__dropdown-profile">
-                                        <div className="header-user__dropdown-avatar">
-                                            {user.photo
-                                                ? <img src={user.photo} alt={displayName} />
-                                                : <span>{initials}</span>
-                                            }
-                                        </div>
-                                        <div className="header-user__dropdown-info">
-                                            <strong>{displayName}</strong>
-                                            <span>{roleLabel}</span>
-                                        </div>
-                                    </div>
-                                    <div className="header-user__dropdown-divider" />
-                                    <Link
-                                        to="/dashboard"
-                                        className="header-user__dropdown-action"
-                                        onClick={() => setDropdownOpen(false)}
-                                    >
-                                        <User size={14} />
-                                        Meu Perfil
-                                    </Link>
-                                    {user.role === 'ADMIN' && (
-                                        <Link
-                                            to="/admin"
-                                            className="header-user__dropdown-action"
-                                            onClick={() => setDropdownOpen(false)}
-                                        >
-                                            <LayoutDashboard size={14} />
-                                            Painel Admin
-                                        </Link>
-                                    )}
-                                    <button
-                                        className="header-user__dropdown-logout"
-                                        onClick={() => { logout(); setDropdownOpen(false); }}
-                                    >
-                                        <LogOut size={14} />
-                                        Sair
-                                    </button>
-                                </div>
+                            <Link to="/dashboard?tab=favorites" className="site-header__icon-btn" aria-label={favoritesLabel}>
+                                <Icon name="favorite" />
+                                {favoritesCount > 0 && <span className="site-header__dot" aria-hidden="true" />}
+                            </Link>
+                            {isAuthenticated ? (
+                                <UserMenu />
+                            ) : (
+                                <Link to="/admin/login" className="site-header__login">
+                                    <Icon name="person" />
+                                    Entrar
+                                </Link>
                             )}
-                        </div>
+                        </>
                     ) : (
-                        <Link to="/admin/login" className="header-login-btn">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                <circle cx="12" cy="7" r="4" />
-                            </svg>
-                            <span>LOGIN</span>
-                        </Link>
+                        <>
+                            <button
+                                type="button"
+                                className="site-header__icon-btn"
+                                aria-label="Buscar"
+                                onClick={() => openMenu(true)}
+                            >
+                                <Icon name="search" />
+                            </button>
+                            <button
+                                ref={menuToggleRef}
+                                type="button"
+                                className="site-header__icon-btn site-header__menu-btn"
+                                aria-label="Abrir menu"
+                                aria-expanded={menuOpen}
+                                aria-controls={menuId}
+                                onClick={() => openMenu(false)}
+                            >
+                                <Icon name="menu" />
+                            </button>
+                        </>
                     )}
                 </div>
-
-                <div className="mobile-contact-btn">
-                    <Link to="/contato">CONTATO</Link>
-                </div>
             </div>
+
+            {searchOpen && (
+                <div className="site-header__search-panel" id={searchPanelId} ref={searchPanelRef}>
+                    <div className="site-header__search-inner">
+                        <SiteSearchForm variant="panel" inputRef={searchInputRef} />
+                    </div>
+                </div>
+            )}
+
+            {!isDesktop && (
+                <MobileMenu id={menuId} open={menuOpen} focusSearch={menuFocusSearch} onClose={closeMenu} />
+            )}
         </header>
-    )
+    );
 }

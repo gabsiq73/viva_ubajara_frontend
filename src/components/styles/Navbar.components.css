@@ -1,237 +1,100 @@
-.navbar ul{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.site-nav__list {
     list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
-/* Hidden on desktop, shown in mobile drawer */
-.navbar-user-mobile {
-    display: none;
-}
-.navbar ul li{
-    margin-left: 20px;
-    text-transform: uppercase;
-}
-.navbar ul li a{
-    color: #ffffff;
+.site-nav__link {
     text-decoration: none;
-    font-weight: 500;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    font-family: 'Inter';
-    font-size: 14px;
-    position: relative;
-    transition: color 0.3s ease;
+    color: inherit;
 }
 
-.navbar ul li:not(#contact) a::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: -4px;
-    left: 50%;
-    background-color: #FFB527;
-    transition: all 0.3s ease;
-    transform: translateX(-50%);
-}
-
-.navbar ul li:not(#contact) a:hover,
-.navbar ul li:not(#contact) a.nav-active {
-    color: #FFB527;
-}
-
-.navbar ul li:not(#contact) a:hover::after,
-.navbar ul li:not(#contact) a.nav-active::after {
-    width: 100%;
-}
-.navbar ul li#contact{
-    margin-left: 30px;
+/* ── Barra desktop ── */
+.site-nav--bar .site-nav__list {
     display: flex;
-    justify-content: center;
+    align-items: center;
+    gap: 4px;
 }
-.navbar ul li#contact a{
-    background-color: transparent;
-    padding: 8px 20px;
-    border: 1.5px solid #ffffff;
+
+.site-nav--bar .site-nav__link {
+    display: inline-flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 14px;
     border-radius: 50px;
-    text-align: center;
-    color: #ffffff !important;
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background 250ms cubic-bezier(0.4, 0, 0.2, 1), color 250ms cubic-bezier(0.4, 0, 0.2, 1), height 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.site-nav--bar .site-nav__link:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.site-nav--bar .site-nav__link.is-active {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.site-nav--bar .site-nav__link:focus-visible {
+    outline: 2px solid #f3c66b;
+    outline-offset: 2px;
+}
+
+.site-header.is-solid .site-nav--bar .site-nav__link {
+    height: 36px;
+}
+
+.site-header.is-solid .site-nav--bar .site-nav__link:hover {
+    background: #f0f7f3;
+}
+
+.site-header.is-solid .site-nav--bar .site-nav__link.is-active {
+    background: #e8f5ef;
+    color: #006b32;
     font-weight: 600;
-    font-size: 13px;
-    transition: all 0.3s ease;
-    text-shadow: none;
-}
-.navbar ul li#contact a:hover {
-    background-color: #ffffff;
-    color: #006B32 !important;
 }
 
-/*Responsive*/
+.site-header.is-solid .site-nav--bar .site-nav__link:focus-visible {
+    outline-color: #006b32;
+}
 
-@media only screen and (max-width: 1024px){
-    /* Contato só na barra superior no mobile; não repetir no drawer */
-    .navbar ul li#contact {
-        display: none;
-    }
+/* ── Menu mobile (tela cheia) ── */
+.site-nav--menu {
+    padding: 20px 16px 0;
+}
 
-    .navbar, .menu {
-        width: 100%;
-        max-width: 100%;
-        height: auto;
-        box-sizing: border-box;
-    }
-    .navbar ul {
-        flex-direction: column;
-        width: 100%;
-        max-width: 100%;
-        gap: 14px;
-        justify-content: flex-start;
-        align-items: stretch;
-        padding: 8px 4px 0;
-        box-sizing: border-box;
-    }
-    .navbar ul li {
-        margin-left: 0;
-        width: 100%;
-        max-width: 100%;
-        text-align: left;
-    }
-    .navbar ul li a {
-        font-size: 15px;
-        display: block;
-        padding: 10px 0;
-        box-sizing: border-box;
-    }
+.site-nav--menu .site-nav__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 60px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: "Nunito", sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #ffffff;
+}
 
-    /* Make navbar fill the drawer height so user section can stick to bottom */
-    .navbar {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        width: 100%;
-    }
+.site-nav--menu .site-nav__arrow {
+    font-size: 22px;
+    color: #9fc9b1;
+}
 
-    /* User section — mobile drawer only */
-    .navbar-user-mobile {
-        display: block;
-        margin-top: auto;
-        padding-top: 20px;
-        border-top: 1px solid rgba(255, 255, 255, 0.12);
-    }
+.site-nav--menu .site-nav__link.is-active,
+.site-nav--menu .site-nav__link.is-active .site-nav__arrow {
+    color: #f3c66b;
+}
 
-    .navbar-user-mobile__info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
+.site-nav--menu .site-nav__link:focus-visible {
+    outline: 2px solid #f3c66b;
+    outline-offset: -2px;
+    border-radius: 8px;
+}
 
-    /* Avatar com foto ou iniciais + ponto verde */
-    .navbar-user-mobile__avatar {
-        position: relative;
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        background: #FFB527;
-        color: #153a27;
-        font-size: 14px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        font-family: 'Inter', sans-serif;
-        overflow: visible;
-        border: 2px solid rgba(255, 255, 255, 0.4);
-    }
-    .navbar-user-mobile__avatar span:first-child {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        overflow: hidden;
-    }
-    .navbar-user-mobile__avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 50%;
-    }
-    .navbar-user-mobile__dot {
-        position: absolute !important;
-        bottom: 0;
-        right: 0;
-        width: 11px;
-        height: 11px;
-        background: #22c55e;
-        border-radius: 50%;
-        border: 2px solid #003016;
-        pointer-events: none;
-        display: block !important;
-    }
-
-    .navbar-user-mobile__details {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        flex: 1;
-        min-width: 0;
-    }
-
-    .navbar-user-mobile__name {
-        color: #ffffff;
-        font-size: 14px;
-        font-weight: 600;
-        font-family: 'Inter', sans-serif;
-        text-transform: capitalize;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .navbar-user-mobile__role {
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 11px;
-        font-family: 'Inter', sans-serif;
-    }
-
-    .navbar-user-mobile__logout {
-        background: rgba(255, 255, 255, 0.08);
-        color: rgba(255, 255, 255, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        padding: 7px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        transition: background 0.2s;
-    }
-    .navbar-user-mobile__logout:hover {
-        background: rgba(239, 68, 68, 0.15);
-        color: #fca5a5;
-    }
-
-    .navbar-login-btn-mobile {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        color: #ffffff;
-        text-decoration: none;
-        font-family: 'Inter', sans-serif;
-        font-size: 14px;
-        font-weight: 600;
-        padding: 12px;
-        border: 1.5px solid rgba(255, 255, 255, 0.4);
-        border-radius: 8px;
-        transition: all 0.25s ease;
-        letter-spacing: 0.5px;
-    }
-    .navbar-login-btn-mobile:hover {
-        background: rgba(255, 255, 255, 0.1);
+@media (prefers-reduced-motion: reduce) {
+    .site-nav--bar .site-nav__link {
+        transition: none;
     }
 }

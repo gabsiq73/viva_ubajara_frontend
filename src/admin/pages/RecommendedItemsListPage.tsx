@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useUrlListState } from '../hooks/useUrlListState';
 import { recommendedItemsService } from '../services/recommendedItemsService';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
@@ -9,15 +10,13 @@ import type { ReactNode } from 'react';
 import { Star, StarOff, Pencil, Trash2, Search, Plus } from 'lucide-react';
 
 export function RecommendedItemsListPage() {
-  const navigate = useNavigate();
   const { showToast } = useToast();
 
   const [items, setItems] = useState<RecommendedItemResponse[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-  const [search, setSearch] = useState('');
+  const { page, search, setPage, setSearch } = useUrlListState();
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -25,6 +24,10 @@ export function RecommendedItemsListPage() {
     setLoading(true);
     try {
       const data = await recommendedItemsService.getAll(page, 10);
+      if (page > 0 && data.content.length === 0 && data.totalPages > 0) {
+        setPage(data.totalPages - 1, true);
+        return;
+      }
       setItems(data.content);
       setTotalPages(data.totalPages);
       setTotalElements(data.totalElements);
@@ -33,7 +36,7 @@ export function RecommendedItemsListPage() {
     } finally {
       setLoading(false);
     }
-  }, [page]);
+  }, [page, setPage, showToast]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -92,11 +95,11 @@ export function RecommendedItemsListPage() {
       width: '100px',
       accessor: (item: RecommendedItemResponse): ReactNode => (
         <div className="adm-table__actions">
-          <button className="adm-btn adm-btn--ghost adm-btn--sm" onClick={() => navigate(`/admin/recommended-items/${item.id}/edit`)}>
-            <Pencil size={14} />
-          </button>
-          <button className="adm-btn adm-btn--danger adm-btn--sm" onClick={() => setDeleteTarget(item.id)}>
-            <Trash2 size={14} />
+          <Link className="adm-btn adm-btn--ghost adm-btn--sm" to={`/admin/recommended-items/${item.id}/edit`} aria-label={`Editar ${item.name}`}>
+            <Pencil size={14} aria-hidden="true" />
+          </Link>
+          <button className="adm-btn adm-btn--danger adm-btn--sm" onClick={() => setDeleteTarget(item.id)} aria-label={`Excluir ${item.name}`}>
+            <Trash2 size={14} aria-hidden="true" />
           </button>
         </div>
       ),
@@ -107,15 +110,20 @@ export function RecommendedItemsListPage() {
     <div>
       <div className="adm-page-header">
         <h2 className="adm-page-title">Itens Recomendados <span>{totalElements} registros</span></h2>
-        <button className="adm-btn adm-btn--primary" onClick={() => navigate('/admin/recommended-items/new')}>
-          <Plus size={16} /> Novo Item
-        </button>
+        <Link className="adm-btn adm-btn--primary" to="/admin/recommended-items/new">
+          <Plus size={16} aria-hidden="true" /> Novo Item
+        </Link>
       </div>
 
       <div className="adm-card">
         <div className="adm-search">
-          <span className="adm-search__icon"><Search size={18} /></span>
+          <span className="adm-search__icon" aria-hidden="true"><Search size={18} aria-hidden="true" /></span>
           <input
+            type="search"
+            name="q"
+            aria-label="Buscar itens recomendados"
+            autoComplete="off"
+            spellCheck={false}
             placeholder="Buscar por título ou categoria…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}

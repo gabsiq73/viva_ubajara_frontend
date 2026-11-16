@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Trash2, Search, Check, X } from 'lucide-react';
+import { useUrlListState } from '../hooks/useUrlListState';
 import { testimonialsService } from '../services/testimonialsService';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
@@ -9,9 +10,11 @@ import type { ReactNode } from 'react';
 
 type ApprovedFilter = 'all' | 'pending' | 'approved';
 
+const APPROVED_FILTERS: readonly ApprovedFilter[] = ['all', 'pending', 'approved'];
+
 function Stars({ value }: { value: number }) {
   return (
-    <span>
+    <span role="img" aria-label={`Nota ${value} de 5`}>
       {[1, 2, 3, 4, 5].map((s) => (
         <span key={s} style={{ color: s <= value ? '#FFB527' : '#e5e7eb', fontSize: 15 }}>★</span>
       ))}
@@ -23,12 +26,11 @@ export function TestimonialsListPage() {
   const { showToast } = useToast();
 
   const [data, setData] = useState<TestimonialResponse[]>([]);
-  const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<ApprovedFilter>('all');
+  const { page, search, getFilter, setPage, setSearch, setFilter } = useUrlListState();
+  const filter = getFilter<ApprovedFilter>('status', APPROVED_FILTERS, 'all');
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -39,6 +41,10 @@ export function TestimonialsListPage() {
     try {
       const approvedParam = filter === 'all' ? undefined : filter === 'approved';
       const result = await testimonialsService.getAll(page, 10, approvedParam);
+      if (page > 0 && result.content.length === 0 && result.totalPages > 0) {
+        setPage(result.totalPages - 1, true);
+        return;
+      }
       setData(result.content);
       setTotalPages(result.totalPages);
       setTotalElements(result.totalElements);
@@ -47,7 +53,7 @@ export function TestimonialsListPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, filter, showToast]);
+  }, [page, filter, setPage, showToast]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -139,14 +145,16 @@ export function TestimonialsListPage() {
             onClick={() => handleToggleApproval(r)}
             disabled={toggling === r.id}
             title={r.approved ? 'Reprovar' : 'Aprovar'}
+            aria-label={`${r.approved ? 'Reprovar' : 'Aprovar'} depoimento de ${r.userName}`}
           >
-            {r.approved ? <X size={14} /> : <Check size={14} />}
+            {r.approved ? <X size={14} aria-hidden="true" /> : <Check size={14} aria-hidden="true" />}
           </button>
           <button
             className="adm-btn adm-btn--danger adm-btn--sm"
             onClick={() => setDeleteId(r.id)}
+            aria-label={`Excluir depoimento de ${r.userName}`}
           >
-            <Trash2 size={14} />
+            <Trash2 size={14} aria-hidden="true" />
           </button>
         </div>
       ),
@@ -161,11 +169,11 @@ export function TestimonialsListPage() {
 
       <div className="adm-card">
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-          {(['all', 'pending', 'approved'] as ApprovedFilter[]).map((f) => (
+          {APPROVED_FILTERS.map((f) => (
             <button
               key={f}
               className={`adm-btn ${filter === f ? 'adm-btn--primary' : 'adm-btn--ghost'} adm-btn--sm`}
-              onClick={() => { setFilter(f); setPage(0); }}
+              onClick={() => setFilter('status', f, 'all')}
             >
               {f === 'all' ? 'Todos' : f === 'pending' ? 'Pendentes' : 'Aprovados'}
             </button>
@@ -173,8 +181,13 @@ export function TestimonialsListPage() {
         </div>
 
         <div className="adm-search">
-          <span className="adm-search__icon"><Search size={18} /></span>
+          <span className="adm-search__icon" aria-hidden="true"><Search size={18} aria-hidden="true" /></span>
           <input
+            type="search"
+            name="q"
+            aria-label="Buscar depoimentos"
+            autoComplete="off"
+            spellCheck={false}
             placeholder="Buscar por nome, e-mail ou comentário…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}

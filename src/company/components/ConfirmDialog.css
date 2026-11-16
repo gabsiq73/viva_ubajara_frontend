@@ -1,0 +1,13 @@
+.company-dialog { position: fixed; inset: 0; z-index: 10100; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.company-dialog__backdrop { position: absolute; inset: 0; background: rgba(0, 20, 9, 0.55); animation: company-fade-in 0.2s ease both; }
+.company-dialog__panel { position: relative; width: min(440px, 100%); padding: 28px 24px 20px; border-radius: var(--pub-radius-lg); background: #ffffff; box-shadow: var(--pub-shadow-lg); animation: company-pop-in 0.22s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.company-dialog__title { margin: 0 0 8px; font-family: "Nunito", sans-serif; font-size: 22px; font-weight: 800; line-height: 1.2; letter-spacing: -0.01em; color: var(--pub-text); }
+.company-dialog__message { margin: 0; font-family: "Inter", sans-serif; font-size: 15px; line-height: 1.55; color: var(--ui-text-secondary); }
+.company-dialog__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 24px; }
+.company-dialog .company-btn--danger { background: var(--ui-danger); }
+.company-dialog .company-btn--danger:hover { background: #c33a3a; }
+.company-dialog .ui-btn:focus-visible { outline: 3px solid var(--pub-green-mid); outline-offset: 2px; }
+@keyframes company-fade-in { from { opacity: 0; } }
+@keyframes company-pop-in { from { opacity: 0; transform: translateY(8px) scale(0.98); } }
+@media (max-width: 480px) { .company-dialog { align-items: flex-end; padding: 0; } .company-dialog__panel { width: 100%; border-radius: 24px 24px 0 0; padding-bottom: max(20px, env(safe-area-inset-bottom)); } .company-dialog__actions { flex-direction: column-reverse; } .company-dialog__actions .ui-btn { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .company-dialog__backdrop, .company-dialog__panel { animation: none; } }
