@@ -151,9 +151,14 @@
   text-align: left;
 }
 
-.dep-summary__bar-row:hover,
 .dep-summary__bar-row.active {
   background: #f0f7f2;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dep-summary__bar-row:hover {
+    background: #f0f7f2;
+  }
 }
 
 .dep-summary__bar-label {
@@ -340,11 +345,17 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background-color 0.2s ease, transform var(--dur-press) var(--ease-out);
   align-self: flex-start;
 }
 
-.dep-form__submit:hover:not(:disabled) { background: #1e5237; }
+.dep-form__submit:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dep-form__submit:hover:not(:disabled) { background: #1e5237; }
+}
 .dep-form__submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .dep-form__submit .material-symbols-outlined {
@@ -418,10 +429,16 @@
   padding: 12px 24px;
   border-radius: 50px;
   margin-top: 8px;
-  transition: background 0.2s;
+  transition: background-color 0.2s ease, transform var(--dur-press) var(--ease-out);
 }
 
-.dep-login-cta__btn:hover { background: #1e5237; }
+.dep-login-cta__btn:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dep-login-cta__btn:hover { background: #1e5237; }
+}
 
 .dep-login-cta__btn .material-symbols-outlined {
   font-size: 18px;
@@ -460,7 +477,9 @@
   transition: border-color 0.15s;
 }
 
-.dep-clear-filter:hover { border-color: #153a27; color: #153a27; }
+@media (hover: hover) and (pointer: fine) {
+  .dep-clear-filter:hover { border-color: #153a27; color: #153a27; }
+}
 .dep-clear-filter .material-symbols-outlined { font-size: 16px; }
 
 /* ── Cards grid ── */
@@ -480,12 +499,6 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  transition: box-shadow 0.2s, transform 0.2s;
-}
-
-.dep-card:hover {
-  box-shadow: 0 4px 20px rgba(21,58,39,0.1);
-  transform: translateY(-2px);
 }
 
 .dep-card__top {
@@ -621,17 +634,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dep-card,
-  .dep-summary__bar-row,
-  .dep-form__submit,
-  .dep-login-cta__btn {
-    transition: none;
-  }
-
-  .dep-card:hover {
-    transform: none;
-  }
-
   .dep-spinner {
     animation-duration: 2.1s;
   }

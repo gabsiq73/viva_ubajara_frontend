@@ -194,9 +194,11 @@
     text-decoration: none;
 }
 
-.ui-hero__crumb a:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
+@media (hover: hover) and (pointer: fine) {
+    .ui-hero__crumb a:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
 }
 
 .ui-hero__crumb [aria-current="page"] {
@@ -253,7 +255,7 @@
     text-decoration: none;
     white-space: nowrap;
     cursor: pointer;
-    transition: background var(--pub-transition), box-shadow var(--pub-transition), border-color var(--pub-transition);
+    transition: background var(--pub-transition), box-shadow var(--pub-transition), border-color var(--pub-transition), transform var(--dur-press) var(--ease-out);
 }
 
 .ui-btn .ui-icon {
@@ -270,10 +272,12 @@
     color: #ffffff;
 }
 
-.ui-btn--primary:hover {
-    background: var(--pub-green-mid);
-    box-shadow: var(--pub-shadow);
-    color: #ffffff;
+@media (hover: hover) and (pointer: fine) {
+    .ui-btn--primary:hover {
+        background: var(--pub-green-mid);
+        box-shadow: var(--pub-shadow);
+        color: #ffffff;
+    }
 }
 
 .ui-btn--outline {
@@ -282,9 +286,11 @@
     color: var(--pub-green);
 }
 
-.ui-btn--outline:hover {
-    background: var(--pub-green-dim);
-    color: var(--pub-green);
+@media (hover: hover) and (pointer: fine) {
+    .ui-btn--outline:hover {
+        background: var(--pub-green-dim);
+        color: var(--pub-green);
+    }
 }
 
 .ui-btn--gold {
@@ -293,9 +299,11 @@
     font-weight: 700;
 }
 
-.ui-btn--gold:hover {
-    background: #d49a33;
-    color: var(--pub-green-dark);
+@media (hover: hover) and (pointer: fine) {
+    .ui-btn--gold:hover {
+        background: #d49a33;
+        color: var(--pub-green-dark);
+    }
 }
 
 .ui-btn--glass {
@@ -304,14 +312,20 @@
     color: #ffffff;
 }
 
-.ui-btn--glass:hover {
-    background: rgba(255, 255, 255, 0.25);
-    color: #ffffff;
+@media (hover: hover) and (pointer: fine) {
+    .ui-btn--glass:hover {
+        background: rgba(255, 255, 255, 0.25);
+        color: #ffffff;
+    }
 }
 
 .ui-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.ui-btn:active:not(:disabled) {
+    transform: scale(0.97);
 }
 
 /* ── Chips ── */
@@ -350,15 +364,22 @@
     color: var(--pub-text);
     font-size: var(--fs-sm);
     font-weight: 500;
-    transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+    transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform var(--dur-press) var(--ease-out);
+}
+
+.ui-chip:active,
+.ui-applied:active {
+    transform: scale(0.96);
 }
 
 .ui-chip .ui-icon {
     font-size: 18px;
 }
 
-.ui-chip:hover {
-    background: var(--pub-green-pale);
+@media (hover: hover) and (pointer: fine) {
+    .ui-chip:hover {
+        background: var(--pub-green-pale);
+    }
 }
 
 .ui-chip--sm {
@@ -378,11 +399,12 @@
     border-color: var(--pub-green);
     background: var(--pub-green-dim);
     color: var(--pub-green);
-    font-weight: 600;
 }
 
-.ui-chip--on:hover {
-    background: var(--pub-green-dim);
+@media (hover: hover) and (pointer: fine) {
+    .ui-chip--on:hover {
+        background: var(--pub-green-dim);
+    }
 }
 
 .ui-chip__count {
@@ -401,11 +423,13 @@
     color: #ffffff;
     font-size: 14px;
     font-weight: 500;
-    transition: background 0.16s ease;
+    transition: background 0.16s ease, transform var(--dur-press) var(--ease-out);
 }
 
-.ui-applied:hover {
-    background: var(--pub-green);
+@media (hover: hover) and (pointer: fine) {
+    .ui-applied:hover {
+        background: var(--pub-green);
+    }
 }
 
 .ui-applied__x {
@@ -425,8 +449,10 @@
     color: var(--pub-text);
 }
 
-.ui-applied--outline:hover {
-    background: var(--pub-green-pale);
+@media (hover: hover) and (pointer: fine) {
+    .ui-applied--outline:hover {
+        background: var(--pub-green-pale);
+    }
 }
 
 /* ── Busca ── */
@@ -492,6 +518,11 @@
     background: var(--pub-green-pale);
     color: var(--pub-text);
     cursor: pointer;
+    transition: transform var(--dur-press) var(--ease-out);
+}
+
+.ui-search__clear:active {
+    transform: scale(0.96);
 }
 
 .ui-search__clear .ui-icon {
@@ -672,15 +703,6 @@
     animation: ui-pulse 1.4s ease-in-out infinite;
 }
 
-@keyframes ui-pulse {
-    0%,
-    100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.55;
-    }
-}
 
 /* ── Favorito ── */
 .ui-fav {
@@ -704,15 +726,21 @@
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.95);
     color: var(--pub-text);
-    transition: transform 0.16s ease;
+    transition: transform var(--dur-press) var(--ease-out);
 }
 
 .ui-fav__disc .ui-icon {
     font-size: 18px;
 }
 
-.ui-fav:hover .ui-fav__disc {
-    transform: scale(1.08);
+@media (hover: hover) and (pointer: fine) {
+    .ui-fav:hover .ui-fav__disc {
+        transform: scale(1.08);
+    }
+}
+
+.ui-fav:active .ui-fav__disc {
+    transform: scale(0.96);
 }
 
 .ui-fav--on .ui-fav__disc {
@@ -773,7 +801,11 @@
     height: 24px;
     border-radius: 50px;
     background: var(--ui-line-strong);
-    transition: background 0.2s ease;
+    transition: background 200ms ease, transform var(--dur-press) var(--ease-out);
+}
+
+.ui-switch:active .ui-switch__track {
+    transform: scale(0.96);
 }
 
 .ui-switch__knob {
@@ -785,7 +817,7 @@
     border-radius: 50%;
     background: #ffffff;
     box-shadow: 0 1px 3px rgba(0, 33, 12, 0.2);
-    transition: transform 0.2s ease;
+    transition: transform 200ms var(--ease-in-out);
 }
 
 .ui-switch[aria-checked="true"] .ui-switch__track {
@@ -827,9 +859,11 @@
     transition: box-shadow var(--pub-transition), border-color var(--pub-transition);
 }
 
-.ui-card:not(.ui-card--skeleton):hover {
-    border-color: var(--ui-line-strong);
-    box-shadow: var(--ui-card-shadow-hover);
+@media (hover: hover) and (pointer: fine) {
+    .ui-card:not(.ui-card--skeleton):hover {
+        border-color: var(--ui-line-strong);
+        box-shadow: var(--ui-card-shadow-hover);
+    }
 }
 
 .ui-card__media {
@@ -988,9 +1022,11 @@
     border-radius: var(--pub-radius);
 }
 
-.ui-card--list:not(.ui-card--skeleton):hover {
-    border-color: var(--pub-border);
-    box-shadow: var(--pub-shadow-md);
+@media (hover: hover) and (pointer: fine) {
+    .ui-card--list:not(.ui-card--skeleton):hover {
+        border-color: var(--pub-border);
+        box-shadow: var(--pub-shadow-md);
+    }
 }
 
 .ui-card--list .ui-card__media {
@@ -1115,8 +1151,10 @@
     transition: background var(--pub-transition);
 }
 
-.ui-card--list:hover .ui-card__cta {
-    background: var(--pub-green-mid);
+@media (hover: hover) and (pointer: fine) {
+    .ui-card--list:hover .ui-card__cta {
+        background: var(--pub-green-mid);
+    }
 }
 
 .ui-card--list.ui-card--skeleton {
@@ -1161,13 +1199,15 @@
     border-radius: 14px;
     background: var(--pub-green-dark);
     box-shadow: var(--pub-shadow-sm);
-    transition: transform var(--pub-transition), box-shadow var(--pub-transition);
+    transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
 }
 
-.ui-point:not(.ui-point--skeleton):hover,
-.ui-point:not(.ui-point--skeleton):has(.ui-point__link:focus-visible) {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 40px rgba(0, 48, 22, 0.22);
+@media (hover: hover) and (pointer: fine) {
+    .ui-point:not(.ui-point--skeleton):hover,
+    .ui-point:not(.ui-point--skeleton):has(.ui-point__link:focus-visible) {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 40px rgba(0, 48, 22, 0.22);
+    }
 }
 
 .ui-point__media {
@@ -1189,12 +1229,14 @@
 
 .ui-point__img {
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 250ms var(--ease-out);
 }
 
-.ui-point:hover .ui-point__img,
-.ui-point:has(.ui-point__link:focus-visible) .ui-point__img {
-    transform: scale(1.06);
+@media (hover: hover) and (pointer: fine) {
+    .ui-point:hover .ui-point__img,
+    .ui-point:has(.ui-point__link:focus-visible) .ui-point__img {
+        transform: scale(1.03);
+    }
 }
 
 .ui-point__placeholder {
@@ -1342,16 +1384,18 @@
     font-weight: 700;
     white-space: nowrap;
     color: #ffffff;
-    transition: gap 0.2s ease;
 }
 
 .ui-point__cta .ui-icon {
     font-size: 17px;
+    transition: transform var(--dur-press) var(--ease-out);
 }
 
-.ui-point:hover .ui-point__cta,
-.ui-point:has(.ui-point__link:focus-visible) .ui-point__cta {
-    gap: 8px;
+@media (hover: hover) and (pointer: fine) {
+    .ui-point:hover .ui-point__cta .ui-icon,
+    .ui-point:has(.ui-point__link:focus-visible) .ui-point__cta .ui-icon {
+        transform: translateX(3px);
+    }
 }
 
 /* Skeleton: mesmas dimensões do card */
@@ -1406,16 +1450,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .ui-point,
-    .ui-point__img,
-    .ui-point__cta {
-        transition: none;
-    }
-
     .ui-point:not(.ui-point--skeleton):hover,
     .ui-point:not(.ui-point--skeleton):has(.ui-point__link:focus-visible),
     .ui-point:hover .ui-point__img,
-    .ui-point:has(.ui-point__link:focus-visible) .ui-point__img {
+    .ui-point:has(.ui-point__link:focus-visible) .ui-point__img,
+    .ui-point:hover .ui-point__cta .ui-icon,
+    .ui-point:has(.ui-point__link:focus-visible) .ui-point__cta .ui-icon {
         transform: none;
     }
 
@@ -1448,7 +1488,7 @@
     height: min(720px, 92dvh);
     border-radius: 24px 24px 0 0;
     background: #ffffff;
-    animation: ui-slide-up 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation: ui-slide-up 0.28s var(--ease-drawer) both;
     overscroll-behavior: contain;
 }
 
@@ -1486,6 +1526,11 @@
     background: none;
     color: var(--pub-text);
     cursor: pointer;
+    transition: transform var(--dur-press) var(--ease-out);
+}
+
+.ui-sheet__close:active {
+    transform: scale(0.96);
 }
 
 .ui-sheet__close .ui-icon {
@@ -1520,19 +1565,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .ui-skeleton,
-    .ui-sheet__backdrop,
-    .ui-sheet__panel {
+    .ui-skeleton {
         animation: none;
     }
 
-    .ui-card,
-    .ui-chip,
-    .ui-btn,
-    .ui-fav__disc,
-    .ui-switch__track,
-    .ui-switch__knob {
-        transition: none;
+    .ui-sheet__backdrop,
+    .ui-sheet__panel {
+        animation: rm-fade 200ms ease !important;
+        transform: none !important;
     }
 
     .ui-fav:hover .ui-fav__disc {

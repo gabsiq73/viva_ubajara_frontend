@@ -34,7 +34,7 @@
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 0.85s ease;
+  transition: opacity 250ms var(--ease-out);
 }
 
 .gastro-slide.is-active {
@@ -70,6 +70,11 @@
   background: transparent;
   cursor: pointer;
   flex-shrink: 0;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+.gastro-dots button:active {
+  transform: scale(0.96);
 }
 
 .gastro-dots button::before {
@@ -81,17 +86,19 @@
   height: 6px;
   border-radius: 9999px;
   background: rgba(255, 255, 255, 0.45);
-  transition: background 0.3s ease, width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: background-color 200ms ease, width 200ms var(--ease-out), left 200ms var(--ease-out);
 }
 
 .gastro-dots button.is-active::before {
   background: #ffffff;
-  left: 0;
   width: 24px;
+  left: 0;
 }
 
-.gastro-dots button:hover:not(.is-active)::before {
-  background: rgba(255, 255, 255, 0.75);
+@media (hover: hover) and (pointer: fine) {
+  .gastro-dots button:hover:not(.is-active)::before {
+    background: rgba(255, 255, 255, 0.75);
+  }
 }
 
 /* Amplia a área de toque na vertical (24px -> 44px) sem mexer no espaçamento entre os pontos. */

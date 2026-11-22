@@ -443,6 +443,6 @@
 
 @media (prefers-reduced-motion: reduce) {
     .rv * {
-        transition: none !important;
+        transition-property: color, background-color, border-color, opacity !important;
     }
 }

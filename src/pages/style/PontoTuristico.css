@@ -117,14 +117,20 @@
     color: rgba(255, 255, 255, 0.8);
     flex-shrink: 0;
     margin-top: 8px;
-    transition: background 0.18s, color 0.18s, transform 0.15s, border-color 0.18s;
+    transition: background 0.18s, color 0.18s, transform var(--dur-press) var(--ease-out), border-color 0.18s;
     backdrop-filter: blur(6px);
 }
 
-.pt-hero__fav-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
-    color: #ffffff;
-    transform: scale(1.08);
+@media (hover: hover) and (pointer: fine) {
+    .pt-hero__fav-btn:hover {
+        background: rgba(255, 255, 255, 0.25);
+        color: #ffffff;
+        transform: scale(1.08);
+    }
+}
+
+.pt-hero__fav-btn:active {
+    transform: scale(0.96);
 }
 
 .pt-hero__fav-btn--active {
@@ -133,9 +139,11 @@
     color: #fca5a5;
 }
 
-.pt-hero__fav-btn--active:hover {
-    background: rgba(239, 68, 68, 0.35);
-    color: #f87171;
+@media (hover: hover) and (pointer: fine) {
+    .pt-hero__fav-btn--active:hover {
+        background: rgba(239, 68, 68, 0.35);
+        color: #f87171;
+    }
 }
 
 .pt-hero__fav-btn .material-symbols-outlined {
@@ -212,8 +220,10 @@
     inset: -12px -6px;
 }
 
-.pt-hero__info-item--link:hover {
-    text-decoration: underline;
+@media (hover: hover) and (pointer: fine) {
+    .pt-hero__info-item--link:hover {
+        text-decoration: underline;
+    }
 }
 
 .pt-hero__info-item--link:focus-visible {
@@ -254,11 +264,17 @@
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, transform var(--dur-press) var(--ease-out);
 }
 
-.pt-hero__gallery-btn:hover {
-    background: rgba(255, 255, 255, 0.26);
+.pt-hero__gallery-btn:active {
+    transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .pt-hero__gallery-btn:hover {
+        background: rgba(255, 255, 255, 0.26);
+    }
 }
 
 .pt-hero__gallery-btn .ui-icon {
@@ -348,11 +364,6 @@
     border: 1px solid #d4eadb;
     border-radius: 14px;
     padding: 12px 18px;
-    transition: border-color 0.2s ease;
-}
-
-.pt-stat-pill:hover {
-    border-color: #a8d5b8;
 }
 
 .pt-stat-pill__icon {
@@ -464,13 +475,19 @@
     font-size: 15px;
     text-decoration: none;
     border-radius: 50px;
-    transition: background 0.2s ease, transform 0.2s ease;
+    transition: background 0.2s ease, transform var(--dur-press) var(--ease-out);
     box-sizing: border-box;
 }
 
-.pt-visit-card__cta:hover {
-    background: #006b32;
-    transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+    .pt-visit-card__cta:hover {
+        background: #006b32;
+        transform: translateY(-2px);
+    }
+}
+
+.pt-visit-card__cta:active {
+    transform: scale(0.97);
 }
 
 /* ─── Como Chegar ─── */
@@ -627,8 +644,10 @@
     transition: color 0.2s ease;
 }
 
-.pt-breadcrumb__link:hover {
-    color: #ffffff;
+@media (hover: hover) and (pointer: fine) {
+    .pt-breadcrumb__link:hover {
+        color: #ffffff;
+    }
 }
 
 .pt-breadcrumb__sep {
@@ -710,21 +729,23 @@
     font-weight: 700;
     color: #006b32;
     text-decoration: none;
-    transition: color 0.2s ease, gap 0.2s ease;
+    transition: color 0.2s ease;
 }
 
 .pt-related__all .material-symbols-outlined {
     font-size: 18px;
     font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
-    transition: transform 0.2s ease;
+    transition: transform var(--dur-press) var(--ease-out);
 }
 
-.pt-related__all:hover {
-    color: #004d24;
-}
+@media (hover: hover) and (pointer: fine) {
+    .pt-related__all:hover {
+        color: #004d24;
+    }
 
-.pt-related__all:hover .material-symbols-outlined {
-    transform: translateX(4px);
+    .pt-related__all:hover .material-symbols-outlined {
+        transform: translateX(4px);
+    }
 }
 
 /* ─── Locais vinculados ─── */
@@ -751,8 +772,10 @@
     transition: background-color 0.2s;
 }
 
-.pt-linked__link:hover {
-    background: #e4f1ea;
+@media (hover: hover) and (pointer: fine) {
+    .pt-linked__link:hover {
+        background: #e4f1ea;
+    }
 }
 
 .pt-linked__pin {
@@ -789,18 +812,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .pt-hero__fav-btn,
-    .pt-hero__gallery-btn,
-    .pt-breadcrumb__link,
-    .pt-visit-card__cta,
-    .pt-related__all,
-    .pt-related__all .material-symbols-outlined,
-    .pt-linked__link {
-        transition: none;
-    }
-
     .pt-hero__fav-btn:hover,
-    .pt-visit-card__cta:hover {
+    .pt-visit-card__cta:hover,
+    .pt-related__all:hover .material-symbols-outlined {
         transform: none;
     }
 }

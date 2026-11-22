@@ -53,10 +53,12 @@
     transition: border-color var(--pub-transition), box-shadow var(--pub-transition), transform var(--pub-transition);
 }
 
-.company-type-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--pub-green);
-    box-shadow: var(--pub-shadow);
+@media (hover: hover) and (pointer: fine) {
+    .company-type-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--pub-green);
+        box-shadow: var(--pub-shadow);
+    }
 }
 
 .company-type-card:focus-visible {
@@ -138,10 +140,16 @@
     transition: background var(--pub-transition), border-color var(--pub-transition);
 }
 
-.company-photo-drop:hover:not(:disabled),
 .company-photo-drop.is-dragging {
     border-color: var(--pub-green);
     background: var(--pub-green-dim);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .company-photo-drop:hover:not(:disabled) {
+        border-color: var(--pub-green);
+        background: var(--pub-green-dim);
+    }
 }
 
 .company-photo-drop:focus-visible {
@@ -299,6 +307,11 @@
     background: none;
     color: var(--ui-text-secondary);
     cursor: pointer;
+    transition: background-color var(--dur-hover) ease, color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
+}
+
+.company-photo-item__actions button:active:not(:disabled) {
+    transform: scale(0.96);
 }
 
 .company-photo-item__actions button.is-danger {
@@ -306,14 +319,16 @@
     color: #b83a3a;
 }
 
-.company-photo-item__actions button:hover:not(:disabled) {
-    background: var(--pub-green-dim);
-    color: var(--pub-green);
-}
+@media (hover: hover) and (pointer: fine) {
+    .company-photo-item__actions button:hover:not(:disabled) {
+        background: var(--pub-green-dim);
+        color: var(--pub-green);
+    }
 
-.company-photo-item__actions button.is-danger:hover:not(:disabled) {
-    background: var(--ui-danger-bg);
-    color: #b83a3a;
+    .company-photo-item__actions button.is-danger:hover:not(:disabled) {
+        background: var(--ui-danger-bg);
+        color: #b83a3a;
+    }
 }
 
 .company-photo-item__actions button:disabled {
@@ -420,11 +435,5 @@
 @media (prefers-reduced-motion: reduce) {
     .company-type-card:hover {
         transform: none;
-    }
-
-    .company-type-card,
-    .company-photo-drop,
-    .company-progress progress::-webkit-progress-value {
-        transition: none;
     }
 }

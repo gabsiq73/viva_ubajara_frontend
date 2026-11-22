@@ -132,12 +132,6 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition: box-shadow 0.2s, transform 0.2s;
-}
-
-.cg-card:hover {
-  box-shadow: 0 4px 20px rgba(21,58,39,0.12);
-  transform: translateY(-2px);
 }
 
 .cg-card__top {
@@ -235,12 +229,18 @@
   font-weight: var(--fw-btn);
   padding: 8px 14px;
   border-radius: 50px;
-  transition: background 0.2s;
+  transition: background-color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
   white-space: nowrap;
 }
 
-.cg-btn-maps:hover {
-  background: #1e5237;
+.cg-btn-maps:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cg-btn-maps:hover {
+    background: #1e5237;
+  }
 }
 
 .cg-btn-maps .material-symbols-outlined {
@@ -262,11 +262,6 @@
   gap: 16px;
   align-items: flex-start;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.03);
-  transition: box-shadow 0.2s;
-}
-
-.cg-app-card:hover {
-  box-shadow: 0 4px 20px rgba(21,58,39,0.1);
 }
 
 .cg-app-card__icon {
@@ -404,12 +399,18 @@
   padding: 14px 28px;
   border-radius: 50px;
   margin-top: 12px;
-  transition: background 0.2s, transform 0.2s;
+  transition: background-color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
 }
 
-.cg-cta__btn:hover {
-  background: #ffc84a;
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .cg-cta__btn:hover {
+    background: #ffc84a;
+    transform: translateY(-1px);
+  }
+}
+
+.cg-cta__btn:active {
+  transform: scale(0.97);
 }
 
 .cg-cta__btn .material-symbols-outlined {
@@ -465,14 +466,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cg-card,
-  .cg-app-card,
-  .cg-btn-maps,
-  .cg-cta__btn {
-    transition: none;
-  }
-
-  .cg-card:hover,
   .cg-cta__btn:hover {
     transform: none;
   }

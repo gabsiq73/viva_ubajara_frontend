@@ -6,11 +6,5 @@
     forced-color-adjust: none;
     -webkit-mask: url("../../assets/images/logo.webp") center / contain no-repeat;
     mask: url("../../assets/images/logo.webp") center / contain no-repeat;
-    transition: height 250ms cubic-bezier(0.4, 0, 0.2, 1), background-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .site-logo {
-        transition: none;
-    }
+    transition: height 250ms var(--ease-out), background-color 250ms var(--ease-out);
 }

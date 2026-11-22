@@ -175,7 +175,7 @@ export function ProfilePage() {
               }}
             >
               {uploadingPhoto
-                ? <Loader size={13} style={{ animation: 'adm-spin 0.6s linear infinite' }} />
+                ? <Loader size={13} className="adm-spin" />
                 : <Camera size={13} aria-hidden="true" />
               }
             </button>
@@ -213,7 +213,7 @@ export function ProfilePage() {
               disabled={removingPhoto}
               style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}
             >
-              {removingPhoto ? <Loader size={12} aria-hidden="true" style={{ animation: 'adm-spin 0.6s linear infinite' }} /> : <Trash2 size={12} aria-hidden="true" />}
+              {removingPhoto ? <Loader size={12} aria-hidden="true" className="adm-spin" /> : <Trash2 size={12} aria-hidden="true" />}
               Remover foto
             </button>
           )}

@@ -88,7 +88,7 @@ section.welcome {
 
 .hero-rotating-word {
     display: inline-block;
-    animation: word-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: word-enter 0.5s var(--ease-out) both;
 }
 
 @keyframes word-enter {
@@ -134,7 +134,7 @@ section.welcome {
     text-decoration: none;
     border: 1.5px solid transparent;
     transition: background 0.22s ease, color 0.22s ease,
-                border-color 0.22s ease, transform 0.18s ease,
+                border-color 0.22s ease, transform var(--dur-press) var(--ease-out),
                 box-shadow 0.22s ease;
     white-space: nowrap;
     cursor: pointer;
@@ -147,11 +147,13 @@ section.welcome {
     box-shadow: 0 4px 18px rgba(0, 107, 50, 0.38);
 }
 
-.hero-btn--primary:hover {
-    background: #003016;
-    border-color: #003016;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 48, 22, 0.48);
+@media (hover: hover) and (pointer: fine) {
+    .hero-btn--primary:hover {
+        background: #003016;
+        border-color: #003016;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 48, 22, 0.48);
+    }
 }
 
 .hero-btn--ghost {
@@ -162,10 +164,16 @@ section.welcome {
     -webkit-backdrop-filter: blur(8px);
 }
 
-.hero-btn--ghost:hover {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.65);
-    transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+    .hero-btn--ghost:hover {
+        background: rgba(255, 255, 255, 0.18);
+        border-color: rgba(255, 255, 255, 0.65);
+        transform: translateY(-2px);
+    }
+}
+
+.hero-btn:active {
+    transform: scale(0.97);
 }
 
 @media screen and (max-width: 1024px) {

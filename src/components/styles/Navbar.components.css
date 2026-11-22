@@ -26,11 +26,13 @@
     font-size: 15px;
     font-weight: 500;
     white-space: nowrap;
-    transition: background 250ms cubic-bezier(0.4, 0, 0.2, 1), color 250ms cubic-bezier(0.4, 0, 0.2, 1), height 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color var(--dur-hover) ease, color var(--dur-hover) ease, height 250ms var(--ease-out);
 }
 
-.site-nav--bar .site-nav__link:hover {
-    background: rgba(255, 255, 255, 0.1);
+@media (hover: hover) and (pointer: fine) {
+    .site-nav--bar .site-nav__link:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
 }
 
 .site-nav--bar .site-nav__link.is-active {
@@ -46,8 +48,10 @@
     height: 36px;
 }
 
-.site-header.is-solid .site-nav--bar .site-nav__link:hover {
-    background: #f0f7f3;
+@media (hover: hover) and (pointer: fine) {
+    .site-header.is-solid .site-nav--bar .site-nav__link:hover {
+        background: #f0f7f3;
+    }
 }
 
 .site-header.is-solid .site-nav--bar .site-nav__link.is-active {
@@ -91,10 +95,4 @@
     outline: 2px solid #f3c66b;
     outline-offset: -2px;
     border-radius: 8px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .site-nav--bar .site-nav__link {
-        transition: none;
-    }
 }

@@ -174,12 +174,18 @@
     box-shadow: 0 4px 16px rgba(0, 33, 12, 0.06);
     text-decoration: none;
     color: inherit;
-    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
 }
 
-.ct-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 14px 36px rgba(0, 33, 12, 0.12);
+@media (hover: hover) and (pointer: fine) {
+    .ct-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 36px rgba(0, 33, 12, 0.12);
+    }
+}
+
+.ct-card:active {
+    transform: scale(0.98);
 }
 
 .ct-card__icon-wrap {
@@ -284,17 +290,14 @@
     text-underline-offset: 3px;
 }
 
-.ct-link:hover {
-    color: #006b32;
-    text-decoration-color: currentColor;
+@media (hover: hover) and (pointer: fine) {
+    .ct-link:hover {
+        color: #006b32;
+        text-decoration-color: currentColor;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .ct-card,
-    .ct-page .contact-section__submit {
-        transition: none;
-    }
-
     .ct-card:hover {
         transform: none;
     }
