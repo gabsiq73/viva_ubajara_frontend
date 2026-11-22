@@ -131,8 +131,8 @@ function CompanyShell() {
         <div className="company-sidebar__account">
           <div className="company-avatar" aria-hidden="true">{initials}</div>
           <div className="company-account-copy">
-            <strong>{user?.name || 'Conta empresarial'}</strong>
-            <small>{user?.email}</small>
+            <strong title={user?.name}>{user?.name || 'Conta empresarial'}</strong>
+            <small title={user?.email}>{user?.email}</small>
           </div>
         </div>
 

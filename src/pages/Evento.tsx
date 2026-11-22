@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import Icon from "../components/ui/Icon";
 import Breadcrumb from "./Breadcrumb";
 import { DetailStatePage } from "./PageState";
+import { useBrokenImage } from "../hooks/useBrokenImage";
 import { eventsService } from "../admin/services/eventsService";
 import type { EventResponse } from "../admin/types";
 import { formatDay, formatLongDate, formatMonthShort, formatTime, parseBackendDate, toIsoDate } from "../utils/dates";
@@ -15,12 +16,13 @@ import "./style/Evento.css";
 
 function RelatedCard({ ev }: { ev: EventResponse }) {
     const start = parseBackendDate(ev.startDateTime);
-    const heroImg = ev.photos?.[0]?.url ?? heroFallback;
+    const photo = useBrokenImage(ev.photos?.[0]?.url);
+    const heroImg = photo.show ? ev.photos![0].url : heroFallback;
 
     return (
         <Link to={`/eventos/${ev.id}`} className="evd-rel-card">
             <div className="evd-rel-card__img-wrap">
-                <img src={heroImg} alt="" className="evd-rel-card__img" width={400} height={220} loading="lazy" decoding="async" />
+                <img src={heroImg} alt="" className="evd-rel-card__img" width={400} height={220} loading="lazy" decoding="async" onError={photo.onError} />
                 {start && (
                     <div className="evd-rel-card__date-badge">
                         <strong>{formatDay(start)}</strong>
@@ -47,11 +49,12 @@ function RelatedCard({ ev }: { ev: EventResponse }) {
 function EventoView({ ev, related }: { ev: EventResponse; related: EventResponse[] }) {
     useDocumentTitle(ev.name);
 
-    const heroImg = ev.photos?.[0]?.url ?? heroFallback;
+    const photo = useBrokenImage(ev.photos?.[0]?.url);
+    const heroImg = photo.show ? ev.photos![0].url : heroFallback;
     const start = parseBackendDate(ev.startDateTime);
     const end = parseBackendDate(ev.endDateTime);
     const dateLabel = start ? formatLongDate(start) : "";
-    const timeDisplay = start ? (end ? `${formatTime(start)} – ${formatTime(end)}` : formatTime(start)) : "";
+    const timeDisplay = start ? (end && end.getTime() !== start.getTime() ? `${formatTime(start)} – ${formatTime(end)}` : formatTime(start)) : "";
 
     return (
         <div className="evd-page">
@@ -60,7 +63,7 @@ function EventoView({ ev, related }: { ev: EventResponse; related: EventResponse
 
                 {/* ── Hero ── */}
                 <section className="evd-hero" aria-labelledby="evd-hero-title">
-                    <img src={heroImg} alt="" className="evd-hero__bg" fetchPriority="high" decoding="async" />
+                    <img src={heroImg} alt="" className="evd-hero__bg" fetchPriority="high" decoding="async" onError={photo.onError} />
                     <div className="evd-hero__overlay" aria-hidden="true" />
 
                     <Breadcrumb

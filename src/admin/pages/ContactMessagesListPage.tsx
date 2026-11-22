@@ -4,6 +4,7 @@ import { useUrlListState } from '../hooks/useUrlListState';
 import { contactMessagesService } from '../services/contactMessagesService';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
+import { countLabel } from '../utils/countLabel';
 import { ConfirmModal, Modal } from '../components/Modal';
 import type { ContactMessageResponse } from '../types';
 import type { ReactNode } from 'react';
@@ -148,7 +149,7 @@ export function ContactMessagesListPage() {
         <h2 className="adm-page-title">
           Mensagens
           <span>
-            {totalElements} mensagens
+            {countLabel(totalElements, 'mensagem', 'mensagens')}
             {unreadCount > 0 && (
               <span style={{
                 marginLeft: 8,
@@ -159,7 +160,7 @@ export function ContactMessagesListPage() {
                 fontSize: 12,
                 fontWeight: 600,
               }}>
-                {unreadCount} não lidas
+                {countLabel(unreadCount, 'não lida', 'não lidas')}
               </span>
             )}
           </span>

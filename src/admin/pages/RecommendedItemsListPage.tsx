@@ -4,6 +4,7 @@ import { useUrlListState } from '../hooks/useUrlListState';
 import { recommendedItemsService } from '../services/recommendedItemsService';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
+import { countLabel } from '../utils/countLabel';
 import { ConfirmModal } from '../components/Modal';
 import type { RecommendedItemResponse } from '../types';
 import type { ReactNode } from 'react';
@@ -109,7 +110,7 @@ export function RecommendedItemsListPage() {
   return (
     <div>
       <div className="adm-page-header">
-        <h2 className="adm-page-title">Itens Recomendados <span>{totalElements} registros</span></h2>
+        <h2 className="adm-page-title">Itens Recomendados <span>{countLabel(totalElements, 'registro', 'registros')}</span></h2>
         <Link className="adm-btn adm-btn--primary" to="/admin/recommended-items/new">
           <Plus size={16} aria-hidden="true" /> Novo Item
         </Link>

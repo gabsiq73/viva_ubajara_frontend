@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Inbox } from 'lucide-react';
+import { countLabel } from '../utils/countLabel';
 
 interface Column<T> {
   header: string;
@@ -83,7 +84,7 @@ export function Pagination({ page, totalPages, totalElements, onPageChange }: Pa
         ← Anterior
       </button>
       <span className="adm-pagination__info" aria-live="polite">
-        Página {page + 1} de {totalPages} ({totalElements} registros)
+        Página {page + 1} de {totalPages} ({countLabel(totalElements, 'registro', 'registros')})
       </span>
       <button
         className="adm-btn adm-btn--ghost adm-btn--sm"

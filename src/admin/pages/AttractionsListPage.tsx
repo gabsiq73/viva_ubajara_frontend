@@ -3,6 +3,7 @@ import { attractionsService } from '../services/attractionsService';
 import { useCrudList } from '../hooks/useCrudList';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
+import { countLabel } from '../utils/countLabel';
 import { ConfirmModal } from '../components/Modal';
 import type { AttractionResponse } from '../types';
 import type { ReactNode } from 'react';
@@ -56,7 +57,7 @@ export function AttractionsListPage() {
   return (
     <div>
       <div className="adm-page-header">
-        <h2 className="adm-page-title">Atrações <span>{totalElements} registros</span></h2>
+        <h2 className="adm-page-title">Atrações <span>{countLabel(totalElements, 'registro', 'registros')}</span></h2>
         <Link className="adm-btn adm-btn--primary" to="/admin/attractions/new">
           <Plus size={16} aria-hidden="true" /> Nova Atração
         </Link>

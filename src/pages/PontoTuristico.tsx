@@ -13,13 +13,14 @@ import type { AttractionResponse } from "../admin/types";
 import ReviewsSection from "../components/reviews/ReviewsSection";
 import PointCard from "../components/ui/PointCard";
 import { ATTRACTION_CATEGORY_LABELS as CATEGORY_LABELS } from "../utils/attractionCategories";
-import { formatRating, reviewsLabel } from "../utils/rating";
+import { formatCount, formatRating, reviewsLabel } from "../utils/rating";
 import { hasMeaningfulText } from "../utils/establishmentDetail";
 import { loadFavorites, toggleFavorite } from "../utils/favorites";
 import { useActivationPop } from "../hooks/useActivationPop";
 import { buildSpotGallery } from "../utils/spotPhotos";
 import { isNotFoundError, requireUuid, useAsyncData } from "../utils/useAsyncData";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
+import { useBrokenImage } from "../hooks/useBrokenImage";
 import heroFallback from "../assets/images/capa-pagina.webp";
 import "../components/ui/ui.css";
 import "../components/Sections/style/Content.components.css";
@@ -51,7 +52,9 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
     const gallery = useMemo(() => buildSpotGallery(attraction.name, attraction.photos), [attraction.name, attraction.photos]);
     const hasGallery = gallery.length >= 2;
 
-    const heroImg = gallery[0]?.url ?? attraction.photos?.[0]?.url ?? heroFallback;
+    const heroSrc = gallery[0]?.url ?? attraction.photos?.[0]?.url;
+    const hero = useBrokenImage(heroSrc);
+    const heroImg = hero.show ? heroSrc! : heroFallback;
     const howToGetImg = attraction.photos?.find((p) => p.description === "how_to_get")?.url;
     const catLabel = CATEGORY_LABELS[attraction.category] ?? attraction.category;
     const reviewCount = attraction.reviewCount ?? 0;
@@ -73,7 +76,7 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
 
                 {/* ── Hero ── */}
                 <section className="pt-hero" aria-labelledby="pt-hero-title">
-                    <img src={heroImg} alt="" className="pt-hero__bg" fetchPriority="high" decoding="async" />
+                    <img src={heroImg} alt="" className="pt-hero__bg" fetchPriority="high" decoding="async" onError={hero.onError} />
                     <div className="pt-hero__overlay" aria-hidden="true" />
 
                     <Breadcrumb
@@ -130,7 +133,7 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
                                         }}
                                     >
                                         <Icon name="star" filled className="pt-hero__info-star" />
-                                        <span aria-hidden="true">{formatRating(attraction.averageRating!)} ({reviewCount})</span>
+                                        <span aria-hidden="true">{formatRating(attraction.averageRating!)} ({formatCount(reviewCount)})</span>
                                         <span className="ui-sr-only">Nota {formatRating(attraction.averageRating!)} de 5, {reviewsLabel(reviewCount)}. Ir para as avaliações</span>
                                     </a>
                                 </>
@@ -144,7 +147,7 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
                                     </span>
                                 </>
                             )}
-                            {attraction.entryPrice != null && (
+                            {!!attraction.entryPrice?.trim() && (
                                 <>
                                     <span className="pt-hero__info-sep" aria-hidden="true">|</span>
                                     <span className="pt-hero__info-item">
@@ -177,7 +180,7 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
                                 <p key={i} className="pt-content__p">{paragraph}</p>
                             ))}
                             <div className="pt-content__stats">
-                                {attraction.entryPrice != null && (
+                                {!!attraction.entryPrice?.trim() && (
                                     <div className="pt-stat-pill">
                                         <Icon name="payments" className="pt-stat-pill__icon" />
                                         <div>
@@ -188,12 +191,12 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
                                         </div>
                                     </div>
                                 )}
-                                {attraction.averageVisitDuration != null && (
+                                {!!attraction.averageVisitDuration && (
                                     <div className="pt-stat-pill">
                                         <Icon name="schedule" className="pt-stat-pill__icon" />
                                         <div>
                                             <span className="pt-stat-pill__lbl">Duração média</span>
-                                            <span className="pt-stat-pill__val">{attraction.averageVisitDuration}&nbsp;min</span>
+                                            <span className="pt-stat-pill__val">{formatCount(attraction.averageVisitDuration)}&nbsp;min</span>
                                         </div>
                                     </div>
                                 )}

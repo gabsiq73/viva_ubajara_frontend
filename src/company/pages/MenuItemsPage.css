@@ -66,6 +66,7 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
+    overflow: hidden;
     background: var(--pub-green-pale);
     color: var(--pub-green-mid);
     font-size: 13px;

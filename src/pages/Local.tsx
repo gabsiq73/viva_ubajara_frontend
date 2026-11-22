@@ -16,6 +16,7 @@ import { buildSpotGallery } from "../utils/spotPhotos";
 import { truncateAtWord } from "../utils/text";
 import { isNotFoundError, requireUuid, useAsyncData } from "../utils/useAsyncData";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
+import { useBrokenImage } from "../hooks/useBrokenImage";
 import heroFallback from "../assets/images/capa-pagina.webp";
 import "../components/ui/ui.css";
 import "../components/Sections/style/Content.components.css";
@@ -30,7 +31,9 @@ function LocalView({ spot }: { spot: TouristSpotResponse }) {
     const gallery = useMemo(() => buildSpotGallery(spot.name, spot.photos), [spot.name, spot.photos]);
     const hasGallery = gallery.length >= 2;
 
-    const heroImg = gallery[0]?.url ?? spot.photos?.[0]?.url ?? heroFallback;
+    const heroSrc = gallery[0]?.url ?? spot.photos?.[0]?.url;
+    const hero = useBrokenImage(heroSrc);
+    const heroImg = hero.show ? heroSrc! : heroFallback;
     const howToGetImg = spot.photos?.find((p) => p.description === "how_to_get")?.url;
     const paragraphs = (spot.description ?? "")
         .split(/\r?\n+/)
@@ -49,7 +52,7 @@ function LocalView({ spot }: { spot: TouristSpotResponse }) {
 
                 {/* ── Hero ── */}
                 <section className="pt-hero" aria-labelledby="local-hero-title">
-                    <img src={heroImg} alt="" className="pt-hero__bg" fetchPriority="high" decoding="async" />
+                    <img src={heroImg} alt="" className="pt-hero__bg" fetchPriority="high" decoding="async" onError={hero.onError} />
                     <div className="pt-hero__overlay" aria-hidden="true" />
 
                     <Breadcrumb

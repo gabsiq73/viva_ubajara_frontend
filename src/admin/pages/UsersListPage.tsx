@@ -3,6 +3,7 @@ import { useUrlListState } from '../hooks/useUrlListState';
 import { usersService } from '../services/usersService';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
+import { countLabel } from '../utils/countLabel';
 import { ConfirmModal, Modal } from '../components/Modal';
 import { Search, Trash2, ShieldCheck, User, UserCog } from 'lucide-react';
 import type { UserResponse, UserRole } from '../types';
@@ -151,7 +152,7 @@ export function UsersListPage() {
   return (
     <div>
       <div className="adm-page-header">
-        <h2 className="adm-page-title">Usuários <span>{totalElements} registros</span></h2>
+        <h2 className="adm-page-title">Usuários <span>{countLabel(totalElements, 'registro', 'registros')}</span></h2>
       </div>
 
       <div className="adm-card">

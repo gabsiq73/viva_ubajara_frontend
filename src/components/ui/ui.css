@@ -215,6 +215,7 @@
 }
 
 .ui-hero__eyebrow {
+    overflow-wrap: anywhere;
     font-family: "Inter", sans-serif;
     font-size: var(--fs-xs);
     font-weight: 700;
@@ -944,12 +945,15 @@
 }
 
 .ui-card__name {
+    display: -webkit-box;
     flex: 1;
     min-width: 0;
     margin: 0;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
     font-family: "Nunito", sans-serif;
     font-weight: 700;
     font-size: 17px;
@@ -1002,7 +1006,13 @@
 }
 
 .ui-card__price {
+    display: -webkit-box;
     margin: 6px 0 0;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
     font-family: "Inter", sans-serif;
     font-size: 14px;
     font-weight: 600;
@@ -1068,7 +1078,13 @@
 }
 
 .ui-card__eyebrow {
+    display: -webkit-box;
     margin: 0;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
     font-family: "Inter", sans-serif;
     font-size: 12px;
     font-weight: 700;
@@ -1079,6 +1095,7 @@
 
 .ui-card__title {
     margin: 0;
+    overflow-wrap: anywhere;
     font-family: "Nunito", sans-serif;
     font-weight: 800;
     font-size: 21px;
@@ -1119,6 +1136,18 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.ui-card__meta-text {
+    display: -webkit-box;
+    min-width: 0;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 .ui-card__meta-item .ui-icon {
@@ -1143,6 +1172,13 @@
 }
 
 .ui-card__price-full {
+    display: -webkit-box;
+    max-width: 220px;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
     font-family: "Inter", sans-serif;
     font-size: 16px;
     font-weight: 700;
@@ -1301,6 +1337,7 @@
     display: -webkit-box;
     margin: 0;
     overflow: hidden;
+    overflow-wrap: anywhere;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     font-family: "Nunito", sans-serif;
@@ -1337,6 +1374,7 @@
     display: -webkit-box;
     margin: 0;
     overflow: hidden;
+    overflow-wrap: anywhere;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     font-family: "Inter", sans-serif;

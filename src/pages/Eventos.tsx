@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import Icon from "../components/ui/Icon";
 import StateBlock from "../components/ui/StateBlock";
 import { Button } from "../components/ui/Button";
+import { useBrokenImage } from "../hooks/useBrokenImage";
 import { eventsService } from "../admin/services/eventsService";
 import { pageConfigService } from "../admin/services/pageConfigService";
 import type { EventResponse } from "../admin/types";
@@ -65,11 +66,12 @@ function compareByProximity(now: number) {
 }
 
 function EventCardItem({ ev }: { ev: EventCard }) {
+    const image = useBrokenImage(ev.img);
     return (
         <article className="ev-card">
             <div className="ev-card__img-wrap">
-                {ev.img ? (
-                    <img src={ev.img} alt="" className="ev-card__img" width={400} height={200} loading="lazy" decoding="async" />
+                {image.show ? (
+                    <img src={ev.img} alt="" className="ev-card__img" width={400} height={200} loading="lazy" decoding="async" onError={image.onError} />
                 ) : (
                     <div className="ev-card__img ev-card__img--placeholder" aria-hidden="true" />
                 )}
@@ -91,7 +93,7 @@ function EventCardItem({ ev }: { ev: EventCard }) {
                 <div className="ev-card__meta">
                     <span className="ev-card__meta-item">
                         <Icon name="location_on" />
-                        <span className="ev-card__meta-text">{ev.place}</span>
+                        <span className="ev-card__meta-text" title={ev.place}>{ev.place}</span>
                     </span>
                     {ev.start && (
                         <span className="ev-card__meta-item">

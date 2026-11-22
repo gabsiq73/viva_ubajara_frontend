@@ -1,8 +1,9 @@
 import { useState, type MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import Icon from "../ui/Icon";
+import { useBrokenImage } from "../../hooks/useBrokenImage";
 import { roomsLabel, shortPrice } from "../../utils/establishments";
-import { formatRating, reviewsLabel } from "../../utils/rating";
+import { formatCount, formatRating, reviewsLabel } from "../../utils/rating";
 import type { EstablishmentDetail } from "../../utils/establishmentDetail";
 import "./establishment-detail.css";
 
@@ -14,7 +15,9 @@ interface DetailHeroProps {
 }
 
 export default function DetailHero({ detail, onOpenGallery, onShare, onGoToReviews }: DetailHeroProps) {
-    const photo = detail.photos[0]?.url;
+    const firstPhoto = detail.photos[0]?.url;
+    const heroImage = useBrokenImage(firstPhoto);
+    const photo = heroImage.show ? firstPhoto : undefined;
     const [imageLoaded, setImageLoaded] = useState(false);
     const photoCount = detail.photos.length;
     const eyebrow = [detail.type, detail.type === "Restaurante" ? detail.cuisine : roomsLabel(detail.numOfRooms)]
@@ -37,7 +40,10 @@ export default function DetailHero({ detail, onOpenGallery, onShare, onGoToRevie
                             if (el?.complete) setImageLoaded(true);
                         }}
                         onLoad={() => setImageLoaded(true)}
-                        onError={() => setImageLoaded(true)}
+                        onError={() => {
+                            heroImage.onError();
+                            setImageLoaded(true);
+                        }}
                     />
                     <div className="ui-hero__shade" />
                 </>
@@ -80,17 +86,21 @@ export default function DetailHero({ detail, onOpenGallery, onShare, onGoToRevie
                                         <Icon name="star" filled className="estd-pill__star" />
                                         <span aria-hidden="true">
                                             {rating}
-                                            {detail.reviewCount > 0 && ` (${detail.reviewCount})`}
+                                            {detail.reviewCount > 0 && ` (${formatCount(detail.reviewCount)})`}
                                         </span>
                                         <span className="ui-sr-only">{spoken}. Ir para as avaliações</span>
                                     </a>
                                 </li>
                             )}
-                            {price && <li className="estd-pill">{price}</li>}
+                            {price && (
+                                <li className="estd-pill" title={price}>
+                                    <span className="estd-pill__text">{price}</span>
+                                </li>
+                            )}
                             {detail.neighborhood && (
-                                <li className="estd-pill">
+                                <li className="estd-pill" title={detail.neighborhood}>
                                     <Icon name="location_on" />
-                                    {detail.neighborhood}
+                                    <span className="estd-pill__text">{detail.neighborhood}</span>
                                 </li>
                             )}
                         </ul>

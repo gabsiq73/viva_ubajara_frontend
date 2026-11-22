@@ -1,5 +1,6 @@
 import type { MouseEvent } from "react";
 import type { DetailPhoto } from "../../utils/establishmentDetail";
+import { useBrokenImage } from "../../hooks/useBrokenImage";
 import "./photo-gallery.css";
 
 const MAX_TILES = 6;
@@ -8,6 +9,11 @@ interface PhotoGalleryProps {
     title: string;
     photos: DetailPhoto[];
     onOpen: (index: number, event: MouseEvent<HTMLButtonElement>) => void;
+}
+
+function Thumb({ url }: { url: string }) {
+    const image = useBrokenImage(url);
+    return image.show ? <img src={url} alt="" width={800} height={600} loading="lazy" decoding="async" onError={image.onError} /> : null;
 }
 
 export default function PhotoGallery({ title, photos, onOpen }: PhotoGalleryProps) {
@@ -24,7 +30,7 @@ export default function PhotoGallery({ title, photos, onOpen }: PhotoGalleryProp
                 return (
                     <li key={photo.url} className="ui-photo-gallery__cell">
                         <button type="button" className="ui-photo-gallery__item" aria-label={label} onClick={(event) => onOpen(i, event)}>
-                            <img src={photo.url} alt="" width={800} height={600} loading="lazy" decoding="async" />
+                            <Thumb url={photo.url} />
                             {more > 0 && <span className="ui-photo-gallery__more" aria-hidden="true">+{more}</span>}
                         </button>
                     </li>

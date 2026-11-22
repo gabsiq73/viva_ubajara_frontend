@@ -10,9 +10,15 @@ import StateBlock from '../../components/ui/StateBlock';
 import Toggle from '../../components/ui/Toggle';
 import { Button, ButtonLink } from '../../components/ui/Button';
 import { Skeleton } from '../../components/ui/Skeleton';
+import { useBrokenImage } from '../../hooks/useBrokenImage';
 import type { GastronomyItemResponse, GastronomyItemRequest, CompanyEstablishmentResponse } from '../../admin/types';
 import '../../components/ui/ui.css';
 import './MenuItemsPage.css';
+
+function MenuMedia({ url, name }: { url?: string | null; name: string }) {
+  const image = useBrokenImage(url);
+  return image.show ? <img src={url!} alt={name} onError={image.onError} /> : <><Icon name="restaurant" /><span>Sem imagem</span></>;
+}
 
 const EMPTY: GastronomyItemRequest = { name: '', displayOrder: undefined, active: true };
 
@@ -260,7 +266,7 @@ export function MenuItemsPage() {
           {items.map((item) => (
             <li key={item.id} className="company-menu-card">
               <div className="company-menu-card__media">
-                {item.imageUrl ? <img src={item.imageUrl} alt={item.name} /> : <><Icon name="restaurant" /><span>Sem imagem</span></>}
+                <MenuMedia url={item.imageUrl} name={item.name} />
               </div>
               <div className="company-menu-card__body">
                 <strong>{item.name}</strong>

@@ -3,6 +3,7 @@ import { restaurantsService } from '../services/restaurantsService';
 import { useCrudList } from '../hooks/useCrudList';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
+import { countLabel } from '../utils/countLabel';
 import { ConfirmModal } from '../components/Modal';
 import type { ApprovalStatus, RestaurantResponse } from '../types';
 import type { ReactNode } from 'react';
@@ -60,7 +61,7 @@ export function RestaurantsListPage() {
   return (
     <div>
       <div className="adm-page-header">
-        <h2 className="adm-page-title">Restaurantes <span>{totalElements} registros</span></h2>
+        <h2 className="adm-page-title">Restaurantes <span>{countLabel(totalElements, 'registro', 'registros')}</span></h2>
         <Link className="adm-btn adm-btn--primary" to="/admin/restaurants/new"><Plus size={16} aria-hidden="true" /> Novo Restaurante</Link>
       </div>
       <div className="adm-card">

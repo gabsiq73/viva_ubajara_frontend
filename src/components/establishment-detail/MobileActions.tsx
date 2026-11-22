@@ -78,7 +78,7 @@ export function BottomBar({ detail, onOpenSheet }: MobileActionsProps) {
     return (
         <div className="estd-bottombar">
             <div className="estd-bottombar__price">
-                {price.value && <span className="estd-bottombar__value">{price.value}</span>}
+                {price.value && <span className="estd-bottombar__value" title={price.value}>{price.value}</span>}
                 {unit && <span className="estd-bottombar__unit">{unit}</span>}
             </div>
             {tel && (

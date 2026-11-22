@@ -3,6 +3,7 @@ import { tourGuidesService } from '../services/tourGuidesService';
 import { useCrudList } from '../hooks/useCrudList';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
+import { countLabel } from '../utils/countLabel';
 import { ConfirmModal } from '../components/Modal';
 import type { TourGuideResponse } from '../types';
 import type { ReactNode } from 'react';
@@ -30,7 +31,7 @@ export function TourGuidesListPage() {
   return (
     <div>
       <div className="adm-page-header">
-        <h2 className="adm-page-title">Guias Turísticos <span>{totalElements} registros</span></h2>
+        <h2 className="adm-page-title">Guias Turísticos <span>{countLabel(totalElements, 'registro', 'registros')}</span></h2>
         <Link className="adm-btn adm-btn--primary" to="/admin/tour-guides/new"><Plus size={16} aria-hidden="true" /> Novo Guia</Link>
       </div>
       <div className="adm-card">

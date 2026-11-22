@@ -4,6 +4,7 @@ import { useUrlListState } from '../hooks/useUrlListState';
 import { testimonialsService } from '../services/testimonialsService';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
+import { countLabel } from '../utils/countLabel';
 import { ConfirmModal } from '../components/Modal';
 import type { TestimonialResponse } from '../types';
 import type { ReactNode } from 'react';
@@ -164,7 +165,7 @@ export function TestimonialsListPage() {
   return (
     <div>
       <div className="adm-page-header">
-        <h2 className="adm-page-title">Depoimentos <span>{totalElements} registros</span></h2>
+        <h2 className="adm-page-title">Depoimentos <span>{countLabel(totalElements, 'registro', 'registros')}</span></h2>
       </div>
 
       <div className="adm-card">

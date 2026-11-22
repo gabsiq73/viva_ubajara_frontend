@@ -115,6 +115,7 @@
 .evd-hero__content {
     position: relative;
     z-index: 2;
+    padding-top: 56px; /* mantém títulos longos fora da faixa do breadcrumb */
     padding-bottom: 56px;
     width: 100%;
     box-sizing: border-box;
@@ -155,6 +156,7 @@
     color: #ffffff;
     line-height: 1.1;
     margin: 0 0 14px;
+    overflow-wrap: anywhere;
 }
 
 .evd-hero__date-row {
@@ -195,6 +197,7 @@
 }
 
 .evd-info-item {
+    overflow-wrap: anywhere;
     display: inline-flex;
     align-items: center;
     gap: 7px;
@@ -257,11 +260,13 @@
 }
 
 .evd-content__desc {
+    overflow-wrap: anywhere;
     font-family: "Inter", sans-serif;
     font-size: var(--fs-body);
     line-height: var(--lh-body);
     color: #3c4a42;
     margin: 0 0 16px;
+    white-space: pre-line;
 }
 
 .evd-tags-title {
@@ -363,6 +368,7 @@
 }
 
 .evd-info-list__value {
+    overflow-wrap: anywhere;
     display: block;
     font-family: "Inter", sans-serif;
     font-size: 14px;
@@ -571,6 +577,7 @@
 }
 
 .evd-rel-card__title {
+    overflow-wrap: anywhere;
     font-family: "Nunito", sans-serif;
     font-weight: 800;
     font-size: 15px;
@@ -580,6 +587,7 @@
 }
 
 .evd-rel-card__place {
+    overflow-wrap: anywhere;
     display: flex;
     align-items: center;
     gap: 3px;

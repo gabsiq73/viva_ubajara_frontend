@@ -3,6 +3,7 @@ import { eventsService } from '../services/eventsService';
 import { useCrudList } from '../hooks/useCrudList';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
+import { countLabel } from '../utils/countLabel';
 import { ConfirmModal } from '../components/Modal';
 import type { EventResponse } from '../types';
 import type { ReactNode } from 'react';
@@ -32,7 +33,7 @@ export function EventsListPage() {
   return (
     <div>
       <div className="adm-page-header">
-        <h2 className="adm-page-title">Eventos <span>{totalElements} registros</span></h2>
+        <h2 className="adm-page-title">Eventos <span>{countLabel(totalElements, 'registro', 'registros')}</span></h2>
         <Link className="adm-btn adm-btn--primary" to="/admin/events/new"><Plus size={16} aria-hidden="true" /> Novo Evento</Link>
       </div>
       <div className="adm-card">

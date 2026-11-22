@@ -12,8 +12,10 @@ import { useAuth } from "../admin/hooks/useAuth";
 import { testimonialsService } from "../admin/services/testimonialsService";
 import { pageConfigService } from "../admin/services/pageConfigService";
 import type { TestimonialResponse } from "../admin/types";
+import { useBrokenImage } from "../hooks/useBrokenImage";
+import { reviewerInitials } from "../components/layout/userDisplay";
 import { formatLongDate, parseIsoDate, toIsoDate } from "../utils/dates";
-import { RATING_LABELS, averageFormat, reviewsLabel } from "../utils/rating";
+import { RATING_LABELS, averageFormat, formatCount, reviewsLabel } from "../utils/rating";
 import { useAsyncData } from "../utils/useAsyncData";
 import { usePresence } from "../utils/usePresence";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
@@ -27,20 +29,21 @@ function parseRating(raw: string | null): 0 | StarValue {
 
 // ─── Card de depoimento ────────────────────────────────────────────────────
 function TestimonialCard({ t }: { t: TestimonialResponse }) {
-  const initials = t.userName.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+  const initials = reviewerInitials(t.userName);
+  const photo = useBrokenImage(t.userPhoto);
   const date = parseIsoDate(t.createdDate);
 
   return (
     <article className="dep-card">
       <div className="dep-card__top">
         <div className="dep-card__avatar">
-          {t.userPhoto
-            ? <img src={t.userPhoto} alt="" width={44} height={44} loading="lazy" decoding="async" />
-            : <span aria-hidden="true">{initials}</span>
+          {photo.show
+            ? <img src={t.userPhoto} alt="" width={44} height={44} loading="lazy" decoding="async" onError={photo.onError} />
+            : <span aria-hidden="true">{initials || <Icon name="person" />}</span>
           }
         </div>
         <div className="dep-card__meta">
-          <strong className="dep-card__name">{t.userName}</strong>
+          <strong className="dep-card__name" title={t.userName}>{t.userName}</strong>
         </div>
         <Stars value={t.rating} size={15} />
       </div>
@@ -181,7 +184,7 @@ export default function Depoimentos(): JSX.Element {
                       style={{ "--p": count / all.length, "--i": index } as CSSProperties}
                     />
                   </div>
-                  <span className="dep-summary__bar-count" aria-hidden="true">{count}</span>
+                  <span className="dep-summary__bar-count" aria-hidden="true">{formatCount(count)}</span>
                 </button>
               ))}
             </div>

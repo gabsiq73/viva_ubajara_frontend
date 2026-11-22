@@ -356,6 +356,7 @@
     top: calc(100% + 8px);
     right: 0;
     min-width: 248px;
+    max-width: min(360px, calc(100vw - 32px));
     padding: 8px;
     box-sizing: border-box;
     border-radius: 16px;

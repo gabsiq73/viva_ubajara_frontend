@@ -1,5 +1,5 @@
 import Icon from "./Icon";
-import { formatRating, reviewsLabel } from "../../utils/rating";
+import { formatCount, formatRating, reviewsLabel } from "../../utils/rating";
 
 export default function Rating({ value, count }: { value: number; count?: number }) {
     const label = formatRating(value);
@@ -8,7 +8,7 @@ export default function Rating({ value, count }: { value: number; count?: number
         <span className="ui-card__rating" role="img" aria-label={spoken}>
             <Icon name="star" filled />
             {label}
-            {count ? <span className="ui-card__rating-count">({count})</span> : null}
+            {count ? <span className="ui-card__rating-count">({formatCount(count)})</span> : null}
         </span>
     );
 }

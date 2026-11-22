@@ -3,6 +3,7 @@ import { contactsService } from '../services/contactsService';
 import { useCrudList } from '../hooks/useCrudList';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
+import { countLabel } from '../utils/countLabel';
 import { ConfirmModal } from '../components/Modal';
 import type { ContactResponse } from '../types';
 import type { ReactNode } from 'react';
@@ -29,7 +30,7 @@ export function ContactsListPage() {
   return (
     <div>
       <div className="adm-page-header">
-        <h2 className="adm-page-title">Contatos <span>{totalElements} registros</span></h2>
+        <h2 className="adm-page-title">Contatos <span>{countLabel(totalElements, 'registro', 'registros')}</span></h2>
         <Link className="adm-btn adm-btn--primary" to="/admin/contacts/new"><Plus size={16} aria-hidden="true" /> Novo Contato</Link>
       </div>
       <div className="adm-card">

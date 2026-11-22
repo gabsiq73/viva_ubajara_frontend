@@ -5,6 +5,7 @@ import { useUrlListState } from '../hooks/useUrlListState';
 import { claimsService } from '../services/claimsService';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
+import { countLabel } from '../utils/countLabel';
 import { ConfirmModal, Modal } from '../components/Modal';
 import { FormTextarea } from '../components/FormField';
 import { formatCnpj } from '../../utils/cnpj';
@@ -127,7 +128,7 @@ export function ClaimsListPage() {
       accessor: (r: EstablishmentClaimAdminResponse): ReactNode => (
         <div>
           <div>{r.claimant.name}</div>
-          <div style={{ fontSize: 12, color: 'var(--adm-text-muted)', overflowWrap: 'break-word' }}>{r.claimant.email}</div>
+          <div style={{ fontSize: 12, color: 'var(--adm-text-muted)', overflowWrap: 'anywhere' }}>{r.claimant.email}</div>
         </div>
       ),
     },
@@ -166,7 +167,7 @@ export function ClaimsListPage() {
       <div className="adm-page-header">
         <h2 className="adm-page-title">
           Reivindicações
-          <span>{totalElements} {totalElements === 1 ? 'solicitação' : 'solicitações'}</span>
+          <span>{countLabel(totalElements, 'solicitação', 'solicitações')}</span>
         </h2>
       </div>
 

@@ -1,6 +1,6 @@
 import type { HostPointResponse, HostType, RestaurantResponse } from "../admin/types";
 import type { FavoriteItem } from "./favorites";
-import { effectiveRating } from "./rating";
+import { effectiveRating, formatCount } from "./rating";
 
 export type EstablishmentType = "Restaurante" | "Hotel" | "Pousada" | "Hostel";
 export type ApiType = "restaurant" | "hostpoint";
@@ -107,7 +107,7 @@ export function shortPrice(raw?: string | null): string {
 
 export function roomsLabel(rooms: number | null): string {
     if (!rooms) return "";
-    return rooms === 1 ? "1 quarto" : `${rooms} quartos`;
+    return rooms === 1 ? "1 quarto" : `${formatCount(rooms)} quartos`;
 }
 
 export function mapRestaurant(r: RestaurantResponse): Establishment {

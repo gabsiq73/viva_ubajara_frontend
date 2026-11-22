@@ -3,9 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../admin/hooks/useAuth";
 import { reviewsService } from "../../admin/services/reviewsService";
 import type { ApprovalStatus, PageResponse, ReviewResponse, ReviewSummary } from "../../admin/types";
+import { useBrokenImage } from "../../hooks/useBrokenImage";
+import { reviewerInitials } from "../layout/userDisplay";
 import { claimErrorMessage } from "../../utils/claims";
 import { formatLongDate, parseIsoDate, toIsoDate } from "../../utils/dates";
-import { RATING_LABELS, formatRating, reviewsLabel } from "../../utils/rating";
+import { RATING_LABELS, formatCount, formatRating, reviewsLabel } from "../../utils/rating";
 import { saveReturnTo } from "../../utils/returnTo";
 import { useAsyncData } from "../../utils/useAsyncData";
 import { usePresence } from "../../utils/usePresence";
@@ -38,20 +40,21 @@ interface ReviewsSectionProps {
 }
 
 function ReviewCard({ review }: { review: ReviewResponse }) {
-    const initials = review.authorName.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+    const initials = reviewerInitials(review.authorName);
+    const photo = useBrokenImage(review.authorPhoto);
     const date = parseIsoDate(review.createdDate);
     return (
         <article className="rv-card">
             <div className="rv-card__top">
                 <div className="rv-card__avatar">
-                    {review.authorPhoto ? (
-                        <img src={review.authorPhoto} alt="" width={40} height={40} loading="lazy" decoding="async" />
+                    {photo.show ? (
+                        <img src={review.authorPhoto!} alt="" width={40} height={40} loading="lazy" decoding="async" onError={photo.onError} />
                     ) : (
-                        <span aria-hidden="true">{initials}</span>
+                        <span aria-hidden="true">{initials || <Icon name="person" />}</span>
                     )}
                 </div>
                 <div className="rv-card__meta">
-                    <strong className="rv-card__name">{review.authorName}</strong>
+                    <strong className="rv-card__name" title={review.authorName}>{review.authorName}</strong>
                     {date && (
                         <time className="rv-card__date" dateTime={toIsoDate(date)}>
                             {formatLongDate(date)}
@@ -84,7 +87,7 @@ function Summary({ summary }: { summary: ReviewSummary }) {
                             <span className="rv-summary__track" aria-hidden="true">
                                 <span className="rv-summary__fill" style={{ "--p": summary.count ? count / summary.count : 0, "--i": index } as CSSProperties} />
                             </span>
-                            <span className="rv-summary__count" aria-hidden="true">{count}</span>
+                            <span className="rv-summary__count" aria-hidden="true">{formatCount(count)}</span>
                         </li>
                     );
                 })}
