@@ -7,10 +7,12 @@ interface ModalBehaviorOptions {
     initialFocusRef: RefObject<HTMLElement | null>;
     /** Elemento que abriu o diálogo; evita depender de `document.activeElement` (Safari não foca botões ao toque). */
     returnFocusRef?: RefObject<HTMLElement | null>;
+    /** Desligue ao iniciar a saída animada para soltar o scroll e devolver o foco sem esperar o desmonte. */
+    enabled?: boolean;
 }
 
 /** Trava a rolagem do body, prende o foco, fecha com Esc e devolve o foco a quem abriu. Use enquanto o diálogo está montado. */
-export function useModalBehavior({ panelRef, onClose, initialFocusRef, returnFocusRef }: ModalBehaviorOptions) {
+export function useModalBehavior({ panelRef, onClose, initialFocusRef, returnFocusRef, enabled = true }: ModalBehaviorOptions) {
     const onCloseRef = useRef(onClose);
 
     useEffect(() => {
@@ -18,6 +20,7 @@ export function useModalBehavior({ panelRef, onClose, initialFocusRef, returnFoc
     });
 
     useEffect(() => {
+        if (!enabled) return;
         const opener = returnFocusRef?.current ?? (document.activeElement as HTMLElement | null);
         const previousOverflow = document.body.style.overflow;
         document.body.style.overflow = "hidden";
@@ -49,5 +52,5 @@ export function useModalBehavior({ panelRef, onClose, initialFocusRef, returnFoc
             document.body.style.overflow = previousOverflow;
             if (opener?.isConnected) opener.focus();
         };
-    }, [panelRef, initialFocusRef, returnFocusRef]);
+    }, [panelRef, initialFocusRef, returnFocusRef, enabled]);
 }

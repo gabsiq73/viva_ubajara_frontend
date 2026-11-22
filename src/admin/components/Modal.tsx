@@ -1,6 +1,9 @@
 import { useId, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { useModalBehavior } from '../../hooks/useModalBehavior';
+import { usePresence } from '../../utils/usePresence';
+
+const EXIT_MS = 180;
 
 interface ModalProps {
   isOpen: boolean;
@@ -12,14 +15,20 @@ interface ModalProps {
   descriptionId?: string;
 }
 
-function ModalDialog({ title, children, onClose, size = 'md', role = 'dialog', descriptionId }: Omit<ModalProps, 'isOpen'>) {
+interface ModalDialogProps extends Omit<ModalProps, 'isOpen'> {
+  open: boolean;
+  state: 'open' | 'closed';
+}
+
+function ModalDialog({ open, state, title, children, onClose, size = 'md', role = 'dialog', descriptionId }: ModalDialogProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
-  useModalBehavior({ panelRef, onClose, initialFocusRef: panelRef });
+  useModalBehavior({ panelRef, onClose, initialFocusRef: panelRef, enabled: open });
 
   return (
     <div
       className="adm-modal-overlay"
+      data-state={state}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
@@ -45,8 +54,9 @@ function ModalDialog({ title, children, onClose, size = 'md', role = 'dialog', d
 }
 
 export function Modal({ isOpen, ...props }: ModalProps) {
-  if (!isOpen) return null;
-  return <ModalDialog {...props} />;
+  const { mounted, state } = usePresence(isOpen, EXIT_MS);
+  if (!mounted) return null;
+  return <ModalDialog open={isOpen} state={state} {...props} />;
 }
 
 interface ConfirmModalProps {

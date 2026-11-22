@@ -84,11 +84,9 @@ function CompanyShell() {
         <span className="company-topbar__title">Painel do parceiro</span>
       </header>
 
+      {isMobile && <div className="company-backdrop" data-open={drawerOpen} onClick={closeDrawer} aria-hidden="true" />}
       {drawerOpen && (
-        <>
-          <div className="company-backdrop" onClick={closeDrawer} aria-hidden="true" />
-          <DrawerBehavior panelRef={drawerRef} initialFocusRef={closeButtonRef} returnFocusRef={menuButtonRef} onClose={closeDrawer} />
-        </>
+        <DrawerBehavior panelRef={drawerRef} initialFocusRef={closeButtonRef} returnFocusRef={menuButtonRef} onClose={closeDrawer} />
       )}
 
       <aside

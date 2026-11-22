@@ -277,13 +277,14 @@
     inset: 0;
     z-index: 110;
     background: rgba(0, 20, 9, 0.55);
-    animation: company-shell-fade 0.2s ease both;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 250ms ease;
 }
 
-@keyframes company-shell-fade {
-    from {
-        opacity: 0;
-    }
+.company-backdrop[data-open="true"] {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 /* ── Conteúdo ── */
@@ -306,6 +307,7 @@
     border-radius: var(--pub-radius-sm);
     box-shadow: var(--pub-shadow-md);
     font-family: "Inter", sans-serif;
+    --adm-toast-from: translateY(-12px);
 }
 
 /* ── Blocos compartilhados pelas páginas ── */
@@ -635,7 +637,7 @@
         padding-bottom: env(safe-area-inset-bottom);
         transform: translateX(-100%);
         visibility: hidden;
-        transition: transform 0.26s var(--ease-drawer), visibility 0s linear 0.26s;
+        transition: transform 300ms var(--ease-drawer), visibility 0s linear 300ms;
         box-shadow: none;
     }
 
@@ -657,7 +659,7 @@
     }
 
     .company-root ~ .adm-toast-container {
-        top: calc(var(--company-topbar-h) + env(safe-area-inset-top) + 8px);
+        top: calc(60px + env(safe-area-inset-top) + 8px);
         right: 12px;
         left: 12px;
     }
@@ -690,8 +692,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .company-sidebar,
-    .company-backdrop,
     .company-btn-spinner {
         animation-duration: 0.01ms;
     }

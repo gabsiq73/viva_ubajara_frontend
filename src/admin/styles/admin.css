@@ -81,7 +81,6 @@
   height: 100vh;
   overflow: hidden;
   z-index: 100;
-  transition: transform var(--adm-transition);
 }
 
 .adm-sidebar__close {
@@ -788,7 +787,17 @@
   justify-content: center;
   z-index: 1000;
   backdrop-filter: blur(4px);
-  animation: adm-fade-in 0.2s ease;
+  opacity: 0;
+  transition: opacity 150ms var(--ease-out);
+}
+
+.adm-modal-overlay[data-state="open"] {
+  opacity: 1;
+  transition-duration: 200ms;
+}
+
+.adm-modal-overlay[data-state="closed"] {
+  pointer-events: none;
 }
 
 .adm-modal {
@@ -799,7 +808,16 @@
   width: 90%;
   max-width: 560px;
   box-shadow: var(--adm-shadow-md);
-  animation: adm-slide-up 0.3s var(--ease-out);
+  opacity: 0;
+  transform: scale(0.96);
+  transform-origin: center;
+  transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out);
+}
+
+.adm-modal-overlay[data-state="open"] .adm-modal {
+  opacity: 1;
+  transform: none;
+  transition-duration: 200ms;
 }
 
 .adm-modal--lg {
@@ -880,7 +898,17 @@
   min-width: min(320px, calc(100vw - 32px));
   max-width: calc(100vw - 32px);
   overflow-wrap: anywhere;
-  animation: adm-slide-in-right 0.3s var(--ease-out);
+  --adm-toast-from: translateX(24px);
+  opacity: 0;
+  transform: var(--adm-toast-from);
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+}
+
+.adm-toast[data-state="open"] {
+  opacity: 1;
+  transform: none;
+  transition-duration: 400ms;
+  transition-timing-function: ease;
 }
 
 .adm-toast--success {
@@ -1507,49 +1535,17 @@
   }
 }
 
-@keyframes adm-fade-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes adm-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes adm-slide-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 /* ============ RESPONSIVE ============ */
 @media (max-width: 768px) {
   /* Sidebar */
   .adm-sidebar {
     transform: translateX(-100%);
+    transition: transform 220ms var(--ease-drawer);
   }
 
   .adm-sidebar.open {
     transform: translateX(0);
+    transition-duration: 300ms;
   }
 
   /* Overlay ao abrir sidebar */
@@ -1558,6 +1554,14 @@
     inset: 0;
     background: rgba(0, 0, 0, 0.45);
     z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 250ms ease;
+  }
+
+  .adm-sidebar-overlay[data-open="true"] {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .adm-sidebar__close {
@@ -1764,6 +1768,6 @@
 @media (prefers-reduced-motion: reduce) {
   .adm-modal,
   .adm-toast {
-    animation: adm-fade-in 200ms ease;
+    transform: none;
   }
 }

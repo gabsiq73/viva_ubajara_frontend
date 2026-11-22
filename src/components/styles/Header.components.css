@@ -594,7 +594,19 @@
     color: #ffffff;
     --site-logo-color: #ffffff;
     --site-logo-h: 36px;
-    animation: site-menu-in 200ms var(--site-ease);
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transition: opacity 150ms var(--ease-out), clip-path 150ms var(--ease-out);
+}
+
+.site-menu[data-state="open"] {
+    opacity: 1;
+    clip-path: inset(0);
+    transition-duration: 220ms;
+}
+
+.site-menu[data-state="closed"] {
+    pointer-events: none;
 }
 
 .site-menu:focus {
@@ -603,11 +615,6 @@
 
 .site-menu[hidden] {
     display: none;
-}
-
-@keyframes site-menu-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
 }
 
 .site-menu__bar {
@@ -777,6 +784,11 @@
     .site-header__search-panel,
     .site-menu {
         animation: none;
+    }
+
+    .site-menu,
+    .site-menu[data-state="open"] {
+        clip-path: none;
     }
 }
 

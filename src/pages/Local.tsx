@@ -167,16 +167,14 @@ function LocalView({ spot }: { spot: TouristSpotResponse }) {
             </main>
             <Footer />
 
-            {galleryIndex !== null && (
-                <PhotoLightbox
-                    title={spot.name}
-                    photos={gallery}
-                    index={galleryIndex}
-                    onIndexChange={setGalleryIndex}
-                    onClose={() => setGalleryIndex(null)}
-                    returnFocusRef={openerRef}
-                />
-            )}
+            <PhotoLightbox
+                title={spot.name}
+                photos={gallery}
+                index={galleryIndex}
+                onIndexChange={setGalleryIndex}
+                onClose={() => setGalleryIndex(null)}
+                returnFocusRef={openerRef}
+            />
         </div>
     );
 }

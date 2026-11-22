@@ -3,12 +3,15 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../admin/hooks/useAuth";
 import { FOCUSABLE_SELECTOR } from "../../hooks/focusable";
 import { getRoleLabel } from "../../utils/roles";
+import { usePresence } from "../../utils/usePresence";
 import Navbar from "../Navbar";
 import Icon from "../ui/Icon";
 import SiteLogo from "./SiteLogo";
 import SiteSearchForm from "./SiteSearchForm";
 import UserAvatar from "./UserAvatar";
 import { getDisplayName } from "./userDisplay";
+
+const EXIT_MS = 150;
 
 interface MobileMenuProps {
     id: string;
@@ -23,6 +26,7 @@ export default function MobileMenu({ id, open, focusSearch, onClose }: MobileMen
     const closeRef = useRef<HTMLButtonElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
     const onCloseRef = useRef(onClose);
+    const { mounted, state } = usePresence(open, EXIT_MS);
 
     useEffect(() => {
         onCloseRef.current = onClose;
@@ -76,7 +80,8 @@ export default function MobileMenu({ id, open, focusSearch, onClose }: MobileMen
             role="dialog"
             aria-modal="true"
             aria-label="Menu"
-            hidden={!open}
+            hidden={!mounted}
+            data-state={state}
             tabIndex={-1}
         >
             <div className="site-menu__bar">

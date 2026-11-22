@@ -956,6 +956,17 @@
     background: rgba(0, 20, 9, 0.95);
     color: #ffffff;
     overscroll-behavior: contain;
+    opacity: 0;
+    transition: opacity 150ms var(--ease-out);
+}
+
+.estd-lightbox[data-state="open"] {
+    opacity: 1;
+    transition-duration: 200ms;
+}
+
+.estd-lightbox[data-state="closed"] {
+    pointer-events: none;
 }
 
 .estd-lightbox__bar {
@@ -1010,12 +1021,30 @@
 
 .estd-lightbox__stage {
     flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
     min-height: 0;
     padding: 0 80px 24px;
     touch-action: pan-y;
+}
+
+.estd-lightbox__slide {
+    grid-area: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+    transition: opacity 160ms ease-out, transform 160ms var(--ease-out);
+}
+
+.estd-lightbox__slide[data-phase="enter"] {
+    opacity: 0;
+    transform: translateX(calc(var(--estd-dir) * 24px));
+}
+
+.estd-lightbox__slide[data-phase="leave"] {
+    opacity: 0;
 }
 
 .estd-lightbox__img {
@@ -1025,6 +1054,16 @@
     object-fit: contain;
     user-select: none;
     -webkit-user-drag: none;
+    opacity: 0;
+    transform: scale(0.96);
+    transform-origin: center;
+    transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out);
+}
+
+.estd-lightbox[data-state="open"] .estd-lightbox__img {
+    opacity: 1;
+    transform: none;
+    transition-duration: 250ms;
 }
 
 .estd-lightbox__nav {
@@ -1049,12 +1088,10 @@
 .estd-sheet .ui-sheet__panel {
     height: auto;
     max-height: 92dvh;
-    animation-fill-mode: backwards;
-    transition: transform 0.2s ease;
 }
 
 .estd-sheet__drag {
-    touch-action: none;
+    display: block;
 }
 
 .estd-sheet__header {
@@ -1125,12 +1162,11 @@
 
 @media (prefers-reduced-motion: reduce) {
     .estd-lightbox__img {
-        animation: none;
+        transform: none;
     }
 
-    .estd-sheet .ui-sheet__panel {
-        animation: rm-fade 200ms ease !important;
-        transform: none !important;
+    .estd-lightbox__slide[data-phase="enter"] {
+        transform: none;
     }
 }
 

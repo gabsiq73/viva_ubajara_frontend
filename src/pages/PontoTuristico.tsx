@@ -322,16 +322,14 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
             </main>
             <Footer />
 
-            {galleryIndex !== null && (
-                <PhotoLightbox
-                    title={attraction.name}
-                    photos={gallery}
-                    index={galleryIndex}
-                    onIndexChange={setGalleryIndex}
-                    onClose={() => setGalleryIndex(null)}
-                    returnFocusRef={openerRef}
-                />
-            )}
+            <PhotoLightbox
+                title={attraction.name}
+                photos={gallery}
+                index={galleryIndex}
+                onIndexChange={setGalleryIndex}
+                onClose={() => setGalleryIndex(null)}
+                returnFocusRef={openerRef}
+            />
         </div>
     );
 }

@@ -1,20 +1,23 @@
-import { useEffect, useId, useRef, type RefObject, type TouchEvent } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties, type RefObject, type TouchEvent } from "react";
 import { createPortal } from "react-dom";
 import Icon from "../ui/Icon";
 import { useModalBehavior } from "../../hooks/useModalBehavior";
 import type { DetailPhoto } from "../../utils/establishmentDetail";
+import { usePresence } from "../../utils/usePresence";
 import "./establishment-detail.css";
 
 interface PhotoLightboxProps {
     title: string;
     photos: DetailPhoto[];
-    index: number;
+    index: number | null;
     onIndexChange: (index: number) => void;
     onClose: () => void;
     returnFocusRef: RefObject<HTMLElement | null>;
 }
 
 const SWIPE_MIN_DISTANCE = 50;
+const EXIT_MS = 150;
+const SWAP_MS = 160;
 
 export default function PhotoLightbox(props: PhotoLightboxProps) {
     if (props.photos.length === 0) return null;
@@ -22,25 +25,33 @@ export default function PhotoLightbox(props: PhotoLightboxProps) {
 }
 
 function LightboxDialog({ title, photos, index, onIndexChange, onClose, returnFocusRef }: PhotoLightboxProps) {
+    const open = index !== null;
+    const [shownIndex, setShownIndex] = useState(index ?? 0);
+    if (index !== null && index !== shownIndex) setShownIndex(index);
+    const { mounted, state } = usePresence(open, EXIT_MS);
+    const [direction, setDirection] = useState(1);
     const titleId = useId();
     const panelRef = useRef<HTMLDivElement>(null);
     const closeRef = useRef<HTMLButtonElement>(null);
     const touchStart = useRef<{ x: number; y: number } | null>(null);
     const total = photos.length;
 
-    useModalBehavior({ panelRef, onClose, initialFocusRef: closeRef, returnFocusRef });
+    useModalBehavior({ panelRef, onClose, initialFocusRef: closeRef, returnFocusRef, enabled: open });
 
-    const go = (step: number) => onIndexChange((index + step + total) % total);
+    const go = (step: number) => {
+        setDirection(step);
+        onIndexChange((shownIndex + step + total) % total);
+    };
 
     useEffect(() => {
-        if (total < 2) return;
+        if (!open || total < 2) return;
         const handleKeyDown = (event: globalThis.KeyboardEvent) => {
-            if (event.key === "ArrowLeft") onIndexChange((index - 1 + total) % total);
-            else if (event.key === "ArrowRight") onIndexChange((index + 1) % total);
+            if (event.key === "ArrowLeft") go(-1);
+            else if (event.key === "ArrowRight") go(1);
         };
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [index, total, onIndexChange]);
+    });
 
     const handleTouchStart = (event: TouchEvent) => {
         const touch = event.touches[0];
@@ -57,12 +68,15 @@ function LightboxDialog({ title, photos, index, onIndexChange, onClose, returnFo
         if (Math.abs(dx) >= SWIPE_MIN_DISTANCE && Math.abs(dx) > Math.abs(dy) * 1.5) go(dx < 0 ? 1 : -1);
     };
 
-    const photo = photos[index];
+    if (!mounted) return null;
+
+    const photo = photos[shownIndex];
 
     return createPortal(
         <div
             ref={panelRef}
             className="estd-lightbox"
+            data-state={state}
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
@@ -72,14 +86,14 @@ function LightboxDialog({ title, photos, index, onIndexChange, onClose, returnFo
             </h2>
             <div className="estd-lightbox__bar">
                 <span className="estd-lightbox__count" aria-live="polite" aria-atomic="true">
-                    {index + 1}/{total}
+                    {shownIndex + 1}/{total}
                 </span>
                 <button ref={closeRef} type="button" className="estd-lightbox__btn" aria-label="Fechar galeria" onClick={onClose}>
                     <Icon name="close" />
                 </button>
             </div>
             <div className="estd-lightbox__stage" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-                <img key={photo.url} src={photo.url} alt={photo.alt} className="estd-lightbox__img" />
+                <LightboxSlides photo={photo} direction={direction} />
             </div>
             {total > 1 && (
                 <>
@@ -103,5 +117,54 @@ function LightboxDialog({ title, photos, index, onIndexChange, onClose, returnFo
             )}
         </div>,
         document.body,
+    );
+}
+
+/** Troca de foto em crossfade: a anterior continua montada até terminar de desaparecer. */
+function LightboxSlides({ photo, direction }: { photo: DetailPhoto; direction: number }) {
+    const [current, setCurrent] = useState(photo);
+    const [outgoing, setOutgoing] = useState<DetailPhoto | null>(null);
+    if (photo.url !== current.url) {
+        setOutgoing(current);
+        setCurrent(photo);
+    }
+
+    useEffect(() => {
+        if (!outgoing) return;
+        const timer = window.setTimeout(() => setOutgoing(null), SWAP_MS);
+        return () => window.clearTimeout(timer);
+    }, [outgoing]);
+
+    return (
+        <>
+            {outgoing && <LightboxSlide key={outgoing.url} photo={outgoing} direction={direction} leaving />}
+            <LightboxSlide key={current.url} photo={current} direction={direction} initial={outgoing === null} leaving={false} />
+        </>
+    );
+}
+
+function LightboxSlide({ photo, direction, leaving, initial }: { photo: DetailPhoto; direction: number; leaving: boolean; initial?: boolean }) {
+    const [entered, setEntered] = useState(initial ?? false);
+
+    useEffect(() => {
+        if (entered) return;
+        let second = 0;
+        const first = requestAnimationFrame(() => {
+            second = requestAnimationFrame(() => setEntered(true));
+        });
+        return () => {
+            cancelAnimationFrame(first);
+            cancelAnimationFrame(second);
+        };
+    }, [entered]);
+
+    return (
+        <div
+            className="estd-lightbox__slide"
+            data-phase={leaving ? "leave" : entered ? "idle" : "enter"}
+            style={{ "--estd-dir": direction } as CSSProperties}
+        >
+            <img src={photo.url} alt={photo.alt} className="estd-lightbox__img" />
+        </div>
     );
 }

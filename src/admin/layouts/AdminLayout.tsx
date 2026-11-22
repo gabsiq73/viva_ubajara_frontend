@@ -59,11 +59,9 @@ function AdminShell() {
 
   return (
     <div className="adm-root">
+      {isMobile && <div className="adm-sidebar-overlay" data-open={drawerOpen} onClick={closeDrawer} aria-hidden="true" />}
       {drawerOpen && (
-        <>
-          <div className="adm-sidebar-overlay" onClick={closeDrawer} aria-hidden="true" />
-          <DrawerBehavior panelRef={drawerRef} initialFocusRef={closeButtonRef} returnFocusRef={menuButtonRef} onClose={closeDrawer} />
-        </>
+        <DrawerBehavior panelRef={drawerRef} initialFocusRef={closeButtonRef} returnFocusRef={menuButtonRef} onClose={closeDrawer} />
       )}
       <Sidebar
         id="adm-sidebar"

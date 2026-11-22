@@ -1,6 +1,8 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { FOCUSABLE_SELECTOR } from "../../hooks/focusable";
+import { useDragToDismiss } from "../../hooks/useDragToDismiss";
+import { usePresence } from "../../utils/usePresence";
 import Icon from "./Icon";
 
 interface BottomSheetProps {
@@ -11,10 +13,15 @@ interface BottomSheetProps {
     children: ReactNode;
 }
 
+const SHEET_EXIT_MS = 250;
+
 export default function BottomSheet({ open, onClose, title, footer, children }: BottomSheetProps) {
     const titleId = useId();
     const panelRef = useRef<HTMLDivElement>(null);
+    const backdropRef = useRef<HTMLDivElement>(null);
     const closeRef = useRef<HTMLButtonElement>(null);
+    const { mounted, state } = usePresence(open, SHEET_EXIT_MS);
+    const dragHandlers = useDragToDismiss({ panelRef, backdropRef, onClose, state });
     const onCloseRef = useRef(onClose);
 
     useEffect(() => {
@@ -55,20 +62,22 @@ export default function BottomSheet({ open, onClose, title, footer, children }: 
         };
     }, [open]);
 
-    if (!open) return null;
+    if (!mounted) return null;
 
     return createPortal(
-        <div className="ui-sheet">
-            <div className="ui-sheet__backdrop" onClick={onClose} aria-hidden="true" />
+        <div className="ui-sheet" data-state={state}>
+            <div ref={backdropRef} className="ui-sheet__backdrop" onClick={onClose} aria-hidden="true" />
             <div ref={panelRef} className="ui-sheet__panel" role="dialog" aria-modal="true" aria-labelledby={titleId}>
-                <span className="ui-sheet__handle" aria-hidden="true" />
-                <div className="ui-sheet__header">
-                    <h2 id={titleId} className="ui-sheet__title">
-                        {title}
-                    </h2>
-                    <button ref={closeRef} type="button" className="ui-sheet__close" aria-label="Fechar" onClick={onClose}>
-                        <Icon name="close" />
-                    </button>
+                <div className="ui-sheet__drag" {...dragHandlers}>
+                    <span className="ui-sheet__handle" aria-hidden="true" />
+                    <div className="ui-sheet__header">
+                        <h2 id={titleId} className="ui-sheet__title">
+                            {title}
+                        </h2>
+                        <button ref={closeRef} type="button" className="ui-sheet__close" aria-label="Fechar" onClick={onClose}>
+                            <Icon name="close" />
+                        </button>
+                    </div>
                 </div>
                 <div className="ui-sheet__body">{children}</div>
                 {footer && <div className="ui-sheet__footer">{footer}</div>}
