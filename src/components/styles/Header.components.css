@@ -1,6 +1,14 @@
-/* Altura do header fixo, para páginas com elementos sticky/offset. */
+/* Altura do header fixo, para páginas com elementos sticky/offset. Registrada para
+   transicionar junto com a altura do header, sem saltar antes dele terminar. */
+@property --site-header-h {
+    syntax: "<length>";
+    inherits: true;
+    initial-value: 84px;
+}
+
 :root {
     --site-header-h: 84px;
+    transition: --site-header-h 250ms var(--ease-out);
 }
 
 :root:has(.site-header.is-solid) {
@@ -183,6 +191,17 @@
     height: 9px;
     border-radius: 50%;
     background: #f3c66b;
+}
+
+.site-header__dot--in {
+    animation: site-header-dot-in 160ms var(--ease-out);
+}
+
+@keyframes site-header-dot-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
 }
 
 .site-header.is-solid .site-header__dot {

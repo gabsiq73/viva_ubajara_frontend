@@ -19,6 +19,7 @@
 
 .estd-content {
     background: #ffffff;
+    animation: ui-fade-in 250ms var(--ease-out);
 }
 
 .estd-layout {

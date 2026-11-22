@@ -1,0 +1,30 @@
+/* Exceção deliberada à regra "só transform/opacity": grid-template-rows 0fr→1fr é a única forma de animar altura automática. */
+.ui-collapse {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 150ms var(--ease-out), opacity 150ms var(--ease-out), transform 150ms var(--ease-out);
+}
+
+.ui-collapse[data-state="closed"] {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transform: translateY(-4px);
+}
+
+.ui-collapse[data-state="open"] {
+    transition-duration: 200ms;
+}
+
+.ui-collapse__inner {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.ui-collapse__inner .ui-icon {
+    transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+}
+
+.ui-collapse[data-state="closed"] .ui-collapse__inner .ui-icon {
+    opacity: 0;
+    transform: scale(0.9);
+}

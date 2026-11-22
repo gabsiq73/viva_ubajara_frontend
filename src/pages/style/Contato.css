@@ -275,6 +275,23 @@
     border-color: #b91c1c;
 }
 
+/* O wrapper cancela o gap do flex; o espaço volta como padding interno e anima junto. */
+.ct-error-collapse {
+    margin-top: -6px;
+}
+
+.ct-error-collapse .ui-collapse__inner {
+    padding-top: 6px;
+}
+
+.ct-alert-collapse {
+    margin-top: -18px;
+}
+
+.ct-alert-collapse .ui-collapse__inner {
+    padding-top: 18px;
+}
+
 .ct-field-error {
     margin: 0;
     font-family: 'Inter', sans-serif;

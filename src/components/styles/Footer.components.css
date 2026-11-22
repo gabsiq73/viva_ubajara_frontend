@@ -351,6 +351,11 @@
     .site-footer__toggle .ui-icon {
         font-size: 22px;
         color: #b9dac6;
+        transition: transform 200ms var(--ease-out);
+    }
+
+    .site-footer__toggle[aria-expanded="true"] .ui-icon {
+        transform: rotate(45deg);
     }
 
     .site-footer__panel {

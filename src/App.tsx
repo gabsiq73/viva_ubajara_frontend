@@ -1,4 +1,4 @@
-import { lazy, Suspense, type MouseEvent } from "react";
+import { lazy, Suspense, useState, type MouseEvent } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import "./pages/style/globalStyle.css";
 import "./pages/style/SkipLink.css";
@@ -49,10 +49,14 @@ function SkipLink() {
 
 function AppRoutes() {
   const { pathname } = useLocation();
+  const [firstPath] = useState(pathname);
+  const isPrivateArea = pathname.startsWith("/admin") || pathname.startsWith("/empresa");
+  const fadeIn = !isPrivateArea && pathname !== firstPath;
 
   return (
     <ChunkErrorBoundary resetKey={pathname}>
       <Suspense fallback={<PageLoading fullPage />}>
+        <div key={isPrivateArea ? "private" : pathname} className={fadeIn ? "route-fade" : undefined}>
         <Routes>
           {/* ─── Rotas públicas ─── */}
           <Route path="/" element={<Index />} />
@@ -82,6 +86,7 @@ function AppRoutes() {
 
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </div>
       </Suspense>
     </ChunkErrorBoundary>
   );

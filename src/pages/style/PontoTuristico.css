@@ -7,6 +7,10 @@
     background: #ffffff;
 }
 
+.pt-main > :not(.pt-hero) {
+    animation: ui-fade-in 250ms var(--ease-out);
+}
+
 .pt-main {
     flex: 1;
 }
@@ -119,6 +123,10 @@
     margin-top: 8px;
     transition: background 0.18s, color 0.18s, transform var(--dur-press) var(--ease-out), border-color 0.18s;
     backdrop-filter: blur(6px);
+}
+
+.pt-hero__fav-btn--pop {
+    animation: ui-pop 220ms var(--ease-out);
 }
 
 @media (hover: hover) and (pointer: fine) {

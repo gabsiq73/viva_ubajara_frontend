@@ -1,9 +1,10 @@
-import type { JSX } from 'react';
+import type { CSSProperties, JSX } from 'react';
 import { useState, useEffect, useRef, useId } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Icon from "../components/ui/Icon";
+import Collapse from "../components/ui/Collapse";
 import StateBlock from "../components/ui/StateBlock";
 import { Button } from "../components/ui/Button";
 import { Stars, StarPicker, type StarValue } from "../components/ui/Stars";
@@ -14,6 +15,7 @@ import type { TestimonialResponse } from "../admin/types";
 import { formatLongDate, parseIsoDate, toIsoDate } from "../utils/dates";
 import { RATING_LABELS, averageFormat, reviewsLabel } from "../utils/rating";
 import { useAsyncData } from "../utils/useAsyncData";
+import { usePresence } from "../utils/usePresence";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
 import "../components/ui/ui.css";
 import "./style/Depoimentos.css";
@@ -95,6 +97,7 @@ export default function Depoimentos(): JSX.Element {
   const all = testimonials.status === "ready" ? [...published, ...testimonials.data] : [];
   const filtered = filter === 0 ? all : all.filter((t) => t.rating === filter);
 
+  const bars = usePresence(all.length > 0, 0);
   const avgRating = all.length ? all.reduce((s, t) => s + t.rating, 0) / all.length : 0;
 
   const countByRating = [5, 4, 3, 2, 1].map((star) => ({
@@ -161,8 +164,8 @@ export default function Depoimentos(): JSX.Element {
               <span className="dep-summary__total">{reviewsLabel(all.length)}</span>
             </div>
 
-            <div className="dep-summary__bars" role="group" aria-label="Filtrar por nota">
-              {countByRating.map(({ star, count }) => (
+            <div className="dep-summary__bars" role="group" aria-label="Filtrar por nota" data-state={bars.state}>
+              {countByRating.map(({ star, count }, index) => (
                 <button
                   key={star}
                   type="button"
@@ -175,7 +178,7 @@ export default function Depoimentos(): JSX.Element {
                   <div className="dep-summary__bar-track" aria-hidden="true">
                     <div
                       className="dep-summary__bar-fill"
-                      style={{ width: `${(count / all.length) * 100}%` }}
+                      style={{ "--p": count / all.length, "--i": index } as CSSProperties}
                     />
                   </div>
                   <span className="dep-summary__bar-count" aria-hidden="true">{count}</span>
@@ -240,12 +243,12 @@ export default function Depoimentos(): JSX.Element {
             </h2>
             <p className="dep-form-section__sub">Sua experiência ajuda outros visitantes a se planejar.</p>
 
-            {submitSuccess && (
+            <Collapse open={submitSuccess} className="dep-alert-collapse">
               <div className="dep-alert dep-alert--success" role="status">
                 <Icon name="check_circle" />
                 Obrigado! Seu depoimento foi enviado e aguarda aprovação.
               </div>
-            )}
+            </Collapse>
 
             <form className="dep-form" onSubmit={handleSubmit} noValidate>
               <div className="dep-form__rating-wrap">
@@ -264,7 +267,9 @@ export default function Depoimentos(): JSX.Element {
                     <span className="dep-form__rating-label" aria-live="polite">{RATING_LABELS[rating]}</span>
                   )}
                 </div>
-                {ratingError && <p id={ratingErrorId} className="dep-form__error">{ratingError}</p>}
+                <Collapse open={!!ratingError}>
+                  <p id={ratingErrorId} className="dep-form__error">{ratingError}</p>
+                </Collapse>
               </div>
 
               <div className="dep-form__field">
@@ -285,15 +290,17 @@ export default function Depoimentos(): JSX.Element {
                   aria-describedby={commentError ? commentErrorId : undefined}
                 />
                 <span className="dep-form__char-count">{comment.length}/600</span>
-                {commentError && <p id={commentErrorId} className="dep-form__error">{commentError}</p>}
+                <Collapse open={!!commentError}>
+                  <p id={commentErrorId} className="dep-form__error">{commentError}</p>
+                </Collapse>
               </div>
 
-              {submitError && (
+              <Collapse open={!!submitError} className="dep-form__alert">
                 <div className="dep-alert dep-alert--error" role="alert">
                   <Icon name="error" />
                   {submitError}
                 </div>
-              )}
+              </Collapse>
 
               <button type="submit" className="dep-form__submit" disabled={submitting}>
                 {submitting

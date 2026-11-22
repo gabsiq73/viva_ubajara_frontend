@@ -733,15 +733,42 @@
         margin-left: auto;
         font-size: 20px;
         color: #7a9080;
+        transition: transform 200ms var(--ease-out);
     }
 
-    /* Sidebar: collapsed by default on mobile (display:none tira os controles do foco e do leitor de tela) */
+    .ev-filter-toggle[aria-expanded="true"] .ev-toggle-arrow {
+        transform: rotate(180deg);
+    }
+
+    /* Sidebar recolhida no mobile: visibility atrasada tira os controles do foco e do leitor de tela só depois do fechamento.
+       Altura via grid-template-rows (exceção deliberada: altura automática); a margem negativa cancela o gap do .ev-body. */
     .ev-sidebar {
-        display: none;
+        display: grid;
+        grid-template-rows: 0fr;
+        margin-bottom: -12px;
+        padding: 0;
+        border: 0;
+        background: none;
+        visibility: hidden;
+        transition: grid-template-rows 250ms var(--ease-out), margin-bottom 250ms var(--ease-out), visibility 0s linear 250ms;
     }
 
     .ev-sidebar.is-open {
-        display: block;
+        grid-template-rows: 1fr;
+        margin-bottom: 0;
+        visibility: visible;
+        transition-delay: 0s;
+    }
+
+    .ev-sidebar__clip {
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .ev-sidebar__box {
+        background: #ffffff;
+        border: 1px solid #e4ede8;
+        border-radius: 16px;
         padding: 24px;
     }
 

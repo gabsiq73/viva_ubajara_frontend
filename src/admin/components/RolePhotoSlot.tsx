@@ -107,8 +107,8 @@ export function RolePhotoSlot({
       {hint && <span className="adm-field__hint">{hint}</span>}
 
       {currentUrl ? (
-        <div className="adm-role-slot__preview">
-          <img src={currentUrl} alt={label} className="adm-role-slot__img" />
+        <div className={`adm-role-slot__preview${uploading ? ' adm-role-slot__preview--busy' : ''}`}>
+          <img key={currentUrl} src={currentUrl} alt={label} className="adm-role-slot__img" />
           <div className="adm-role-slot__actions">
             <button
               type="button"

@@ -88,14 +88,14 @@ section.welcome {
 
 .hero-rotating-word {
     display: inline-block;
-    animation: word-enter 0.5s var(--ease-out) both;
+    animation: word-enter 400ms var(--ease-out) both;
 }
 
 @keyframes word-enter {
     0% {
         opacity: 0;
         transform: translateY(18px);
-        filter: blur(6px);
+        filter: blur(4px);
     }
     100% {
         opacity: 1;

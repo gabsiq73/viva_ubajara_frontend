@@ -6,6 +6,7 @@ import FiltersPanel from "../components/establishments/FiltersPanel";
 import BottomSheet from "../components/ui/BottomSheet";
 import { Button, ButtonLink } from "../components/ui/Button";
 import { AppliedChip, FilterChip } from "../components/ui/Chip";
+import Collapse from "../components/ui/Collapse";
 import EstablishmentCard from "../components/ui/EstablishmentCard";
 import Icon from "../components/ui/Icon";
 import PageHero from "../components/ui/PageHero";
@@ -235,6 +236,14 @@ export default function Estabelecimentos() {
 
     const loading = status === "loading";
     const ready = status === "ready";
+
+    // A busca fica fora da assinatura: digitar não pode remontar a grade a cada tecla.
+    const resultsKey = [filters.tipo, filters.culinaria.join(","), filters.reserva, filters.avaliacao, filters.online, filters.quartos, sort, effectiveView].join("|");
+    const [firstKey, setFirstKey] = useState<string | null>(null);
+    const [firstDone, setFirstDone] = useState(false);
+    if (ready && firstKey === null) setFirstKey(resultsKey);
+    if (firstKey !== null && resultsKey !== firstKey && !firstDone) setFirstDone(true);
+    const gridMotion = !firstDone ? "stagger" : "fade";
     const countLabel = `${results.length} ${results.length === 1 ? "estabelecimento" : "estabelecimentos"}`;
     const endLabel =
         results.length === 1 ? "Você viu o único resultado" : `Você viu todos os ${results.length} resultados`;
@@ -425,7 +434,7 @@ export default function Estabelecimentos() {
                                         </div>
                                     </div>
 
-                                    {activeFilters.length > 0 && (
+                                    <Collapse open={activeFilters.length > 0} className="estab-applied-collapse">
                                         <div className="estab-applied">
                                             {activeFilters.map((f) => (
                                                 <AppliedChip
@@ -439,7 +448,7 @@ export default function Estabelecimentos() {
                                                 Limpar filtros
                                             </button>
                                         </div>
-                                    )}
+                                    </Collapse>
 
                                     {results.length === 0 ? (
                                         <StateBlock
@@ -466,7 +475,10 @@ export default function Estabelecimentos() {
                                         </StateBlock>
                                     ) : (
                                         <>
-                                            <div className={effectiveView === "list" ? "estab-list" : "estab-grid"}>
+                                            <div
+                                                key={resultsKey}
+                                                className={`${effectiveView === "list" ? "estab-list" : "estab-grid"} estab-motion--${gridMotion}`}
+                                            >
                                                 {results.map((item) => (
                                                     <EstablishmentCard
                                                         key={`${item.apiType}-${item.id}`}

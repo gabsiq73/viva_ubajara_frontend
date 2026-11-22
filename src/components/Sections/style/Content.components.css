@@ -140,7 +140,7 @@ body {
 @keyframes slideUpFade {
     from {
         opacity: 0;
-        transform: translateY(40px);
+        transform: translateY(16px);
     }
 
     to {
@@ -167,7 +167,7 @@ body {
 @keyframes grid-reveal-up {
     from {
         opacity: 0;
-        transform: translateY(28px);
+        transform: translateY(var(--reveal-y, 16px));
     }
 }
 
@@ -177,16 +177,23 @@ body {
 
 .grid-reveal.is-visible > * {
     opacity: 1;
-    animation: grid-reveal-up 0.55s var(--ease-out) backwards;
+    animation: grid-reveal-up 400ms var(--ease-out) backwards;
 }
 
-.grid-reveal.is-visible > *:nth-child(2) { animation-delay: 0.09s; }
-.grid-reveal.is-visible > *:nth-child(3) { animation-delay: 0.18s; }
-.grid-reveal.is-visible > *:nth-child(4) { animation-delay: 0.27s; }
-.grid-reveal.is-visible > *:nth-child(5) { animation-delay: 0.09s; }
-.grid-reveal.is-visible > *:nth-child(6) { animation-delay: 0.18s; }
-.grid-reveal.is-visible > *:nth-child(7) { animation-delay: 0.27s; }
-.grid-reveal.is-visible > *:nth-child(8) { animation-delay: 0.36s; }
+.grid-reveal.is-visible > *:nth-child(2) { animation-delay: 50ms; }
+.grid-reveal.is-visible > *:nth-child(3) { animation-delay: 100ms; }
+.grid-reveal.is-visible > *:nth-child(4) { animation-delay: 150ms; }
+.grid-reveal.is-visible > *:nth-child(5) { animation-delay: 50ms; }
+.grid-reveal.is-visible > *:nth-child(6) { animation-delay: 100ms; }
+.grid-reveal.is-visible > *:nth-child(7) { animation-delay: 150ms; }
+.grid-reveal.is-visible > *:nth-child(8) { animation-delay: 200ms; }
+
+/* Já revelada (ex.: troca de chip do guia): itens novos só fazem fade curto, sem deslocamento nem escalonamento. */
+.grid-reveal.is-visible.has-revealed > *:nth-child(n) {
+    --reveal-y: 0px;
+    animation-duration: 150ms;
+    animation-delay: 0s;
+}
 
 @media (prefers-reduced-motion: reduce) {
     .reveal, .grid-reveal > * {
@@ -317,7 +324,7 @@ ul.list-cards li {
     top: -120px;
     overflow: hidden;
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
-    animation: slideUpFade 0.6s ease backwards;
+    animation: slideUpFade 400ms var(--ease-out) backwards;
     transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
 }
 
@@ -328,10 +335,9 @@ ul.list-cards li {
     }
 }
 
-ul.list-cards li:nth-child(1) { animation-delay: 0.1s; }
-ul.list-cards li:nth-child(2) { animation-delay: 0.2s; }
-ul.list-cards li:nth-child(3) { animation-delay: 0.3s; }
-ul.list-cards li:nth-child(4) { animation-delay: 0.4s; }
+ul.list-cards li:nth-child(2) { animation-delay: 50ms; }
+ul.list-cards li:nth-child(3) { animation-delay: 100ms; }
+ul.list-cards li:nth-child(4) { animation-delay: 150ms; }
 
 .info-card__link {
     display: flex;

@@ -60,11 +60,24 @@
     color: var(--ui-text-secondary);
 }
 
+/* Linha reservada: o erro nasce no blur e não pode deslocar o botão entre mousedown e mouseup. */
+.ui-field__error-slot {
+    min-height: 1.3em;
+    margin-top: -2px;
+    font-size: 13px;
+}
+
 .ui-field__error {
     display: flex;
     align-items: flex-start;
     gap: 6px;
     color: #b83a3a;
+    transition: opacity 160ms var(--ease-out), transform 160ms var(--ease-out);
+}
+
+.ui-field__error[data-state="closed"] {
+    opacity: 0;
+    transform: translateY(-4px);
 }
 
 .ui-field__error .ui-icon {

@@ -7,6 +7,10 @@
     background: #f7faf8;
 }
 
+.evd-main > :not(.evd-hero) {
+    animation: ui-fade-in 250ms var(--ease-out);
+}
+
 .evd-main {
     flex: 1;
 }

@@ -232,62 +232,66 @@ export default function Eventos() {
                                 {activeCount > 0 && (
                                     <span className="ev-filter-badge">{activeCount}</span>
                                 )}
-                                <Icon name={sidebarOpen ? "expand_less" : "expand_more"} className="ev-toggle-arrow" />
+                                <Icon name="expand_more" className="ev-toggle-arrow" />
                             </button>
 
                             <aside id={sidebarId} className={`ev-sidebar${sidebarOpen ? " is-open" : ""}`} aria-label="Filtros">
+                                <div className="ev-sidebar__clip">
+                                    <div className="ev-sidebar__box">
 
-                                <div className="ev-sidebar__section">
-                                    <p className="ev-sidebar__label">Buscar</p>
-                                    <div className="ev-search__wrap">
-                                        <Icon name="search" className="ev-search__icon" />
-                                        <input
-                                            type="search"
-                                            name="q"
-                                            className="ev-search__input"
-                                            placeholder="Nome ou local…"
-                                            value={search}
-                                            onChange={(e) => handleSearch(e.target.value)}
-                                            autoComplete="off"
-                                            spellCheck={false}
-                                            aria-label="Buscar eventos"
-                                        />
+                                        <div className="ev-sidebar__section">
+                                            <p className="ev-sidebar__label">Buscar</p>
+                                            <div className="ev-search__wrap">
+                                                <Icon name="search" className="ev-search__icon" />
+                                                <input
+                                                    type="search"
+                                                    name="q"
+                                                    className="ev-search__input"
+                                                    placeholder="Nome ou local…"
+                                                    value={search}
+                                                    onChange={(e) => handleSearch(e.target.value)}
+                                                    autoComplete="off"
+                                                    spellCheck={false}
+                                                    aria-label="Buscar eventos"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {monthOptions.length > 0 && (
+                                            <div className="ev-sidebar__section">
+                                                <p id={periodLabelId} className="ev-sidebar__label">Período</p>
+                                                <div className="ev-filter-group" role="group" aria-labelledby={periodLabelId}>
+                                                    <button
+                                                        type="button"
+                                                        className={`ev-pill${activeMonth === "" ? " is-active" : ""}`}
+                                                        aria-pressed={activeMonth === ""}
+                                                        onClick={() => updateParams({ mes: null })}
+                                                    >
+                                                        Todos
+                                                    </button>
+                                                    {monthOptions.map((opt) => (
+                                                        <button
+                                                            key={opt.value}
+                                                            type="button"
+                                                            className={`ev-pill${activeMonth === opt.value ? " is-active" : ""}`}
+                                                            aria-pressed={activeMonth === opt.value}
+                                                            onClick={() => updateParams({ mes: opt.value })}
+                                                        >
+                                                            {opt.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {activeCount > 0 && (
+                                            <button type="button" className="ev-sidebar__clear" onClick={clearAll}>
+                                                <Icon name="close" />
+                                                Limpar filtros
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
-
-                                {monthOptions.length > 0 && (
-                                    <div className="ev-sidebar__section">
-                                        <p id={periodLabelId} className="ev-sidebar__label">Período</p>
-                                        <div className="ev-filter-group" role="group" aria-labelledby={periodLabelId}>
-                                            <button
-                                                type="button"
-                                                className={`ev-pill${activeMonth === "" ? " is-active" : ""}`}
-                                                aria-pressed={activeMonth === ""}
-                                                onClick={() => updateParams({ mes: null })}
-                                            >
-                                                Todos
-                                            </button>
-                                            {monthOptions.map((opt) => (
-                                                <button
-                                                    key={opt.value}
-                                                    type="button"
-                                                    className={`ev-pill${activeMonth === opt.value ? " is-active" : ""}`}
-                                                    aria-pressed={activeMonth === opt.value}
-                                                    onClick={() => updateParams({ mes: opt.value })}
-                                                >
-                                                    {opt.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeCount > 0 && (
-                                    <button type="button" className="ev-sidebar__clear" onClick={clearAll}>
-                                        <Icon name="close" />
-                                        Limpar filtros
-                                    </button>
-                                )}
                             </aside>
                         </>
                     )}

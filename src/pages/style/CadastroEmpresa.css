@@ -99,7 +99,7 @@
 
 .ce-alert:focus-visible {
     outline: 3px solid var(--pub-green-mid);
-    outline-offset: 2px;
+    outline-offset: -3px;
 }
 
 .ce-form {
@@ -155,6 +155,7 @@
     height: 6px;
     border-radius: 50px;
     background: var(--ui-line);
+    transition: background-color 160ms ease;
 }
 
 .ce-strength--0 .ce-strength__bars i:nth-child(1) {

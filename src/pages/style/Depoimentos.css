@@ -181,6 +181,13 @@
   height: 100%;
   background: #FFB527;
   border-radius: 4px;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 400ms var(--ease-out) calc(var(--i, 0) * 40ms);
+}
+
+.dep-summary__bars[data-state="open"] .dep-summary__bar-fill {
+  transform: scaleX(var(--p));
 }
 
 .dep-summary__bar-count {
@@ -331,8 +338,22 @@
   border: 1px solid #fecaca;
 }
 
+.dep-alert-collapse .ui-collapse__inner {
+  padding-bottom: 16px;
+}
+
+/* Cancela o gap do flex para que o espaço acima do alerta cresça junto com ele. */
+.dep-form__alert {
+  margin-top: -20px;
+}
+
+.dep-form__alert .ui-collapse__inner {
+  padding-top: 20px;
+}
+
 /* Submit */
 .dep-form__submit {
+  min-width: 13.5rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -345,7 +366,7 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform var(--dur-press) var(--ease-out);
+  transition: background-color 0.2s ease, transform var(--dur-press) var(--ease-out), opacity 160ms ease;
   align-self: flex-start;
 }
 

@@ -1,4 +1,4 @@
-import type { MouseEvent } from "react";
+import { useState, type MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import Icon from "../ui/Icon";
 import { roomsLabel, shortPrice } from "../../utils/establishments";
@@ -15,6 +15,7 @@ interface DetailHeroProps {
 
 export default function DetailHero({ detail, onOpenGallery, onShare, onGoToReviews }: DetailHeroProps) {
     const photo = detail.photos[0]?.url;
+    const [imageLoaded, setImageLoaded] = useState(false);
     const photoCount = detail.photos.length;
     const eyebrow = [detail.type, detail.type === "Restaurante" ? detail.cuisine : roomsLabel(detail.numOfRooms)]
         .filter(Boolean)
@@ -27,7 +28,17 @@ export default function DetailHero({ detail, onOpenGallery, onShare, onGoToRevie
         <section className={`estd-hero${photo ? "" : " estd-hero--plain"}`}>
             {photo ? (
                 <>
-                    <img src={photo} alt="" className="ui-hero__img" fetchPriority="high" />
+                    <img
+                        src={photo}
+                        alt=""
+                        className={`ui-hero__img ui-hero__img--fade${imageLoaded ? " is-loaded" : ""}`}
+                        fetchPriority="high"
+                        ref={(el) => {
+                            if (el?.complete) setImageLoaded(true);
+                        }}
+                        onLoad={() => setImageLoaded(true)}
+                        onError={() => setImageLoaded(true)}
+                    />
                     <div className="ui-hero__shade" />
                 </>
             ) : (

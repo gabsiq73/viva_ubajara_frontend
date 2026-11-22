@@ -76,6 +76,7 @@ function scrollToSection(id: string) {
 function DetailView({ detail }: { detail: EstablishmentDetail }) {
     const isMobile = useMediaQuery("(max-width: 768px)");
     const [nearby, setNearby] = useState<Establishment[]>([]);
+    const [nearbyLoading, setNearbyLoading] = useState(true);
     const [favoriteIds, setFavoriteIds] = useState<Set<string>>(() => new Set(loadFavorites().map((f) => f.id)));
     const [galleryIndex, setGalleryIndex] = useState<number | null>(null);
     const [sheetOpen, setSheetOpen] = useState(false);
@@ -92,7 +93,10 @@ function DetailView({ detail }: { detail: EstablishmentDetail }) {
             .then((items) => {
                 if (!cancelled) setNearby(items);
             })
-            .catch(() => undefined);
+            .catch(() => undefined)
+            .then(() => {
+                if (!cancelled) setNearbyLoading(false);
+            });
         return () => {
             cancelled = true;
         };
@@ -186,8 +190,9 @@ function DetailView({ detail }: { detail: EstablishmentDetail }) {
                 </div>
             </div>
 
-            {nearby.length > 0 && (
+            {(nearbyLoading || nearby.length > 0) && (
                 <NearbySection
+                    loading={nearbyLoading}
                     items={nearby}
                     lodging={detail.apiType === "hostpoint"}
                     favoriteIds={favoriteIds}

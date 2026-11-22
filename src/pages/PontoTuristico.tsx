@@ -16,6 +16,7 @@ import { ATTRACTION_CATEGORY_LABELS as CATEGORY_LABELS } from "../utils/attracti
 import { formatRating, reviewsLabel } from "../utils/rating";
 import { hasMeaningfulText } from "../utils/establishmentDetail";
 import { loadFavorites, toggleFavorite } from "../utils/favorites";
+import { useActivationPop } from "../hooks/useActivationPop";
 import { buildSpotGallery } from "../utils/spotPhotos";
 import { isNotFoundError, requireUuid, useAsyncData } from "../utils/useAsyncData";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
@@ -31,6 +32,7 @@ function reduceMotion() {
 function PontoTuristicoView({ attraction, related }: { attraction: AttractionResponse; related: AttractionResponse[] }) {
     useDocumentTitle(attraction.name);
     const [isFavorite, setIsFavorite] = useState(() => loadFavorites().some((f) => f.id === attraction.id));
+    const favPop = useActivationPop(isFavorite);
 
     const handleToggleFavorite = () => {
         setIsFavorite(toggleFavorite({
@@ -85,7 +87,8 @@ function PontoTuristicoView({ attraction, related }: { attraction: AttractionRes
                             <div className="pt-hero__title-row">
                                 <h1 id="pt-hero-title" className="pt-hero__title">{attraction.name}</h1>
                                 <button
-                                    className={`pt-hero__fav-btn${isFavorite ? " pt-hero__fav-btn--active" : ""}`}
+                                    className={`pt-hero__fav-btn${isFavorite ? " pt-hero__fav-btn--active" : ""}${favPop.popping ? " pt-hero__fav-btn--pop is-popping" : ""}`}
+                                    onAnimationEnd={favPop.onAnimationEnd}
                                     onClick={handleToggleFavorite}
                                     aria-label={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
                                     title={isFavorite ? "Remover dos favoritos" : "Salvar nos favoritos"}

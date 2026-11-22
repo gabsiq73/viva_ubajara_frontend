@@ -210,6 +210,20 @@ textarea {
     50%      { opacity: 0.55; }
 }
 
+@keyframes ui-fade-in {
+    from { opacity: 0; }
+}
+
+/* Pop curto de confirmação (favoritar); só ao ativar, via useActivationPop. */
+@keyframes ui-pop {
+    50% { transform: scale(1.12); }
+}
+
+/* Só opacity (sem translate) e só em navegação cliente: o carregamento inicial não atrasa o LCP. */
+.route-fade {
+    animation: ui-fade-in 150ms var(--ease-out);
+}
+
 /* Skeleton placeholder for image containers before src loads */
 .evd-rel-card__img--placeholder {
     background: #e2ece6;
@@ -244,6 +258,15 @@ textarea {
 
     .evd-rel-card__img--placeholder {
         animation: none !important;
+    }
+
+    .is-popping,
+    .adm-upload-zone.drag-over,
+    .company-photo-drop.is-dragging,
+    .adm-upload-zone.drag-over .adm-upload-zone__icon-wrap,
+    .company-photo-drop.is-dragging .company-photo-drop__icon {
+        animation: none !important;
+        transform: none !important;
     }
 }
 

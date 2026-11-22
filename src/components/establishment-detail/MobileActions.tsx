@@ -1,4 +1,5 @@
 import type { MouseEvent } from "react";
+import { useActivationPop } from "../../hooks/useActivationPop";
 import Icon from "../ui/Icon";
 import { shortPrice } from "../../utils/establishments";
 import { splitPrice, telHref, type EstablishmentDetail } from "../../utils/establishmentDetail";
@@ -16,6 +17,7 @@ interface QuickActionsProps extends MobileActionsProps {
 
 export function QuickActions({ detail, favorite, onToggleFavorite, onOpenSheet }: QuickActionsProps) {
     const tel = telHref(detail.phone);
+    const { popping, onAnimationEnd } = useActivationPop(favorite);
     return (
         <div className="estd-qa">
             {tel && (
@@ -58,7 +60,7 @@ export function QuickActions({ detail, favorite, onToggleFavorite, onOpenSheet }
                 aria-pressed={favorite}
                 onClick={onToggleFavorite}
             >
-                <span className="estd-qa__disc">
+                <span className={`estd-qa__disc${popping ? " estd-qa__disc--pop is-popping" : ""}`} onAnimationEnd={onAnimationEnd}>
                     <Icon name="favorite" filled={favorite} />
                 </span>
                 {favorite ? "Salvo" : "Salvar"}

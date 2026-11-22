@@ -114,6 +114,13 @@
     height: 100%;
     border-radius: 4px;
     background: #ffb527;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 400ms var(--ease-out) calc(var(--i, 0) * 40ms);
+}
+
+.rv-summary__bars[data-state="open"] .rv-summary__fill {
+    transform: scaleX(var(--p));
 }
 
 .rv-summary__count {
@@ -215,6 +222,40 @@
 .rv-more {
     display: flex;
     justify-content: center;
+}
+
+.rv-list__item--new {
+    animation: rv-item-in 250ms var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+@keyframes rv-item-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+}
+
+/* Mesmo spinner do envio de solicitação; o box de 18px troca com o ícone sem mudar a largura do botão. */
+.rv-spinner {
+    box-sizing: border-box;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: rv-spin 0.7s linear infinite;
+}
+
+.ui-btn--outline .rv-spinner {
+    border-color: var(--ui-line-strong);
+    border-top-color: var(--pub-green);
+}
+
+@keyframes rv-spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .rv-inline-error {
@@ -327,6 +368,15 @@
     color: #153a27;
 }
 
+/* O wrapper cancela o gap do formulário; o espaço volta como padding interno e anima junto. */
+.rv-form__alert {
+    margin-top: -18px;
+}
+
+.rv-form__alert .ui-collapse__inner {
+    padding-top: 18px;
+}
+
 .rv-form__actions {
     display: flex;
     flex-wrap: wrap;
@@ -348,6 +398,42 @@
 
 .rv-alert .ui-icon {
     font-size: 20px;
+}
+
+.rv-form-card--sent {
+    animation: rv-sent-in 300ms var(--ease-out);
+}
+
+@keyframes rv-sent-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+}
+
+.rv-alert--success .ui-icon {
+    animation: rv-check-in 250ms var(--ease-out);
+}
+
+@keyframes rv-check-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rv-form-card--sent,
+    .rv-list__item--new,
+    .rv-alert--success .ui-icon {
+        animation-name: rv-fade-in;
+    }
+}
+
+@keyframes rv-fade-in {
+    from {
+        opacity: 0;
+    }
 }
 
 .rv-alert--success {

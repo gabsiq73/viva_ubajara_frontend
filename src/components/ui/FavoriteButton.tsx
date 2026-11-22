@@ -1,3 +1,4 @@
+import { useActivationPop } from "../../hooks/useActivationPop";
 import Icon from "./Icon";
 
 interface FavoriteButtonProps {
@@ -8,6 +9,7 @@ interface FavoriteButtonProps {
 }
 
 export default function FavoriteButton({ active, onToggle, variant = "overlay", className = "" }: FavoriteButtonProps) {
+    const { popping, onAnimationEnd } = useActivationPop(active);
     return (
         <button
             type="button"
@@ -16,7 +18,7 @@ export default function FavoriteButton({ active, onToggle, variant = "overlay", 
             aria-pressed={active}
             onClick={onToggle}
         >
-            <span className="ui-fav__disc">
+            <span className={`ui-fav__disc${popping ? " ui-fav__disc--pop is-popping" : ""}`} onAnimationEnd={onAnimationEnd}>
                 <Icon name="favorite" filled={active} />
             </span>
         </button>

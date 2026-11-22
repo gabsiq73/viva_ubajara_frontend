@@ -34,7 +34,10 @@ export default function CopyAddressButton({ address, selectRef, shortLabel = fal
     return (
         <>
             <button type="button" className={`estd-copy${copied ? " estd-copy--done" : ""} ${className}`.trim()} onClick={handleCopy}>
-                <Icon name={copied ? "check" : "content_copy"} />
+                <span className="estd-copy__icon">
+                    <Icon name="content_copy" />
+                    <Icon name="check" />
+                </span>
                 {copied ? (shortLabel ? "Copiado" : "Endereço copiado") : shortLabel ? "Copiar" : "Copiar endereço"}
             </button>
             <span className="ui-sr-only" role="status" aria-live="polite">
