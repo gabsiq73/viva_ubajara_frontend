@@ -150,6 +150,8 @@ export interface AttractionResponse {
   category: AttractionCategory;
   photos: PhotoResponse[];
   linkedSpots?: TouristSpotSummary[];
+  averageRating?: number | null;
+  reviewCount?: number;
 }
 
 // ============================================================
@@ -188,6 +190,8 @@ export interface TouristSpotResponse {
   instagramUrl?: string;
   active: boolean;
   photos: PhotoResponse[];
+  averageRating?: number | null;
+  reviewCount?: number;
 }
 
 // ============================================================
@@ -282,6 +286,9 @@ export interface RestaurantResponse {
   starRating?: number;
   photos: PhotoResponse[];
   approvalStatus?: ApprovalStatus;
+  claimable?: boolean;
+  averageRating?: number | null;
+  reviewCount?: number;
 }
 
 // ============================================================
@@ -338,6 +345,9 @@ export interface HostPointResponse {
   bookingUrl?: string;
   photos: PhotoResponse[];
   approvalStatus?: ApprovalStatus;
+  claimable?: boolean;
+  averageRating?: number | null;
+  reviewCount?: number;
 }
 
 // ============================================================
@@ -509,6 +519,42 @@ export interface TestimonialResponse {
 }
 
 // ============================================================
+// Reviews (avaliações de visitantes)
+// ============================================================
+export interface ReviewRequest {
+  rating: number;
+  comment?: string | null;
+}
+
+export interface ReviewResponse {
+  id: string;
+  rating: number;
+  comment: string | null;
+  authorName: string;
+  authorPhoto?: string | null;
+  status: ApprovalStatus;
+  createdDate: string;
+}
+
+export type ReviewSpotType = 'RESTAURANT' | 'HOST_POINT' | 'ATTRACTION' | 'SPOT';
+
+export interface ReviewAdminResponse {
+  id: string;
+  rating: number;
+  comment: string | null;
+  status: ApprovalStatus;
+  createdDate: string;
+  spot: { id: string; name: string; type: ReviewSpotType };
+  author: { id: string; name: string; email: string };
+}
+
+export interface ReviewSummary {
+  average: number | null;
+  count: number;
+  distribution: Record<string, number>;
+}
+
+// ============================================================
 // User Management
 // ============================================================
 export interface UserProfileUpdateRequest {
@@ -634,6 +680,51 @@ export interface CompanyEstablishmentResponse {
   bookingUrl?: string;
 
   photos: PhotoResponse[];
+}
+
+// ============================================================
+// Reivindicação de estabelecimento
+// ============================================================
+export type ClaimStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
+
+export interface EstablishmentClaimRequest {
+  spotId: string;
+  message: string;
+  contactPhone: string;
+}
+
+export interface EstablishmentClaimResponse {
+  id: string;
+  spotId: string;
+  spotName: string;
+  spotType: EstablishmentType;
+  status: ClaimStatus;
+  message: string;
+  contactPhone: string;
+  createdAt: string;
+  reviewedAt?: string | null;
+  rejectionReason?: string | null;
+}
+
+export interface EstablishmentClaimAdminResponse extends EstablishmentClaimResponse {
+  claimant: {
+    id: string;
+    name: string;
+    email: string;
+    companyName?: string | null;
+    cnpj?: string | null;
+    role: UserRole;
+  };
+  spot: {
+    id: string;
+    name: string;
+    type: EstablishmentType;
+    address?: string | null;
+    active?: boolean | null;
+    approvalStatus: ApprovalStatus;
+    hasOwner: boolean;
+  };
+  reviewedByName?: string | null;
 }
 
 // ============================================================

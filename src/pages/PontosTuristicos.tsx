@@ -1,48 +1,48 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Icon from "../components/ui/Icon";
+import StateBlock from "../components/ui/StateBlock";
+import { Button } from "../components/ui/Button";
+import { FilterChip } from "../components/ui/Chip";
 import { attractionsService } from "../admin/services/attractionsService";
 import { pageConfigService } from "../admin/services/pageConfigService";
-import type { AttractionResponse, AttractionCategory } from "../admin/types";
-import heroFallback from "../assets/images/foto-capa-parque-ubajara.png";
+import PointCard from "../components/ui/PointCard";
+import { ATTRACTION_CATEGORY_LABELS as CATEGORY_LABELS } from "../utils/attractionCategories";
+import { useAsyncData } from "../utils/useAsyncData";
+import { useDocumentTitle } from "../utils/useDocumentTitle";
+import heroFallback from "../assets/images/capa-pagina.webp";
+import "../components/ui/ui.css";
 import "../components/Sections/style/Content.components.css";
 import "./style/PontosTuristicos.css";
 
 const ALL = "Todos";
 
-const CATEGORY_LABELS: Record<AttractionCategory, string> = {
-  PARK: "Parque",
-  WATERFALL: "Cachoeira",
-  MUSEUM: "Museu",
-  FARM: "Fazenda",
-  ROUTE: "Rota",
-  MARKET: "Mercado",
-};
-
 export default function PontosTuristicos() {
-  const [items, setItems] = useState<AttractionResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  useDocumentTitle("Pontos turísticos");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const data = useAsyncData(async () => (await attractionsService.getAll(0, 100, true)).content, "attractions");
   const [coverImg, setCoverImg] = useState<string>(heroFallback);
   const [heroDesc, setHeroDesc] = useState("Descubra cachoeiras, fazendas, mercados históricos e museus que fazem da Serra da Ibiapaba um destino único no Ceará.");
-  const [activeCategory, setActiveCategory] = useState(ALL);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("q") ?? "");
 
   useEffect(() => {
     pageConfigService.getConfig('PONTOS_TURISTICOS').then((cfg) => {
       if (cfg.imageUrl) setCoverImg(cfg.imageUrl);
       if (cfg.description) setHeroDesc(cfg.description);
     });
-    attractionsService.getAll(0, 100, true)
-      .then(page => setItems(page.content))
-      .catch(() => setItems([]))
-      .finally(() => setLoading(false));
   }, []);
+
+  const items = useMemo(() => (data.status === "ready" ? data.data : []), [data]);
 
   const categories = useMemo(() => {
     const cats = Array.from(new Set(items.map(p => CATEGORY_LABELS[p.category] ?? p.category)));
     return [ALL, ...cats];
   }, [items]);
+
+  const categoryParam = searchParams.get("categoria") ?? ALL;
+  const activeCategory = categories.includes(categoryParam) ? categoryParam : ALL;
 
   const filtered = useMemo(
     () =>
@@ -59,14 +59,38 @@ export default function PontosTuristicos() {
     [items, activeCategory, search]
   );
 
+  function updateParams(changes: Record<string, string | null>) {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      for (const [key, value] of Object.entries(changes)) {
+        if (value) params.set(key, value);
+        else params.delete(key);
+      }
+      return params;
+    }, { replace: true });
+  }
+
+  function handleSearch(value: string) {
+    setSearch(value);
+    updateParams({ q: value.trim() ? value : null });
+  }
+
+  function clearFilters() {
+    setSearch("");
+    updateParams({ q: null, categoria: null });
+  }
+
+  const hasItems = data.status === "ready" && items.length > 0;
+  const showToolbar = data.status === "loading" || hasItems;
+
   return (
     <div className="ptl-page">
       <Header />
-      <main className="ptl-main">
+      <main className="ptl-main" id="conteudo" tabIndex={-1}>
 
         <section className="ptl-hero">
-          <img src={coverImg} alt="" className="ptl-hero__bg" aria-hidden />
-          <div className="ptl-hero__overlay" />
+          <img src={coverImg} alt="" className="ptl-hero__bg" fetchPriority="high" decoding="async" />
+          <div className="ptl-hero__overlay" aria-hidden="true" />
           <div className="ptl-hero__content">
             <div className="ptl-hero__inner">
               <span className="ptl-hero__kicker">PARQUE NACIONAL DE UBAJARA</span>
@@ -76,112 +100,77 @@ export default function PontosTuristicos() {
           </div>
         </section>
 
-        <div className="ptl-toolbar">
-          <div className="ptl-toolbar__inner">
-            <div className="ptl-filters" role="group" aria-label="Filtrar por categoria">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  className={`ptl-filter-btn${activeCategory === cat ? " is-active" : ""}`}
-                  onClick={() => setActiveCategory(cat)}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
+        {showToolbar && (
+          <div className="ptl-toolbar">
+            <div className="ptl-toolbar__inner">
+              <div className="ptl-filters" role="group" aria-label="Filtrar por categoria">
+                {categories.map((cat) => (
+                  <FilterChip
+                    key={cat}
+                    label={cat}
+                    selected={activeCategory === cat}
+                    onClick={() => updateParams({ categoria: cat === ALL ? null : cat })}
+                  />
+                ))}
+              </div>
 
-            <div className="ptl-search">
-              <label htmlFor="ptl-search-input" className="ptl-search__label">
-                Buscar atrativo
-              </label>
-              <div className="ptl-search__wrap">
-                <span className="material-symbols-outlined ptl-search__icon" aria-hidden="true">search</span>
-                <input
-                  id="ptl-search-input"
-                  type="search"
-                  placeholder="Nome do local..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="ptl-search__input"
-                />
+              <div className="ptl-search">
+                <label htmlFor="ptl-search-input" className="ptl-search__label">
+                  Buscar atrativo
+                </label>
+                <div className="ptl-search__wrap">
+                  <Icon name="search" className="ptl-search__icon" />
+                  <input
+                    id="ptl-search-input"
+                    name="q"
+                    type="search"
+                    placeholder="Nome do local…"
+                    value={search}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    autoComplete="off"
+                    spellCheck={false}
+                    className="ptl-search__input"
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
-        <section className="ptl-section">
+        <section className="ptl-section" aria-labelledby="ptl-list-title">
           <div className="ptl-section__inner">
-            {loading ? (
-              <div className="ptl-empty">
-                <span className="material-symbols-outlined ptl-empty__icon">hourglass_top</span>
-                <p className="ptl-empty__msg">Carregando pontos turísticos...</p>
+            <h2 id="ptl-list-title" className="ui-sr-only">Lista de pontos turísticos</h2>
+            {data.status === "loading" ? (
+              <div className="ptl-empty" role="status">
+                <Icon name="hourglass_top" className="ptl-empty__icon" />
+                <p className="ptl-empty__msg">Carregando pontos turísticos…</p>
               </div>
+            ) : data.status === "error" ? (
+              <StateBlock
+                variant="error"
+                icon="wifi_off"
+                title="Não conseguimos carregar os pontos turísticos"
+                actions={<Button icon="refresh" onClick={data.retry}>Tentar de novo</Button>}
+              >
+                A conexão na serra pode oscilar. Verifique o sinal e tente de novo.
+              </StateBlock>
+            ) : items.length === 0 ? (
+              <StateBlock variant="empty" icon="landscape" title="Ainda não há pontos turísticos cadastrados">
+                Volte em breve para conhecer os atrativos da Serra da Ibiapaba.
+              </StateBlock>
             ) : filtered.length > 0 ? (
-              <div className="cards-points ptl-cards-override">
-                <ul>
-                  {filtered.map((pt) => (
-                    <li key={pt.id}>
-                      <Link
-                        to={`/pontos/${pt.id}`}
-                        className="point-card__link"
-                        aria-label={`Ver detalhes de ${pt.name}`}
-                      >
-                        {pt.photos?.[0]?.url ? (
-                          <img
-                            src={pt.photos[0].url}
-                            alt={pt.name}
-                            className="point-card__img"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="point-card__img point-card__img--placeholder" aria-hidden="true" />
-                        )}
-                        <div className="point-card__gradient" />
-                        <span className="point-card__tag" aria-hidden="true">
-                          {CATEGORY_LABELS[pt.category] ?? pt.category}
-                        </span>
-                        <div className="point-card__body">
-                          <h3 className="point-card__title">{pt.name}</h3>
-                          <p className="point-card__desc">{pt.shortDescription ?? pt.description}</p>
-                          <div className="point-card__meta">
-                            {pt.averageVisitDuration != null && (
-                              <span className="point-card__meta-item">
-                                <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
-                                {pt.averageVisitDuration} min
-                              </span>
-                            )}
-                            {pt.openingHours && (
-                              <span className="point-card__meta-item">
-                                <span className="material-symbols-outlined" aria-hidden="true">calendar_today</span>
-                                {pt.openingHours}
-                              </span>
-                            )}
-                          </div>
-                          <span className="point-card__cta" aria-hidden="true">
-                            <span className="material-symbols-outlined" aria-hidden="true">visibility</span>
-                            Saiba mais
-                          </span>
-                        </div>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="ui-point-grid ui-point-grid--3">
+                {filtered.map((pt) => (
+                  <li key={pt.id}><PointCard item={pt} /></li>
+                ))}
+              </ul>
             ) : (
-              <div className="ptl-empty">
-                <span className="material-symbols-outlined ptl-empty__icon">search_off</span>
-                <p className="ptl-empty__msg">
-                  Nenhum ponto turístico encontrado para essa busca.
-                </p>
-                <button
-                  type="button"
-                  className="ptl-empty__reset"
-                  onClick={() => { setActiveCategory(ALL); setSearch(""); }}
-                >
-                  Limpar filtros
-                </button>
-              </div>
+              <StateBlock
+                variant="empty"
+                icon="search_off"
+                title="Nenhum ponto turístico encontrado para essa busca"
+                actions={<Button variant="outline" onClick={clearFilters}>Limpar filtros</Button>}
+              />
             )}
           </div>
         </section>
@@ -194,13 +183,13 @@ export default function PontosTuristicos() {
               rica em conhecimento histórico e ambiental.
             </p>
             <div className="ptl-cta__btns">
-              <Link to="/" className="ptl-cta__btn ptl-cta__btn--outline">Contratar um Guia</Link>
-              <Link to="/" className="ptl-cta__btn">Ver Regulamento do Parque</Link>
+              <Link to="/#guias-de-turismo" className="ptl-cta__btn ptl-cta__btn--outline">Contratar um Guia</Link>
             </div>
           </div>
         </section>
 
-        <section className="ptl-stats">
+        <section className="ptl-stats" aria-labelledby="ptl-stats-title">
+          <h2 id="ptl-stats-title" className="ui-sr-only">O parque em números</h2>
           <div className="ptl-stats__inner">
             {[
               { value: "6.288", label: "Hectares Protegidos" },

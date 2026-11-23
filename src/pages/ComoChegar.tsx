@@ -1,6 +1,9 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import heroImg from "../assets/images/foto-capa-parque-ubajara.png";
+import Icon from "../components/ui/Icon";
+import heroImg from "../assets/images/capa-pagina.webp";
+import { useDocumentTitle } from "../utils/useDocumentTitle";
+import "../components/ui/ui.css";
 import "./style/ComoChegar.css";
 
 const PARK_DESTINATION = "Parque+Nacional+de+Ubajara,Ubajara,CE,Brasil";
@@ -15,7 +18,7 @@ const AIRPORTS = [
     name: "Aeroporto Internacional Pinto Martins",
     city: "Fortaleza",
     state: "CE",
-    distance: "334 km",
+    distance: "334\u00a0km",
     duration: "~4h de carro",
     note: "Principal aeroporto do Ceará. Voos diretos de todo o Brasil e internacionais.",
     origin: "Aeroporto Internacional Pinto Martins, Fortaleza, CE",
@@ -25,7 +28,7 @@ const AIRPORTS = [
     name: "Aeroporto de Parnaíba – Prefeito Dr. João Silva Filho",
     city: "Parnaíba",
     state: "PI",
-    distance: "200 km",
+    distance: "200\u00a0km",
     duration: "~2h30 de carro",
     note: "Alternativa para quem vem do Piauí. Voos regionais com conexão em Fortaleza.",
     origin: "Aeroporto de Parnaíba, Parnaíba, PI",
@@ -35,7 +38,7 @@ const AIRPORTS = [
     name: "Aeroporto Municipal de Sobral",
     city: "Sobral",
     state: "CE",
-    distance: "100 km",
+    distance: "100\u00a0km",
     duration: "~1h30 de carro",
     note: "Aeroporto regional mais próximo. Operações limitadas — verifique disponibilidade antes.",
     origin: "Aeroporto Municipal de Sobral, Sobral, CE",
@@ -47,8 +50,8 @@ const BUS_STATIONS = [
     name: "Rodoviária de Ubajara",
     city: "Ubajara",
     state: "CE",
-    distance: "2 km do parque",
-    duration: "5 min de carro",
+    distance: "2\u00a0km do parque",
+    duration: "5\u00a0min de carro",
     note: "Terminal mais próximo. Ônibus de Tianguá e Sobral chegam aqui diariamente.",
     origin: "Rodoviária de Ubajara, Ubajara, CE",
   },
@@ -56,8 +59,8 @@ const BUS_STATIONS = [
     name: "Rodoviária de Tianguá",
     city: "Tianguá",
     state: "CE",
-    distance: "18 km",
-    duration: "25 min de carro",
+    distance: "18\u00a0km",
+    duration: "25\u00a0min de carro",
     note: "Principal hub da Serra da Ibiapaba. Linhas de Fortaleza, Sobral e Piauí.",
     origin: "Rodoviária de Tianguá, Tianguá, CE",
   },
@@ -65,7 +68,7 @@ const BUS_STATIONS = [
     name: "Terminal Rodoviário de Sobral",
     city: "Sobral",
     state: "CE",
-    distance: "100 km",
+    distance: "100\u00a0km",
     duration: "~1h30 de carro",
     note: "Maior terminal da região. Ônibus de Fortaleza em ~3h. Conexões para Ubajara.",
     origin: "Terminal Rodoviário de Sobral, Sobral, CE",
@@ -74,7 +77,7 @@ const BUS_STATIONS = [
     name: "Terminal Rodoviário de Fortaleza",
     city: "Fortaleza",
     state: "CE",
-    distance: "334 km",
+    distance: "334\u00a0km",
     duration: "~5h de ônibus",
     note: "Saída da capital. Ônibus diretos para Tianguá e Ubajara pela Viação Ibiapaba.",
     origin: "Terminal Rodoviário de Fortaleza, Fortaleza, CE",
@@ -135,19 +138,21 @@ const TIPS = [
   {
     icon: "emergency",
     title: "Serviços de emergência",
-    text: "Hospital Regional de Tianguá (18 km). SAMU: 192. Bombeiros: 193. Guarda do Parque: (88) 3634-1388.",
+    text: "Hospital Regional de Tianguá (18\u00a0km). SAMU: 192. Bombeiros: 193. Guarda do Parque: (88) 3634-1388.",
   },
 ];
 
 export default function ComoChegar() {
+  useDocumentTitle("Como chegar");
   return (
     <div className="cg-page">
       <Header />
 
+      <main id="conteudo" tabIndex={-1}>
       {/* ── Hero ── */}
       <section className="cg-hero">
-        <img src={heroImg} alt="Parque Nacional de Ubajara" className="cg-hero__img" />
-        <div className="cg-hero__overlay" />
+        <img src={heroImg} alt="" className="cg-hero__img" fetchPriority="high" decoding="async" />
+        <div className="cg-hero__overlay" aria-hidden="true" />
         <div className="cg-hero__content">
           <span className="cg-hero__label">Planejamento</span>
           <h1 className="cg-hero__title">Como Chegar</h1>
@@ -163,7 +168,7 @@ export default function ComoChegar() {
         {/* ── Aeroportos ── */}
         <section className="cg-section">
           <div className="cg-section__head">
-            <span className="material-symbols-outlined cg-section__icon">flight</span>
+            <Icon name="flight" className="cg-section__icon" />
             <div>
               <h2 className="cg-section__title">Aeroportos Próximos</h2>
               <p className="cg-section__sub">Voe até o aeroporto mais conveniente e siga de carro ou ônibus até o parque.</p>
@@ -176,7 +181,7 @@ export default function ComoChegar() {
                 <div className="cg-card__top">
                   <span className="cg-card__badge cg-card__badge--iata">{a.iata}</span>
                   <span className="cg-card__dist">
-                    <span className="material-symbols-outlined">near_me</span>
+                    <Icon name="near_me" />
                     {a.distance}
                   </span>
                 </div>
@@ -185,7 +190,7 @@ export default function ComoChegar() {
                 <p className="cg-card__note">{a.note}</p>
                 <div className="cg-card__footer">
                   <span className="cg-card__duration">
-                    <span className="material-symbols-outlined">schedule</span>
+                    <Icon name="schedule" />
                     {a.duration}
                   </span>
                   <a
@@ -194,7 +199,7 @@ export default function ComoChegar() {
                     rel="noopener noreferrer"
                     className="cg-btn-maps"
                   >
-                    <span className="material-symbols-outlined">map</span>
+                    <Icon name="map" />
                     Traçar rota
                   </a>
                 </div>
@@ -206,7 +211,7 @@ export default function ComoChegar() {
         {/* ── Rodoviárias ── */}
         <section className="cg-section">
           <div className="cg-section__head">
-            <span className="material-symbols-outlined cg-section__icon">directions_bus</span>
+            <Icon name="directions_bus" className="cg-section__icon" />
             <div>
               <h2 className="cg-section__title">Rodoviárias Próximas</h2>
               <p className="cg-section__sub">Ônibus é a opção mais econômica. Há linhas regulares a partir de Fortaleza e Sobral.</p>
@@ -218,11 +223,11 @@ export default function ComoChegar() {
               <div key={b.name} className="cg-card">
                 <div className="cg-card__top">
                   <span className="cg-card__badge cg-card__badge--bus">
-                    <span className="material-symbols-outlined" style={{ fontSize: 14 }}>directions_bus</span>
+                    <Icon name="directions_bus" className="cg-card__badge-icon" />
                     Rodoviária
                   </span>
                   <span className="cg-card__dist">
-                    <span className="material-symbols-outlined">near_me</span>
+                    <Icon name="near_me" />
                     {b.distance}
                   </span>
                 </div>
@@ -231,7 +236,7 @@ export default function ComoChegar() {
                 <p className="cg-card__note">{b.note}</p>
                 <div className="cg-card__footer">
                   <span className="cg-card__duration">
-                    <span className="material-symbols-outlined">schedule</span>
+                    <Icon name="schedule" />
                     {b.duration}
                   </span>
                   <a
@@ -240,7 +245,7 @@ export default function ComoChegar() {
                     rel="noopener noreferrer"
                     className="cg-btn-maps"
                   >
-                    <span className="material-symbols-outlined">map</span>
+                    <Icon name="map" />
                     Traçar rota
                   </a>
                 </div>
@@ -252,7 +257,7 @@ export default function ComoChegar() {
         {/* ── Aplicativos ── */}
         <section className="cg-section">
           <div className="cg-section__head">
-            <span className="material-symbols-outlined cg-section__icon">smartphone</span>
+            <Icon name="smartphone" className="cg-section__icon" />
             <div>
               <h2 className="cg-section__title">Aplicativos de Mobilidade</h2>
               <p className="cg-section__sub">Opções disponíveis na região para facilitar seu deslocamento.</p>
@@ -263,7 +268,7 @@ export default function ComoChegar() {
             {APPS.map((app) => (
               <div key={app.name} className="cg-app-card">
                 <div className="cg-app-card__icon" style={{ background: app.color }}>
-                  <span className="material-symbols-outlined">{app.icon}</span>
+                  <Icon name={app.icon} />
                 </div>
                 <div className="cg-app-card__body">
                   <div className="cg-app-card__top">
@@ -281,7 +286,7 @@ export default function ComoChegar() {
         {/* ── Dicas de viagem ── */}
         <section className="cg-section">
           <div className="cg-section__head">
-            <span className="material-symbols-outlined cg-section__icon">tips_and_updates</span>
+            <Icon name="tips_and_updates" className="cg-section__icon" />
             <div>
               <h2 className="cg-section__title">Dicas de Viagem</h2>
               <p className="cg-section__sub">Informações úteis para planejar melhor sua ida ao parque.</p>
@@ -291,8 +296,8 @@ export default function ComoChegar() {
           <div className="cg-tips">
             {TIPS.map((tip) => (
               <div key={tip.title} className="cg-tip-card">
-                <span className="material-symbols-outlined cg-tip-card__icon">{tip.icon}</span>
-                <h4 className="cg-tip-card__title">{tip.title}</h4>
+                <Icon name={tip.icon} className="cg-tip-card__icon" />
+                <h3 className="cg-tip-card__title">{tip.title}</h3>
                 <p className="cg-tip-card__text">{tip.text}</p>
               </div>
             ))}
@@ -301,7 +306,7 @@ export default function ComoChegar() {
 
         {/* ── CTA maps ── */}
         <section className="cg-cta">
-          <span className="material-symbols-outlined cg-cta__icon">explore</span>
+          <Icon name="explore" className="cg-cta__icon" />
           <h2 className="cg-cta__title">Ver o parque no mapa</h2>
           <p className="cg-cta__sub">Veja a localização exata do Parque Nacional de Ubajara e planeje sua rota de qualquer ponto de partida.</p>
           <a
@@ -310,12 +315,13 @@ export default function ComoChegar() {
             rel="noopener noreferrer"
             className="cg-cta__btn"
           >
-            <span className="material-symbols-outlined">map</span>
+            <Icon name="map" />
             Abrir no Google Maps
           </a>
         </section>
 
       </div>
+      </main>
 
       <Footer />
     </div>

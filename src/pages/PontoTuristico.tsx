@@ -1,107 +1,83 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { useState, useEffect, useCallback } from "react";
+import { useParams, Link } from "react-router-dom";
+import { useMemo, useRef, useState, type MouseEvent } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Icon from "../components/ui/Icon";
+import PhotoGallery from "../components/ui/PhotoGallery";
+import HowToGetSection from "../components/ui/HowToGetSection";
+import PhotoLightbox from "../components/establishment-detail/PhotoLightbox";
+import Breadcrumb from "./Breadcrumb";
+import { DetailStatePage } from "./PageState";
 import { attractionsService } from "../admin/services/attractionsService";
-import type { AttractionResponse, AttractionCategory } from "../admin/types";
-import heroFallback from "../assets/images/foto-capa-parque-ubajara.png";
+import type { AttractionResponse } from "../admin/types";
+import ReviewsSection from "../components/reviews/ReviewsSection";
+import PointCard from "../components/ui/PointCard";
+import { ATTRACTION_CATEGORY_LABELS as CATEGORY_LABELS } from "../utils/attractionCategories";
+import { formatRating, reviewsLabel } from "../utils/rating";
+import { hasMeaningfulText } from "../utils/establishmentDetail";
+import { loadFavorites, toggleFavorite } from "../utils/favorites";
+import { buildSpotGallery } from "../utils/spotPhotos";
+import { isNotFoundError, requireUuid, useAsyncData } from "../utils/useAsyncData";
+import { useDocumentTitle } from "../utils/useDocumentTitle";
+import heroFallback from "../assets/images/capa-pagina.webp";
+import "../components/ui/ui.css";
 import "../components/Sections/style/Content.components.css";
 import "./style/PontoTuristico.css";
 
-const CATEGORY_LABELS: Record<AttractionCategory, string> = {
-    PARK: "Parque", WATERFALL: "Cachoeira", MUSEUM: "Museu",
-    FARM: "Fazenda", ROUTE: "Rota", MARKET: "Mercado",
-};
+function reduceMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
-export default function PontoTuristico() {
-    const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
-    const [attraction, setAttraction] = useState<AttractionResponse | null>(null);
-    const [related, setRelated] = useState<AttractionResponse[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [isFavorite, setIsFavorite] = useState(false);
+function PontoTuristicoView({ attraction, related }: { attraction: AttractionResponse; related: AttractionResponse[] }) {
+    useDocumentTitle(attraction.name);
+    const [isFavorite, setIsFavorite] = useState(() => loadFavorites().some((f) => f.id === attraction.id));
 
-    const toggleFavorite = useCallback(() => {
-        if (!attraction) return;
-        const stored: unknown[] = JSON.parse(localStorage.getItem("ubajara-favorites") ?? "[]");
-        const exists = stored.some((f: unknown) => (f as { id: string }).id === attraction.id);
-        const updated = exists
-            ? stored.filter((f: unknown) => (f as { id: string }).id !== attraction.id)
-            : [...stored, {
-                id: attraction.id,
-                name: attraction.name,
-                type: "attraction",
-                photo: attraction.photos?.[0]?.url,
-                shortDescription: attraction.shortDescription || attraction.description?.slice(0, 100),
-                path: `/pontos/${attraction.id}`,
-            }];
-        localStorage.setItem("ubajara-favorites", JSON.stringify(updated));
-        setIsFavorite(!exists);
-    }, [attraction]);
+    const handleToggleFavorite = () => {
+        setIsFavorite(toggleFavorite({
+            id: attraction.id,
+            name: attraction.name,
+            type: "attraction",
+            photo: attraction.photos?.[0]?.url,
+            shortDescription: attraction.shortDescription || attraction.description?.slice(0, 100),
+            path: `/pontos/${attraction.id}`,
+        }));
+    };
 
-    useEffect(() => {
-        if (!id) { navigate("/pontos-turisticos"); return; }
-        Promise.allSettled([
-            attractionsService.getById(id),
-            attractionsService.getAll(0, 10, true),
-        ]).then(([attrResult, allResult]) => {
-            if (attrResult.status === "fulfilled") {
-                setAttraction(attrResult.value);
-                if (allResult.status === "fulfilled") {
-                    setRelated(allResult.value.content.filter(a => a.id !== id).slice(0, 3));
-                }
-            } else {
-                navigate("/pontos-turisticos");
-            }
-        }).finally(() => setLoading(false));
-    }, [id]);
+    const [galleryIndex, setGalleryIndex] = useState<number | null>(null);
+    const openerRef = useRef<HTMLElement | null>(null);
 
-    useEffect(() => {
-        if (!attraction) return;
-        const stored: unknown[] = JSON.parse(localStorage.getItem("ubajara-favorites") ?? "[]");
-        setIsFavorite(stored.some((f: unknown) => (f as { id: string }).id === attraction.id));
-    }, [attraction]);
+    const gallery = useMemo(() => buildSpotGallery(attraction.name, attraction.photos), [attraction.name, attraction.photos]);
+    const hasGallery = gallery.length >= 2;
 
-    if (loading) {
-        return (
-            <div className="pt-page">
-                <Header />
-                <main className="pt-main" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
-                    <span className="adm-spinner adm-spinner--lg" />
-                </main>
-                <Footer />
-            </div>
-        );
-    }
-
-    if (!attraction) return null;
-
-    const getPhotoByRole = (role: string) =>
-        attraction.photos?.find(p => p.description === role)?.url;
-
-    const heroImg = getPhotoByRole('cover') ?? attraction.photos?.[0]?.url ?? heroFallback;
-    const howToGetImg = getPhotoByRole('how_to_get') ?? heroImg;
+    const heroImg = gallery[0]?.url ?? attraction.photos?.[0]?.url ?? heroFallback;
+    const howToGetImg = attraction.photos?.find((p) => p.description === "how_to_get")?.url;
     const catLabel = CATEGORY_LABELS[attraction.category] ?? attraction.category;
+    const reviewCount = attraction.reviewCount ?? 0;
+    const hasRating = reviewCount > 0 && attraction.averageRating != null;
+    const paragraphs = (attraction.description ?? "")
+        .split(/\r?\n+/)
+        .map((p) => p.trim())
+        .filter(hasMeaningfulText);
+
+    function openGallery(index: number, event: MouseEvent<HTMLElement>) {
+        openerRef.current = event.currentTarget;
+        setGalleryIndex(index);
+    }
 
     return (
         <div className="pt-page">
             <Header />
-            <main className="pt-main">
+            <main className="pt-main" id="conteudo" tabIndex={-1}>
 
                 {/* ── Hero ── */}
                 <section className="pt-hero" aria-labelledby="pt-hero-title">
-                    <img src={heroImg} alt={attraction.name} className="pt-hero__bg" fetchPriority="high" decoding="async" />
+                    <img src={heroImg} alt="" className="pt-hero__bg" fetchPriority="high" decoding="async" />
                     <div className="pt-hero__overlay" aria-hidden="true" />
 
-                    <nav className="pt-breadcrumb" aria-label="Navegação">
-                        <div className="pt-breadcrumb__inner">
-                            <Link to="/" className="pt-breadcrumb__link">Início</Link>
-                            <span className="pt-breadcrumb__sep" aria-hidden="true">›</span>
-                            <Link to="/pontos-turisticos" className="pt-breadcrumb__link">Pontos Turísticos</Link>
-                            <span className="pt-breadcrumb__sep" aria-hidden="true">›</span>
-                            <span className="pt-breadcrumb__current">{attraction.name}</span>
-                        </div>
-                    </nav>
+                    <Breadcrumb
+                        prefix="pt"
+                        items={[{ label: "Início", to: "/" }, { label: "Pontos Turísticos", to: "/pontos-turisticos" }, { label: attraction.name }]}
+                    />
 
                     <div className="pt-hero__content">
                         <div className="pt-hero__inner">
@@ -110,19 +86,23 @@ export default function PontoTuristico() {
                                 <h1 id="pt-hero-title" className="pt-hero__title">{attraction.name}</h1>
                                 <button
                                     className={`pt-hero__fav-btn${isFavorite ? " pt-hero__fav-btn--active" : ""}`}
-                                    onClick={toggleFavorite}
+                                    onClick={handleToggleFavorite}
                                     aria-label={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
                                     title={isFavorite ? "Remover dos favoritos" : "Salvar nos favoritos"}
                                 >
-                                    <span className="material-symbols-outlined" aria-hidden="true">
-                                        {isFavorite ? "favorite" : "favorite_border"}
-                                    </span>
+                                    <Icon name={isFavorite ? "favorite" : "favorite_border"} />
                                 </button>
                             </div>
                             {(attraction.shortDescription || attraction.description) && (
                                 <p className="pt-hero__subtitle">
                                     {attraction.shortDescription || attraction.description}
                                 </p>
+                            )}
+                            {hasGallery && (
+                                <button type="button" className="pt-hero__gallery-btn" onClick={(event) => openGallery(0, event)}>
+                                    <Icon name="photo_library" />
+                                    Ver {gallery.length} fotos
+                                </button>
                             )}
                         </div>
                     </div>
@@ -131,17 +111,32 @@ export default function PontoTuristico() {
                         <div className="pt-hero__infobar-inner">
                             {attraction.openToPublic != null && (
                                 <span className={`pt-hero__info-item${attraction.openToPublic ? " pt-hero__info-item--status" : " pt-hero__info-item--closed"}`}>
-                                    <span className="material-symbols-outlined" aria-hidden="true">
-                                        {attraction.openToPublic ? "check_circle" : "cancel"}
-                                    </span>
+                                    <Icon name={attraction.openToPublic ? "check_circle" : "cancel"} />
                                     {attraction.openToPublic ? "Aberto ao Público" : "Temporariamente Fechado"}
                                 </span>
                             )}
-                            {attraction.openingHours && (
+                            {hasRating && (
                                 <>
                                     {attraction.openToPublic != null && <span className="pt-hero__info-sep" aria-hidden="true">|</span>}
+                                    <a
+                                        href="#avaliacoes"
+                                        className="pt-hero__info-item pt-hero__info-item--link"
+                                        onClick={(event) => {
+                                            event.preventDefault();
+                                            document.getElementById("avaliacoes")?.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
+                                        }}
+                                    >
+                                        <Icon name="star" filled className="pt-hero__info-star" />
+                                        <span aria-hidden="true">{formatRating(attraction.averageRating!)} ({reviewCount})</span>
+                                        <span className="ui-sr-only">Nota {formatRating(attraction.averageRating!)} de 5, {reviewsLabel(reviewCount)}. Ir para as avaliações</span>
+                                    </a>
+                                </>
+                            )}
+                            {attraction.openingHours && (
+                                <>
+                                    {(attraction.openToPublic != null || hasRating) && <span className="pt-hero__info-sep" aria-hidden="true">|</span>}
                                     <span className="pt-hero__info-item">
-                                        <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
+                                        <Icon name="schedule" />
                                         {attraction.openingHours}
                                     </span>
                                 </>
@@ -150,7 +145,7 @@ export default function PontoTuristico() {
                                 <>
                                     <span className="pt-hero__info-sep" aria-hidden="true">|</span>
                                     <span className="pt-hero__info-item">
-                                        <span className="material-symbols-outlined" aria-hidden="true">payments</span>
+                                        <Icon name="payments" />
                                         {attraction.entryPrice}
                                     </span>
                                 </>
@@ -159,7 +154,7 @@ export default function PontoTuristico() {
                                 <>
                                     <span className="pt-hero__info-sep" aria-hidden="true">|</span>
                                     <span className="pt-hero__info-item pt-hero__info-item--status">
-                                        <span className="material-symbols-outlined" aria-hidden="true">lock_open</span>
+                                        <Icon name="lock_open" />
                                         Acesso Livre
                                     </span>
                                 </>
@@ -168,38 +163,20 @@ export default function PontoTuristico() {
                     </div>
                 </section>
 
-                {/* ── Galeria ── */}
-                {attraction.photos && attraction.photos.length > 0 && (
-                    <section className="pt-gallery" aria-label="Galeria de fotos">
-                        <div className="pt-gallery__inner">
-                            <div className="pt-gallery__main">
-                                <img src={attraction.photos[0].url} alt={attraction.name} />
-                            </div>
-                            {attraction.photos.length > 1 && (
-                                <div className="pt-gallery__secondary">
-                                    {attraction.photos.slice(1, 3).map((ph, i) => (
-                                        <div key={ph.id} className="pt-gallery__thumb">
-                                            <img src={ph.url} alt={`${attraction.name} — foto ${i + 2}`} aria-hidden="true" />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </section>
-                )}
-
                 {/* ── Conteúdo + Planeje sua Visita ── */}
                 <section className="pt-content" aria-labelledby="pt-content-title">
                     <div className="pt-content__inner">
 
                         <div className="pt-content__left">
                             <span className="pt-content__kicker">{catLabel.toUpperCase()}</span>
-                            <h2 id="pt-content-title" className="pt-content__title">{attraction.name}</h2>
-                            <p className="pt-content__p">{attraction.description}</p>
+                            <h2 id="pt-content-title" className="pt-content__title">Sobre o local</h2>
+                            {paragraphs.map((paragraph, i) => (
+                                <p key={i} className="pt-content__p">{paragraph}</p>
+                            ))}
                             <div className="pt-content__stats">
                                 {attraction.entryPrice != null && (
                                     <div className="pt-stat-pill">
-                                        <span className="material-symbols-outlined pt-stat-pill__icon" aria-hidden="true">payments</span>
+                                        <Icon name="payments" className="pt-stat-pill__icon" />
                                         <div>
                                             <span className="pt-stat-pill__lbl">Entrada</span>
                                             <span className="pt-stat-pill__val">
@@ -210,15 +187,15 @@ export default function PontoTuristico() {
                                 )}
                                 {attraction.averageVisitDuration != null && (
                                     <div className="pt-stat-pill">
-                                        <span className="material-symbols-outlined pt-stat-pill__icon" aria-hidden="true">schedule</span>
+                                        <Icon name="schedule" className="pt-stat-pill__icon" />
                                         <div>
                                             <span className="pt-stat-pill__lbl">Duração média</span>
-                                            <span className="pt-stat-pill__val">{attraction.averageVisitDuration} min</span>
+                                            <span className="pt-stat-pill__val">{attraction.averageVisitDuration}&nbsp;min</span>
                                         </div>
                                     </div>
                                 )}
                                 <div className="pt-stat-pill">
-                                    <span className="material-symbols-outlined pt-stat-pill__icon" aria-hidden="true">category</span>
+                                    <Icon name="category" className="pt-stat-pill__icon" />
                                     <div>
                                         <span className="pt-stat-pill__lbl">Categoria</span>
                                         <span className="pt-stat-pill__val">{catLabel}</span>
@@ -233,7 +210,7 @@ export default function PontoTuristico() {
                                 <ul className="pt-visit-card__list">
                                     {attraction.hasGuide != null && (
                                         <li className="pt-visit-item">
-                                            <span className="material-symbols-outlined pt-visit-item__icon" aria-hidden="true">hiking</span>
+                                            <Icon name="hiking" className="pt-visit-item__icon" />
                                             <div>
                                                 <strong>{attraction.hasGuide ? "Guia Disponível" : "Acesso Livre"}</strong>
                                                 <p>{attraction.hasGuide ? "Visite com um condutor credenciado pelo ICMBio" : "Trilha de acesso livre ao público"}</p>
@@ -242,7 +219,7 @@ export default function PontoTuristico() {
                                     )}
                                     {attraction.openingHours && (
                                         <li className="pt-visit-item">
-                                            <span className="material-symbols-outlined pt-visit-item__icon" aria-hidden="true">schedule</span>
+                                            <Icon name="schedule" className="pt-visit-item__icon" />
                                             <div>
                                                 <strong>{attraction.openingHours}</strong>
                                                 <p>Horário de Funcionamento</p>
@@ -250,7 +227,7 @@ export default function PontoTuristico() {
                                         </li>
                                     )}
                                     <li className="pt-visit-item">
-                                        <span className="material-symbols-outlined pt-visit-item__icon" aria-hidden="true">backpack</span>
+                                        <Icon name="backpack" className="pt-visit-item__icon" />
                                         <div>
                                             <strong>Itens Recomendados</strong>
                                             <p>Água, protetor solar e calçado adequado para trilhas</p>
@@ -258,7 +235,7 @@ export default function PontoTuristico() {
                                     </li>
                                     {attraction.address && (
                                         <li className="pt-visit-item">
-                                            <span className="material-symbols-outlined pt-visit-item__icon" aria-hidden="true">location_on</span>
+                                            <Icon name="location_on" className="pt-visit-item__icon" />
                                             <div>
                                                 <strong>Endereço</strong>
                                                 <p>{attraction.address}</p>
@@ -275,43 +252,30 @@ export default function PontoTuristico() {
                     </div>
                 </section>
 
-                {/* ── Como Chegar ── */}
-                {attraction.address && (
-                    <section className="pt-how" aria-labelledby="pt-how-title">
-                        <div className="pt-how__inner">
-                            <div className="pt-how__left">
-                                <h2 id="pt-how-title" className="pt-how__title">Como Chegar</h2>
-                                <p className="pt-how__desc">
-                                    Localizado em {attraction.address}. O acesso pode ser feito de carro ou ônibus a partir do centro de Ubajara.
-                                </p>
-                                <ul className="pt-how__routes">
-                                    <li className="pt-how__route-item">
-                                        <span className="material-symbols-outlined" aria-hidden="true">directions_car</span>
-                                        De carro — siga as indicações para {attraction.name}
-                                    </li>
-                                    {attraction.phone && (
-                                        <li className="pt-how__route-item">
-                                            <span className="material-symbols-outlined" aria-hidden="true">call</span>
-                                            Informações: {attraction.phone}
-                                        </li>
-                                    )}
-                                </ul>
-                                <a
-                                    href={attraction.mapsUrl || `https://maps.google.com/maps?q=${encodeURIComponent(attraction.address)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="pt-how__maps-btn"
-                                >
-                                    <span className="material-symbols-outlined" aria-hidden="true">map</span>
-                                    Abrir no Google Maps
-                                </a>
-                            </div>
-                            <div className="pt-how__right">
-                                <img src={howToGetImg} alt={attraction.name} className="pt-how__img" />
-                            </div>
+                {/* ── Fotos ── */}
+                {hasGallery && (
+                    <section id="fotos" className="pt-photos" aria-labelledby="pt-photos-title">
+                        <div className="pt-photos__inner">
+                            <p className="estd-eyebrow">Galeria</p>
+                            <h2 id="pt-photos-title" className="estd-h2">Fotos</h2>
+                            <PhotoGallery title={attraction.name} photos={gallery} onOpen={openGallery} />
                         </div>
                     </section>
                 )}
+
+                {/* ── Como Chegar ── */}
+                {attraction.address?.trim() && (
+                    <HowToGetSection
+                        name={attraction.name}
+                        address={attraction.address.trim()}
+                        mapsUrl={attraction.mapsUrl}
+                        phone={attraction.phone}
+                        photoUrl={howToGetImg}
+                    />
+                )}
+
+                {/* ── Avaliações ── */}
+                <ReviewsSection spotId={attraction.id} spotName={attraction.name} className="rv--page" />
 
                 {/* ── Pontos Turísticos Vinculados ── */}
                 {attraction.linkedSpots && attraction.linkedSpots.length > 0 && (
@@ -319,33 +283,17 @@ export default function PontoTuristico() {
                         <div className="pt-related__inner">
                             <h2 id="pt-linked-title" className="pt-related__title">Pontos Turísticos Vinculados</h2>
                             <p className="pt-related__subtitle">Locais que fazem parte desta atração</p>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginTop: 24 }}>
+                            <ul className="pt-linked">
                                 {attraction.linkedSpots.map((spot) => (
-                                    <Link
-                                        key={spot.id}
-                                        to={`/local/${spot.id}`}
-                                        style={{
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: 8,
-                                            padding: '12px 20px',
-                                            borderRadius: 12,
-                                            background: 'rgba(255,255,255,0.07)',
-                                            border: '1px solid rgba(255,255,255,0.15)',
-                                            color: '#fff',
-                                            textDecoration: 'none',
-                                            fontWeight: 600,
-                                            fontSize: 15,
-                                            backdropFilter: 'blur(4px)',
-                                            transition: 'background 0.2s',
-                                        }}
-                                    >
-                                        <span className="material-symbols-outlined" style={{ fontSize: 18 }} aria-hidden="true">location_on</span>
-                                        {spot.name}
-                                        <span className="material-symbols-outlined" style={{ fontSize: 16, opacity: 0.7 }} aria-hidden="true">arrow_forward</span>
-                                    </Link>
+                                    <li key={spot.id}>
+                                        <Link to={`/local/${spot.id}`} className="pt-linked__link">
+                                            <Icon name="location_on" className="pt-linked__pin" />
+                                            {spot.name}
+                                            <Icon name="arrow_forward" className="pt-linked__arrow" />
+                                        </Link>
+                                    </li>
                                 ))}
-                            </div>
+                            </ul>
                         </div>
                     </section>
                 )}
@@ -356,42 +304,15 @@ export default function PontoTuristico() {
                         <div className="pt-related__inner">
                             <h2 id="pt-related-title" className="pt-related__title">Pontos Recomendados</h2>
                             <p className="pt-related__subtitle">Continue explorando o Parque Nacional de Ubajara</p>
-                            <div className="cards-points pt-related__grid">
-                                <ul>
-                                    {related.map((pt) => (
-                                        <li key={pt.id}>
-                                            <Link to={`/pontos/${pt.id}`} className="point-card__link" aria-label={`Ver detalhes de ${pt.name}`}>
-                                                {pt.photos?.[0]?.url
-                                                    ? <img src={pt.photos[0].url} alt={pt.name} className="point-card__img" loading="lazy" />
-                                                    : <div className="point-card__img point-card__img--placeholder" aria-hidden="true" />
-                                                }
-                                                <div className="point-card__gradient" />
-                                                <span className="point-card__tag" aria-hidden="true">{CATEGORY_LABELS[pt.category] ?? pt.category}</span>
-                                                <div className="point-card__body">
-                                                    <h3 className="point-card__title">{pt.name}</h3>
-                                                    <p className="point-card__desc">{pt.shortDescription ?? pt.description}</p>
-                                                    {pt.averageVisitDuration != null && (
-                                                        <div className="point-card__meta">
-                                                            <span className="point-card__meta-item">
-                                                                <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
-                                                                {pt.averageVisitDuration} min
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                    <span className="point-card__cta" aria-hidden="true">
-                                                        <span className="material-symbols-outlined" aria-hidden="true">visibility</span>
-                                                        Saiba mais
-                                                    </span>
-                                                </div>
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
+                            <ul className="ui-point-grid ui-point-grid--3">
+                                {related.map((pt) => (
+                                    <li key={pt.id}><PointCard item={pt} /></li>
+                                ))}
+                            </ul>
                             <div className="pt-related__footer">
                                 <Link to="/pontos-turisticos" className="pt-related__all">
                                     Ver todos os pontos turísticos
-                                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                                    <Icon name="arrow_forward" />
                                 </Link>
                             </div>
                         </div>
@@ -400,6 +321,47 @@ export default function PontoTuristico() {
 
             </main>
             <Footer />
+
+            {galleryIndex !== null && (
+                <PhotoLightbox
+                    title={attraction.name}
+                    photos={gallery}
+                    index={galleryIndex}
+                    onIndexChange={setGalleryIndex}
+                    onClose={() => setGalleryIndex(null)}
+                    returnFocusRef={openerRef}
+                />
+            )}
         </div>
     );
+}
+
+export default function PontoTuristico() {
+    const { id = "" } = useParams<{ id: string }>();
+    const data = useAsyncData(async () => {
+        requireUuid(id);
+        const related = attractionsService
+            .getAll(0, 10, true)
+            .then((page) => page.content.filter((a) => a.id !== id).slice(0, 3))
+            .catch((): AttractionResponse[] => []);
+        return { attraction: await attractionsService.getById(id), related: await related };
+    }, id);
+
+    useDocumentTitle(data.status === "ready" ? null : "Ponto turístico");
+
+    if (data.status === "loading") return <DetailStatePage kind="loading" />;
+    if (data.status === "error") {
+        return (
+            <DetailStatePage
+                kind={isNotFoundError(data.error) ? "not-found" : "error"}
+                heroTitle="Ponto turístico"
+                breadcrumb={[{ label: "Início", to: "/" }, { label: "Pontos Turísticos", to: "/pontos-turisticos" }]}
+                noun="este ponto turístico"
+                backTo="/pontos-turisticos"
+                backLabel="Ver todos os pontos turísticos"
+                onRetry={data.retry}
+            />
+        );
+    }
+    return <PontoTuristicoView key={data.data.attraction.id} attraction={data.data.attraction} related={data.data.related} />;
 }

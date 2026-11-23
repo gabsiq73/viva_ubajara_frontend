@@ -15,7 +15,7 @@ section.welcome {
     align-items: center;
     text-align: center;
     color: #ffffff;
-    padding: 136px 24px 100px;
+    padding: 136px var(--gutter) 100px;
     position: relative;
     user-select: none;
     -webkit-user-select: none;
@@ -37,9 +37,9 @@ section.welcome {
     align-items: center;
     gap: 8px;
     font-family: 'Inter', sans-serif;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.88);
     background: rgba(255, 255, 255, 0.12);
@@ -126,8 +126,8 @@ section.welcome {
     align-items: center;
     justify-content: center;
     font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--fs-btn);
+    font-weight: var(--fw-btn);
     letter-spacing: 0.02em;
     padding: 13px 28px;
     border-radius: 50px;
@@ -168,40 +168,6 @@ section.welcome {
     transform: translateY(-2px);
 }
 
-.hero-scroll {
-    position: absolute;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    color: rgba(255, 255, 255, 0.45);
-    animation: scroll-pulse 2.6s ease-in-out infinite;
-}
-
-.hero-scroll__line {
-    display: block;
-    width: 1px;
-    height: 36px;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.0), rgba(255,255,255,0.4));
-}
-
-.hero-scroll__label {
-    font-family: 'Inter', sans-serif;
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.38);
-}
-
-@keyframes scroll-pulse {
-    0%, 100% { transform: translateX(-50%) translateY(0);   opacity: 0.7; }
-    50%       { transform: translateX(-50%) translateY(7px); opacity: 1;   }
-}
-
 @media screen and (max-width: 1024px) {
     section.welcome {
         min-height: 68vh;
@@ -211,7 +177,7 @@ section.welcome {
 @media screen and (max-width: 768px) {
     section.welcome {
         min-height: 65vh;
-        padding: 112px 20px 88px;
+        padding: 112px var(--gutter) 88px;
     }
     .hero-title__lead {
         font-size: clamp(22px, 4vw, 46px);
@@ -219,15 +185,12 @@ section.welcome {
     .hero-title--gold {
         font-size: clamp(46px, 8vw, 90px);
     }
-    .hero-kicker {
-        font-size: 10px;
-    }
 }
 
 @media screen and (max-width: 480px) {
     section.welcome {
         min-height: 60vh;
-        padding: 100px 18px 80px;
+        padding: 100px var(--gutter) 80px;
     }
     .hero-title__lead {
         font-size: clamp(20px, 5.5vw, 46px);
@@ -236,27 +199,26 @@ section.welcome {
         font-size: clamp(40px, 10.5vw, 90px);
     }
     .hero-kicker {
-        font-size: 9.5px;
         padding: 5px 13px;
     }
     .hero-btn {
-        font-size: 13.5px;
-        padding: 12px 22px;
+        flex: 1 1 0;
+        min-width: 0;
+        min-height: 46px;
+        padding: 12px 10px;
     }
     .hero-actions {
-        flex-direction: column;
-        align-items: center;
+        flex-wrap: nowrap;
+        width: 100%;
         gap: 10px;
-    }
-    .hero-scroll {
-        bottom: 20px;
-    }
-    .hero-scroll__line {
-        height: 28px;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .hero-rotating-word { animation: none; }
-    .hero-scroll         { animation: none; }
+
+    .hero-btn--primary:hover,
+    .hero-btn--ghost:hover {
+        transform: none;
+    }
 }

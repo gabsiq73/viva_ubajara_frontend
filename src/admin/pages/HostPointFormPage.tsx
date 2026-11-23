@@ -1,5 +1,8 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useGuardedNavigate } from '../hooks/useGuardedNavigate';
+import { useFormGuard } from '../hooks/useFormGuard';
+import { useFocusFirstError } from '../hooks/useFocusFirstError';
 import { hostPointsService } from '../services/hostPointsService';
 import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
@@ -16,6 +19,7 @@ export function HostPointFormPage() {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const navigate = useNavigate();
+  const guardedNavigate = useGuardedNavigate();
   const { showToast } = useToast();
   const [form, setForm] = useState<HostPointRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
@@ -24,6 +28,8 @@ export function HostPointFormPage() {
   const [errors, setErrors] = useState<Partial<Record<keyof HostPointRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
+  useFormGuard({ form, coverFile, cardFile }, !fetching);
+  const { formRef, focusFirstError } = useFocusFirstError();
 
   useEffect(() => {
     if (!isEdit) return;
@@ -45,7 +51,7 @@ export function HostPointFormPage() {
   };
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault(); if (!validate()) return;
+    e.preventDefault(); if (!validate()) { focusFirstError(); return; }
     setLoading(true);
     try {
       if (isEdit) {
@@ -78,10 +84,10 @@ export function HostPointFormPage() {
     <div>
       <div className="adm-page-header">
         <h2 className="adm-page-title">{isEdit ? 'Editar Hospedagem' : 'Nova Hospedagem'}</h2>
-        <button className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/host-points')}>← Voltar</button>
+        <Link className="adm-btn adm-btn--ghost" to="/admin/host-points" onClick={guardedNavigate('/admin/host-points')}>← Voltar</Link>
       </div>
       <div className="adm-card">
-        <form className="adm-form" onSubmit={handleSubmit}>
+        <form ref={formRef} className="adm-form" onSubmit={handleSubmit}>
           <div className="adm-form-row">
             <FormInput label="Nome" value={form.name} onChange={(e) => set('name', e.target.value)} error={errors.name} required />
             <FormSelect label="Tipo" value={form.hostType} onChange={(e) => set('hostType', e.target.value as HostType)} required>
@@ -93,15 +99,15 @@ export function HostPointFormPage() {
           <FormTextarea label="Descrição" value={form.description} onChange={(e) => set('description', e.target.value)} error={errors.description} required maxLength={600} />
           <FormInput label="Endereço" value={form.address} onChange={(e) => set('address', e.target.value)} error={errors.address} required />
           <div className="adm-form-row">
-            <FormInput label="Telefone" value={form.phone ?? ''} onChange={(e) => set('phone', e.target.value)} />
-            <FormInput label="Email" type="email" value={form.email ?? ''} onChange={(e) => set('email', e.target.value)} />
+            <FormInput label="Telefone" type="tel" inputMode="tel" autoComplete="off" value={form.phone ?? ''} onChange={(e) => set('phone', e.target.value)} />
+            <FormInput label="Email" type="email" inputMode="email" autoComplete="off" spellCheck={false} value={form.email ?? ''} onChange={(e) => set('email', e.target.value)} />
           </div>
           <div className="adm-form-row">
-            <FormInput label="Nº de Quartos" type="number" value={form.numOfRooms ?? ''} onChange={(e) => set('numOfRooms', e.target.value ? Number(e.target.value) : undefined)} />
+            <FormInput label="Nº de Quartos" type="number" inputMode="numeric" min={0} value={form.numOfRooms ?? ''} onChange={(e) => set('numOfRooms', e.target.value ? Number(e.target.value) : undefined)} />
             <FormInput label="Preço Médio" value={form.avgPrice ?? ''} onChange={(e) => set('avgPrice', e.target.value || undefined)} hint="Ex: R$ 180,00 / noite" maxLength={20} />
           </div>
-          <FormInput label="URL de Reserva" type="url" value={form.bookingUrl ?? ''} onChange={(e) => set('bookingUrl', e.target.value)} />
-          <FormInput label="URL Google Maps" type="url" value={form.mapsUrl ?? ''} onChange={(e) => set('mapsUrl', e.target.value)} hint="Link para o local no Google Maps" />
+          <FormInput label="URL de Reserva" type="url" inputMode="url" autoComplete="off" spellCheck={false} value={form.bookingUrl ?? ''} onChange={(e) => set('bookingUrl', e.target.value)} />
+          <FormInput label="URL Google Maps" type="url" inputMode="url" autoComplete="off" spellCheck={false} value={form.mapsUrl ?? ''} onChange={(e) => set('mapsUrl', e.target.value)} hint="Link para o local no Google Maps" />
           <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
 
           <div className="adm-role-slots-section">
@@ -127,7 +133,7 @@ export function HostPointFormPage() {
           </div>
 
           <div className="adm-form-actions">
-            <button type="button" className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/host-points')}>Cancelar</button>
+            <Link className="adm-btn adm-btn--ghost" to="/admin/host-points" onClick={guardedNavigate('/admin/host-points')}>Cancelar</Link>
             <button type="submit" className="adm-btn adm-btn--primary" disabled={loading}>{loading ? 'Salvando…' : isEdit ? 'Atualizar' : 'Criar'}</button>
           </div>
         </form>

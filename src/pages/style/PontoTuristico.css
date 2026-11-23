@@ -61,9 +61,9 @@
 }
 
 .pt-hero__inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
 }
 
 .pt-hero__tag {
@@ -72,7 +72,7 @@
     background: rgba(0, 107, 50, 0.82);
     color: #ffffff;
     font-family: "Inter", sans-serif;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -93,8 +93,8 @@
 
 .pt-hero__title {
     font-family: "Nunito", sans-serif;
-    font-weight: 900;
-    font-size: clamp(34px, 5.5vw, 68px);
+    font-weight: var(--fw-heading);
+    font-size: clamp(var(--fs-h1), 5.5vw, 68px);
     color: #ffffff;
     line-height: 1.08;
     margin: 0;
@@ -168,9 +168,9 @@
 }
 
 .pt-hero__infobar-inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -200,89 +200,98 @@
     color: #f87171;
 }
 
+.pt-hero__info-item--link {
+    position: relative;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.pt-hero__info-item--link::after {
+    content: "";
+    position: absolute;
+    inset: -12px -6px;
+}
+
+.pt-hero__info-item--link:hover {
+    text-decoration: underline;
+}
+
+.pt-hero__info-item--link:focus-visible {
+    outline: 3px solid #f3c66b;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.pt-hero__info-star {
+    color: #f3c66b;
+}
+
+.pt-hero__info-item .pt-hero__info-star {
+    font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
+}
+
 .pt-hero__info-sep {
     color: rgba(255, 255, 255, 0.22);
     font-size: 14px;
     flex-shrink: 0;
 }
 
-/* ─── Gallery ─── */
-.pt-gallery {
-    background: #f0f7f3;
-    padding: clamp(20px, 3vw, 36px) 0;
+/* ─── Botão "Ver N fotos" (hero) ─── */
+.pt-hero__gallery-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    margin-top: 24px;
+    padding: 0 18px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #ffffff;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
 }
 
-.pt-gallery__inner {
-    max-width: 1200px;
+.pt-hero__gallery-btn:hover {
+    background: rgba(255, 255, 255, 0.26);
+}
+
+.pt-hero__gallery-btn .ui-icon {
+    font-size: 20px;
+}
+
+/* ─── Fotos ─── */
+.pt-photos {
+    background: #ffffff;
+    padding: 0 0 var(--section-y);
+    scroll-margin-top: 96px;
+}
+
+.pt-photos__inner {
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 16px;
-    align-items: stretch;
+    padding: 0 var(--gutter);
 }
 
-.pt-gallery__inner:has(.pt-gallery__main:only-child),
-.pt-gallery__inner:not(:has(.pt-gallery__secondary)) {
-    grid-template-columns: 1fr;
-}
-
-.pt-gallery__main {
-    border-radius: 20px;
-    overflow: hidden;
-    aspect-ratio: 16 / 9;
-}
-
-.pt-gallery__main img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-    transition: transform 0.55s ease;
-}
-
-.pt-gallery__main:hover img {
-    transform: scale(1.05);
-}
-
-.pt-gallery__secondary {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.pt-gallery__thumb {
-    flex: 1;
-    border-radius: 20px;
-    overflow: hidden;
-    min-height: 180px;
-    aspect-ratio: 4 / 3;
-}
-
-.pt-gallery__thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-    transition: transform 0.55s ease;
-}
-
-.pt-gallery__thumb:hover img {
-    transform: scale(1.06);
+.pt-photos__inner .estd-h2 {
+    margin-bottom: 24px;
 }
 
 /* ─── Content + Planeje sua Visita ─── */
 .pt-content {
-    padding: clamp(36px, 5vw, 68px) 0;
+    padding: var(--section-y) 0;
     background: #ffffff;
 }
 
 .pt-content__inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
     display: grid;
     grid-template-columns: 1fr 400px;
     gap: clamp(40px, 5vw, 80px);
@@ -291,9 +300,9 @@
 
 .pt-content__kicker {
     font-family: "Inter", sans-serif;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: #006b32;
     display: block;
@@ -302,17 +311,18 @@
 
 .pt-content__title {
     font-family: "Nunito", sans-serif;
-    font-weight: 900;
-    font-size: clamp(26px, 3vw, 40px);
+    font-weight: var(--fw-heading);
+    font-size: var(--fs-h2);
     color: #00210c;
-    line-height: 1.15;
+    line-height: var(--lh-h2);
     margin: 0 0 28px;
 }
 
 .pt-content__p {
+    overflow-wrap: anywhere;
     font-family: "Inter", sans-serif;
-    font-size: 15px;
-    line-height: 1.8;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
     color: #4a5c51;
     margin: 0 0 16px;
 }
@@ -355,7 +365,7 @@
 .pt-stat-pill__lbl {
     display: block;
     font-family: "Inter", sans-serif;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     font-weight: 500;
     color: #7a9080;
     text-transform: uppercase;
@@ -466,90 +476,57 @@
 /* ─── Como Chegar ─── */
 .pt-how {
     background: #f4f9f6;
-    padding: clamp(36px, 5vw, 68px) 0;
+    padding: var(--section-y) 0;
 }
 
 .pt-how__inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(40px, 5vw, 72px);
-    align-items: center;
+    padding: 0 var(--gutter);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
 }
 
 .pt-how__title {
     font-family: "Nunito", sans-serif;
-    font-weight: 900;
-    font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: var(--fw-heading);
+    font-size: var(--fs-h2);
     color: #00210c;
-    margin: 0 0 16px;
-    line-height: 1.1;
+    margin: 0;
+    line-height: var(--lh-h2);
 }
 
-.pt-how__desc {
-    font-family: "Inter", sans-serif;
-    font-size: 15px;
-    line-height: 1.75;
-    color: #4a5c51;
-    margin: 0 0 28px;
+.pt-how__card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    background: #ffffff;
+    border: 1px solid #e4ede8;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 33, 12, 0.08);
 }
 
-.pt-how__routes {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.pt-how__route-item {
+.pt-how__phone {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin: 0;
     font-family: "Inter", sans-serif;
     font-size: 14px;
     color: #3c4a42;
 }
 
-.pt-how__route-item .material-symbols-outlined {
+.pt-how__phone .ui-icon {
     font-size: 20px;
     color: #006b32;
     flex-shrink: 0;
-    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-}
-
-.pt-how__maps-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #003016;
-    color: #ffffff;
-    font-family: "Nunito", sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    padding: 13px 28px;
-    border-radius: 50px;
-    text-decoration: none;
-    transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.pt-how__maps-btn .material-symbols-outlined {
-    font-size: 18px;
-    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-}
-
-.pt-how__maps-btn:hover {
-    background: #006b32;
-    transform: translateY(-2px);
 }
 
 .pt-how__right {
     border-radius: 24px;
     overflow: hidden;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 21 / 9;
     box-shadow: 0 20px 60px rgba(0, 33, 12, 0.15);
 }
 
@@ -575,28 +552,22 @@
     }
 }
 
+@media only screen and (max-width: 860px) {
+    .pt-how__card {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .pt-how .pt-how__map {
+        min-height: 240px;
+    }
+    .pt-how .estd-map-card__info {
+        padding: 20px;
+    }
+}
+
 @media only screen and (max-width: 768px) {
     .pt-hero {
         min-height: 80vh;
         padding-top: 70px;
-    }
-    .pt-gallery__inner {
-        grid-template-columns: 1fr;
-    }
-    .pt-gallery__main {
-        aspect-ratio: 16 / 9;
-    }
-    .pt-gallery__secondary {
-        flex-direction: row;
-        gap: 12px;
-    }
-    .pt-gallery__thumb {
-        flex: 1;
-        min-height: 0;
-        aspect-ratio: 4 / 3;
-    }
-    .pt-how__inner {
-        grid-template-columns: 1fr;
     }
     .pt-how__right {
         aspect-ratio: 16 / 9;
@@ -615,16 +586,8 @@
     .pt-content__stats {
         gap: 28px;
     }
-    .pt-gallery__secondary {
-        flex-direction: column;
-        height: auto;
-    }
-    .pt-gallery__secondary .pt-gallery__thumb {
-        height: 160px;
-        flex: none;
-    }
     .pt-hero__title {
-        font-size: clamp(28px, 8vw, 48px);
+        font-size: clamp(var(--fs-h1), 8vw, 48px);
     }
 }
 
@@ -638,13 +601,21 @@
 }
 
 .pt-breadcrumb__inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
     display: flex;
     align-items: center;
     gap: 6px;
     flex-wrap: wrap;
+    list-style: none;
+}
+
+.pt-breadcrumb__item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
 }
 
 .pt-breadcrumb__link {
@@ -684,27 +655,38 @@
     .pt-breadcrumb__current {
         max-width: 160px;
     }
+    .pt-breadcrumb__link {
+        position: relative;
+    }
+    .pt-breadcrumb__link::after {
+        content: "";
+        position: absolute;
+        inset: -15px -7px;
+    }
+    .pt-related__all {
+        min-height: 44px;
+    }
 }
 
 /* ─── Pontos Recomendados ─── */
 .pt-related {
     background: #f0f7f3;
-    padding: clamp(40px, 5vw, 72px) 0;
+    padding: var(--section-y) 0;
 }
 
 .pt-related__inner {
-    max-width: 1200px;
+    max-width: var(--container-max);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--gutter);
 }
 
 .pt-related__title {
     font-family: "Nunito", sans-serif;
-    font-weight: 900;
-    font-size: clamp(26px, 3vw, 38px);
+    font-weight: var(--fw-heading);
+    font-size: var(--fs-h2);
     color: #00210c;
     margin: 0 0 6px;
-    line-height: 1.15;
+    line-height: var(--lh-h2);
 }
 
 .pt-related__subtitle {
@@ -712,11 +694,6 @@
     font-size: 15px;
     color: #7a9080;
     margin: 0 0 32px;
-}
-
-/* Override 4-col grid to 3-col */
-.pt-related__grid ul {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 }
 
 .pt-related__footer {
@@ -750,14 +727,80 @@
     transform: translateX(4px);
 }
 
-@media only screen and (max-width: 1024px) {
-    .pt-related__grid ul {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
+/* ─── Locais vinculados ─── */
+.pt-linked {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 24px;
+    list-style: none;
 }
 
-@media only screen and (max-width: 480px) {
-    .pt-related__grid ul {
-        grid-template-columns: 1fr !important;
+.pt-linked__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #cfe3d7;
+    color: #003016;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    transition: background-color 0.2s;
+}
+
+.pt-linked__link:hover {
+    background: #e4f1ea;
+}
+
+.pt-linked__pin {
+    font-size: 18px;
+}
+
+.pt-linked__arrow {
+    font-size: 16px;
+    color: #006b32;
+}
+
+.pt-link {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.pt-hero__fav-btn:focus-visible,
+.pt-hero__gallery-btn:focus-visible,
+.pt-breadcrumb__link:focus-visible,
+.pt-linked__link:focus-visible,
+.pt-link:focus-visible,
+.pt-visit-card__cta:focus-visible,
+.pt-related__all:focus-visible {
+    outline: 3px solid #6bcf91;
+    outline-offset: 2px;
+}
+
+.pt-how .estd-route:focus-visible,
+.pt-how .estd-copy:focus-visible,
+.pt-how .estd-map__expand:focus-visible {
+    outline: 3px solid #2d8a54;
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pt-hero__fav-btn,
+    .pt-hero__gallery-btn,
+    .pt-breadcrumb__link,
+    .pt-visit-card__cta,
+    .pt-related__all,
+    .pt-related__all .material-symbols-outlined,
+    .pt-linked__link {
+        transition: none;
+    }
+
+    .pt-hero__fav-btn:hover,
+    .pt-visit-card__cta:hover {
+        transform: none;
     }
 }

@@ -1,0 +1,27 @@
+.company-claim-list { display: grid; margin: 0; padding: 0; list-style: none; }
+.company-claim { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 18px 24px; }
+.company-claim + .company-claim { border-top: 1px solid var(--ui-line); }
+.company-claim__main { display: grid; flex: 1; gap: 6px; min-width: 0; }
+.company-claim__title { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.company-claim__title strong { font-family: "Nunito", sans-serif; font-size: 17px; font-weight: 800; color: var(--pub-text); overflow-wrap: anywhere; }
+.company-claim__meta, .company-claim__note { margin: 0; font-size: 14px; line-height: 1.5; color: var(--ui-text-secondary); overflow-wrap: anywhere; }
+.company-claim__note--ok { color: var(--pub-green); font-weight: 600; }
+.company-claim__note--danger { color: #8f2d2d; }
+.company-claim__actions { display: flex; flex-shrink: 0; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 16px; }
+.company-claim__link { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; font-size: 15px; font-weight: 600; color: var(--pub-green); text-decoration: none; }
+.company-claim__link:hover { text-decoration: underline; }
+.company-claim__link .ui-icon { font-size: 18px; }
+.company-claim__link:focus-visible { outline: 3px solid var(--pub-green-mid); outline-offset: 2px; border-radius: 6px; }
+
+.company-claim-hint { display: flex; align-items: center; gap: 16px; }
+.company-claim-hint__icon { display: grid; width: 44px; height: 44px; flex: 0 0 auto; place-items: center; border-radius: 12px; background: var(--pub-green-dim); color: var(--pub-green); }
+.company-claim-hint__text { flex: 1; min-width: 0; }
+.company-claim-hint__text h2 { margin: 0 0 4px; font-family: "Nunito", sans-serif; font-size: 19px; font-weight: 800; color: var(--pub-text); }
+.company-claim-hint__text p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--ui-text-secondary); }
+
+@media (max-width: 640px) {
+  .company-claim { flex-direction: column; padding: 16px; }
+  .company-claim__actions { width: 100%; justify-content: space-between; }
+  .company-claim-hint { flex-direction: column; align-items: flex-start; }
+  .company-claim-hint .ui-btn { width: 100%; }
+}

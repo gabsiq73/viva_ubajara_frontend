@@ -1,5 +1,8 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useGuardedNavigate } from '../hooks/useGuardedNavigate';
+import { useFormGuard } from '../hooks/useFormGuard';
+import { useFocusFirstError } from '../hooks/useFocusFirstError';
 import { restaurantsService } from '../services/restaurantsService';
 import { photosService } from '../services/photosService';
 import { useToast } from '../components/Toast';
@@ -17,6 +20,7 @@ export function RestaurantFormPage() {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const navigate = useNavigate();
+  const guardedNavigate = useGuardedNavigate();
   const { showToast } = useToast();
   const [form, setForm] = useState<RestaurantRequest>(EMPTY);
   const [photos, setPhotos] = useState<PhotoResponse[]>([]);
@@ -25,6 +29,8 @@ export function RestaurantFormPage() {
   const [errors, setErrors] = useState<Partial<Record<keyof RestaurantRequest, string>>>({});
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
+  useFormGuard({ form, coverFile, cardFile }, !fetching);
+  const { formRef, focusFirstError } = useFocusFirstError();
 
   useEffect(() => {
     if (!isEdit) return;
@@ -47,7 +53,7 @@ export function RestaurantFormPage() {
   };
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault(); if (!validate()) return;
+    e.preventDefault(); if (!validate()) { focusFirstError(); return; }
     setLoading(true);
     try {
       if (isEdit) {
@@ -80,10 +86,10 @@ export function RestaurantFormPage() {
     <div>
       <div className="adm-page-header">
         <h2 className="adm-page-title">{isEdit ? 'Editar Restaurante' : 'Novo Restaurante'}</h2>
-        <button className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/restaurants')}>← Voltar</button>
+        <Link className="adm-btn adm-btn--ghost" to="/admin/restaurants" onClick={guardedNavigate('/admin/restaurants')}>← Voltar</Link>
       </div>
       <div className="adm-card">
-        <form className="adm-form" onSubmit={handleSubmit}>
+        <form ref={formRef} className="adm-form" onSubmit={handleSubmit}>
           <div className="adm-form-row">
             <FormInput label="Nome" value={form.name} onChange={(e) => set('name', e.target.value)} error={errors.name} required />
             <FormInput label="Tipo de Culinária" value={form.cuisineType} onChange={(e) => set('cuisineType', e.target.value)} error={errors.cuisineType} required />
@@ -91,20 +97,20 @@ export function RestaurantFormPage() {
           <FormTextarea label="Descrição" value={form.description} onChange={(e) => set('description', e.target.value)} error={errors.description} required maxLength={600} />
           <FormInput label="Endereço" value={form.address} onChange={(e) => set('address', e.target.value)} error={errors.address} required />
           <div className="adm-form-row">
-            <FormInput label="Telefone" value={form.phone ?? ''} onChange={(e) => set('phone', e.target.value)} />
-            <FormInput label="Email" type="email" value={form.email ?? ''} onChange={(e) => set('email', e.target.value)} />
+            <FormInput label="Telefone" type="tel" inputMode="tel" autoComplete="off" value={form.phone ?? ''} onChange={(e) => set('phone', e.target.value)} />
+            <FormInput label="Email" type="email" inputMode="email" autoComplete="off" spellCheck={false} value={form.email ?? ''} onChange={(e) => set('email', e.target.value)} />
           </div>
           <div className="adm-form-row">
             <FormInput label="Horário de Funcionamento" value={form.openingHours ?? ''} onChange={(e) => set('openingHours', e.target.value)} hint="Ex: Seg-Dom 11:00-22:00" />
             <FormInput label="Preço Médio" value={form.avgPrice ?? ''} onChange={(e) => set('avgPrice', e.target.value || undefined)} hint="Ex: R$ 45,00 por pessoa" maxLength={20} />
           </div>
           <div className="adm-form-row">
-            <FormInput label="Website" type="url" value={form.webUrl ?? ''} onChange={(e) => set('webUrl', e.target.value)} />
-            <FormInput label="Instagram" value={form.instagramUrl ?? ''} onChange={(e) => set('instagramUrl', e.target.value)} />
+            <FormInput label="Website" type="url" inputMode="url" autoComplete="off" spellCheck={false} value={form.webUrl ?? ''} onChange={(e) => set('webUrl', e.target.value)} />
+            <FormInput label="Instagram" inputMode="url" autoComplete="off" spellCheck={false} value={form.instagramUrl ?? ''} onChange={(e) => set('instagramUrl', e.target.value)} />
           </div>
-          <FormInput label="URL Google Maps" type="url" value={form.mapsUrl ?? ''} onChange={(e) => set('mapsUrl', e.target.value)} hint="Link para o local no Google Maps" />
+          <FormInput label="URL Google Maps" type="url" inputMode="url" autoComplete="off" spellCheck={false} value={form.mapsUrl ?? ''} onChange={(e) => set('mapsUrl', e.target.value)} hint="Link para o local no Google Maps" />
           <div className="adm-form-row">
-            <FormInput label="Avaliação (1–5 estrelas)" type="number" value={form.starRating ?? ''} onChange={(e) => set('starRating', e.target.value ? Math.min(5, Math.max(1, Number(e.target.value))) : undefined)} hint="Deixe em branco para sem avaliação" />
+            <FormInput label="Avaliação (1–5 estrelas)" type="number" inputMode="numeric" value={form.starRating ?? ''} onChange={(e) => set('starRating', e.target.value ? Math.min(5, Math.max(1, Number(e.target.value))) : undefined)} hint="Deixe em branco para sem avaliação" />
           </div>
           <div style={{ display: 'flex', gap: 24 }}>
             <FormToggle label="Aceita Reserva" checked={!!form.acceptsReservation} onChange={(v) => set('acceptsReservation', v)} />
@@ -134,7 +140,7 @@ export function RestaurantFormPage() {
           </div>
 
           <div className="adm-form-actions">
-            <button type="button" className="adm-btn adm-btn--ghost" onClick={() => navigate('/admin/restaurants')}>Cancelar</button>
+            <Link className="adm-btn adm-btn--ghost" to="/admin/restaurants" onClick={guardedNavigate('/admin/restaurants')}>Cancelar</Link>
             <button type="submit" className="adm-btn adm-btn--primary" disabled={loading}>{loading ? 'Salvando…' : isEdit ? 'Atualizar' : 'Criar'}</button>
           </div>
         </form>

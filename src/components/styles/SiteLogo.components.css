@@ -1,0 +1,16 @@
+.site-logo {
+    display: block;
+    height: var(--site-logo-h, 52px);
+    aspect-ratio: 674 / 318;
+    background-color: var(--site-logo-color, #ffffff);
+    forced-color-adjust: none;
+    -webkit-mask: url("../../assets/images/logo.webp") center / contain no-repeat;
+    mask: url("../../assets/images/logo.webp") center / contain no-repeat;
+    transition: height 250ms cubic-bezier(0.4, 0, 0.2, 1), background-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-logo {
+        transition: none;
+    }
+}

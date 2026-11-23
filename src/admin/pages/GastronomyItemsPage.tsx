@@ -3,6 +3,7 @@ import { gastronomyItemsService } from '../services/gastronomyItemsService';
 import { useToast } from '../components/Toast';
 import { Spinner } from '../components/Spinner';
 import { ConfirmModal } from '../components/Modal';
+import { RemovePhotoDialog } from '../components/RemovePhotoDialog';
 import { FormInput, FormToggle } from '../components/FormField';
 import { Plus, Pencil, Trash2, Upload, X } from 'lucide-react';
 import type { GastronomyItemResponse, GastronomyItemRequest } from '../types';
@@ -20,6 +21,7 @@ export function GastronomyItemsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [removeImageId, setRemoveImageId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadTargetId = useRef<string | null>(null);
 
@@ -100,14 +102,14 @@ export function GastronomyItemsPage() {
       showToast('Imagem removida.', 'success');
       load();
     } catch { showToast('Erro ao remover imagem.', 'error'); }
-    finally { setUploadingId(null); }
+    finally { setUploadingId(null); setRemoveImageId(null); }
   };
 
   return (
     <div>
       <div className="adm-page-header">
         <h2 className="adm-page-title">Gastronomia <span>{items.length} itens</span></h2>
-        <button className="adm-btn adm-btn--primary" onClick={openNew}><Plus size={16} /> Novo Item</button>
+        <button className="adm-btn adm-btn--primary" onClick={openNew}><Plus size={16} aria-hidden="true" /> Novo Item</button>
       </div>
 
       <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
@@ -116,12 +118,12 @@ export function GastronomyItemsPage() {
         <div className="adm-card" style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>{editItem ? 'Editar Item' : 'Novo Item'}</h3>
-            <button className="adm-btn adm-btn--ghost adm-btn--sm" onClick={closeForm}><X size={16} /></button>
+            <button type="button" className="adm-btn adm-btn--ghost adm-btn--sm" onClick={closeForm} aria-label="Fechar formulário"><X size={16} aria-hidden="true" /></button>
           </div>
           <form className="adm-form" onSubmit={handleSubmit}>
             <div className="adm-form-row">
               <FormInput label="Nome" value={form.name} onChange={(e) => set('name', e.target.value)} required />
-              <FormInput label="Ordem de Exibição" type="number" value={form.displayOrder ?? ''} onChange={(e) => set('displayOrder', e.target.value ? Number(e.target.value) : undefined)} hint="Menor número aparece primeiro" />
+              <FormInput label="Ordem de Exibição" type="number" inputMode="numeric" min={0} value={form.displayOrder ?? ''} onChange={(e) => set('displayOrder', e.target.value ? Number(e.target.value) : undefined)} hint="Menor número aparece primeiro" />
             </div>
             <FormToggle label="Ativo" checked={form.active} onChange={(v) => set('active', v)} />
             <div className="adm-form-actions">
@@ -161,12 +163,12 @@ export function GastronomyItemsPage() {
                       {item.displayOrder != null ? ` · Ordem ${item.displayOrder}` : ''}
                     </div>
                     <div style={{ display: 'flex', gap: 6 }}>
-                      <button className="adm-btn adm-btn--ghost adm-btn--sm" title="Editar" onClick={() => openEdit(item)}><Pencil size={13} /></button>
-                      <button className="adm-btn adm-btn--ghost adm-btn--sm" title="Upload imagem" onClick={() => triggerUpload(item.id)}><Upload size={13} /></button>
+                      <button className="adm-btn adm-btn--ghost adm-btn--sm" title="Editar" aria-label={`Editar ${item.name}`} onClick={() => openEdit(item)}><Pencil size={13} aria-hidden="true" /></button>
+                      <button className="adm-btn adm-btn--ghost adm-btn--sm" title="Upload imagem" aria-label={`Enviar imagem de ${item.name}`} onClick={() => triggerUpload(item.id)}><Upload size={13} aria-hidden="true" /></button>
                       {item.imageUrl && (
-                        <button className="adm-btn adm-btn--ghost adm-btn--sm" title="Remover imagem" onClick={() => handleRemoveImage(item.id)}><X size={13} /></button>
+                        <button className="adm-btn adm-btn--ghost adm-btn--sm" title="Remover imagem" aria-label={`Remover imagem de ${item.name}`} onClick={() => setRemoveImageId(item.id)}><X size={13} aria-hidden="true" /></button>
                       )}
-                      <button className="adm-btn adm-btn--danger adm-btn--sm" title="Deletar" onClick={() => setDeleteId(item.id)} style={{ marginLeft: 'auto' }}><Trash2 size={13} /></button>
+                      <button className="adm-btn adm-btn--danger adm-btn--sm" title="Deletar" aria-label={`Deletar ${item.name}`} onClick={() => setDeleteId(item.id)} style={{ marginLeft: 'auto' }}><Trash2 size={13} aria-hidden="true" /></button>
                     </div>
                   </div>
                 </div>
@@ -184,6 +186,14 @@ export function GastronomyItemsPage() {
         onCancel={() => setDeleteId(null)}
         loading={deleting}
       />
+
+      {removeImageId && (
+        <RemovePhotoDialog
+          loading={uploadingId === removeImageId}
+          onConfirm={() => handleRemoveImage(removeImageId)}
+          onCancel={() => setRemoveImageId(null)}
+        />
+      )}
     </div>
   );
 }

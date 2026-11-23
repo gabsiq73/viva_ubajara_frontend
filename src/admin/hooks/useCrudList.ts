@@ -1,7 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { PageResponse } from '../types';
+import { useUrlListState } from './useUrlListState';
+
+// Com busca ativa a listagem traz até este número de registros e filtra/pagina no cliente.
+const SEARCH_FETCH_LIMIT = 200;
 
 interface UseCrudListOptions<T> {
+  /** Precisa ter identidade estável (referência de service), senão o fetch dispara a cada render. */
   fetchFn: (page: number, size: number) => Promise<PageResponse<T>>;
   deleteFn: (id: string) => Promise<void>;
   pageSize?: number;
@@ -16,30 +21,50 @@ export function useCrudList<T extends { id: string }>({
   onSuccess,
   onError,
 }: UseCrudListOptions<T>) {
-  const [data, setData] = useState<T[]>([]);
-  const [page, setPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalElements, setTotalElements] = useState(0);
+  const { page: urlPage, search, setPage, setSearch } = useUrlListState();
+  const [rows, setRows] = useState<T[]>([]);
+  const [rowsFromSearch, setRowsFromSearch] = useState(false);
+  const [serverTotalPages, setServerTotalPages] = useState(0);
+  const [serverTotalElements, setServerTotalElements] = useState(0);
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const [search, setSearch] = useState('');
 
-  const fetch = useCallback(async (p = page) => {
+  const onSuccessRef = useRef(onSuccess);
+  const onErrorRef = useRef(onError);
+  const requestRef = useRef(0);
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+    onErrorRef.current = onError;
+  });
+
+  const hasSearch = search.trim() !== '';
+  const serverPage = hasSearch ? 0 : urlPage;
+
+  const load = useCallback(async () => {
+    const request = ++requestRef.current;
     setLoading(true);
     try {
-      const result = await fetchFn(p, pageSize);
-      setData(result.content);
-      setTotalPages(result.totalPages);
-      setTotalElements(result.totalElements);
+      const result = hasSearch
+        ? await fetchFn(0, SEARCH_FETCH_LIMIT)
+        : await fetchFn(serverPage, pageSize);
+      if (request !== requestRef.current) return;
+      if (!hasSearch && serverPage > 0 && result.content.length === 0 && result.totalPages > 0) {
+        setPage(result.totalPages - 1, true);
+        return;
+      }
+      setRows(result.content);
+      setRowsFromSearch(hasSearch);
+      setServerTotalPages(result.totalPages);
+      setServerTotalElements(result.totalElements);
     } catch {
-      onError?.('Erro ao carregar dados.');
+      if (request === requestRef.current) onErrorRef.current?.('Erro ao carregar dados.');
     } finally {
-      setLoading(false);
+      if (request === requestRef.current) setLoading(false);
     }
-  }, [page, pageSize, fetchFn]);
+  }, [fetchFn, hasSearch, serverPage, pageSize, setPage]);
 
-  useEffect(() => { fetch(page); }, [page]);
+  useEffect(() => { load(); }, [load]);
 
   const confirmDelete = useCallback((id: string) => setDeleteId(id), []);
   const cancelDelete = useCallback(() => setDeleteId(null), []);
@@ -49,32 +74,38 @@ export function useCrudList<T extends { id: string }>({
     setDeleting(true);
     try {
       await deleteFn(deleteId);
-      onSuccess?.('Registro deletado com sucesso.');
+      onSuccessRef.current?.('Registro deletado com sucesso.');
       setDeleteId(null);
-      fetch(page);
+      load();
     } catch {
-      onError?.('Erro ao deletar registro.');
+      onErrorRef.current?.('Erro ao deletar registro.');
     } finally {
       setDeleting(false);
     }
-  }, [deleteId, deleteFn, page]);
+  }, [deleteId, deleteFn, load]);
 
-  const filtered = search.trim()
-    ? data.filter((item) =>
+  const visibleRows = rowsFromSearch === hasSearch ? rows : [];
+  const matches = hasSearch
+    ? visibleRows.filter((item) =>
         Object.values(item).some((v) =>
           String(v).toLowerCase().includes(search.toLowerCase())
         )
       )
-    : data;
+    : visibleRows;
+
+  const totalPages = hasSearch ? Math.ceil(matches.length / pageSize) : serverTotalPages;
+  const totalElements = hasSearch ? matches.length : serverTotalElements;
+  const page = hasSearch ? Math.min(urlPage, Math.max(0, totalPages - 1)) : urlPage;
+  const data = hasSearch ? matches.slice(page * pageSize, (page + 1) * pageSize) : matches;
 
   return {
-    data: filtered,
+    data,
     page, setPage,
     totalPages, totalElements,
     loading,
     search, setSearch,
     deleteId, deleting,
     confirmDelete, cancelDelete, executeDelete,
-    refresh: () => fetch(page),
+    refresh: load,
   };
 }

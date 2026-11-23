@@ -1,0 +1,30 @@
+:root {
+    --torn-h: clamp(28px, 5vw, 64px);
+}
+
+.torn-host {
+    position: relative;
+}
+
+.torn-divider {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: calc(var(--torn-h) + 1px);
+    background: var(--torn-fill);
+    pointer-events: none;
+    -webkit-mask: url("../../assets/images/torn-edge.svg") repeat-x left top / 720px 100%;
+    mask: url("../../assets/images/torn-edge.svg") repeat-x left top / 720px 100%;
+}
+
+.torn-divider--top {
+    top: calc(var(--torn-h) * -1);
+    transform: scaleY(-1);
+}
+
+.torn-divider--bottom {
+    bottom: calc(var(--torn-h) * -1);
+}

@@ -1,13 +1,15 @@
 import "./style/Content.components.css"
 import { Link } from "react-router-dom"
-import { useEffect, useState, useMemo } from "react"
-import paper from "./../../assets/images/paper.png"
-import park from "./../../assets/images/parque.png";
-import food from "./../../assets/images/food.png";
-import cac from "./../../assets/images/cachoeira.png";
-import farm from "./../../assets/images/fazenda.png";
-import mercado from "./../../assets/images/mercado.png";
-import museum from "./../../assets/images/museu.png";
+import { useEffect, useState, useMemo, useRef, type KeyboardEvent, type ReactNode } from "react"
+import paper from "./../../assets/images/paper.webp"
+import park from "./../../assets/images/parque.webp";
+import food from "./../../assets/images/food.webp";
+import cachoeiraAvatar from "./../../assets/images/cachoeira-avatar.webp";
+import farm from "./../../assets/images/fazenda.webp";
+import fazendaAvatar from "./../../assets/images/fazenda-avatar.webp";
+import mercado from "./../../assets/images/mercado.webp";
+import mercadoAvatar from "./../../assets/images/mercado-avatar.webp";
+import museum from "./../../assets/images/museu.webp";
 import { GastronomyCarousel, type GastronomySlide } from "./GastronomyCarousel";
 import { gastronomyItemsService } from "../../admin/services/gastronomyItemsService";
 import { attractionsService } from "../../admin/services/attractionsService";
@@ -18,15 +20,28 @@ import { tourGuidesService } from "../../admin/services/tourGuidesService";
 import { testimonialsService } from "../../admin/services/testimonialsService";
 import type {
     AttractionResponse,
-    AttractionCategory,
     EventResponse,
-    RestaurantResponse,
-    HostPointResponse,
-    HostType,
     TourGuideResponse,
     TestimonialResponse,
 } from "../../admin/types";
 import { ArrowRight } from "lucide-react";
+import EstablishmentCard from "../ui/EstablishmentCard";
+import { Button } from "../ui/Button";
+import TornDivider from "../ui/TornDivider";
+import { FilterChip } from "../ui/Chip";
+import StateBlock from "../ui/StateBlock";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
+import PointCard from "../ui/PointCard";
+import { Skeleton, EstablishmentCardSkeleton, PointCardSkeleton } from "../ui/Skeleton";
+import {
+    ESTABLISHMENT_TYPES,
+    mapHostPoint,
+    mapRestaurant,
+    toFavoriteItem,
+    type Establishment,
+} from "../../utils/establishments";
+import { loadFavorites, toggleFavorite } from "../../utils/favorites";
+import "../ui/ui.css";
 
 // ── Static icons ───────────────────────────────────────────────
 const IconFazer = () => (
@@ -59,65 +74,124 @@ const GASTRO_SLIDES_FALLBACK: GastronomySlide[] = [
 ];
 
 const AIRPORTS = [
-    { code: "JJD", name: "Aeroporto de Jericoacoara", dist: "165 km de distância" },
-    { code: "THE", name: "Aeroporto de Teresina", dist: "280 km de distância" },
-    { code: "FOR", name: "Aeroporto de Fortaleza", dist: "320 km de distância" },
-    { code: "PHB", name: "Aeroporto de Parnaíba", dist: "190 km de distância" },
+    { code: "JJD", name: "Aeroporto de Jericoacoara", dist: "165\u00A0km de distância" },
+    { code: "THE", name: "Aeroporto de Teresina", dist: "280\u00A0km de distância" },
+    { code: "FOR", name: "Aeroporto de Fortaleza", dist: "320\u00A0km de distância" },
+    { code: "PHB", name: "Aeroporto de Parnaíba", dist: "190\u00A0km de distância" },
 ];
 
-const FAQ_ITEMS = [
-    { id: 1, q: "Onde fica o Parque Nacional de Ubajara?", a: "O Parque está localizado na Serra da Ibiapaba, a cerca de 320 km de Fortaleza. A entrada principal fica no município de Ubajara, no estado do Ceará." },
-    { id: 2, q: "Qual o horário de funcionamento do teleférico?", a: "O teleférico opera de terça a domingo, das 8h às 17h. Às segundas-feiras o Parque permanece fechado para manutenção. Recomendamos chegar cedo para garantir sua entrada." },
-    { id: 3, q: "É necessário guia para visitar a gruta?", a: "Sim, a visita à Gruta de Ubajara é obrigatoriamente acompanhada por condutores locais credenciados pelo ICMBio, garantindo sua segurança e a preservação do ambiente." },
-    { id: 4, q: "É possível acampar dentro do Parque?", a: "O camping é permitido em áreas específicas e requer agendamento prévio junto ao ICMBio. Consulte o site oficial do parque ou entre em contato com nossa secretaria de turismo." },
+interface FaqItem {
+    id: string;
+    question: string;
+    answer: ReactNode;
+}
+
+const FAQ_ITEMS: FaqItem[] = [
+    {
+        id: "onde-fica",
+        question: "Onde fica o Parque Nacional de Ubajara?",
+        answer: <p>O Parque está localizado na Serra da Ibiapaba, a cerca de 320&nbsp;km de Fortaleza. A entrada principal fica no município de Ubajara, no estado do Ceará.</p>,
+    },
+    {
+        id: "teleferico",
+        question: "Qual o horário de funcionamento do teleférico?",
+        answer: <p>O teleférico opera de terça a domingo, das 8h às 17h. Às segundas-feiras o Parque permanece fechado para manutenção. Recomendamos chegar cedo para garantir sua entrada.</p>,
+    },
+    {
+        id: "guia",
+        question: "É necessário guia para visitar a gruta?",
+        answer: <p>Sim, a visita à Gruta de Ubajara é obrigatoriamente acompanhada por condutores locais credenciados pelo ICMBio, garantindo sua segurança e a preservação do ambiente.</p>,
+    },
+    {
+        id: "camping",
+        question: "É possível acampar dentro do Parque?",
+        answer: <p>O camping é permitido em áreas específicas e requer agendamento prévio junto ao ICMBio. Consulte o site oficial do parque ou entre em contato com nossa secretaria de turismo.</p>,
+    },
+    {
+        id: "como-chegar",
+        question: "Como chego a Ubajara?",
+        answer: (
+            <>
+                <p>De avião, você pode voar até os aeroportos de Jericoacoara, Teresina, Fortaleza ou Parnaíba e completar a viagem por terra. De ônibus, há linhas regulares saindo de Fortaleza, Teresina e outras cidades da região. De carro, o acesso é pela BR-222 e pela CE-187, em estrada totalmente asfaltada e sinalizada.</p>
+                <p><Link to="/como-chegar" className="faq__link">Ver todas as rotas</Link></p>
+            </>
+        ),
+    },
+    {
+        id: "comer-hospedar",
+        question: "Onde posso comer e me hospedar?",
+        answer: (
+            <>
+                <p>Ubajara tem restaurantes com a gastronomia regional da Ibiapaba, além de pousadas e hotéis integrados à natureza. Veja a lista completa, com fotos e detalhes de cada lugar.</p>
+                <p><Link to="/estabelecimentos" className="faq__link">Ver estabelecimentos</Link></p>
+            </>
+        ),
+    },
+    {
+        id: "divulgar",
+        question: "Tenho um restaurante ou pousada. Como divulgo meu negócio?",
+        answer: (
+            <>
+                <p>Faça o cadastro da sua empresa no <span translate="no">Viva Ubajara</span>. Depois de enviado, o cadastro passa pela análise da nossa equipe antes de ser publicado no site.</p>
+                <p><Link to="/cadastro-empresa" className="faq__link">Cadastrar minha empresa</Link></p>
+            </>
+        ),
+    },
+    {
+        id: "contato",
+        question: "Como falo com a equipe do parque?",
+        answer: (
+            <>
+                <p>Ligue para <a href="tel:+558836341234" className="faq__link">(88)&nbsp;3634-1234</a> ou escreva para <a href="mailto:contato@vivaubajara.com.br" className="faq__link">contato@vivaubajara.com.br</a>. Você também pode enviar uma mensagem pela página de contato.</p>
+                <p><Link to="/contato" className="faq__link">Ir para a página de contato</Link></p>
+            </>
+        ),
+    },
 ];
 
 // ── Skeleton cards ─────────────────────────────────────────────
 
-const PointSkeleton = () => (
-    <li aria-hidden="true" style={{ cursor: "default" }}>
-        <div className="skel" style={{ height: "100%", width: "100%", borderRadius: 20 }} />
-    </li>
-);
-
-const PubGuideSkeleton = () => (
-    <article className="pub-guide-card" aria-hidden="true" style={{ pointerEvents: "none" }}>
-        <div className="pub-guide-card__media">
-            <div className="skel" style={{ width: "100%", height: "100%", borderRadius: 0 }} />
-        </div>
-        <div className="pub-guide-card__body">
-            <div className="skel" style={{ height: 17, width: "65%" }} />
-            <div className="skel" style={{ height: 13, width: "100%" }} />
-            <div className="skel" style={{ height: 13, width: "80%" }} />
-            <div className="skel" style={{ height: 34, width: 110, borderRadius: 20, marginTop: 6 }} />
-        </div>
-    </article>
-);
-
 const EventSkeleton = () => (
-    <article className="pub-event-card" aria-hidden="true" style={{ pointerEvents: "none" }}>
-        <div className="pub-event-card__media" style={{ position: "relative" }}>
-            <div className="skel" style={{ position: "absolute", inset: 0, borderRadius: 0 }} />
+    <article className="pub-event-card pub-event-card--skeleton" aria-hidden="true">
+        <div className="pub-event-card__media">
+            <Skeleton className="pub-skel-fill" radius={0} />
         </div>
         <div className="pub-event-card__body">
-            <div className="skel" style={{ height: 17, width: "75%" }} />
-            <div className="skel" style={{ height: 13, width: "100%" }} />
-            <div className="skel" style={{ height: 13, width: "60%" }} />
-            <div className="skel" style={{ height: 36, width: 120, borderRadius: 20, marginTop: 4 }} />
+            <div className="pub-event-card__title">
+                <Skeleton width="80%" height={15} />
+                <Skeleton width="55%" height={15} />
+            </div>
+            <div className="pub-event-card__desc">
+                <Skeleton width="100%" height={12} />
+                <Skeleton width="70%" height={12} />
+            </div>
+            <div className="pub-event-card__loc">
+                <Skeleton width="45%" height={13} />
+            </div>
+            <div className="pub-event-card__footer">
+                <Skeleton width={96} height={14} />
+            </div>
         </div>
     </article>
 );
 
 const GuideSkeleton = () => (
-    <article className="guide-card" aria-hidden="true" style={{ pointerEvents: "none" }}>
+    <article className="guide-card guide-card--skeleton" aria-hidden="true">
         <div className="guide-card__photo">
-            <div className="skel" style={{ width: "100%", height: "100%", borderRadius: 0 }} />
+            <Skeleton className="pub-skel-fill" radius={0} />
         </div>
         <div className="guide-card__body">
-            <div className="skel" style={{ height: 17, width: "60%" }} />
-            <div className="skel" style={{ height: 12, width: "35%" }} />
-            <div className="skel" style={{ height: 13, width: "100%", marginTop: 4 }} />
-            <div className="skel" style={{ height: 13, width: "85%" }} />
+            <div className="guide-card__name">
+                <Skeleton width="60%" height={16} />
+            </div>
+            <div className="guide-card__specialty">
+                <Skeleton width="35%" height={11} />
+            </div>
+            <div className="guide-card__desc">
+                <Skeleton width="100%" height={12} />
+                <Skeleton width="100%" height={12} />
+                <Skeleton width="75%" height={12} />
+            </div>
         </div>
     </article>
 );
@@ -141,66 +215,110 @@ const ReviewSkeleton = () => (
 );
 
 // ── Type helpers ───────────────────────────────────────────────
-const CATEGORY_LABELS: Record<AttractionCategory, string> = {
-    PARK: "Parque", WATERFALL: "Cachoeira", MUSEUM: "Museu",
-    FARM: "Fazenda", ROUTE: "Rota", MARKET: "Mercado",
-};
+const DAY_FORMAT = new Intl.DateTimeFormat("pt-BR", { day: "2-digit" });
+const MONTH_FORMAT = new Intl.DateTimeFormat("pt-BR", { month: "short" });
+const DAY_MONTH_LONG_FORMAT = new Intl.DateTimeFormat("pt-BR", { day: "numeric", month: "long" });
 
-const HOST_TYPE_LABELS: Record<HostType, string> = {
-    HOTEL: "Hotel", ROOST: "Pousada", HOSTEL: "Hostel",
-};
-
-const PT_MONTHS = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-
+// O backend manda dd/MM/yyyy HH:mm:ss; montar a data por partes evita o parse em UTC de "YYYY-MM-DD".
 function parseDate(raw: string): Date {
     if (!raw) return new Date(NaN);
-    if (raw.includes("/")) {
-        const [d, t = "00:00:00"] = raw.split(" ");
-        const [day, mon, yr] = d.split("/");
-        return new Date(`${yr}-${mon}-${day}T${t}`);
+    const br = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (br) {
+        const [, day, mon, yr, hh = "0", mm = "0", ss = "0"] = br;
+        const date = new Date(+yr, +mon - 1, +day, +hh, +mm, +ss);
+        return date.getMonth() === +mon - 1 ? date : new Date(NaN);
     }
+    const isoDate = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (isoDate) return new Date(+isoDate[1], +isoDate[2] - 1, +isoDate[3]);
     return new Date(raw);
 }
 
-interface PubItem {
+function SectionState({ failed, emptyTitle, emptyIcon, emptyVariant = "empty", onRetry }: {
+    failed: boolean;
+    emptyTitle: string;
+    emptyIcon: string;
+    emptyVariant?: "empty" | "notice";
+    onRetry: () => void;
+}) {
+    if (failed) {
+        return (
+            <StateBlock
+                variant="error"
+                icon="cloud_off"
+                title="Não foi possível carregar esta seção."
+                actions={<Button variant="outline" icon="refresh" onClick={onRetry}>Tentar de novo</Button>}
+            >
+                Verifique sua conexão e tente novamente.
+            </StateBlock>
+        );
+    }
+    return <StateBlock variant={emptyVariant} icon={emptyIcon} title={emptyTitle} />;
+}
+
+const PUB_LIMIT = 8;
+
+function pickPubItems(items: Establishment[], filter: string): Establishment[] {
+    if (filter !== "Todos") return items.filter((i) => i.type === filter).slice(0, PUB_LIMIT);
+    const restaurants = items.filter((i) => i.type === "Restaurante");
+    const lodging = items.filter((i) => i.type !== "Restaurante");
+    const mixed: Establishment[] = [];
+    for (let i = 0; mixed.length < PUB_LIMIT && (i < restaurants.length || i < lodging.length); i++) {
+        if (restaurants[i]) mixed.push(restaurants[i]);
+        if (lodging[i] && mixed.length < PUB_LIMIT) mixed.push(lodging[i]);
+    }
+    return mixed;
+}
+
+interface SectionHeaderProps {
     id: string;
-    apiType: "restaurant" | "hostpoint";
-    category: string;
+    kicker: string;
     title: string;
-    desc: string;
-    img: string;
+    subtitle?: string;
+    cta?: { to: string; label: string; text?: string };
+    onDark?: boolean;
 }
 
-function mapRestaurantPub(r: RestaurantResponse): PubItem {
-    return { id: r.id, apiType: "restaurant", category: "Restaurante", title: r.name, desc: r.description, img: r.photos?.[0]?.url ?? "" };
+function SectionHeader({ id, kicker, title, subtitle, cta, onDark }: SectionHeaderProps) {
+    return (
+        <header className={`sec-head reveal${onDark ? " sec-head--on-dark" : ""}`}>
+            <div className="sec-head__text">
+                <span className="sec-head__kicker">{kicker}</span>
+                <h2 id={id} className="sec-head__title">{title}</h2>
+                {subtitle && <p className="sec-head__sub">{subtitle}</p>}
+            </div>
+            {cta && (
+                <Link to={cta.to} className="sec-head__cta" aria-label={cta.label}>
+                    {cta.text ?? "Ver todos"}
+                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                </Link>
+            )}
+        </header>
+    );
 }
-function mapHostPub(h: HostPointResponse): PubItem {
-    return { id: h.id, apiType: "hostpoint", category: HOST_TYPE_LABELS[h.hostType] ?? "Hospedagem", title: h.name, desc: h.description, img: h.photos?.[0]?.url ?? "" };
-}
-
-const PUB_GUIDE_TAG_COLORS: Record<string, string> = {
-    Restaurante: "#006B32",
-    Hotel: "#304FCD",
-    Pousada: "#304FCD",
-    Hostel: "#0d7a6f",
-};
 
 // ── Fallback review avatars ───────────────────────────────────
-const FALLBACK_AVATARS = [cac, farm, mercado];
+const FALLBACK_AVATARS = [cachoeiraAvatar, fazendaAvatar, mercadoAvatar];
 
 export default function Content() {
     const [gastroIndex, setGastroIndex] = useState(0);
     const [gastroSlides, setGastroSlides] = useState<GastronomySlide[]>(GASTRO_SLIDES_FALLBACK);
-    const [faqOpen, setFaqOpen] = useState<number | null>(1);
+    const [faqOpen, setFaqOpen] = useState<string | null>(null);
+    const faqListRef = useRef<HTMLDivElement>(null);
 
     // API state
     const [loading, setLoading] = useState(true);
     const [attractions, setAttractions] = useState<AttractionResponse[]>([]);
     const [homeEvents, setHomeEvents] = useState<EventResponse[]>([]);
-    const [pubItems, setPubItems] = useState<PubItem[]>([]);
+    const [pubItems, setPubItems] = useState<Establishment[]>([]);
     const [homeGuides, setHomeGuides] = useState<TourGuideResponse[]>([]);
     const [homeReviews, setHomeReviews] = useState<TestimonialResponse[]>([]);
+    const [failed, setFailed] = useState({ attractions: false, events: false, establishments: false, guides: false, reviews: false });
+    const [reloadKey, setReloadKey] = useState(0);
+    const [gastroHover, setGastroHover] = useState(false);
+    const [gastroFocus, setGastroFocus] = useState(false);
+    const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
     const [pubGuideFilter, setPubGuideFilter] = useState("Todos");
+    const [favoriteIds, setFavoriteIds] = useState<Set<string>>(() => new Set(loadFavorites().map((f) => f.id)));
 
     useEffect(() => {
         gastronomyItemsService.getActive().then((items) => {
@@ -209,12 +327,14 @@ export default function Content() {
                 .map(item => ({ tag: item.name, src: item.imageUrl!, alt: item.name }));
             if (slides.length > 0) setGastroSlides(slides);
         }).catch(() => {});
+    }, []);
 
+    useEffect(() => {
         Promise.allSettled([
             attractionsService.getAll(0, 4, true),
             eventsService.getAll(0, 4, true),
-            restaurantsService.getAll(0, 6),
-            hostPointsService.getAll(0, 6),
+            restaurantsService.getAll(0, PUB_LIMIT),
+            hostPointsService.getAll(0, PUB_LIMIT),
             tourGuidesService.getAll(0, 4, true),
             testimonialsService.listApproved(),
         ]).then(([attR, evR, restR, hostR, guideR, testR]) => {
@@ -224,20 +344,34 @@ export default function Content() {
             if (testR.status === "fulfilled") setHomeReviews(testR.value.slice(0, 3));
 
             const rests = restR.status === "fulfilled"
-                ? restR.value.content.filter(r => r.active).map(mapRestaurantPub) : [];
+                ? restR.value.content.filter(r => r.active).map(mapRestaurant) : [];
             const hosts = hostR.status === "fulfilled"
-                ? hostR.value.content.filter(h => h.active).map(mapHostPub) : [];
+                ? hostR.value.content.filter(h => h.active).map(mapHostPoint) : [];
             setPubItems([...rests, ...hosts]);
+            setFailed({
+                attractions: attR.status === "rejected",
+                events: evR.status === "rejected",
+                establishments: restR.status === "rejected" && hostR.status === "rejected",
+                guides: guideR.status === "rejected",
+                reviews: testR.status === "rejected",
+            });
         }).finally(() => setLoading(false));
-    }, []);
+    }, [reloadKey]);
+
+    const retryLoad = () => {
+        setLoading(true);
+        setReloadKey((k) => k + 1);
+    };
+
+    const gastroPaused = reduceMotion || gastroHover || gastroFocus;
 
     useEffect(() => {
-        if (gastroSlides.length <= 1) return;
+        if (gastroSlides.length <= 1 || gastroPaused) return;
         const id = window.setInterval(() => {
             setGastroIndex((i) => (i + 1) % gastroSlides.length);
         }, 4500);
         return () => window.clearInterval(id);
-    }, [gastroSlides]);
+    }, [gastroSlides, gastroPaused, gastroIndex]);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -253,18 +387,40 @@ export default function Content() {
     }, [loading]);
 
     const pubCategories = useMemo(() => {
-        const cats = Array.from(new Set(pubItems.map(i => i.category)));
-        return ["Todos", ...cats];
+        const present = new Set(pubItems.map(i => i.type));
+        return ["Todos", ...ESTABLISHMENT_TYPES.filter(t => present.has(t))];
     }, [pubItems]);
 
-    const filteredPub = useMemo(
-        () => pubGuideFilter === "Todos" ? pubItems : pubItems.filter(i => i.category === pubGuideFilter),
-        [pubItems, pubGuideFilter]
-    );
+    const filteredPub = useMemo(() => pickPubItems(pubItems, pubGuideFilter), [pubItems, pubGuideFilter]);
+
+    const handleToggleFavorite = (item: Establishment) => {
+        const nowFavorite = toggleFavorite(toFavoriteItem(item));
+        setFavoriteIds((prev) => {
+            const next = new Set(prev);
+            if (nowFavorite) next.add(item.id);
+            else next.delete(item.id);
+            return next;
+        });
+    };
+
+    const handleFaqKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+        const keys = ["ArrowDown", "ArrowUp", "Home", "End"];
+        if (!keys.includes(e.key) || !(e.target instanceof HTMLButtonElement)) return;
+        const buttons = Array.from(faqListRef.current?.querySelectorAll<HTMLButtonElement>(".faq__question") ?? []);
+        const current = buttons.indexOf(e.target);
+        if (current === -1) return;
+        e.preventDefault();
+        const next =
+            e.key === "Home" ? 0
+            : e.key === "End" ? buttons.length - 1
+            : e.key === "ArrowDown" ? (current + 1) % buttons.length
+            : (current - 1 + buttons.length) % buttons.length;
+        buttons[next].focus();
+    };
 
     return (
         <section className="section">
-            <div className="paper"><img src={paper} /></div>
+            <div className="paper"><img src={paper} alt="" width={3660} height={856} decoding="async" /></div>
             <div className="fundo">
 
                 {/* ── Quick nav cards ── */}
@@ -314,75 +470,48 @@ export default function Content() {
                 </div>
 
                 {/* ── Pontos Turísticos ── */}
-                <div className="point">
+                <section className="point" aria-labelledby="pontos-title">
                     <div className="point-container">
-                        <div className="section-header reveal">
-                            <div className="title-group">
-                                <span className="subtitle">Experiências Únicas</span>
-                                <h1>Pontos Turísticos</h1>
-                            </div>
-                            <div id="more"><Link to="/pontos-turisticos">Ver Todos</Link></div>
-                        </div>
+                        <SectionHeader
+                            id="pontos-title"
+                            kicker="Experiências Únicas"
+                            title="Pontos Turísticos"
+                            subtitle="Cachoeiras, trilhas, fazendas e mercados para viver a serra de perto."
+                            cta={{ to: "/pontos-turisticos", label: "Ver todos os pontos turísticos" }}
+                        />
                         {loading ? (
-                            <div className="cards-points">
-                                <ul className="list-points">
-                                    {Array.from({ length: 4 }).map((_, i) => <PointSkeleton key={i} />)}
-                                </ul>
-                            </div>
+                            <ul className="ui-point-grid" aria-hidden="true">
+                                {Array.from({ length: 4 }).map((_, i) => <li key={i}><PointCardSkeleton /></li>)}
+                            </ul>
+                        ) : failed.attractions || attractions.length === 0 ? (
+                            <SectionState failed={failed.attractions} emptyTitle="Nenhum ponto turístico cadastrado por enquanto." emptyIcon="landscape" onRetry={retryLoad} />
                         ) : (
-                            <div className="cards-points">
-                                <ul className="list-points grid-reveal">
-                                    {attractions.map((pt) => (
-                                        <li key={pt.id}>
-                                            <Link to={`/pontos/${pt.id}`} className="point-card__link" aria-label={pt.name}>
-                                                {pt.photos?.[0]?.url
-                                                    ? <img src={pt.photos[0].url} alt={pt.name} className="point-card__img" loading="lazy" />
-                                                    : <div className="point-card__img point-card__img--placeholder" aria-hidden="true" />
-                                                }
-                                                <div className="point-card__gradient" />
-                                                <span className="point-card__tag" aria-hidden="true">{CATEGORY_LABELS[pt.category] ?? pt.category}</span>
-                                                <div className="point-card__body">
-                                                    <h3 className="point-card__title">{pt.name}</h3>
-                                                    <p className="point-card__desc">{pt.shortDescription ?? pt.description}</p>
-                                                    <div className="point-card__meta">
-                                                        {pt.averageVisitDuration != null && (
-                                                            <span className="point-card__meta-item">
-                                                                <span className="material-symbols-outlined" aria-hidden="true">schedule</span>
-                                                                {pt.averageVisitDuration} min
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <span className="point-card__cta" aria-hidden="true">
-                                                        <span className="material-symbols-outlined" aria-hidden="true">visibility</span>
-                                                        Saiba mais
-                                                    </span>
-                                                </div>
-                                            </Link>
-                                        </li>
-                                    ))}
-                                    {Array.from({ length: Math.max(0, 4 - attractions.length) }).map((_, i) => (
-                                        <PointSkeleton key={`pad-${i}`} />
-                                    ))}
-                                </ul>
-                            </div>
+                            <ul className="ui-point-grid grid-reveal">
+                                {attractions.map((pt) => (
+                                    <li key={pt.id}><PointCard item={pt} /></li>
+                                ))}
+                            </ul>
                         )}
                     </div>
-                </div>
+                </section>
 
                 {/* ── Gastronomia ── */}
-                <div className="top-n">
-                    <div className="papel">
-                        <div className="paper1"><img src={paper} alt="papel" /></div>
-                        <div className="paper2"><img src={paper} alt="papel" /></div>
-                    </div>
+                <div className="top-n torn-host">
+                    <TornDivider edge="top" fill="#c58b24" />
                     <div className="news">
-                        <div className="news-inner">
+                        <div
+                            className="news-inner"
+                            onPointerEnter={(e) => { if (e.pointerType === "mouse") setGastroHover(true); }}
+                            onPointerLeave={(e) => { if (e.pointerType === "mouse") setGastroHover(false); }}
+                            onFocus={() => setGastroFocus(true)}
+                            onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setGastroFocus(false); }}
+                        >
                             <div className="caixa">
                                 <GastronomyCarousel slides={gastroSlides} activeIndex={gastroIndex} onActiveChange={setGastroIndex} />
                             </div>
                             <div className="text-n">
-                                <h2>Sabores da Ibiapaba</h2>
-                                <h1>Gastronomia Regional</h1>
+                                <span className="text-n__kicker">Sabores da Ibiapaba</span>
+                                <h2 className="text-n__title">Gastronomia Regional</h2>
                                 <div className="protect">
                                     <ul>
                                         {gastroSlides.map((slide, i) => (
@@ -408,187 +537,170 @@ export default function Content() {
                             </div>
                         </div>
                     </div>
-                    <div className="papel ptop">
-                        <div className="paper1"><img src={paper} alt="papel" /></div>
-                        <div className="paper2"><img src={paper} alt="papel" /></div>
-                    </div>
+                    <TornDivider edge="bottom" fill="#c58b24" />
                 </div>
 
-                {/* ── Guia + Eventos + Guias ── */}
+                {/* ── Guia + Eventos ── */}
                 <div className="pub-landing-blocks">
 
                     {/* Estabelecimentos */}
                     <section className="pub-guide" aria-labelledby="pub-guide-title">
-                        <header className="pub-guide__header reveal">
-                            <h2 id="pub-guide-title" className="pub-guide__title">Guia de Estabelecimentos</h2>
-                            <p className="pub-guide__subtitle">Os melhores lugares para comer, dormir e viver momentos inesquecíveis em nossa cidade.</p>
-                        </header>
-                        {loading || pubItems.length === 0 ? (
-                            <div className="pub-guide__grid">
-                                {Array.from({ length: 4 }).map((_, i) => <PubGuideSkeleton key={i} />)}
-                            </div>
+                        <SectionHeader
+                            id="pub-guide-title"
+                            kicker="Onde comer e dormir"
+                            title="Guia de Estabelecimentos"
+                            subtitle="Os melhores lugares para comer, dormir e viver momentos inesquecíveis em nossa cidade."
+                            cta={{ to: "/estabelecimentos", label: "Ver todos os estabelecimentos" }}
+                        />
+                        {loading ? (
+                            <>
+                                <div className="pub-guide__filters" aria-hidden="true">
+                                    {Array.from({ length: 4 }).map((_, i) => (
+                                        <Skeleton key={i} width={88} height={36} radius={50} />
+                                    ))}
+                                </div>
+                                <div className="pub-guide__grid">
+                                    {Array.from({ length: PUB_LIMIT }).map((_, i) => <EstablishmentCardSkeleton key={i} />)}
+                                </div>
+                            </>
+                        ) : failed.establishments || pubItems.length === 0 ? (
+                            <SectionState failed={failed.establishments} emptyTitle="Nenhum estabelecimento cadastrado por enquanto." emptyIcon="storefront" onRetry={retryLoad} />
                         ) : (
                             <>
-                                <div className="pub-guide__filters" role="toolbar" aria-label="Filtrar por tipo">
+                                <div className="pub-guide__filters" role="group" aria-label="Filtrar por tipo">
                                     {pubCategories.map((label) => (
-                                        <button
+                                        <FilterChip
                                             key={label}
-                                            type="button"
-                                            className={pubGuideFilter === label ? "pub-guide__filter pub-guide__filter--active" : "pub-guide__filter"}
+                                            label={label}
+                                            selected={pubGuideFilter === label}
                                             onClick={() => setPubGuideFilter(label)}
-                                            aria-pressed={pubGuideFilter === label}
-                                        >
-                                            {label}
-                                        </button>
+                                        />
                                     ))}
                                 </div>
                                 <div className="pub-guide__grid reveal grid-reveal">
                                     {filteredPub.map((item) => (
-                                        <article key={item.id} className="pub-guide-card">
-                                            <div className="pub-guide-card__media">
-                                                {item.img
-                                                    ? <img src={item.img} alt={item.title} />
-                                                    : <div style={{ background: "#e5e7eb", height: "100%" }} aria-hidden="true" />
-                                                }
-                                                <span
-                                                    className="pub-guide-card__tag"
-                                                    style={{ background: PUB_GUIDE_TAG_COLORS[item.category] ?? "#006B32" }}
-                                                >
-                                                    {item.category.toUpperCase()}
-                                                </span>
-                                            </div>
-                                            <div className="pub-guide-card__body">
-                                                <h3 className="pub-guide-card__name">{item.title}</h3>
-                                                <p className="pub-guide-card__desc">{item.desc}</p>
-                                                <Link
-                                                    to={`/estabelecimentos/${item.id}?apiType=${item.apiType}`}
-                                                    className="pub-guide-card__cta"
-                                                >
-                                                    Ver Detalhes
-                                                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
-                                                </Link>
-                                            </div>
-                                        </article>
+                                        <EstablishmentCard
+                                            key={`${item.apiType}-${item.id}`}
+                                            item={item}
+                                            favorite={favoriteIds.has(item.id)}
+                                            onToggleFavorite={handleToggleFavorite}
+                                        />
                                     ))}
-                                    {filteredPub.length > 0 && filteredPub.length < 4 && (
-                                        Array.from({ length: 4 - filteredPub.length }).map((_, i) => (
-                                            <PubGuideSkeleton key={`pad-${i}`} />
-                                        ))
-                                    )}
                                 </div>
                             </>
                         )}
-                        <div className="pub-guide__footer reveal">
-                            <Link to="/estabelecimentos" className="pub-guide__all">Ver todos os Estabelecimentos</Link>
-                        </div>
                     </section>
 
                     {/* Eventos */}
                     <section className="pub-events" aria-labelledby="pub-events-title">
-                        <header className="pub-events__header reveal">
-                            <div className="pub-events__head-left">
-                                <span className="pub-events__kicker">Experiências Inesquecíveis</span>
-                                <h2 id="pub-events-title" className="pub-events__title">Próximos Eventos</h2>
-                            </div>
-                            <p className="pub-events__lede">Fique por dentro da programação cultural e festivais que movimentam a nossa serra.</p>
-                        </header>
-                        {loading || homeEvents.length === 0 ? (
+                        <SectionHeader
+                            id="pub-events-title"
+                            kicker="Experiências Inesquecíveis"
+                            title="Próximos Eventos"
+                            subtitle="Fique por dentro da programação cultural e dos festivais que movimentam a nossa serra."
+                            cta={{ to: "/eventos", label: "Ver todos os eventos" }}
+                        />
+                        {loading ? (
                             <div className="pub-events__grid">
                                 {Array.from({ length: 4 }).map((_, i) => <EventSkeleton key={i} />)}
                             </div>
+                        ) : failed.events || homeEvents.length === 0 ? (
+                            <SectionState failed={failed.events} emptyTitle="Nenhum evento agendado por enquanto." emptyIcon="event" onRetry={retryLoad} />
                         ) : (
                             <div className="pub-events__grid reveal grid-reveal">
                                 {homeEvents.map((ev) => {
                                     const d = parseDate(ev.startDateTime);
-                                    const day = isNaN(d.getTime()) ? "—" : String(d.getDate()).padStart(2, "0");
-                                    const month = isNaN(d.getTime()) ? "—" : PT_MONTHS[d.getMonth()];
+                                    const valid = !isNaN(d.getTime());
+                                    const day = valid ? DAY_FORMAT.format(d) : "—";
+                                    const month = valid ? MONTH_FORMAT.format(d).replace(".", "") : "—";
                                     return (
                                         <article key={ev.id} className="pub-event-card">
                                             <div className="pub-event-card__media">
                                                 {ev.photos?.[0]?.url
-                                                    ? <img src={ev.photos[0].url} alt={ev.name} />
-                                                    : <div style={{ background: "#e5e7eb", height: "100%" }} aria-hidden="true" />
+                                                    ? <img src={ev.photos[0].url} alt="" width={640} height={480} loading="lazy" decoding="async" />
+                                                    : <div className="pub-event-card__placeholder" aria-hidden="true" />
                                                 }
-                                                <div className="pub-event-card__date" aria-label={`${day} de ${month}`}>
+                                                <div className="pub-event-card__date" aria-hidden="true">
                                                     <strong>{day}</strong>
                                                     <span>{month}</span>
                                                 </div>
                                             </div>
                                             <div className="pub-event-card__body">
-                                                <h3 className="pub-event-card__title">{ev.name}</h3>
+                                                <h3 className="pub-event-card__title">
+                                                    <Link to={`/eventos/${ev.id}`} className="pub-event-card__link">
+                                                        {ev.name}
+                                                        {valid && <span className="ui-sr-only">, {DAY_MONTH_LONG_FORMAT.format(d)}</span>}
+                                                    </Link>
+                                                </h3>
                                                 <p className="pub-event-card__desc">{ev.description}</p>
                                                 <div className="pub-event-card__loc">
-                                                    <span className="material-symbols-outlined" aria-hidden>location_on</span>
-                                                    {ev.location}
+                                                    <span className="material-symbols-outlined" aria-hidden="true">location_on</span>
+                                                    <span className="pub-event-card__loc-text">{ev.location}</span>
                                                 </div>
-                                                <Link to={`/eventos/${ev.id}`} className="pub-event-card__cta">
-                                                    <span className="material-symbols-outlined" aria-hidden>calendar_month</span>
-                                                    Ver evento
-                                                </Link>
+                                                <div className="pub-event-card__footer">
+                                                    <span className="pub-event-card__cta" aria-hidden="true">
+                                                        Ver evento
+                                                        <span className="material-symbols-outlined">arrow_forward</span>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </article>
                                     );
                                 })}
-                                {Array.from({ length: Math.max(0, 4 - homeEvents.length) }).map((_, i) => (
-                                    <EventSkeleton key={`pad-${i}`} />
+                            </div>
+                        )}
+                    </section>
+                </div>
+
+                {/* ── Guias Turísticos ── */}
+                <div className="tour-guides-wrap">
+                    <section id="guias-de-turismo" className="tour-guides" aria-labelledby="tour-guides-title">
+                        <SectionHeader
+                            id="tour-guides-title"
+                            kicker="Seu passeio em boas mãos"
+                            title="Nossos Guias Turísticos"
+                            subtitle="Conheça os profissionais credenciados que vão transformar sua visita em uma experiência inesquecível."
+                        />
+                        {loading ? (
+                            <div className="tour-guides__grid">
+                                {Array.from({ length: 4 }).map((_, i) => <GuideSkeleton key={i} />)}
+                            </div>
+                        ) : failed.guides || homeGuides.length === 0 ? (
+                            <SectionState failed={failed.guides} emptyTitle="Nenhum guia cadastrado por enquanto." emptyIcon="hiking" onRetry={retryLoad} />
+                        ) : (
+                            <div className="tour-guides__grid reveal grid-reveal">
+                                {homeGuides.map((guide) => (
+                                    <article key={guide.id} className="guide-card">
+                                        <div className="guide-card__photo">
+                                            <img src={guide.photos?.[0]?.url || park} alt={guide.name} width={640} height={480} loading="lazy" decoding="async" />
+                                            {guide.languages && guide.languages.length > 0 && (
+                                                <span className="guide-card__lang">{guide.languages.join(" / ")}</span>
+                                            )}
+                                        </div>
+                                        <div className="guide-card__body">
+                                            <h3 className="guide-card__name" title={guide.name}>{guide.name}</h3>
+                                            <span className="guide-card__specialty">Guia Turístico</span>
+                                            <p className="guide-card__desc">{guide.description}</p>
+                                        </div>
+                                    </article>
                                 ))}
                             </div>
                         )}
-                        <div className="pub-events__footer reveal">
-                            <Link to="/eventos" className="pub-events__all">Ver todos os Eventos</Link>
-                        </div>
                     </section>
-
-                    {/* Guias Turísticos */}
-                    <div className="tour-guides-wrap">
-                        <section className="tour-guides" aria-labelledby="tour-guides-title">
-                            <div className="tour-guides__inner">
-                                <header className="tour-guides__header reveal">
-                                    <span className="tour-guides__kicker">Seu passeio em boas mãos</span>
-                                    <h2 id="tour-guides-title" className="tour-guides__title">Nossos Guias Turísticos</h2>
-                                    <p className="tour-guides__subtitle">Conheça os profissionais credenciados que vão transformar sua visita em uma experiência inesquecível.</p>
-                                </header>
-                                {loading ? (
-                                    <div className="tour-guides__grid">
-                                        {Array.from({ length: 4 }).map((_, i) => <GuideSkeleton key={i} />)}
-                                    </div>
-                                ) : (
-                                    <div className="tour-guides__grid reveal grid-reveal">
-                                        {homeGuides.map((guide) => (
-                                            <article key={guide.id} className="guide-card">
-                                                <div className="guide-card__photo">
-                                                    {guide.photos?.[0]?.url
-                                                        ? <img src={guide.photos[0].url} alt={guide.name} />
-                                                        : <img src={park} alt={guide.name} />
-                                                    }
-                                                    {guide.languages && guide.languages.length > 0 && (
-                                                        <span className="guide-card__lang">{guide.languages.join(" / ")}</span>
-                                                    )}
-                                                </div>
-                                                <div className="guide-card__body">
-                                                    <h3 className="guide-card__name">{guide.name}</h3>
-                                                    <span className="guide-card__specialty">Guia Turístico</span>
-                                                    <p className="guide-card__desc">{guide.description}</p>
-                                                </div>
-                                            </article>
-                                        ))}
-                                        {Array.from({ length: Math.max(0, 4 - homeGuides.length) }).map((_, i) => (
-                                            <GuideSkeleton key={`pad-${i}`} />
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </section>
-                    </div>
                 </div>
 
                 {/* ── Como Chegar ── */}
                 <section className="como-chegar" aria-labelledby="como-chegar-title">
                     <div className="como-chegar__banner" style={{ backgroundImage: `url(${park})` }}>
                         <div className="como-chegar__banner-inner">
-                            <span className="como-chegar__kicker">Planejando sua visita</span>
-                            <h2 id="como-chegar-title" className="como-chegar__title">Como Chegar</h2>
-                            <p className="como-chegar__desc">Ubajara fica na Serra da Ibiapaba, acessível por diversas rotas aéreas e terrestres. Escolha seu ponto de partida e venha viver essa experiência única.</p>
+                            <SectionHeader
+                                id="como-chegar-title"
+                                kicker="Planejando sua visita"
+                                title="Como Chegar"
+                                subtitle="Ubajara fica na Serra da Ibiapaba, acessível por diversas rotas aéreas e terrestres. Escolha seu ponto de partida e venha viver essa experiência única."
+                                cta={{ to: "/como-chegar", label: "Encontrar rotas até Ubajara", text: "Encontrar rotas" }}
+                                onDark
+                            />
                         </div>
                     </div>
                     <div className="como-chegar__body">
@@ -600,7 +712,7 @@ export default function Content() {
                                         <h3 className="transport-card__title">De Avião</h3>
                                         <p className="transport-card__desc">Voe para os aeroportos mais próximos e complete a viagem por terra em menos de 3 horas de carro.</p>
                                     </div>
-                                    <span className="transport-card__badge">A partir de 165 km</span>
+                                    <span className="transport-card__badge">A partir de 165&nbsp;km</span>
                                 </div>
                                 <div className="transport-card transport-card--bus">
                                     <div className="transport-card__icon-wrap"><span className="material-symbols-outlined" aria-hidden="true">directions_bus</span></div>
@@ -631,44 +743,46 @@ export default function Content() {
                                     ))}
                                 </div>
                             </div>
-                            <div className="como-chegar__cta-row reveal">
-                                <Link to="/como-chegar" className="como-chegar__cta">
-                                    <span className="material-symbols-outlined" aria-hidden="true">map</span>
-                                    Encontrar Rotas
-                                </Link>
-                            </div>
                         </div>
                     </div>
                 </section>
 
                 {/* ── Depoimentos ── */}
-                <div className="reviews-block">
-                    <div className="papel">
-                        <div className="paper1"><img src={paper} alt="" /></div>
-                        <div className="paper2"><img src={paper} alt="" /></div>
-                    </div>
+                <div className="reviews-block torn-host">
+                    <TornDivider edge="top" fill="#002a27" />
                     <section className="reviews" aria-labelledby="reviews-title">
                         <div className="reviews__inner">
-                            <span className="reviews__kicker">Quem já visitou recomenda</span>
-                            <h2 id="reviews-title" className="reviews__title">O que dizem os visitantes</h2>
-                            <p className="reviews__subtitle">Experiências reais de quem já se encantou com as belezas de Ubajara.</p>
-                            {loading || homeReviews.length === 0 ? (
+                            <SectionHeader
+                                id="reviews-title"
+                                kicker="Quem já visitou recomenda"
+                                title="O que dizem os visitantes"
+                                subtitle="Experiências reais de quem já se encantou com as belezas de Ubajara."
+                                cta={{ to: "/depoimentos", label: "Ver todos os depoimentos" }}
+                                onDark
+                            />
+                            {loading ? (
                                 <div className="reviews__grid">
                                     {Array.from({ length: 3 }).map((_, i) => <ReviewSkeleton key={i} />)}
                                 </div>
+                            ) : failed.reviews || homeReviews.length === 0 ? (
+                                <SectionState failed={failed.reviews} emptyTitle="Ainda não há depoimentos publicados." emptyIcon="rate_review" emptyVariant="notice" onRetry={retryLoad} />
                             ) : (
                                 <div className="reviews__grid reveal grid-reveal">
                                     {homeReviews.map((r, i) => (
                                         <article key={r.id} className="review-card">
-                                            <div className="review-card__stars" aria-label={`${r.rating} de 5 estrelas`}>
-                                                {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}
+                                            <div className="review-card__stars" role="img" aria-label={`${r.rating} de 5 estrelas`}>
+                                                <span aria-hidden="true">{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</span>
                                             </div>
-                                            <p className="review-card__text">"{r.comment}"</p>
+                                            <p className="review-card__text">“{r.comment}”</p>
                                             <div className="review-card__author">
                                                 <img
                                                     src={r.userPhoto || FALLBACK_AVATARS[i % FALLBACK_AVATARS.length]}
                                                     alt={r.userName}
                                                     className="review-card__avatar"
+                                                    width={42}
+                                                    height={42}
+                                                    loading="lazy"
+                                                    decoding="async"
                                                 />
                                                 <div className="review-card__info">
                                                     <strong className="review-card__name">{r.userName}</strong>
@@ -677,44 +791,62 @@ export default function Content() {
                                             </div>
                                         </article>
                                     ))}
-                                    {Array.from({ length: Math.max(0, 3 - homeReviews.length) }).map((_, i) => (
-                                        <ReviewSkeleton key={`pad-${i}`} />
-                                    ))}
                                 </div>
                             )}
-                            <div className="reviews__footer reveal">
-                                <Link to="/depoimentos" className="reviews__all">Ver todos os depoimentos</Link>
-                            </div>
                         </div>
                     </section>
-                    <div className="papel ptop">
-                        <div className="paper1"><img src={paper} alt="" /></div>
-                        <div className="paper2"><img src={paper} alt="" /></div>
-                    </div>
+                    <TornDivider edge="bottom" fill="#002a27" />
                 </div>
 
                 {/* ── FAQ ── */}
                 <section className="faq" aria-labelledby="faq-title">
                     <div className="faq__inner">
-                        <h2 id="faq-title" className="faq__title reveal">Dúvidas Frequentes</h2>
-                        <div className="faq__list reveal grid-reveal">
-                            {FAQ_ITEMS.map((item) => (
-                                <div key={item.id} className={`faq__item${faqOpen === item.id ? " faq__item--open" : ""}`}>
-                                    <button
-                                        type="button"
-                                        className="faq__question"
-                                        onClick={() => setFaqOpen(faqOpen === item.id ? null : item.id)}
-                                        aria-expanded={faqOpen === item.id}
-                                        aria-controls={`faq-answer-${item.id}`}
-                                    >
-                                        {item.q}
-                                        <span className="material-symbols-outlined faq__chevron" aria-hidden="true">expand_more</span>
-                                    </button>
-                                    <div id={`faq-answer-${item.id}`} className="faq__answer">
-                                        <div className="faq__answer-inner"><p>{item.a}</p></div>
+                        <header className="faq__intro reveal">
+                            <span className="faq__kicker">Tire suas dúvidas</span>
+                            <h2 id="faq-title" className="faq__title">Dúvidas Frequentes</h2>
+                            <p className="faq__lede">As respostas para as perguntas mais comuns de quem planeja visitar o Parque e a cidade de Ubajara.</p>
+                        </header>
+                        <div className="faq__list reveal" ref={faqListRef} onKeyDown={handleFaqKeyDown}>
+                            {FAQ_ITEMS.map((item) => {
+                                const open = faqOpen === item.id;
+                                return (
+                                    <div key={item.id} className={`faq__item${open ? " faq__item--open" : ""}`}>
+                                        <h3 className="faq__heading">
+                                            <button
+                                                type="button"
+                                                id={`faq-question-${item.id}`}
+                                                className="faq__question"
+                                                onClick={() => setFaqOpen(open ? null : item.id)}
+                                                aria-expanded={open}
+                                                aria-controls={`faq-answer-${item.id}`}
+                                            >
+                                                <span className="faq__question-text">{item.question}</span>
+                                                <span className="faq__icon" aria-hidden="true">
+                                                    <span className="material-symbols-outlined">add</span>
+                                                </span>
+                                            </button>
+                                        </h3>
+                                        <div
+                                            id={`faq-answer-${item.id}`}
+                                            className="faq__answer"
+                                            role="region"
+                                            aria-labelledby={`faq-question-${item.id}`}
+                                            inert={!open}
+                                        >
+                                            <div className="faq__answer-inner">
+                                                <div className="faq__answer-body">{item.answer}</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
+                        </div>
+                        <div className="faq__more reveal">
+                            <div className="faq__more-text">
+                                <strong>Não encontrou o que procurava?</strong>
+                                <span>Fale com a nossa equipe e tire sua dúvida.</span>
+                            </div>
+                            <Link to="/contato" className="faq__more-btn">Falar com a equipe</Link>
                         </div>
                     </div>
                 </section>

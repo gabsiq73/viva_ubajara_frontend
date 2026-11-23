@@ -58,17 +58,17 @@
 }
 
 .ptl-hero__inner {
-  max-width: 1200px;
+  max-width: var(--container-max);
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 var(--gutter);
 }
 
 .ptl-hero__kicker {
   display: inline-block;
   font-family: "Inter", sans-serif;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #ffffff;
   background: rgba(0, 107, 50, 0.78);
@@ -82,8 +82,8 @@
 
 .ptl-hero__title {
   font-family: "Nunito", sans-serif;
-  font-weight: 900;
-  font-size: clamp(38px, 6vw, 72px);
+  font-weight: var(--fw-heading);
+  font-size: clamp(var(--fs-h1), 6vw, 72px);
   color: #ffffff;
   line-height: 1.05;
   margin: 0 0 16px;
@@ -102,7 +102,7 @@
 .ptl-toolbar {
   background: #ffffff;
   border-bottom: 1px solid #e4ede8;
-  padding: 16px 20px;
+  padding: 16px var(--gutter);
 }
 
 .ptl-toolbar__inner {
@@ -159,7 +159,7 @@
 
 .ptl-search__label {
   font-family: "Inter", sans-serif;
-  font-size: 10px;
+  font-size: var(--fs-xs);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -184,20 +184,26 @@
 
 .ptl-search__input {
   font-family: "Inter", sans-serif;
-  font-size: 14px;
+  font-size: max(16px, 1em);
   color: #00210c;
   background: #f4f9f6;
   border: 1.5px solid #d4eadb;
   border-radius: 50px;
   padding: 8px 16px 8px 40px;
   width: 220px;
-  outline: none;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.ptl-search__input:focus {
+.ptl-search__input:focus-visible {
   border-color: #006b32;
   background: #ffffff;
+  outline: 3px solid #2d8a54;
+  outline-offset: 2px;
+}
+
+.ptl-cta__btn:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
 }
 
 .ptl-search__input::-webkit-search-cancel-button {
@@ -207,17 +213,12 @@
 /* ── Cards section ── */
 .ptl-section {
   background: #f0f7f3;
-  padding: clamp(32px, 4vw, 56px) 20px;
+  padding: var(--section-y) var(--gutter);
 }
 
 .ptl-section__inner {
   max-width: 1200px;
   margin: 0 auto;
-}
-
-/* Override 4-col to 3-col for the listing page */
-.ptl-cards-override ul {
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 }
 
 /* ── Empty state ── */
@@ -263,7 +264,7 @@
 /* ── CTA section ── */
 .ptl-cta {
   background: #003016;
-  padding: clamp(48px, 6vw, 80px) 20px;
+  padding: var(--section-y-lg) var(--gutter);
 }
 
 .ptl-cta__inner {
@@ -274,11 +275,11 @@
 
 .ptl-cta__title {
   font-family: "Nunito", sans-serif;
-  font-weight: 900;
-  font-size: clamp(26px, 3.5vw, 42px);
+  font-weight: var(--fw-heading);
+  font-size: var(--fs-h2);
   color: #ffffff;
   margin: 0 0 14px;
-  line-height: 1.15;
+  line-height: var(--lh-h2);
 }
 
 .ptl-cta__desc {
@@ -332,7 +333,7 @@
 /* ── Stats section ── */
 .ptl-stats {
   background: #ffffff;
-  padding: clamp(36px, 4vw, 60px) 20px;
+  padding: var(--section-y) var(--gutter);
   border-top: 1px solid #e4ede8;
 }
 
@@ -357,9 +358,9 @@
 .ptl-stat__label {
   display: block;
   font-family: "Inter", sans-serif;
-  font-size: 11px;
+  font-size: var(--fs-xs);
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #7a9080;
   margin-top: 8px;
@@ -370,10 +371,6 @@
   .ptl-hero {
     min-height: 56vh;
     padding-top: 80px;
-  }
-
-  .ptl-cards-override ul {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
 
@@ -399,11 +396,7 @@
 
   .ptl-search__input {
     width: 100%;
-  }
-
-  .ptl-cards-override ul {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 14px;
+    min-height: 44px;
   }
 
   .ptl-stats__inner {
@@ -413,11 +406,6 @@
 }
 
 @media only screen and (max-width: 480px) {
-  .ptl-cards-override ul {
-    grid-template-columns: 1fr !important;
-    gap: 12px;
-  }
-
   .ptl-filters {
     gap: 6px;
   }
@@ -425,5 +413,16 @@
   .ptl-filter-btn {
     padding: 6px 14px;
     font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ptl-search__input,
+  .ptl-cta__btn {
+    transition: none;
+  }
+
+  .ptl-cta__btn:hover {
+    transform: none;
   }
 }

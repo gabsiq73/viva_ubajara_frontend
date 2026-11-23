@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, type ReactNode } from 'react';
+import { useUrlListState } from '../hooks/useUrlListState';
 import { usersService } from '../services/usersService';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
-import { ConfirmModal } from '../components/Modal';
+import { ConfirmModal, Modal } from '../components/Modal';
 import { Search, Trash2, ShieldCheck, User, UserCog } from 'lucide-react';
 import type { UserResponse, UserRole } from '../types';
 
@@ -27,17 +28,18 @@ const ROLE_ICONS: Record<UserRole, ReactNode> = {
   EMPRESA: <UserCog size={13} />,
 };
 
+const ROLE_FILTERS: readonly (UserRole | '')[] = ['', 'ADMIN', 'USER', 'GUIDE'];
+
 export function UsersListPage() {
   const { showToast } = useToast();
 
   const [data, setData] = useState<UserResponse[]>([]);
-  const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState<UserRole | ''>('');
+  const { page, search, getFilter, setPage, setSearch, setFilter } = useUrlListState();
+  const roleFilter = getFilter<UserRole | ''>('role', ROLE_FILTERS, '');
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -46,10 +48,14 @@ export function UsersListPage() {
   const [roleChanging, setRoleChanging] = useState(false);
   const [selectedRole, setSelectedRole] = useState<UserRole>('USER');
 
-  const fetch = useCallback(async (p = page) => {
+  const fetch = useCallback(async () => {
     setLoading(true);
     try {
-      const result = await usersService.getAll(p, 10, search || undefined, roleFilter || undefined);
+      const result = await usersService.getAll(page, 10, search || undefined, roleFilter || undefined);
+      if (page > 0 && result.content.length === 0 && result.totalPages > 0) {
+        setPage(result.totalPages - 1, true);
+        return;
+      }
       setData(result.content);
       setTotalPages(result.totalPages);
       setTotalElements(result.totalElements);
@@ -58,10 +64,9 @@ export function UsersListPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, roleFilter]);
+  }, [page, search, roleFilter, setPage, showToast]);
 
-  useEffect(() => { setPage(0); }, [search, roleFilter]);
-  useEffect(() => { fetch(page); }, [page, search, roleFilter]);
+  useEffect(() => { fetch(); }, [fetch]);
 
   const openRoleChange = (user: UserResponse) => {
     setRoleChangeId(user.id);
@@ -75,7 +80,7 @@ export function UsersListPage() {
       await usersService.changeRole(roleChangeId, selectedRole);
       showToast('Função atualizada com sucesso.', 'success');
       setRoleChangeId(null);
-      fetch(page);
+      fetch();
     } catch {
       showToast('Erro ao atualizar função.', 'error');
     } finally {
@@ -90,7 +95,7 @@ export function UsersListPage() {
       await usersService.delete(deleteId);
       showToast('Usuário excluído com sucesso.', 'success');
       setDeleteId(null);
-      fetch(page);
+      fetch();
     } catch {
       showToast('Erro ao excluir usuário.', 'error');
     } finally {
@@ -126,15 +131,17 @@ export function UsersListPage() {
             className="adm-btn adm-btn--ghost adm-btn--sm"
             onClick={() => openRoleChange(r)}
             title="Alterar função"
+            aria-label={`Alterar função de ${r.username}`}
           >
-            <ShieldCheck size={14} />
+            <ShieldCheck size={14} aria-hidden="true" />
           </button>
           <button
             className="adm-btn adm-btn--danger adm-btn--sm"
             onClick={() => setDeleteId(r.id)}
             title="Excluir usuário"
+            aria-label={`Excluir usuário ${r.username}`}
           >
-            <Trash2 size={14} />
+            <Trash2 size={14} aria-hidden="true" />
           </button>
         </div>
       ),
@@ -150,8 +157,13 @@ export function UsersListPage() {
       <div className="adm-card">
         <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
           <div className="adm-search" style={{ flex: 1, minWidth: 200 }}>
-            <span className="adm-search__icon"><Search size={18} /></span>
+            <span className="adm-search__icon" aria-hidden="true"><Search size={18} aria-hidden="true" /></span>
             <input
+              type="search"
+              name="q"
+              aria-label="Buscar usuários por username"
+              autoComplete="off"
+              spellCheck={false}
               placeholder="Buscar por username…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -159,8 +171,9 @@ export function UsersListPage() {
           </div>
           <select
             className="adm-select"
+            aria-label="Filtrar por função"
             value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value as UserRole | '')}
+            onChange={(e) => setFilter('role', e.target.value, '')}
             style={{ minWidth: 160 }}
           >
             <option value="">Todas as funções</option>
@@ -183,36 +196,32 @@ export function UsersListPage() {
         loading={deleting}
       />
 
-      {roleChangeId && (
-        <div className="adm-modal-overlay" onClick={() => setRoleChangeId(null)}>
-          <div className="adm-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 400 }}>
-            <h3 className="adm-modal__title">Alterar Função do Usuário</h3>
-            <p style={{ fontSize: 14, color: 'var(--adm-text-muted)', marginBottom: 16 }}>
-              Selecione a nova função para este usuário.
-            </p>
-            <div className="adm-field">
-              <label className="adm-label">Função</label>
-              <select
-                className="adm-select"
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value as UserRole)}
-              >
-                <option value="USER">Usuário</option>
-                <option value="GUIDE">Guia</option>
-                <option value="ADMIN">Administrador</option>
-              </select>
-            </div>
-            <div className="adm-modal__footer">
-              <button className="adm-btn adm-btn--ghost" onClick={() => setRoleChangeId(null)} disabled={roleChanging}>
-                Cancelar
-              </button>
-              <button className="adm-btn adm-btn--primary" onClick={handleRoleChange} disabled={roleChanging}>
-                {roleChanging ? 'Salvando…' : 'Confirmar'}
-              </button>
-            </div>
-          </div>
+      <Modal isOpen={!!roleChangeId} title="Alterar Função do Usuário" onClose={() => !roleChanging && setRoleChangeId(null)}>
+        <p style={{ fontSize: 14, color: 'var(--adm-text-muted)', marginBottom: 16 }}>
+          Selecione a nova função para este usuário.
+        </p>
+        <div className="adm-field">
+          <label className="adm-label" htmlFor="user-role-select">Função</label>
+          <select
+            id="user-role-select"
+            className="adm-select"
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value as UserRole)}
+          >
+            <option value="USER">Usuário</option>
+            <option value="GUIDE">Guia</option>
+            <option value="ADMIN">Administrador</option>
+          </select>
         </div>
-      )}
+        <div className="adm-modal__footer" style={{ marginTop: 24 }}>
+          <button type="button" className="adm-btn adm-btn--ghost" onClick={() => setRoleChangeId(null)} disabled={roleChanging}>
+            Cancelar
+          </button>
+          <button type="button" className="adm-btn adm-btn--primary" onClick={handleRoleChange} disabled={roleChanging}>
+            {roleChanging ? 'Salvando…' : 'Confirmar'}
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ImagePlus, Trash2, RefreshCw, Loader } from 'lucide-react';
 import { photosService } from '../services/photosService';
 import { useToast } from './Toast';
+import { RemovePhotoDialog } from './RemovePhotoDialog';
 import type { PhotoResponse } from '../types';
 
 interface RolePhotoSlotProps {
@@ -28,6 +29,7 @@ export function RolePhotoSlot({
   const isEditMode = !!(entityPath && entityId);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToast();
@@ -50,12 +52,19 @@ export function RolePhotoSlot({
     if (isEditMode) {
       setUploading(true);
       try {
-        if (existingPhoto) await photosService.delete(existingPhoto.id);
         const photo = await photosService.uploadForEntity(entityPath!, entityId!, file, roleDescription);
         onPhotoUpdate?.(photo);
+        if (existingPhoto) {
+          try {
+            await photosService.delete(existingPhoto.id);
+          } catch {
+            showToast('Foto atualizada, mas a foto anterior não foi removida do servidor.', 'error');
+            return;
+          }
+        }
         showToast('Foto atualizada!', 'success');
       } catch {
-        showToast('Erro ao enviar foto.', 'error');
+        showToast(existingPhoto ? 'Erro ao enviar foto. A foto atual foi mantida.' : 'Erro ao enviar foto.', 'error');
       } finally {
         setUploading(false);
       }
@@ -75,6 +84,7 @@ export function RolePhotoSlot({
         showToast('Erro ao remover foto.', 'error');
       } finally {
         setDeleting(false);
+        setConfirmRemove(false);
       }
     } else {
       onPendingFileChange?.(null);
@@ -107,19 +117,19 @@ export function RolePhotoSlot({
               disabled={isBusy}
             >
               {uploading
-                ? <Loader size={13} style={{ animation: 'adm-spin 0.6s linear infinite' }} />
-                : <RefreshCw size={13} />}
+                ? <Loader size={13} aria-hidden="true" style={{ animation: 'adm-spin 0.6s linear infinite' }} />
+                : <RefreshCw size={13} aria-hidden="true" />}
               Trocar
             </button>
             <button
               type="button"
               className="adm-role-slot__btn adm-role-slot__btn--remove"
-              onClick={handleRemove}
+              onClick={isEditMode ? () => setConfirmRemove(true) : handleRemove}
               disabled={isBusy}
             >
               {deleting
-                ? <Loader size={13} style={{ animation: 'adm-spin 0.6s linear infinite' }} />
-                : <Trash2 size={13} />}
+                ? <Loader size={13} aria-hidden="true" style={{ animation: 'adm-spin 0.6s linear infinite' }} />
+                : <Trash2 size={13} aria-hidden="true" />}
               Remover
             </button>
           </div>
@@ -131,7 +141,7 @@ export function RolePhotoSlot({
           onClick={() => fileRef.current?.click()}
           disabled={isBusy}
         >
-          <ImagePlus size={22} />
+          <ImagePlus size={22} aria-hidden="true" />
           <span>Clique para adicionar</span>
         </button>
       )}
@@ -143,6 +153,14 @@ export function RolePhotoSlot({
         style={{ display: 'none' }}
         onChange={handleFileSelect}
       />
+
+      {confirmRemove && (
+        <RemovePhotoDialog
+          loading={deleting}
+          onConfirm={handleRemove}
+          onCancel={() => setConfirmRemove(false)}
+        />
+      )}
     </div>
   );
 }

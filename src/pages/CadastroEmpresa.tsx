@@ -1,235 +1,357 @@
-import { useEffect, useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { flushSync } from "react-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import PageHero from "../components/ui/PageHero";
+import Field from "../components/ui/Field";
+import Icon from "../components/ui/Icon";
+import StateBlock from "../components/ui/StateBlock";
+import { Button } from "../components/ui/Button";
 import { useAuth } from "../admin/hooks/useAuth";
 import { authService } from "../admin/services/authService";
-import heroImg from "../assets/images/mercado.png";
-import "../components/Sections/style/Content.components.css";
+import { cnpjRaw, formatCnpj, validateCnpj } from "../utils/cnpj";
+import { consumeReturnTo } from "../utils/returnTo";
+import { getRoleLabel } from "../utils/roles";
+import { useDocumentTitle } from "../utils/useDocumentTitle";
+import { validateEmail } from "../company/utils/fields";
+import heroImg from "../assets/images/mercado.webp";
+import "../components/ui/ui.css";
 import "./style/CadastroEmpresa.css";
 
-const GENERIC_ERROR = "Não foi possível concluir o cadastro. Verifique os dados e tente novamente.";
+type FieldName = "firstName" | "lastName" | "username" | "email" | "password" | "companyName" | "cnpj";
+type Errors = Partial<Record<FieldName, string>>;
 
-function apiErrorMsg(err: unknown): string {
-    const e = err as {
-        response?: { data?: { message?: string; errors?: { field: string; message: string }[] } };
-    };
-    const data = e?.response?.data;
-    if (!data) return GENERIC_ERROR;
-    if (data.errors?.length) {
-        return data.errors.map((fieldError) => fieldError.message).join(" ");
+const GENERIC_ERROR = "Não foi possível concluir o cadastro. Verifique os dados e tente novamente.";
+const FIELD_NAMES: FieldName[] = ["firstName", "lastName", "username", "email", "password", "companyName", "cnpj"];
+
+const STEPS = [
+    { title: "Crie sua conta de empresa", text: "Informe seus dados de acesso e os dados da empresa." },
+    { title: "Cadastre seu estabelecimento", text: "No painel, escolha restaurante ou hospedagem e preencha as informações e fotos." },
+    { title: "A equipe do parque revisa", text: "Depois da análise, seu estabelecimento fica visível para os visitantes." },
+];
+
+function validate(name: FieldName, values: Record<FieldName, string>, activation: boolean): string | undefined {
+    const value = values[name];
+    switch (name) {
+        case "firstName":
+            if (activation) return undefined;
+            if (!value.trim()) return "Informe seu nome.";
+            return value.trim().length < 2 || value.trim().length > 20 ? "O nome deve ter de 2 a 20 caracteres." : undefined;
+        case "lastName":
+            return !activation && value.trim().length > 20 ? "O sobrenome pode ter até 20 caracteres." : undefined;
+        case "username":
+            if (activation) return undefined;
+            if (!value.trim()) return "Escolha um nome de usuário.";
+            return value.trim().length < 2 || value.trim().length > 30 ? "O usuário deve ter de 2 a 30 caracteres." : undefined;
+        case "email":
+            if (activation) return undefined;
+            return value.trim() ? validateEmail(value) : "Informe seu e-mail.";
+        case "password":
+            if (activation) return undefined;
+            if (!value) return "Crie uma senha.";
+            return value.length < 6 ? "A senha deve ter no mínimo 6 caracteres." : undefined;
+        case "companyName":
+            if (!value.trim()) return "Informe o nome da empresa.";
+            return value.trim().length > 150 ? "O nome da empresa pode ter até 150 caracteres." : undefined;
+        case "cnpj":
+            return validateCnpj(value);
     }
-    return data.message ?? GENERIC_ERROR;
+}
+
+function passwordStrength(password: string): { level: 0 | 1 | 2 | 3; label: string } {
+    if (!password) return { level: 0, label: "" };
+    if (password.length < 6) return { level: 0, label: "muito curta" };
+    const score =
+        Number(password.length >= 8) +
+        Number(/[a-z]/.test(password) && /[A-Z]/.test(password)) +
+        Number(/\d/.test(password)) +
+        Number(/[^A-Za-z0-9]/.test(password));
+    if (score <= 1) return { level: 1, label: "fraca" };
+    if (score === 2) return { level: 2, label: "média" };
+    return { level: 3, label: "forte" };
+}
+
+interface ApiFailure {
+    fields: Errors;
+    general?: string;
+}
+
+function parseApiError(err: unknown): ApiFailure {
+    const data = (err as { response?: { data?: { message?: string; errors?: { field: string; message: string }[] } } })?.response?.data;
+    if (!data) return { fields: {}, general: "Não foi possível falar com o servidor. Verifique sua conexão e tente novamente." };
+
+    if (data.errors?.length) {
+        const fields: Errors = {};
+        const general: string[] = [];
+        for (const { field, message } of data.errors) {
+            if (FIELD_NAMES.includes(field as FieldName)) fields[field as FieldName] = field === "cnpj" ? "CNPJ inválido. Confira os números digitados." : message;
+            else general.push(message);
+        }
+        return { fields, general: general.length ? general.join(" ") : undefined };
+    }
+
+    const message = data.message ?? GENERIC_ERROR;
+    if (/cnpj/i.test(message)) {
+        return { fields: { cnpj: /cadastrado/i.test(message) ? "Este CNPJ já está cadastrado em outra conta." : "CNPJ inválido. Confira os números digitados." } };
+    }
+    if (/e-?mail/i.test(message) && /cadastrado/i.test(message)) {
+        return { fields: { email: "Este e-mail já está cadastrado. Entre na sua conta ou use outro e-mail." } };
+    }
+    return { fields: {}, general: message };
 }
 
 export default function CadastroEmpresa() {
+    useDocumentTitle("Cadastro de empresa");
     const navigate = useNavigate();
-    const { applyAuthResponse, activateCompany, isAuthenticated, isCompany, user } = useAuth();
+    const { applyAuthResponse, activateCompany, logout, isAuthenticated, isCompany, user } = useAuth();
     const activationMode = isAuthenticated && user?.role === "USER";
+    const otherRoleLabel = isAuthenticated && !activationMode && !isCompany ? getRoleLabel(user?.role) : null;
 
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [companyName, setCompanyName] = useState("");
-    const [cnpj, setCnpj] = useState("");
-
+    const [values, setValues] = useState<Record<FieldName, string>>({
+        firstName: "", lastName: "", username: "", email: "", password: "", companyName: "", cnpj: "",
+    });
+    const [errors, setErrors] = useState<Errors>({});
+    const [showPassword, setShowPassword] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const formRef = useRef<HTMLFormElement>(null);
+    const alertRef = useRef<HTMLDivElement>(null);
+
+    // O destino só pode ser lido uma vez, mas o envio e o efeito abaixo disputam o redirecionamento.
+    const target = useRef<string | null>(null);
+    const resolveTarget = useCallback(() => (target.current ??= consumeReturnTo() ?? "/empresa"), []);
 
     useEffect(() => {
-        if (isCompany) navigate("/empresa", { replace: true });
-    }, [isCompany, navigate]);
+        if (isCompany) navigate(resolveTarget(), { replace: true });
+    }, [isCompany, navigate, resolveTarget]);
 
-    const handleSubmit = async (e: FormEvent): Promise<void> => {
-        e.preventDefault();
+    const setFieldError = (name: FieldName, message: string | undefined) =>
+        setErrors((current) => {
+            const next = { ...current };
+            if (message) next[name] = message;
+            else delete next[name];
+            return next;
+        });
+
+    const handleChange = (name: FieldName, raw: string) => {
+        const value = name === "cnpj" ? formatCnpj(raw) : raw;
+        const next = { ...values, [name]: value };
+        setValues(next);
+        if (errors[name]) setFieldError(name, validate(name, next, activationMode));
+    };
+
+    const handleBlur = (name: FieldName) => setFieldError(name, validate(name, values, activationMode));
+
+    const input = (name: FieldName) => ({
+        value: values[name],
+        onChange: (event: { target: { value: string } }) => handleChange(name, event.target.value),
+        onBlur: () => handleBlur(name),
+    });
+
+    const focusFirstInvalid = () => formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+
+    const handleSubmit = async (event: FormEvent): Promise<void> => {
+        event.preventDefault();
+        if (submitting) return;
         setError(null);
 
-        if (!companyName.trim() || !cnpj.trim()
-            || (!activationMode
-                && (!firstName.trim() || !username.trim() || !email.trim() || !password.trim()))) {
-            setError("Preencha todos os campos obrigatórios.");
-            return;
+        const found: Errors = {};
+        for (const name of FIELD_NAMES) {
+            const message = validate(name, values, activationMode);
+            if (message) found[name] = message;
         }
-        if (!activationMode && password.length < 6) {
-            setError("A senha deve ter no mínimo 6 caracteres.");
+        flushSync(() => setErrors(found));
+        if (Object.keys(found).length) {
+            focusFirstInvalid();
             return;
         }
 
         setSubmitting(true);
         try {
+            const companyName = values.companyName.trim();
+            const cnpj = cnpjRaw(values.cnpj);
             if (activationMode) {
-                await activateCompany({
-                    companyName: companyName.trim(),
-                    cnpj: cnpj.trim(),
-                });
+                await activateCompany({ companyName, cnpj });
             } else {
                 const response = await authService.registerCompany({
-                    firstName: firstName.trim(),
-                    lastName: lastName.trim() || undefined,
-                    username: username.trim(),
-                    email: email.trim(),
-                    password,
-                    companyName: companyName.trim(),
-                    cnpj: cnpj.trim(),
+                    firstName: values.firstName.trim(),
+                    lastName: values.lastName.trim() || undefined,
+                    username: values.username.trim(),
+                    email: values.email.trim(),
+                    password: values.password,
+                    companyName,
+                    cnpj,
                 });
                 applyAuthResponse(response);
             }
-            navigate("/empresa", { replace: true });
+            navigate(resolveTarget(), { replace: true });
         } catch (err) {
-            setError(apiErrorMsg(err));
-        } finally {
-            setSubmitting(false);
+            const failure = parseApiError(err);
+            flushSync(() => {
+                setErrors(failure.fields);
+                setError(failure.general ?? (Object.keys(failure.fields).length ? null : GENERIC_ERROR));
+                setSubmitting(false);
+            });
+            if (Object.keys(failure.fields).length) focusFirstInvalid();
+            else alertRef.current?.focus();
         }
     };
 
+    if (isCompany) return null;
+
+    const strength = passwordStrength(values.password);
+    const submitLabel = activationMode ? "Ativar acesso empresarial" : "Criar conta de empresa";
+
     return (
-        <div className="est-page">
+        <div className="ce-page">
             <Header />
-            <main className="est-main">
+            <main id="conteudo" tabIndex={-1}>
+                <PageHero
+                    image={heroImg}
+                    breadcrumb={[{ label: "Início", to: "/" }, { label: "Cadastro de empresa" }]}
+                    eyebrow="Parque Nacional de Ubajara"
+                    title={activationMode ? "Ative seu acesso" : "Cadastre seu"}
+                    accent={activationMode ? "empresarial" : "estabelecimento"}
+                    description={
+                        activationMode
+                            ? "Informe os dados da sua empresa para ativar o acesso empresarial na sua conta."
+                            : "Crie sua conta de empresa para divulgar seu restaurante ou hospedagem no Viva Ubajara."
+                    }
+                />
 
-                <section className="est-hero">
-                    <img src={heroImg} alt="" className="est-hero__bg" aria-hidden />
-                    <div className="est-hero__overlay" />
-                    <div className="est-hero__content">
-                        <div className="est-hero__inner">
-                            <span className="est-hero__kicker">PARQUE NACIONAL DE UBAJARA</span>
-                            <h1 className="est-hero__title">
-                                {activationMode ? "Ative seu Acesso Empresarial" : "Cadastre seu Estabelecimento"}
-                            </h1>
-                            <p className="est-hero__subtitle">
-                                {activationMode
-                                    ? "Informe os dados da sua empresa para ativar o acesso empresarial na sua conta."
-                                    : "Crie sua conta de empresa para divulgar seu restaurante ou hospedagem no Viva Ubajara."}
-                            </p>
-                        </div>
-                    </div>
-                </section>
-
-                <section className="contact-section" aria-labelledby="ce-form-title">
-                    <div className="ce-section__inner">
-                        <div className="contact-section__form-wrap">
-                            <h2 id="ce-form-title" className="contact-section__title" style={{ marginBottom: "8px" }}>
-                                Dados do Cadastro
-                            </h2>
-                            <p className="contact-section__desc" style={{ marginBottom: "20px" }}>
+                <section className="ce-section" aria-labelledby="ce-form-title">
+                    <div className="ui-container ce-layout">
+                        <div className="ce-card">
+                            <h2 id="ce-form-title" className="ce-card__title">Dados do cadastro</h2>
+                            <p className="ce-card__desc">
                                 {activationMode
                                     ? "Sua conta existente será mantida; nenhum novo usuário será criado."
                                     : "Seu estabelecimento passará por uma análise da equipe do parque antes de ficar visível ao público."}
                             </p>
 
-                            {error && (
-                                <div className="contact-section__alert contact-section__alert--error" role="alert">
-                                    <span className="material-symbols-outlined">error</span>
-                                    {error}
+                            {activationMode && (
+                                <p className="ce-account">
+                                    <Icon name="account_circle" />
+                                    <span>Conta: <strong>{user?.name || user?.email}</strong>{user?.name && <> · {user.email}</>}</span>
+                                </p>
+                            )}
+
+                            {otherRoleLabel && (
+                                <div className="ce-notice">
+                                    <StateBlock variant="notice" icon="info" title={`Você está conectado como ${otherRoleLabel}`} actions={<Button variant="outline" onClick={logout}>Sair da conta</Button>}>
+                                        Ao criar a conta de empresa, esta sessão será substituída pela nova conta.
+                                    </StateBlock>
                                 </div>
                             )}
 
-                            <form className="contact-section__form" onSubmit={handleSubmit} noValidate>
-                                {!activationMode && <div className="ce-form__row">
-                                    <div className="contact-section__field">
-                                        <label htmlFor="ce-firstName" className="contact-section__label">Nome</label>
-                                        <input
-                                            id="ce-firstName"
-                                            type="text"
-                                            className="contact-section__input"
-                                            value={firstName}
-                                            onChange={(e) => setFirstName(e.target.value)}
-                                            disabled={submitting}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="contact-section__field">
-                                        <label htmlFor="ce-lastName" className="contact-section__label">Sobrenome</label>
-                                        <input
-                                            id="ce-lastName"
-                                            type="text"
-                                            className="contact-section__input"
-                                            value={lastName}
-                                            onChange={(e) => setLastName(e.target.value)}
-                                            disabled={submitting}
-                                        />
-                                    </div>
-                                </div>}
-
-                                {!activationMode && <div className="contact-section__field">
-                                    <label htmlFor="ce-username" className="contact-section__label">Usuário</label>
-                                    <input
-                                        id="ce-username"
-                                        type="text"
-                                        className="contact-section__input"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        disabled={submitting}
-                                        required
-                                    />
-                                </div>}
-
-                                {!activationMode && <div className="contact-section__field">
-                                    <label htmlFor="ce-email" className="contact-section__label">E-mail</label>
-                                    <input
-                                        id="ce-email"
-                                        type="email"
-                                        className="contact-section__input"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        disabled={submitting}
-                                        required
-                                    />
-                                </div>}
-
-                                {!activationMode && <div className="contact-section__field">
-                                    <label htmlFor="ce-password" className="contact-section__label">Senha</label>
-                                    <input
-                                        id="ce-password"
-                                        type="password"
-                                        className="contact-section__input"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        disabled={submitting}
-                                        required
-                                        autoComplete="new-password"
-                                    />
-                                </div>}
-
-                                <div className="ce-form__row">
-                                    <div className="contact-section__field">
-                                        <label htmlFor="ce-companyName" className="contact-section__label">Nome da Empresa</label>
-                                        <input
-                                            id="ce-companyName"
-                                            type="text"
-                                            className="contact-section__input"
-                                            value={companyName}
-                                            onChange={(e) => setCompanyName(e.target.value)}
-                                            disabled={submitting}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="contact-section__field">
-                                        <label htmlFor="ce-cnpj" className="contact-section__label">CNPJ</label>
-                                        <input
-                                            id="ce-cnpj"
-                                            type="text"
-                                            className="contact-section__input"
-                                            value={cnpj}
-                                            onChange={(e) => setCnpj(e.target.value)}
-                                            disabled={submitting}
-                                            required
-                                        />
-                                    </div>
+                            {error && (
+                                <div ref={alertRef} tabIndex={-1} className="ce-alert" role="alert">
+                                    <Icon name="error" filled />
+                                    <span>{error}</span>
                                 </div>
+                            )}
 
-                                <button type="submit" className="contact-section__submit" disabled={submitting}>
-                                    {submitting
-                                        ? (activationMode ? "Ativando…" : "Criando conta…")
-                                        : (activationMode ? "Ativar Acesso Empresarial" : "Criar Conta de Empresa")}
-                                </button>
+                            <form ref={formRef} className="ce-form" onSubmit={handleSubmit} noValidate>
+                                {!activationMode && (
+                                    <fieldset className="ce-fieldset" disabled={submitting}>
+                                        <legend>Seus dados de acesso</legend>
+                                        <div className="ce-row">
+                                            <Field label="Nome" required error={errors.firstName}>
+                                                {(control) => <input {...control} className="ui-input" type="text" autoComplete="given-name" maxLength={20} {...input("firstName")} />}
+                                            </Field>
+                                            <Field label="Sobrenome" optional error={errors.lastName}>
+                                                {(control) => <input {...control} className="ui-input" type="text" autoComplete="family-name" maxLength={20} {...input("lastName")} />}
+                                            </Field>
+                                        </div>
+                                        <Field label="Usuário" required error={errors.username} hint="Como você será identificado no painel.">
+                                            {(control) => <input {...control} className="ui-input" type="text" autoComplete="username" autoCapitalize="none" maxLength={30} {...input("username")} />}
+                                        </Field>
+                                        <Field label="E-mail" required error={errors.email}>
+                                            {(control) => <input {...control} className="ui-input" type="email" autoComplete="email" placeholder="voce@suaempresa.com.br" {...input("email")} />}
+                                        </Field>
+                                        <Field label="Senha" required error={errors.password} hint="Use no mínimo 6 caracteres; misture letras, números e símbolos para uma senha mais forte.">
+                                            {(control) => (
+                                                <>
+                                                    <div className="ui-input-wrap">
+                                                        <input {...control} className="ui-input" type={showPassword ? "text" : "password"} autoComplete="new-password" {...input("password")} />
+                                                        <button
+                                                            type="button"
+                                                            className="ui-input-wrap__action"
+                                                            aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                                                            aria-pressed={showPassword}
+                                                            onClick={() => setShowPassword((current) => !current)}
+                                                        >
+                                                            <Icon name={showPassword ? "visibility_off" : "visibility"} />
+                                                        </button>
+                                                    </div>
+                                                    {strength.label && (
+                                                        <div className={`ce-strength ce-strength--${strength.level}`} role="status">
+                                                            <span className="ce-strength__bars" aria-hidden="true"><i /><i /><i /></span>
+                                                            <span>Força da senha: {strength.label}</span>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+                                        </Field>
+                                    </fieldset>
+                                )}
+
+                                <fieldset className="ce-fieldset" disabled={submitting}>
+                                    <legend>Dados da empresa</legend>
+                                    <Field label="Nome da empresa" required error={errors.companyName}>
+                                        {(control) => <input {...control} className="ui-input" type="text" autoComplete="organization" maxLength={150} {...input("companyName")} />}
+                                    </Field>
+                                    <Field label="CNPJ" required error={errors.cnpj} hint="Aceitamos o CNPJ numérico e o novo CNPJ alfanumérico.">
+                                        {(control) => (
+                                            <input
+                                                {...control}
+                                                className="ui-input"
+                                                type="text"
+                                                inputMode="text"
+                                                autoComplete="off"
+                                                autoCapitalize="characters"
+                                                spellCheck={false}
+                                                placeholder="00.000.000/0000-00"
+                                                maxLength={18}
+                                                {...input("cnpj")}
+                                            />
+                                        )}
+                                    </Field>
+                                </fieldset>
+
+                                <Button type="submit" large className="ce-submit" disabled={submitting} aria-busy={submitting}>
+                                    {submitting ? (
+                                        <>
+                                            <span className="ce-spinner" aria-hidden="true" />
+                                            {activationMode ? "Ativando…" : "Criando conta…"}
+                                        </>
+                                    ) : (
+                                        submitLabel
+                                    )}
+                                </Button>
+
+                                {!isAuthenticated && (
+                                    <p className="ce-login">
+                                        Já tem uma conta? <Link to="/admin/login">Entrar</Link>
+                                    </p>
+                                )}
                             </form>
                         </div>
+
+                        <aside className="ce-steps" aria-labelledby="ce-steps-title">
+                            <h2 id="ce-steps-title">Como funciona</h2>
+                            <ol>
+                                {STEPS.map((step) => (
+                                    <li key={step.title}>
+                                        <strong>{step.title}</strong>
+                                        <span>{step.text}</span>
+                                    </li>
+                                ))}
+                            </ol>
+                        </aside>
                     </div>
                 </section>
-
             </main>
             <Footer />
         </div>
