@@ -1,11 +1,9 @@
 import type { JSX } from 'react';
-import { useId, useState } from "react";
 import { Link } from "react-router-dom"
 import "./styles/Footer.components.css"
 import "./ui/ui.css"
 import Icon from "./ui/Icon";
 import SiteLogo from "./layout/SiteLogo";
-import { useMediaQuery } from "../hooks/useMediaQuery";
 
 type SocialKey = "instagram" | "facebook" | "youtube" | "tiktok";
 
@@ -43,7 +41,6 @@ const SOCIAL_NETWORKS: { key: SocialKey; label: string; path: string }[] = [
 interface FooterLink {
     label: string;
     to: string;
-    cta?: boolean;
 }
 
 interface FooterGroupData {
@@ -65,75 +62,33 @@ const EXPLORE: FooterGroupData = {
     ],
 };
 
-const BUSINESS: FooterGroupData = {
-    id: "negocios",
-    title: "Para negócios",
-    links: [
-        { label: "Cadastre seu negócio", to: "/cadastro-empresa", cta: true },
-        { label: "Área do parceiro", to: "/empresa/estabelecimento" },
-        { label: "Seja um guia", to: "/contato" },
-    ],
-};
-
 const INSTITUTIONAL: FooterGroupData = {
     id: "institucional",
     title: "Institucional",
     links: [
         { label: "Depoimentos", to: "/depoimentos" },
         { label: "Contato", to: "/contato" },
+        { label: "Área do parceiro", to: "/empresa/estabelecimento" },
+        { label: "Seja um guia", to: "/contato" },
     ],
 };
 
-interface FooterGroupProps {
-    group: FooterGroupData;
-    accordion: boolean;
-    open: boolean;
-    onToggle: (id: string) => void;
-    className: string;
-}
-
-function FooterGroup({ group, accordion, open, onToggle, className }: FooterGroupProps) {
-    const listId = useId();
-    const collapsed = accordion && !open;
-
+function FooterGroup({ group, className }: { group: FooterGroupData; className: string }) {
     return (
-        <div className={`site-footer__group ${className}`}>
-            <h2 className="site-footer__heading">
-                {accordion ? (
-                    <button
-                        type="button"
-                        className="site-footer__toggle"
-                        aria-expanded={open}
-                        aria-controls={listId}
-                        onClick={() => onToggle(group.id)}
-                    >
-                        {group.title}
-                        <Icon name="add" />
-                    </button>
-                ) : (
-                    group.title
-                )}
-            </h2>
-            <div className={`site-footer__panel${collapsed ? " is-collapsed" : ""}`} id={listId}>
-                <ul className="site-footer__list">
-                    {group.links.map((link) => (
-                        <li key={link.label}>
-                            <Link to={link.to} className={link.cta ? "site-footer__cta" : undefined}>
-                                {link.label}
-                                {link.cta && <Icon name="arrow_forward" />}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </div>
+        <nav className={`site-footer__group ${className}`} aria-labelledby={`footer-${group.id}`}>
+            <h2 className="site-footer__heading" id={`footer-${group.id}`}>{group.title}</h2>
+            <ul className="site-footer__list">
+                {group.links.map((link) => (
+                    <li key={link.label}>
+                        <Link to={link.to}>{link.label}</Link>
+                    </li>
+                ))}
+            </ul>
+        </nav>
     );
 }
 
 export default function Footer(): JSX.Element {
-    const isDesktop = useMediaQuery("(min-width: 1024px)");
-    const [openGroup, setOpenGroup] = useState<string | null>(null);
-    const toggleGroup = (id: string) => setOpenGroup((current) => (current === id ? null : id));
     const socials = SOCIAL_NETWORKS.filter(({ key }) => SOCIAL_LINKS[key]);
 
     return (
@@ -142,11 +97,10 @@ export default function Footer(): JSX.Element {
                 <div className="site-footer__inner">
 
                     <div className="site-footer__brand">
-                        <div className="site-footer__identity">
-                            <Link to="/" className="site-footer__logo-link">
-                                <SiteLogo className="site-footer__logo" />
-                            </Link>
-                        </div>
+                        <Link to="/" className="site-footer__logo-link">
+                            <SiteLogo className="site-footer__logo" />
+                        </Link>
+                        <p className="site-footer__tagline">Natureza, sabores e experiências na Serra da Ibiapaba.</p>
                         {socials.length > 0 && (
                             <div className="site-footer__social">
                                 {socials.map(({ key, label, path }) => (
@@ -168,9 +122,8 @@ export default function Footer(): JSX.Element {
                     </div>
 
                     <div className="site-footer__links">
-                        <FooterGroup group={EXPLORE} accordion={!isDesktop} open={openGroup === EXPLORE.id} onToggle={toggleGroup} className="site-footer__group--explore" />
-                        <FooterGroup group={BUSINESS} accordion={!isDesktop} open={openGroup === BUSINESS.id} onToggle={toggleGroup} className="site-footer__group--business" />
-                        <FooterGroup group={INSTITUTIONAL} accordion={!isDesktop} open={openGroup === INSTITUTIONAL.id} onToggle={toggleGroup} className="site-footer__group--institutional" />
+                        <FooterGroup group={EXPLORE} className="site-footer__group--explore" />
+                        <FooterGroup group={INSTITUTIONAL} className="site-footer__group--institutional" />
                     </div>
 
                     <div className="site-footer__service">
@@ -196,6 +149,17 @@ export default function Footer(): JSX.Element {
                             </li>
                         </ul>
                     </div>
+
+                    <aside className="site-footer__business" aria-labelledby="footer-business-title">
+                        <div className="site-footer__business-text">
+                            <h2 className="site-footer__business-title" id="footer-business-title">Tem um negócio na serra?</h2>
+                            <p>Cadastre-se no guia, acesse a área do parceiro ou seja um guia credenciado.</p>
+                        </div>
+                        <Link to="/cadastro-empresa" className="site-footer__business-btn">
+                            Cadastre seu negócio
+                            <Icon name="arrow_forward" />
+                        </Link>
+                    </aside>
 
                 </div>
             </div>

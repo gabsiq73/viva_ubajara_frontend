@@ -47,8 +47,8 @@ textarea {
 
 :root {
     /* ── Foto do hero ── */
-    --hero-position-desktop: 30% 40%;
-    --hero-position-mobile: center center;
+    --hero-position-desktop: 62% 50%;
+    --hero-position-mobile: 22% center;
 
     /* ── Tokens de marca (site público) ── */
     --pub-green-dark: #003016;
@@ -107,6 +107,7 @@ textarea {
     --container-max: 1248px;
     --section-y: 40px;
     --section-y-lg: 56px;
+    --band-y: 56px; /* respiro vertical das faixas da home */
     --scroller-peek: 78%;
 
     /* ── Tipografia (mobile first) ── */
@@ -138,6 +139,7 @@ textarea {
         --gutter: 24px;
         --section-y: clamp(48px, 5vw, 64px);
         --section-y-lg: clamp(64px, 7vw, 96px);
+        --band-y: clamp(72px, 8vw, 104px);
         --fs-body: 16px;
         --fs-lead: 18px;
         --fs-h3: 22px;

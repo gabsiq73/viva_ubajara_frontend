@@ -45,23 +45,11 @@
 }
 
 .site-header.is-solid .site-nav--bar .site-nav__link {
-    height: 36px;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .site-header.is-solid .site-nav--bar .site-nav__link:hover {
-        background: #f0f7f3;
-    }
+    height: 38px;
 }
 
 .site-header.is-solid .site-nav--bar .site-nav__link.is-active {
-    background: #e8f5ef;
-    color: #006b32;
     font-weight: 600;
-}
-
-.site-header.is-solid .site-nav--bar .site-nav__link:focus-visible {
-    outline-color: #006b32;
 }
 
 /* ── Menu mobile (tela cheia) ── */

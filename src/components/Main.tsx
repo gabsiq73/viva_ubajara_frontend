@@ -1,19 +1,17 @@
 import "./styles/Main.components.css";
 import Content from "./Sections/Content";
 import { Link } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 
 const HERO_WORDS = ["Inesquecível", "Memorável", "Incrível"] as const;
 const WORD_INTERVAL_MS = 3400;
-const WORD_MAX_CYCLES = 2;
 
 export default function Main(){
     const [wordIdx, setWordIdx] = useState(0);
     const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
     const [interacting, setInteracting] = useState(false);
     const [tabHidden, setTabHidden] = useState(() => document.hidden);
-    const ticks = useRef(0);
 
     useEffect(() => {
         const onVisibility = () => setTabHidden(document.hidden);
@@ -24,11 +22,9 @@ export default function Main(){
     const paused = interacting || tabHidden;
 
     useEffect(() => {
-        if (reduceMotion || paused || ticks.current >= HERO_WORDS.length * WORD_MAX_CYCLES) return;
+        if (reduceMotion || paused) return;
         const t = setInterval(() => {
-            ticks.current += 1;
             setWordIdx(i => (i + 1) % HERO_WORDS.length);
-            if (ticks.current >= HERO_WORDS.length * WORD_MAX_CYCLES) clearInterval(t);
         }, WORD_INTERVAL_MS);
         return () => clearInterval(t);
     }, [reduceMotion, paused]);
@@ -38,23 +34,21 @@ export default function Main(){
             <section
                 className="welcome"
                 aria-label="Capa do site"
-                onMouseEnter={() => setInteracting(true)}
-                onMouseLeave={() => setInteracting(false)}
                 onFocus={() => setInteracting(true)}
                 onBlur={() => setInteracting(false)}
             >
                 <div className="hero-inner">
-                    <span className="hero-kicker">
-                        <span className="hero-kicker__dot" aria-hidden="true" />
-                        Parque Nacional de Ubajara · Ceará
-                    </span>
                     <h1 className="hero-title">
-                        <span className="hero-title__lead">Tenha uma experiência</span>
-                        <span className="hero-title--gold">
-                            <span className="ui-sr-only">{HERO_WORDS[0]}</span>
-                            <span key={wordIdx} className="hero-rotating-word" aria-hidden="true">
-                                {HERO_WORDS[wordIdx]}
-                            </span>
+                        <span className="hero-title__kicker">Venha conhecer Ubajara</span>
+                        <span className="hero-title__lead">Uma experiência</span>
+                        <span className="hero-title__line">
+                            <span className="hero-title--gold">
+                                <span className="ui-sr-only">{HERO_WORDS[0]}</span>
+                                <span key={wordIdx} className="hero-rotating-word" aria-hidden="true">
+                                    {HERO_WORDS[wordIdx]}
+                                </span>
+                            </span>{" "}
+                            <span className="hero-title__tail">na serra</span>
                         </span>
                     </h1>
                     <p className="hero-subtitle">

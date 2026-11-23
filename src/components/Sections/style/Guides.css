@@ -1,0 +1,261 @@
+/* ── Guias turísticos (home): cards com foto 4:5, idiomas sobre a foto e contato no rodapé ── */
+
+section.tour-guides {
+    max-width: none;
+    margin: 0;
+    padding: var(--band-y) 0;
+    background: #f3f7f4;
+}
+
+.tour-guides__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--home-gutter);
+    box-sizing: border-box;
+}
+
+.guides-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(16px, 2vw, 24px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.guides-grid > li {
+    min-width: 0;
+    display: flex;
+}
+
+.guide-card {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #dfe9e2;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #ffffff;
+    transition: box-shadow 250ms var(--ease-out), transform 250ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .guide-card:not(.guide-card--skeleton):hover {
+        box-shadow: 0 18px 40px rgba(0, 47, 20, 0.12);
+        transform: translateY(-3px);
+    }
+}
+
+.guide-card__photo {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    background: #dfe9e2;
+}
+
+.guide-card__photo img,
+.guide-card__placeholder {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.guide-card__photo img {
+    display: block;
+    object-fit: cover;
+}
+
+.guide-card__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, var(--pub-green-mid) 0%, var(--pub-green) 100%);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.guide-card__placeholder .ui-icon {
+    font-size: 72px;
+    font-variation-settings: "FILL" 0, "wght" 300;
+}
+
+.guide-card__langs {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    pointer-events: none;
+}
+
+.guide-card__langs li {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #00210c;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.guide-card__langs .ui-icon {
+    font-size: 15px;
+    color: #006b32;
+}
+
+.guide-card__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    padding: 20px 22px 18px;
+}
+
+.guide-card__name {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-family: "Nunito", sans-serif;
+    font-size: 21px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #00210c;
+}
+
+.guide-card__role {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #006b32;
+}
+
+.guide-card__role .ui-icon {
+    font-size: 16px;
+}
+
+.guide-card__desc {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #5c6670;
+}
+
+.guide-card__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 44px;
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid #e9f0eb;
+    color: #006b32;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.guide-card__go {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e6f0e9;
+    transition: background-color var(--dur-hover) ease, color var(--dur-hover) ease;
+}
+
+.guide-card__go .ui-icon {
+    font-size: 18px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .guide-card__foot:hover .guide-card__go {
+        background: #006b32;
+        color: #ffffff;
+    }
+}
+
+.guide-card__foot:focus-visible {
+    outline: 3px solid #2d8a54;
+    outline-offset: 2px;
+    border-radius: 8px;
+}
+
+.guide-card--skeleton .guide-card__skeleton-photo {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+}
+
+/* ── Tablet: 2 colunas ── */
+@media (max-width: 1023px) and (min-width: 769px) {
+    .guides-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* ── Celular: carrossel com o próximo card aparecendo ── */
+@media (max-width: 768px) {
+    .guides-grid {
+        display: flex;
+        gap: 14px;
+        overflow-x: auto;
+        margin-inline: calc(var(--home-gutter) * -1);
+        padding-inline: var(--home-gutter);
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline: var(--home-gutter);
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .guides-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .guides-grid > li {
+        flex: 0 0 min(272px, 76%);
+        scroll-snap-align: start;
+    }
+
+    .guide-card__body {
+        padding: 18px;
+    }
+
+    .guide-card__name {
+        font-size: 20px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .guide-card:hover {
+        transform: none;
+    }
+}

@@ -12,11 +12,12 @@
 }
 
 :root:has(.site-header.is-solid) {
-    --site-header-h: 64px;
+    --site-header-h: 72px;
 }
 
 @media screen and (max-width: 1023.98px) {
-    :root {
+    :root,
+    :root:has(.site-header.is-solid) {
         --site-header-h: 64px;
     }
 }
@@ -67,16 +68,16 @@
 }
 
 .site-header.is-solid {
-    --site-logo-color: #003016;
-    --site-logo-h: 42px;
-    height: 64px;
-    color: #00210c;
-    box-shadow: 0 6px 24px rgba(0, 33, 12, 0.08);
+    --site-logo-color: #ffffff;
+    --site-logo-h: 44px;
+    height: 72px;
+    color: #ffffff;
+    box-shadow: 0 6px 24px rgba(0, 20, 9, 0.22);
 }
 
 .site-header.is-solid::after {
-    background: rgba(255, 255, 255, 0.86);
-    border-bottom-color: rgba(0, 48, 22, 0.1);
+    background: rgba(0, 48, 22, 0.95);
+    border-bottom-color: rgba(255, 255, 255, 0.12);
 }
 
 .site-header.is-solid::before {
@@ -89,7 +90,7 @@
     }
 
     .site-header.is-solid::after {
-        background: #ffffff;
+        background: #003016;
     }
 }
 
@@ -115,10 +116,6 @@
 .site-header__logo:focus-visible {
     outline: 2px solid #f3c66b;
     outline-offset: 4px;
-}
-
-.site-header.is-solid .site-header__logo:focus-visible {
-    outline-color: #006b32;
 }
 
 .site-header__actions {
@@ -164,23 +161,9 @@
     }
 }
 
-.site-header.is-solid .site-header__icon-btn[aria-expanded="true"] {
-    background: #f0f7f3;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .site-header.is-solid .site-header__icon-btn:hover {
-        background: #f0f7f3;
-    }
-}
-
 .site-header__icon-btn:focus-visible {
     outline: 2px solid #f3c66b;
     outline-offset: 2px;
-}
-
-.site-header.is-solid .site-header__icon-btn:focus-visible {
-    outline-color: #006b32;
 }
 
 .site-header__dot {
@@ -202,10 +185,6 @@
         opacity: 0;
         transform: scale(0.9);
     }
-}
-
-.site-header.is-solid .site-header__dot {
-    background: #c58b24;
 }
 
 /* ── Botão Entrar ── */
@@ -249,19 +228,7 @@
 }
 
 .site-header.is-solid .site-header__login {
-    height: 38px;
-    background: #003016;
-    color: #ffffff;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .site-header.is-solid .site-header__login:hover {
-        background: #004a22;
-    }
-}
-
-.site-header.is-solid .site-header__login:focus-visible {
-    outline-color: #006b32;
+    height: 40px;
 }
 
 /* ── Avatar ── */
@@ -318,10 +285,6 @@
     transition: border-color 250ms var(--site-ease);
 }
 
-.site-header.is-solid .site-user__button .site-avatar {
-    border-color: #c8ddd0;
-}
-
 .site-user__button[aria-expanded="true"] .site-avatar {
     border-color: #ffffff;
 }
@@ -332,23 +295,9 @@
     }
 }
 
-.site-header.is-solid .site-user__button[aria-expanded="true"] .site-avatar {
-    border-color: #006b32;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .site-header.is-solid .site-user__button:hover .site-avatar {
-        border-color: #006b32;
-    }
-}
-
 .site-user__button:focus-visible {
     outline: 2px solid #f3c66b;
     outline-offset: 2px;
-}
-
-.site-header.is-solid .site-user__button:focus-visible {
-    outline-color: #006b32;
 }
 
 .site-user__popover {
@@ -577,6 +526,7 @@
 
     .site-header.is-solid {
         --site-logo-h: 36px;
+        height: 64px;
     }
 
     .site-header__inner {

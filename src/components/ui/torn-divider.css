@@ -28,3 +28,14 @@
 .torn-divider--bottom {
     bottom: calc(var(--torn-h) * -1);
 }
+
+/* No celular as seções terminam retas, sem a borda rasgada */
+@media (max-width: 768px) {
+    :root {
+        --torn-h: 0px;
+    }
+
+    .torn-divider {
+        display: none;
+    }
+}

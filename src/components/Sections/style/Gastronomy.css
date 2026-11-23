@@ -1,0 +1,433 @@
+/* ── Gastronomia (home): foto grande com troca por borda rasgada, abas com progresso e texto do prato ── */
+
+.gastro {
+    --ridge-full: polygon(0% 100%, 100% 100%, 100% -12%, 92% -9%, 82% -15%, 70% -4%, 58% -13%, 46% -7%, 34% -16%, 22% -6%, 12% -14%, 0% -8%);
+    --ridge-hide: polygon(0% 100%, 100% 100%, 100% 106%, 92% 109%, 82% 103%, 70% 114%, 58% 105%, 46% 111%, 34% 102%, 22% 112%, 12% 104%, 0% 110%);
+    --gastro-gold-text: #ffe3a3;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--band-y) var(--home-gutter);
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: clamp(32px, 6vw, 80px);
+    align-items: center;
+    color: #ffffff;
+}
+
+.gastro__stage {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* ── Foto ── */
+.gastro__viewport {
+    position: relative;
+    height: clamp(320px, 42vw, 560px);
+    border-radius: 24px;
+    overflow: hidden;
+    background: #8f6014;
+    box-shadow: 0 30px 60px rgba(0, 47, 20, 0.28);
+}
+
+.gastro__slide {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    clip-path: var(--ridge-hide);
+    pointer-events: none;
+}
+
+.gastro__slide-img {
+    position: absolute;
+    inset: 0;
+    transform: scale(1.2);
+}
+
+.gastro__slide-img img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gastro__slide.is-prev {
+    z-index: 2;
+    clip-path: var(--ridge-full);
+}
+
+.gastro__slide.is-prev .gastro__slide-img {
+    transform: scale(1);
+}
+
+.gastro__slide.is-on {
+    z-index: 3;
+    clip-path: var(--ridge-full);
+    transition: clip-path 1.2s cubic-bezier(0.77, 0, 0.18, 1);
+    pointer-events: auto;
+}
+
+.gastro__slide.is-on .gastro__slide-img {
+    transform: scale(1);
+    transition: transform 2.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.gastro__slide.is-on.is-reset {
+    clip-path: var(--ridge-hide);
+    transition: none;
+}
+
+.gastro__slide.is-on.is-reset .gastro__slide-img {
+    transform: scale(1.2);
+    transition: none;
+}
+
+.gastro__count {
+    position: absolute;
+    top: 22px;
+    left: 22px;
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 19px;
+    background: #ffffff;
+    color: #00210c;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+}
+
+.gastro__count i {
+    font-style: normal;
+    opacity: 0.45;
+}
+
+.gastro__arrows {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 5;
+    display: flex;
+    gap: 10px;
+}
+
+.gastro__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #00210c;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    transition: background-color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
+}
+
+.gastro__arrow:active {
+    transform: scale(0.94);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .gastro__arrow:hover {
+        background: #f2c14e;
+    }
+}
+
+.gastro__arrow:focus-visible,
+.gastro__tab:focus-visible,
+.gastro__cta:focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 3px;
+}
+
+/* ── Abas com progresso ── */
+.gastro__tabs {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 14px;
+}
+
+.gastro__tab {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: rgba(255, 255, 255, 0.8);
+    transition: color var(--dur-hover) ease;
+}
+
+.gastro__tab.is-active {
+    color: #ffffff;
+}
+
+.gastro__bar {
+    display: block;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.3);
+    overflow: hidden;
+}
+
+.gastro__bar-fill {
+    display: block;
+    height: 100%;
+    background: #ffffff;
+    transform-origin: left center;
+    animation: gastro-progress linear forwards;
+}
+
+.gastro__bar-fill.is-static {
+    animation: none;
+}
+
+@keyframes gastro-progress {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+/* ── Texto ── */
+.gastro__info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.gastro__info .sec-head {
+    margin-bottom: 0;
+}
+
+.gastro__dish {
+    position: relative;
+    min-height: 170px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.35);
+    overflow: hidden;
+}
+
+.gastro__dish-item {
+    position: absolute;
+    top: 24px;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(24px);
+}
+
+.gastro__dish-item.is-prev {
+    opacity: 0;
+    transform: translateY(-16px);
+    transition: opacity 0.35s ease, transform 0.45s ease;
+}
+
+.gastro__dish-item.is-on {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.6s ease 0.45s, transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 0.45s;
+}
+
+.gastro__dish-item.is-on.is-reset {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: none;
+}
+
+.gastro__dish-num {
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gastro-gold-text);
+}
+
+.gastro__dish-name {
+    font-family: "Nunito", sans-serif;
+    font-size: clamp(28px, 3vw, 38px);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+}
+
+.gastro__dish-desc {
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    text-wrap: pretty;
+}
+
+.gastro__cta {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 56px;
+    padding: 0 28px;
+    border-radius: 28px;
+    background: #ffffff;
+    color: #006b32;
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: background-color var(--dur-hover) ease, color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
+}
+
+.gastro__cta:active {
+    transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .gastro__cta:hover {
+        background: #f2c14e;
+        color: #002f14;
+    }
+}
+
+/* ── Tablet e celular ── */
+@media (max-width: 1023px) {
+    .gastro {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 28px;
+        align-items: start;
+    }
+
+    /* texto e título primeiro, foto depois */
+    .gastro__info {
+        display: contents;
+    }
+
+    .gastro__info > :first-child {
+        order: 1;
+    }
+
+    .gastro__stage {
+        order: 2;
+    }
+
+    .gastro__dish {
+        order: 3;
+    }
+
+    .gastro__cta {
+        order: 4;
+    }
+}
+
+@media (max-width: 768px) {
+    .gastro {
+        gap: 24px;
+    }
+
+    .gastro__viewport {
+        height: auto;
+        aspect-ratio: 4 / 5;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 47, 20, 0.28);
+    }
+
+    .gastro__count {
+        top: 14px;
+        left: 14px;
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 17px;
+        font-size: 12px;
+    }
+
+    .gastro__arrows {
+        top: auto;
+        right: 12px;
+        bottom: 12px;
+        gap: 8px;
+    }
+
+    .gastro__arrow {
+        width: 48px;
+        height: 48px;
+    }
+
+    .gastro__tabs {
+        position: relative;
+        display: flex;
+        gap: 14px;
+        margin-inline: calc(var(--home-gutter) * -1);
+        padding-inline: var(--home-gutter);
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .gastro__tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .gastro__tab {
+        flex: 0 0 auto;
+        min-width: 84px;
+        max-width: 132px;
+        gap: 12px;
+        padding-bottom: 4px;
+        font-size: 14px;
+    }
+
+    .gastro__tab-name {
+        display: block;
+        overflow-wrap: anywhere;
+    }
+
+    .gastro__dish {
+        min-height: 150px;
+        padding-top: 20px;
+    }
+
+    .gastro__dish-item {
+        top: 20px;
+    }
+
+    .gastro__dish-name {
+        font-size: 30px;
+    }
+
+    .gastro__cta {
+        align-self: stretch;
+        justify-content: center;
+        height: 52px;
+        font-size: 15px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gastro__slide.is-on,
+    .gastro__slide.is-on .gastro__slide-img,
+    .gastro__dish-item.is-on,
+    .gastro__dish-item.is-prev {
+        transition-duration: 0.01ms;
+        transition-delay: 0s;
+    }
+}

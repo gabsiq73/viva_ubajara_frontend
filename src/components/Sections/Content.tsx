@@ -1,16 +1,17 @@
 import "./style/Content.components.css"
+import "./style/Arrival.css"
+import "./style/Gastronomy.css"
+import { AgendaItem, AgendaSkeleton } from "./AgendaItem";
+import GuidesShowcase from "./GuidesShowcase";
+import { TestimonialsShowcase } from "./TestimonialsShowcase";
 import { Link } from "react-router-dom"
 import { useEffect, useState, useMemo, useRef, type KeyboardEvent, type ReactNode } from "react"
 import paper from "./../../assets/images/paper.webp"
-import park from "./../../assets/images/parque.webp";
 import food from "./../../assets/images/food.webp";
-import cachoeiraAvatar from "./../../assets/images/cachoeira-avatar.webp";
 import farm from "./../../assets/images/fazenda.webp";
-import fazendaAvatar from "./../../assets/images/fazenda-avatar.webp";
 import mercado from "./../../assets/images/mercado.webp";
-import mercadoAvatar from "./../../assets/images/mercado-avatar.webp";
 import museum from "./../../assets/images/museu.webp";
-import { GastronomyCarousel, type GastronomySlide } from "./GastronomyCarousel";
+import { GastronomyShowcase, type GastronomySlide } from "./GastronomyShowcase";
 import { gastronomyItemsService } from "../../admin/services/gastronomyItemsService";
 import { attractionsService } from "../../admin/services/attractionsService";
 import { eventsService } from "../../admin/services/eventsService";
@@ -31,14 +32,16 @@ import TornDivider from "../ui/TornDivider";
 import { FilterChip } from "../ui/Chip";
 import StateBlock from "../ui/StateBlock";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
-import PointCard from "../ui/PointCard";
-import { Skeleton, EstablishmentCardSkeleton, PointCardSkeleton } from "../ui/Skeleton";
+import PointsShowcase from "./PointsShowcase";
+import { Skeleton, EstablishmentCardSkeleton } from "../ui/Skeleton";
 import {
     ESTABLISHMENT_TYPES,
+    TYPE_ICONS,
     mapHostPoint,
     mapRestaurant,
     toFavoriteItem,
     type Establishment,
+    type EstablishmentType,
 } from "../../utils/establishments";
 import { loadFavorites, toggleFavorite } from "../../utils/favorites";
 import "../ui/ui.css";
@@ -67,18 +70,41 @@ const IconChegar = () => (
 
 // ── Static fallback gastronomy slides (used when API returns nothing) ──
 const GASTRO_SLIDES_FALLBACK: GastronomySlide[] = [
-    { tag: "Cachaça Artesanal", src: food, alt: "Cachaça artesanal e produtos da roça" },
-    { tag: "Café de Sombra", src: farm, alt: "Cultivo de café em altitude" },
-    { tag: "Comida Caipira", src: mercado, alt: "Mercado e sabores da cozinha regional" },
-    { tag: "Doces Caseiros", src: museum, alt: "Doces e iguarias típicas da região" },
+    { tag: "Cachaça Artesanal", src: food, alt: "Cachaça artesanal e produtos da roça", desc: "Produção artesanal dos alambiques locais, envelhecida em madeira." },
+    { tag: "Café de Sombra", src: farm, alt: "Cultivo de café em altitude", desc: "Cafés especiais cultivados na altitude da serra, com sabor suave e aroma marcante." },
+    { tag: "Comida Caipira", src: mercado, alt: "Mercado e sabores da cozinha regional", desc: "Pratos fartos com temperos da serra, feitos como nas casas da Ibiapaba." },
+    { tag: "Doces Caseiros", src: museum, alt: "Doces e iguarias típicas da região", desc: "Rapadura, doces de leite e de frutas feitos nos engenhos e cozinhas locais." },
 ];
 
-const AIRPORTS = [
-    { code: "JJD", name: "Aeroporto de Jericoacoara", dist: "165\u00A0km de distância" },
-    { code: "THE", name: "Aeroporto de Teresina", dist: "280\u00A0km de distância" },
-    { code: "FOR", name: "Aeroporto de Fortaleza", dist: "320\u00A0km de distância" },
-    { code: "PHB", name: "Aeroporto de Parnaíba", dist: "190\u00A0km de distância" },
+// Descrição do prato para itens vindos da API, que só trazem nome e foto.
+const DISH_DESCRIPTIONS: [RegExp, string][] = [
+    [/panelada/i, "Cozido farto de miúdos com temperos da serra, servido com arroz e farinha."],
+    [/rapadura/i, "Doce de cana feito nos engenhos da Ibiapaba, puro ou com amendoim."],
+    [/peta/i, "Biscoito de polvilho leve e crocante, companheiro do café da tarde."],
+    [/cacha[cç]a/i, "Produção artesanal dos alambiques locais, envelhecida em madeira."],
+    [/tapioca/i, "Massa de goma fresca com queijo coalho, carne de sol ou doce."],
+    [/beiju/i, "Tradição das casas de farinha, com coco ralado e açúcar."],
+    [/caf[eé]/i, "Cafés especiais cultivados na altitude da serra, com sabor suave e aroma marcante."],
+    [/doce/i, "Doces caseiros feitos nos engenhos e cozinhas locais."],
 ];
+const dishDescription = (name: string) => DISH_DESCRIPTIONS.find(([re]) => re.test(name))?.[1];
+
+const AIRPORTS = [
+    { code: "JJD", name: "Aeroporto de Jericoacoara", dist: "165 km" },
+    { code: "PHB", name: "Aeroporto de Parnaíba", dist: "190 km" },
+    { code: "THE", name: "Aeroporto de Teresina", dist: "280 km" },
+    { code: "FOR", name: "Aeroporto de Fortaleza", dist: "320 km" },
+];
+
+const ARRIVAL_STEPS = [
+    { icon: "flight", title: "De avião", badge: "a partir de 165 km", desc: "Voe para os aeroportos mais próximos e complete a viagem por terra em menos de 3 horas de carro." },
+    { icon: "directions_bus", title: "De ônibus", badge: "~6h de Fortaleza", desc: "Linhas regulares com saída de Fortaleza, Teresina e outras cidades da região." },
+    { icon: "directions_car", title: "De carro", badge: "~5h de Fortaleza", desc: "Pela BR-222 e CE-187. Estrada asfaltada, sinalizada e com belas paisagens da serra." },
+];
+
+// Mapa da região (Ubajara e aeroportos) sem chave de API; o botão abre o mapa completo.
+const REGION_MAP_EMBED = "https://www.openstreetmap.org/export/embed.html?bbox=-43.3%2C-5.6%2C-38.0%2C-2.4&layer=mapnik&marker=-3.8567%2C-40.9217";
+const UBAJARA_MAPS_URL = "https://www.google.com/maps/search/?api=1&query=Parque+Nacional+de+Ubajara";
 
 interface FaqItem {
     id: string;
@@ -151,69 +177,6 @@ const FAQ_ITEMS: FaqItem[] = [
 
 // ── Skeleton cards ─────────────────────────────────────────────
 
-const EventSkeleton = () => (
-    <article className="pub-event-card pub-event-card--skeleton" aria-hidden="true">
-        <div className="pub-event-card__media">
-            <Skeleton className="pub-skel-fill" radius={0} />
-        </div>
-        <div className="pub-event-card__body">
-            <div className="pub-event-card__title">
-                <Skeleton width="80%" height={15} />
-                <Skeleton width="55%" height={15} />
-            </div>
-            <div className="pub-event-card__desc">
-                <Skeleton width="100%" height={12} />
-                <Skeleton width="70%" height={12} />
-            </div>
-            <div className="pub-event-card__loc">
-                <Skeleton width="45%" height={13} />
-            </div>
-            <div className="pub-event-card__footer">
-                <Skeleton width={96} height={14} />
-            </div>
-        </div>
-    </article>
-);
-
-const GuideSkeleton = () => (
-    <article className="guide-card guide-card--skeleton" aria-hidden="true">
-        <div className="guide-card__photo">
-            <Skeleton className="pub-skel-fill" radius={0} />
-        </div>
-        <div className="guide-card__body">
-            <div className="guide-card__name">
-                <Skeleton width="60%" height={16} />
-            </div>
-            <div className="guide-card__specialty">
-                <Skeleton width="35%" height={11} />
-            </div>
-            <div className="guide-card__desc">
-                <Skeleton width="100%" height={12} />
-                <Skeleton width="100%" height={12} />
-                <Skeleton width="75%" height={12} />
-            </div>
-        </div>
-    </article>
-);
-
-const ReviewSkeleton = () => (
-    <article className="review-card" aria-hidden="true" style={{ pointerEvents: "none" }}>
-        <div className="skel" style={{ height: 18, width: 100 }} />
-        <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-            <div className="skel" style={{ height: 14, width: "100%" }} />
-            <div className="skel" style={{ height: 14, width: "85%" }} />
-            <div className="skel" style={{ height: 14, width: "70%" }} />
-        </div>
-        <div className="review-card__author">
-            <div className="skel" style={{ width: 42, height: 42, borderRadius: "50%", flexShrink: 0 }} />
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
-                <div className="skel" style={{ height: 14, width: "60%" }} />
-                <div className="skel" style={{ height: 12, width: "40%" }} />
-            </div>
-        </div>
-    </article>
-);
-
 // ── Type helpers ───────────────────────────────────────────────
 const DAY_FORMAT = new Intl.DateTimeFormat("pt-BR", { day: "2-digit" });
 const MONTH_FORMAT = new Intl.DateTimeFormat("pt-BR", { month: "short" });
@@ -256,6 +219,14 @@ function SectionState({ failed, emptyTitle, emptyIcon, emptyVariant = "empty", o
 }
 
 const PUB_LIMIT = 8;
+const GASTRO_AUTOPLAY_MS = 5000;
+const PUB_FILTER_LABELS: Record<string, string> = {
+    Todos: "Todos",
+    Restaurante: "Restaurantes",
+    Hotel: "Hotéis",
+    Pousada: "Pousadas",
+    Hostel: "Hostels",
+};
 const GRID_REVEAL_MS = 900;
 
 function pickPubItems(items: Establishment[], filter: string): Establishment[] {
@@ -277,11 +248,13 @@ interface SectionHeaderProps {
     subtitle?: string;
     cta?: { to: string; label: string; text?: string };
     onDark?: boolean;
+    /** Esconde o botão do cabeçalho no celular (a seção mostra o seu próprio no fim). */
+    ctaDesktopOnly?: boolean;
 }
 
-function SectionHeader({ id, kicker, title, subtitle, cta, onDark }: SectionHeaderProps) {
+function SectionHeader({ id, kicker, title, subtitle, cta, onDark, ctaDesktopOnly }: SectionHeaderProps) {
     return (
-        <header className={`sec-head reveal${onDark ? " sec-head--on-dark" : ""}`}>
+        <header className={`sec-head reveal${onDark ? " sec-head--on-dark" : ""}${ctaDesktopOnly ? " sec-head--cta-desktop" : ""}`}>
             <div className="sec-head__text">
                 <span className="sec-head__kicker">{kicker}</span>
                 <h2 id={id} className="sec-head__title">{title}</h2>
@@ -296,9 +269,6 @@ function SectionHeader({ id, kicker, title, subtitle, cta, onDark }: SectionHead
         </header>
     );
 }
-
-// ── Fallback review avatars ───────────────────────────────────
-const FALLBACK_AVATARS = [cachoeiraAvatar, fazendaAvatar, mercadoAvatar];
 
 export default function Content() {
     const [gastroIndex, setGastroIndex] = useState(0);
@@ -325,7 +295,7 @@ export default function Content() {
         gastronomyItemsService.getActive().then((items) => {
             const slides: GastronomySlide[] = items
                 .filter(item => item.imageUrl)
-                .map(item => ({ tag: item.name, src: item.imageUrl!, alt: item.name }));
+                .map(item => ({ tag: item.name, src: item.imageUrl!, alt: item.name, desc: dishDescription(item.name) }));
             if (slides.length > 0) setGastroSlides(slides);
         }).catch(() => {});
     }, []);
@@ -370,7 +340,7 @@ export default function Content() {
         if (gastroSlides.length <= 1 || gastroPaused) return;
         const id = window.setInterval(() => {
             setGastroIndex((i) => (i + 1) % gastroSlides.length);
-        }, 4500);
+        }, GASTRO_AUTOPLAY_MS);
         return () => window.clearInterval(id);
     }, [gastroSlides, gastroPaused, gastroIndex]);
 
@@ -403,6 +373,23 @@ export default function Content() {
     }, [pubItems]);
 
     const filteredPub = useMemo(() => pickPubItems(pubItems, pubGuideFilter), [pubItems, pubGuideFilter]);
+
+    const handleTogglePointFavorite = (item: AttractionResponse) => {
+        const nowFavorite = toggleFavorite({
+            id: item.id,
+            name: item.name,
+            type: "attraction",
+            photo: item.photos?.[0]?.url,
+            shortDescription: item.shortDescription || item.description?.slice(0, 100),
+            path: `/pontos/${item.id}`,
+        });
+        setFavoriteIds((prev) => {
+            const next = new Set(prev);
+            if (nowFavorite) next.add(item.id);
+            else next.delete(item.id);
+            return next;
+        });
+    };
 
     const handleToggleFavorite = (item: Establishment) => {
         const nowFavorite = toggleFavorite(toFavoriteItem(item));
@@ -488,67 +475,50 @@ export default function Content() {
                             kicker="Experiências Únicas"
                             title="Pontos Turísticos"
                             subtitle="Cachoeiras, trilhas, fazendas e mercados para viver a serra de perto."
-                            cta={{ to: "/pontos-turisticos", label: "Ver todos os pontos turísticos" }}
+                            cta={{ to: "/pontos-turisticos", label: "Ver todos os pontos turísticos", text: "Ver todos os pontos" }}
+                            ctaDesktopOnly
                         />
-                        {loading ? (
-                            <ul className="ui-point-grid" aria-hidden="true">
-                                {Array.from({ length: 4 }).map((_, i) => <li key={i}><PointCardSkeleton /></li>)}
-                            </ul>
-                        ) : failed.attractions || attractions.length === 0 ? (
-                            <SectionState failed={failed.attractions} emptyTitle="Nenhum ponto turístico cadastrado por enquanto." emptyIcon="landscape" onRetry={retryLoad} />
-                        ) : (
-                            <ul className="ui-point-grid grid-reveal">
-                                {attractions.map((pt) => (
-                                    <li key={pt.id}><PointCard item={pt} /></li>
-                                ))}
-                            </ul>
-                        )}
+                        <PointsShowcase
+                            items={failed.attractions ? [] : attractions}
+                            loading={loading}
+                            favoriteIds={favoriteIds}
+                            onToggleFavorite={handleTogglePointFavorite}
+                            moreTo="/pontos-turisticos"
+                            moreLabel="Ver todos os pontos"
+                            fallback={<SectionState failed={failed.attractions} emptyTitle="Nenhum ponto turístico cadastrado por enquanto." emptyIcon="landscape" onRetry={retryLoad} />}
+                        />
                     </div>
                 </section>
 
                 {/* ── Gastronomia ── */}
                 <div className="top-n torn-host">
-                    <TornDivider edge="top" fill="#c58b24" />
+                    <TornDivider edge="top" fill="#a87219" />
                     <div className="news">
                         <div
-                            className="news-inner"
                             onPointerEnter={(e) => { if (e.pointerType === "mouse") setGastroHover(true); }}
                             onPointerLeave={(e) => { if (e.pointerType === "mouse") setGastroHover(false); }}
                             onFocus={() => setGastroFocus(true)}
                             onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setGastroFocus(false); }}
                         >
-                            <div className="caixa">
-                                <GastronomyCarousel slides={gastroSlides} activeIndex={gastroIndex} onActiveChange={setGastroIndex} />
-                            </div>
-                            <div className="text-n">
-                                <span className="text-n__kicker">Sabores da Ibiapaba</span>
-                                <h2 className="text-n__title">Gastronomia Regional</h2>
-                                <div className="protect">
-                                    <ul>
-                                        {gastroSlides.map((slide, i) => (
-                                            <li key={slide.tag}>
-                                                <button
-                                                    type="button"
-                                                    className={`protect-chip${i === gastroIndex ? " is-active" : ""}`}
-                                                    onClick={() => setGastroIndex(i)}
-                                                    aria-pressed={i === gastroIndex}
-                                                >
-                                                    {slide.tag}
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                                <div className="desc">
-                                    <p>A altitude de Ubajara proporciona um clima perfeito para o cultivo de cafés especiais e a produção de iguarias únicas que você só encontra aqui. Delicie-se com o melhor tempero da serra.</p>
-                                </div>
-                                <div className="restaurant">
-                                    <Link to="/estabelecimentos?tipo=Restaurante">Ver Restaurantes</Link>
-                                </div>
-                            </div>
+                            <GastronomyShowcase
+                                slides={gastroSlides}
+                                activeIndex={gastroIndex}
+                                onActiveChange={setGastroIndex}
+                                paused={gastroPaused}
+                                autoplayMs={GASTRO_AUTOPLAY_MS}
+                                header={
+                                    <SectionHeader
+                                        id="gastro-title"
+                                        kicker="Sabores da Ibiapaba"
+                                        title="Gastronomia Regional"
+                                        subtitle="A altitude de Ubajara favorece cafés especiais e iguarias que você só encontra aqui."
+                                        onDark
+                                    />
+                                }
+                            />
                         </div>
                     </div>
-                    <TornDivider edge="bottom" fill="#c58b24" />
+                    <TornDivider edge="bottom" fill="#a87219" />
                 </div>
 
                 {/* ── Guia + Eventos ── */}
@@ -562,6 +532,7 @@ export default function Content() {
                             title="Guia de Estabelecimentos"
                             subtitle="Os melhores lugares para comer, dormir e viver momentos inesquecíveis em nossa cidade."
                             cta={{ to: "/estabelecimentos", label: "Ver todos os estabelecimentos" }}
+                            ctaDesktopOnly
                         />
                         {loading ? (
                             <>
@@ -582,7 +553,9 @@ export default function Content() {
                                     {pubCategories.map((label) => (
                                         <FilterChip
                                             key={label}
-                                            label={label}
+                                            label={PUB_FILTER_LABELS[label] ?? label}
+                                            icon={label === "Todos" ? "grid_view" : TYPE_ICONS[label as EstablishmentType]}
+                                            count={label === "Todos" ? pubItems.length : pubItems.filter((i) => i.type === label).length}
                                             selected={pubGuideFilter === label}
                                             onClick={() => setPubGuideFilter(label)}
                                         />
@@ -593,174 +566,160 @@ export default function Content() {
                                         <EstablishmentCard
                                             key={`${item.apiType}-${item.id}`}
                                             item={item}
+                                            variant="showcase"
                                             favorite={favoriteIds.has(item.id)}
                                             onToggleFavorite={handleToggleFavorite}
                                         />
                                     ))}
                                 </div>
+                                <Link to="/estabelecimentos" className="sec-head__cta sec-more">
+                                    Ver todos
+                                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                                </Link>
                             </>
                         )}
                     </section>
 
                     {/* Eventos */}
-                    <section className="pub-events" aria-labelledby="pub-events-title">
-                        <SectionHeader
-                            id="pub-events-title"
-                            kicker="Experiências Inesquecíveis"
-                            title="Próximos Eventos"
-                            subtitle="Fique por dentro da programação cultural e dos festivais que movimentam a nossa serra."
-                            cta={{ to: "/eventos", label: "Ver todos os eventos" }}
-                        />
-                        {loading ? (
-                            <div className="pub-events__grid">
-                                {Array.from({ length: 4 }).map((_, i) => <EventSkeleton key={i} />)}
-                            </div>
-                        ) : failed.events || homeEvents.length === 0 ? (
-                            <SectionState failed={failed.events} emptyTitle="Nenhum evento agendado por enquanto." emptyIcon="event" onRetry={retryLoad} />
-                        ) : (
-                            <div className="pub-events__grid grid-reveal">
-                                {homeEvents.map((ev) => {
-                                    const d = parseDate(ev.startDateTime);
-                                    const valid = !isNaN(d.getTime());
-                                    const day = valid ? DAY_FORMAT.format(d) : "—";
-                                    const month = valid ? MONTH_FORMAT.format(d).replace(".", "") : "—";
-                                    return (
-                                        <article key={ev.id} className="pub-event-card">
-                                            <div className="pub-event-card__media">
-                                                {ev.photos?.[0]?.url
-                                                    ? <img src={ev.photos[0].url} alt="" width={640} height={480} loading="lazy" decoding="async" />
-                                                    : <div className="pub-event-card__placeholder" aria-hidden="true" />
-                                                }
-                                                <div className="pub-event-card__date" aria-hidden="true">
-                                                    <strong>{day}</strong>
-                                                    <span>{month}</span>
-                                                </div>
-                                            </div>
-                                            <div className="pub-event-card__body">
-                                                <h3 className="pub-event-card__title">
-                                                    <Link to={`/eventos/${ev.id}`} className="pub-event-card__link">
-                                                        {ev.name}
-                                                        {valid && <span className="ui-sr-only">, {DAY_MONTH_LONG_FORMAT.format(d)}</span>}
-                                                    </Link>
-                                                </h3>
-                                                <p className="pub-event-card__desc">{ev.description}</p>
-                                                <div className="pub-event-card__loc">
-                                                    <span className="material-symbols-outlined" aria-hidden="true">location_on</span>
-                                                    <span className="pub-event-card__loc-text">{ev.location}</span>
-                                                </div>
-                                                <div className="pub-event-card__footer">
-                                                    <span className="pub-event-card__cta" aria-hidden="true">
-                                                        Ver evento
-                                                        <span className="material-symbols-outlined">arrow_forward</span>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </article>
-                                    );
-                                })}
-                            </div>
-                        )}
+                    <section className="agenda" aria-labelledby="pub-events-title">
+                        <div className="agenda__inner">
+                            <header className="agenda__head reveal">
+                                <span className="sec-head__kicker">Experiências Inesquecíveis</span>
+                                <h2 id="pub-events-title" className="sec-head__title">Próximos Eventos</h2>
+                                <p className="sec-head__sub">A programação cultural e os festivais que movimentam a serra.</p>
+                                <Link to="/eventos" className="sec-head__cta">
+                                    Ver agenda completa
+                                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                                </Link>
+                            </header>
+                            {loading ? (
+                                <ul className="agenda__list" aria-hidden="true">
+                                    {Array.from({ length: 4 }).map((_, i) => <AgendaSkeleton key={i} />)}
+                                </ul>
+                            ) : failed.events || homeEvents.length === 0 ? (
+                                <SectionState failed={failed.events} emptyTitle="Nenhum evento agendado por enquanto." emptyIcon="event" onRetry={retryLoad} />
+                            ) : (
+                                <ul className="agenda__list grid-reveal">
+                                    {homeEvents.map((ev) => {
+                                        const d = parseDate(ev.startDateTime);
+                                        const valid = !isNaN(d.getTime());
+                                        const day = valid ? DAY_FORMAT.format(d) : "—";
+                                        const month = valid ? MONTH_FORMAT.format(d).replace(".", "") : "—";
+                                        return (
+                                            <li key={ev.id}>
+                                                <AgendaItem
+                                                    id={ev.id}
+                                                    name={ev.name}
+                                                    description={ev.description}
+                                                    location={ev.location}
+                                                    photo={ev.photos?.[0]?.url}
+                                                    day={day}
+                                                    month={month}
+                                                    longDate={valid ? DAY_MONTH_LONG_FORMAT.format(d) : undefined}
+                                                />
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            )}
+                        </div>
                     </section>
                 </div>
 
+                {/* ── Como Chegar ── */}
+                <section className="arrival" aria-labelledby="como-chegar-title">
+                    <div className="arrival__inner">
+                        <div className="arrival__main">
+                            <SectionHeader
+                                id="como-chegar-title"
+                                kicker="Planejando sua visita"
+                                title="Como Chegar"
+                                subtitle="Ubajara fica na Serra da Ibiapaba, acessível por rotas aéreas e terrestres. Escolha seu ponto de partida."
+                                onDark
+                            />
+                            <ol className="arrival__steps grid-reveal">
+                                {ARRIVAL_STEPS.map((step) => (
+                                    <li key={step.title} className="arrival__step">
+                                        <span className="arrival__step-icon" aria-hidden="true">
+                                            <span className="material-symbols-outlined">{step.icon}</span>
+                                        </span>
+                                        <div className="arrival__card">
+                                            <div className="arrival__card-head">
+                                                <h3 className="arrival__card-title">{step.title}</h3>
+                                                <span className="arrival__card-badge">{step.badge}</span>
+                                            </div>
+                                            <p className="arrival__card-desc">{step.desc}</p>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
+
+                        <div className="arrival__map">
+                            <div className="arrival__map-frame">
+                                <iframe
+                                    className="arrival__map-embed"
+                                    title="Mapa da região: Ubajara e os aeroportos mais próximos"
+                                    src={REGION_MAP_EMBED}
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer"
+                                    tabIndex={-1}
+                                />
+                                <a className="arrival__map-credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap</a>
+                                <span className="arrival__map-pill">
+                                    <span className="material-symbols-outlined" aria-hidden="true">location_on</span>
+                                    Ubajara, CE
+                                </span>
+                            </div>
+                            <div className="arrival__airports">
+                                <div className="arrival__airports-head">
+                                    <h3 className="arrival__airports-title">
+                                        <span className="material-symbols-outlined" aria-hidden="true">flight</span>
+                                        Aeroportos mais próximos
+                                    </h3>
+                                    <a href={UBAJARA_MAPS_URL} className="arrival__map-link arrival__map-link--text" target="_blank" rel="noopener noreferrer">
+                                        Abrir no mapa
+                                        <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                                    </a>
+                                </div>
+                                <ul className="arrival__airport-list grid-reveal">
+                                    {AIRPORTS.map((ap) => (
+                                        <li key={ap.code} className="arrival__airport">
+                                            <span className="arrival__airport-code">{ap.code}</span>
+                                            <p className="arrival__airport-name">{ap.name}</p>
+                                            <p className="arrival__airport-dist">{ap.dist}</p>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <a href={UBAJARA_MAPS_URL} className="arrival__map-link arrival__map-link--button" target="_blank" rel="noopener noreferrer">
+                                    Abrir no mapa
+                                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 {/* ── Guias Turísticos ── */}
-                <div className="tour-guides-wrap">
-                    <section id="guias-de-turismo" className="tour-guides" aria-labelledby="tour-guides-title">
+                <section id="guias-de-turismo" className="tour-guides" aria-labelledby="tour-guides-title">
+                    <div className="tour-guides__inner">
                         <SectionHeader
                             id="tour-guides-title"
                             kicker="Seu passeio em boas mãos"
                             title="Nossos Guias Turísticos"
                             subtitle="Conheça os profissionais credenciados que vão transformar sua visita em uma experiência inesquecível."
                         />
-                        {loading ? (
-                            <div className="tour-guides__grid">
-                                {Array.from({ length: 4 }).map((_, i) => <GuideSkeleton key={i} />)}
-                            </div>
-                        ) : failed.guides || homeGuides.length === 0 ? (
-                            <SectionState failed={failed.guides} emptyTitle="Nenhum guia cadastrado por enquanto." emptyIcon="hiking" onRetry={retryLoad} />
-                        ) : (
-                            <div className="tour-guides__grid grid-reveal">
-                                {homeGuides.map((guide) => (
-                                    <article key={guide.id} className="guide-card">
-                                        <div className="guide-card__photo">
-                                            <img src={guide.photos?.[0]?.url || park} alt={guide.name} width={640} height={480} loading="lazy" decoding="async" />
-                                            {guide.languages && guide.languages.length > 0 && (
-                                                <span className="guide-card__lang">{guide.languages.join(" / ")}</span>
-                                            )}
-                                        </div>
-                                        <div className="guide-card__body">
-                                            <h3 className="guide-card__name" title={guide.name}>{guide.name}</h3>
-                                            <span className="guide-card__specialty">Guia Turístico</span>
-                                            <p className="guide-card__desc">{guide.description}</p>
-                                        </div>
-                                    </article>
-                                ))}
-                            </div>
-                        )}
-                    </section>
-                </div>
-
-                {/* ── Como Chegar ── */}
-                <section className="como-chegar" aria-labelledby="como-chegar-title">
-                    <div className="como-chegar__banner" style={{ backgroundImage: `url(${park})` }}>
-                        <div className="como-chegar__banner-inner">
-                            <SectionHeader
-                                id="como-chegar-title"
-                                kicker="Planejando sua visita"
-                                title="Como Chegar"
-                                subtitle="Ubajara fica na Serra da Ibiapaba, acessível por diversas rotas aéreas e terrestres. Escolha seu ponto de partida e venha viver essa experiência única."
-                                cta={{ to: "/como-chegar", label: "Encontrar rotas até Ubajara", text: "Encontrar rotas" }}
-                                onDark
-                            />
-                        </div>
-                    </div>
-                    <div className="como-chegar__body">
-                        <div className="como-chegar__body-inner">
-                            <div className="como-chegar__transport grid-reveal">
-                                <div className="transport-card transport-card--air">
-                                    <div className="transport-card__icon-wrap"><span className="material-symbols-outlined" aria-hidden="true">flight</span></div>
-                                    <div className="transport-card__content">
-                                        <h3 className="transport-card__title">De Avião</h3>
-                                        <p className="transport-card__desc">Voe para os aeroportos mais próximos e complete a viagem por terra em menos de 3 horas de carro.</p>
-                                    </div>
-                                    <span className="transport-card__badge">A partir de 165&nbsp;km</span>
-                                </div>
-                                <div className="transport-card transport-card--bus">
-                                    <div className="transport-card__icon-wrap"><span className="material-symbols-outlined" aria-hidden="true">directions_bus</span></div>
-                                    <div className="transport-card__content">
-                                        <h3 className="transport-card__title">De Ônibus</h3>
-                                        <p className="transport-card__desc">Linhas regulares com saída de Fortaleza, Teresina e outras cidades da região.</p>
-                                    </div>
-                                    <span className="transport-card__badge">~6h de Fortaleza</span>
-                                </div>
-                                <div className="transport-card transport-card--car">
-                                    <div className="transport-card__icon-wrap"><span className="material-symbols-outlined" aria-hidden="true">directions_car</span></div>
-                                    <div className="transport-card__content">
-                                        <h3 className="transport-card__title">De Carro</h3>
-                                        <p className="transport-card__desc">Pela BR-222 e CE-187. Estrada totalmente asfaltada, sinalizada e com belas paisagens da serra.</p>
-                                    </div>
-                                    <span className="transport-card__badge">~5h de Fortaleza</span>
-                                </div>
-                            </div>
-                            <div className="como-chegar__airports-section">
-                                <h3 className="como-chegar__airports-title reveal">Aeroportos mais próximos</h3>
-                                <div className="como-chegar__airports grid-reveal">
-                                    {AIRPORTS.map((ap) => (
-                                        <div key={ap.code} className="airport-card">
-                                            <span className="airport-card__code">{ap.code}</span>
-                                            <p className="airport-card__name">{ap.name}</p>
-                                            <p className="airport-card__dist">{ap.dist}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
+                        <GuidesShowcase
+                            guides={failed.guides ? [] : homeGuides}
+                            loading={loading}
+                            fallback={<SectionState failed={failed.guides} emptyTitle="Nenhum guia cadastrado por enquanto." emptyIcon="hiking" onRetry={retryLoad} />}
+                        />
                     </div>
                 </section>
 
                 {/* ── Depoimentos ── */}
                 <div className="reviews-block torn-host">
-                    <TornDivider edge="top" fill="#002a27" />
+                    <TornDivider edge="top" fill="#003016" />
                     <section className="reviews" aria-labelledby="reviews-title">
                         <div className="reviews__inner">
                             <SectionHeader
@@ -768,45 +727,25 @@ export default function Content() {
                                 kicker="Quem já visitou recomenda"
                                 title="O que dizem os visitantes"
                                 subtitle="Experiências reais de quem já se encantou com as belezas de Ubajara."
-                                cta={{ to: "/depoimentos", label: "Ver todos os depoimentos" }}
+                                cta={{ to: "/depoimentos", label: "Ver todos os depoimentos", text: "Ver todos" }}
+                                ctaDesktopOnly
                                 onDark
                             />
                             {loading ? (
-                                <div className="reviews__grid">
-                                    {Array.from({ length: 3 }).map((_, i) => <ReviewSkeleton key={i} />)}
+                                <div className="tst-skeleton" aria-hidden="true">
+                                    <Skeleton className="tst-skeleton__card" radius={24} />
                                 </div>
-                            ) : failed.reviews || homeReviews.length === 0 ? (
-                                <SectionState failed={failed.reviews} emptyTitle="Ainda não há depoimentos publicados." emptyIcon="rate_review" emptyVariant="notice" onRetry={retryLoad} />
                             ) : (
-                                <div className="reviews__grid grid-reveal">
-                                    {homeReviews.map((r, i) => (
-                                        <article key={r.id} className="review-card">
-                                            <div className="review-card__stars" role="img" aria-label={`${r.rating} de 5 estrelas`}>
-                                                <span aria-hidden="true">{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</span>
-                                            </div>
-                                            <p className="review-card__text">“{r.comment}”</p>
-                                            <div className="review-card__author">
-                                                <img
-                                                    src={r.userPhoto || FALLBACK_AVATARS[i % FALLBACK_AVATARS.length]}
-                                                    alt={r.userName}
-                                                    className="review-card__avatar"
-                                                    width={42}
-                                                    height={42}
-                                                    loading="lazy"
-                                                    decoding="async"
-                                                />
-                                                <div className="review-card__info">
-                                                    <strong className="review-card__name">{r.userName}</strong>
-                                                    <span className="review-card__location">Visitante</span>
-                                                </div>
-                                            </div>
-                                        </article>
-                                    ))}
-                                </div>
+                                <TestimonialsShowcase
+                                    items={failed.reviews ? [] : homeReviews}
+                                    moreTo="/depoimentos"
+                                    moreLabel="Ver todos os depoimentos"
+                                    fallback={<SectionState failed={failed.reviews} emptyTitle="Ainda não há depoimentos publicados." emptyIcon="rate_review" emptyVariant="notice" onRetry={retryLoad} />}
+                                />
                             )}
                         </div>
                     </section>
-                    <TornDivider edge="bottom" fill="#002a27" />
+                    <TornDivider edge="bottom" fill="#003016" />
                 </div>
 
                 {/* ── FAQ ── */}

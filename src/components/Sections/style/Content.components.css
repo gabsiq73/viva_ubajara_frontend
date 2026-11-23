@@ -135,6 +135,25 @@ body {
         align-items: flex-start;
         gap: 16px;
     }
+
+    .sec-head--cta-desktop .sec-head__cta {
+        display: none;
+    }
+}
+
+/* Botão "ver todos" no fim da seção: só no celular */
+.sec-more {
+    display: none;
+}
+
+@media only screen and (max-width: 768px) {
+    .sec-more {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        min-height: 52px;
+        margin-top: 24px;
+    }
 }
 
 @keyframes slideUpFade {
@@ -434,13 +453,13 @@ ul.list-cards li#dormir { background: linear-gradient(145deg, #CD8700, #a96e00);
 ul.list-cards li#chegar { background: linear-gradient(145deg, #005225, #003016); }
 
 .point {
-    padding: 32px 0 var(--home-section-y);
+    padding: clamp(48px, 6vw, 80px) 0 calc(var(--home-section-y) + var(--torn-h));
     width: 100%;
     display: flex;
     justify-content: center;
     position: relative;
     top: 0;
-    margin-top: 8px;
+    margin-top: 0;
     box-sizing: border-box;
 }
 
@@ -459,8 +478,7 @@ div.news {
     margin-right: 0;
     margin-top: 0;
     margin-bottom: 0;
-    background: #C58B24;
-    background: linear-gradient(to bottom, #c58b24 0%, #a97318 40%, #9e6c14 60%, #c58b24 100%);
+    background: #a87219;
     padding: 0;
     box-sizing: border-box;
     position: relative;
@@ -481,183 +499,11 @@ div.news > * {
     z-index: 1;
 }
 
-div.news-inner {
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: clamp(36px, 5vw, 60px) var(--home-gutter) clamp(60px, 8vw, 100px);
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    gap: clamp(32px, 5vw, 64px);
-    align-items: center;
-    box-sizing: border-box;
-}
-
-div.caixa {
-    grid-column: 1;
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    border: none;
-    background: transparent;
-}
-
-div.text-n {
-    grid-column: 2;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-}
-
-div.text-n .text-n__kicker {
-    display: block;
-    font-family: "Caveat", cursive;
-    font-weight: 600;
-    font-size: var(--kicker-size);
-    line-height: 1.1;
-    color: rgba(255, 235, 160, 0.92);
-    margin: 0;
-}
-
-div.text-n .text-n__title {
-    font-family: "Nunito", sans-serif;
-    width: auto;
-    max-width: 100%;
-    height: auto;
-    font-weight: 900;
-    font-style: normal;
-    font-size: var(--section-title-size);
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-    color: #FFFFFF;
-    margin: 6px 0 0;
-    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.25);
-}
-
-div.protect ul {
-    display: flex;
-    list-style: none;
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    min-height: 0;
-    flex-wrap: wrap;
-    gap: 8px 10px;
-    margin: 16px 0 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-div.protect ul>li {
-    width: auto;
-    min-width: 0;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    border: none;
-    background: transparent;
-}
-
-div.protect .protect-chip {
-    display: block;
-    width: 100%;
-    cursor: pointer;
-    font: inherit;
-    border-radius: 9999px;
-    border: solid 1px #FFFFFF33;
-    padding: 8px 16px;
-    font-size: 14px;
-    line-height: 20px;
-    font-family: "Inter", sans-serif;
-    color: #FFFFFF;
-    font-weight: 500;
-    text-align: center;
-    background: #FFFFFF33;
-    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform var(--dur-press) var(--ease-out);
-}
-
-div.protect .protect-chip:active {
-    transform: scale(0.97);
-}
-
-div.protect .protect-chip.is-active {
-    background: #ffffff;
-    color: #006B32;
-    border-color: #ffffff;
+@media (hover: hover) and (pointer: fine) {
 }
 
 @media (hover: hover) and (pointer: fine) {
-    div.protect .protect-chip:hover:not(.is-active) {
-        background: rgba(255, 255, 255, 0.45);
-    }
 }
-
-div.desc p {
-    font-family: "Inter", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-    font-size: 18px;
-    line-height: 1.55;
-    vertical-align: middle;
-    color: #EDFFF2;
-}
-
-div.desc {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    min-height: 0;
-    padding: 20px 0 8px;
-}
-
-div.restaurant {
-    width: auto;
-    height: auto;
-    margin-top: 8px;
-    padding: 0;
-    border-radius: 0;
-    background-color: transparent;
-}
-
-div.restaurant a {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: auto;
-    height: auto;
-    margin: 0;
-    position: static;
-    top: auto;
-    padding: 12px 28px;
-    border-radius: 50px;
-    background-color: transparent;
-    border: 1.5px solid #ffffff;
-    box-shadow: none;
-    text-decoration: none;
-    font-family: "Inter", sans-serif;
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 1.25;
-    letter-spacing: 0.3px;
-    color: #ffffff;
-    transition: background-color 0.25s ease, color 0.25s ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    div.restaurant a:hover {
-        background-color: #ffffff;
-        color: #006B32;
-    }
-}
-
-div.restaurant a:active {
-    background-color: #ffffff;
-    color: #006B32;
-}
-
 
 @media only screen and (max-width: 1024px) {
     ul.list-cards {
@@ -675,13 +521,6 @@ div.restaurant a:active {
 }
 
 @media only screen and (max-width: 768px) {
-
-    div.news-inner {
-        grid-template-columns: 1fr;
-        height: auto;
-        padding: 32px var(--home-gutter) 44px;
-        gap: 28px;
-    }
 
     ul.list-cards {
         gap: 12px;
@@ -722,83 +561,8 @@ div.restaurant a:active {
     }
 
     .point {
-        padding: 18px 0 var(--home-section-y);
+        padding: 40px 0 calc(var(--home-section-y) + var(--torn-h));
         box-sizing: border-box;
-    }
-
-    div.text-n {
-        grid-column: 1;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        width: 100%;
-        margin: 0;
-    }
-
-    div.text-n .text-n__kicker,
-    div.text-n .text-n__title {
-        width: 100%;
-        text-align: center;
-    }
-
-    div.text-n .text-n__title {
-        margin-bottom: 12px;
-    }
-
-    div.caixa {
-        grid-column: 1;
-        width: 100%;
-        max-width: min(420px, 100%);
-        height: auto;
-        margin: 0 auto;
-    }
-
-    div.protect {
-        width: 100%;
-        justify-content: center;
-    }
-
-    div.protect ul {
-        width: 100%;
-        height: auto;
-        justify-content: center;
-    }
-
-    div.protect ul > li {
-        margin: 0;
-    }
-
-    div.protect .protect-chip {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 44px;
-        font-size: 13px;
-        padding: 0 16px;
-    }
-
-    div.desc {
-        width: 100%;
-        height: auto;
-        padding: 12px 0 4px;
-    }
-
-    div.desc p {
-        font-size: 14px;
-        text-align: center;
-    }
-
-    div.restaurant {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        margin-top: 12px;
-    }
-
-    div.restaurant a {
-        min-height: 44px;
-        padding: 0 24px;
-        font-size: 14px;
     }
 
 }
@@ -838,8 +602,8 @@ div.restaurant a:active {
 .pub-landing-blocks {
     display: flex;
     flex-direction: column;
-    gap: calc(var(--home-section-y) * 1.5);
-    padding: var(--home-section-y) 0;
+    gap: var(--band-y);
+    padding: calc(var(--band-y) + var(--torn-h)) 0 var(--band-y);
     box-sizing: border-box;
     background: #f4f9f6;
     width: 100%;
@@ -889,205 +653,6 @@ div.restaurant a:active {
     height: 100%;
 }
 
-/* ── Eventos ── */
-
-.pub-event-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    background: #ffffff;
-    border: 1px solid var(--ui-line);
-    border-radius: 14px;
-    transition: box-shadow var(--pub-transition), border-color var(--pub-transition);
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .pub-event-card:not(.pub-event-card--skeleton):hover {
-        border-color: var(--ui-line-strong);
-        box-shadow: var(--ui-card-shadow-hover);
-    }
-}
-
-.pub-event-card__media {
-    position: relative;
-    aspect-ratio: 4 / 3;
-    border-radius: 13px 13px 0 0;
-    background: var(--pub-green-pale);
-    overflow: hidden;
-}
-
-.pub-event-card__media img,
-.pub-event-card__placeholder {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.pub-event-card__media img {
-    transition: transform 250ms var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .pub-event-card:hover .pub-event-card__media img {
-        transform: scale(1.05);
-    }
-}
-
-.pub-event-card__date {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 1;
-    background: #a66b1f;
-    color: #ffffff;
-    border-radius: 12px;
-    padding: 8px 10px;
-    text-align: center;
-    line-height: 1.1;
-    min-width: 52px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.pub-event-card__date strong {
-    display: block;
-    font-family: "Nunito", sans-serif;
-    font-size: 20px;
-    font-weight: 800;
-}
-
-.pub-event-card__date span {
-    font-family: "Inter", sans-serif;
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-}
-
-.pub-event-card__body {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex: 1;
-    min-width: 0;
-    padding: 14px 16px 16px;
-}
-
-.pub-event-card__title {
-    margin: 0;
-    min-height: calc(1.3em * 2);
-    font-family: "Nunito", sans-serif;
-    font-weight: 800;
-    font-size: 17px;
-    line-height: 1.3;
-    color: #00210c;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    transition: color 0.2s ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .pub-event-card:hover .pub-event-card__title {
-        color: #006b32;
-    }
-}
-
-.pub-event-card__link {
-    color: inherit;
-    text-decoration: none;
-}
-
-.pub-event-card__link::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    border-radius: 14px;
-}
-
-.pub-event-card__link:focus-visible {
-    outline: none;
-}
-
-.pub-event-card__link:focus-visible::after {
-    outline: 3px solid var(--pub-green-mid);
-    outline-offset: 2px;
-}
-
-.pub-event-card__desc {
-    margin: 0;
-    min-height: calc(1.55em * 2);
-    font-family: "Inter", sans-serif;
-    font-size: 13px;
-    line-height: 1.55;
-    color: var(--ui-text-secondary);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.pub-event-card__loc {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-height: 20px;
-    font-family: "Inter", sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    color: #006b32;
-}
-
-.pub-event-card__loc .material-symbols-outlined {
-    flex-shrink: 0;
-    font-size: 18px;
-    font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
-}
-
-.pub-event-card__loc-text {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.pub-event-card__footer {
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
-    min-height: 46px;
-    margin-top: auto;
-    padding-top: 12px;
-    border-top: 1px solid var(--ui-line);
-}
-
-.pub-event-card__cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-family: "Nunito", sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    color: #006b32;
-}
-
-.pub-event-card__cta .material-symbols-outlined {
-    font-size: 16px;
-    font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 20;
-    transition: transform var(--dur-press) var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .pub-event-card:hover .pub-event-card__cta .material-symbols-outlined {
-        transform: translateX(3px);
-    }
-}
-
 @media only screen and (max-width: 1024px) {
     .pub-guide__grid,
     .pub-events__grid,
@@ -1112,255 +677,69 @@ div.restaurant a:active {
 }
 
 @media only screen and (max-width: 560px) {
-    .pub-guide__grid,
     .pub-events__grid,
     .tour-guides__grid {
         grid-template-columns: minmax(0, 1fr);
     }
 
-    .pub-guide__grid > :nth-child(n + 5) {
-        display: none;
-    }
-
     .pub-event-card__media,
-    .guide-card__photo,
-    .pub-guide__grid .ui-card__media {
+    .guide-card__photo {
         aspect-ratio: 16 / 10;
     }
 }
 
-
-.como-chegar {
-    padding: 0;
-    background: #f4f9f6;
-    overflow: hidden;
-}
-
-.como-chegar__banner {
-    background-color: #0a1a0f;
-    background-size: cover;
-    background-position: center 40%;
-    background-repeat: no-repeat;
-    padding: clamp(52px, 7vw, 96px) var(--home-gutter) clamp(88px, 13vw, 160px);
-    position: relative;
-    overflow: hidden;
-}
-
-.como-chegar__banner::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.42) 0%,
-        rgba(0, 0, 0, 0.72) 100%
-    );
-    pointer-events: none;
-}
-
-.como-chegar__banner-inner {
-    max-width: calc(1200px - var(--home-gutter) * 2);
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-}
-
-.como-chegar__banner-inner .sec-head {
-    margin-bottom: 0;
-}
-
-.como-chegar__body {
-    padding: 0 var(--home-gutter) clamp(48px, 6vw, 72px);
-    margin-top: clamp(-72px, -10vw, -100px);
-    position: relative;
-    z-index: 2;
-}
-
-.como-chegar__body-inner {
-    max-width: calc(1200px - var(--home-gutter) * 2);
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: clamp(32px, 4vw, 52px);
-    box-sizing: border-box;
-}
-
-.como-chegar__transport {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: clamp(16px, 2vw, 24px);
-}
-
-.transport-card {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: clamp(24px, 3vw, 36px) clamp(20px, 2.5vw, 28px);
-    box-shadow: 0 12px 40px rgba(0, 33, 12, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    border-top: 4px solid transparent;
-    transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .transport-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 52px rgba(0, 33, 12, 0.15);
-    }
-}
-
-.transport-card--air { border-top-color: #304fcd; }
-.transport-card--bus { border-top-color: #006b32; }
-.transport-card--car { border-top-color: #c58b24; }
-
-.transport-card__icon-wrap {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.transport-card--air .transport-card__icon-wrap { background: #eef0fc; color: #304fcd; }
-.transport-card--bus .transport-card__icon-wrap { background: #e8f5ef; color: #006b32; }
-.transport-card--car .transport-card__icon-wrap { background: #fdf4e6; color: #c58b24; }
-
-.transport-card__icon-wrap .material-symbols-outlined {
-    font-size: 26px;
-    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-}
-
-.transport-card__content { flex: 1; }
-
-.transport-card__title {
-    font-family: "Nunito", sans-serif;
-    font-weight: 800;
-    font-size: 19px;
-    color: #00210c;
-    margin: 0 0 8px;
-    line-height: 1.2;
-}
-
-.transport-card__desc {
-    font-family: "Inter", sans-serif;
-    font-size: 14px;
-    line-height: 1.65;
-    color: #5c6670;
-    margin: 0;
-}
-
-.transport-card__badge {
-    display: inline-flex;
-    align-items: center;
-    font-family: "Inter", sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 6px 14px;
-    border-radius: 50px;
-    align-self: flex-start;
-    letter-spacing: 0.02em;
-}
-
-.transport-card--air .transport-card__badge { background: #eef0fc; color: #304fcd; }
-.transport-card--bus .transport-card__badge { background: #e8f5ef; color: #006b32; }
-.transport-card--car .transport-card__badge { background: #fdf4e6; color: #a67520; }
-
-.como-chegar__airports-section {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(16px, 2.5vw, 24px);
-}
-
-.como-chegar__airports-title {
-    font-family: "Nunito", sans-serif;
-    font-weight: 800;
-    font-size: clamp(16px, 1.8vw, 20px);
-    color: #00210c;
-    margin: 0;
-    text-align: center;
-}
-
-.como-chegar__airports {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-}
-
-.airport-card {
-    background: #f0f7f3;
-    border-radius: 12px;
-    padding: 20px 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    border: 1px solid #d8ede2;
-    transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .airport-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 107, 50, 0.12);
-    }
-}
-
-.airport-card__code {
-    font-family: "Nunito", sans-serif;
-    font-weight: 900;
-    font-size: 36px;
-    color: #006b32;
-    line-height: 1;
-}
-
-.airport-card__name {
-    font-family: "Inter", sans-serif;
-    font-weight: 600;
-    font-size: 13px;
-    color: #00210c;
-    margin: 4px 0 0;
-    line-height: 1.3;
-}
-
-.airport-card__dist {
-    font-family: "Inter", sans-serif;
-    font-size: 13px;
-    color: #7a9080;
-    margin: 0;
-}
-
+/* Celular: o guia vira carrossel, com o próximo card aparecendo */
 @media only screen and (max-width: 768px) {
-    .como-chegar__banner {
-        padding-bottom: clamp(72px, 12vw, 100px);
+    .pub-guide__grid {
+        display: flex;
+        gap: 14px;
+        overflow-x: auto;
+        margin-inline: calc(var(--home-gutter) * -1);
+        padding: 4px var(--home-gutter) 6px;
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline: var(--home-gutter);
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
     }
 
-    .como-chegar__body {
-        padding: 0 16px clamp(40px, 6vw, 60px);
-        margin-top: clamp(-60px, -9vw, -80px);
+    .pub-guide__grid::-webkit-scrollbar {
+        display: none;
     }
 
-    .como-chegar__transport {
-        grid-template-columns: 1fr;
-        max-width: 480px;
-        margin: 0 auto;
-        width: 100%;
-    }
-
-    .como-chegar__airports {
-        grid-template-columns: repeat(2, 1fr);
+    .pub-guide__grid > * {
+        flex: 0 0 min(76%, 300px);
+        scroll-snap-align: start;
     }
 }
 
-@media only screen and (max-width: 480px) {
-    .airport-card__code { font-size: 28px; }
-    .como-chegar__transport { max-width: 100%; }
+/* Guia: chips verdes preenchidos quando selecionados */
+.pub-guide__filters .ui-chip {
+    height: 40px;
+    padding: 0 16px;
+    font-weight: 600;
+    color: #00210c;
+}
+
+.pub-guide__filters .ui-chip--on {
+    border-color: #006b32;
+    background: #006b32;
+    color: #ffffff;
+}
+
+.pub-guide__filters .ui-chip--on .ui-chip__count {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .pub-guide__filters .ui-chip--on:hover {
+        background: #005a2a;
+    }
 }
 
 .reviews {
-    background: #002a27;
-    padding: clamp(48px, 6vw, 80px) 0;
+    background: #003016;
+    padding: var(--band-y) 0;
 }
 
 .reviews__inner {
@@ -1370,194 +749,20 @@ div.restaurant a:active {
     box-sizing: border-box;
 }
 
-.reviews__grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    width: 100%;
-}
-
-.review-card {
-    background: #ffffff;
-    border-radius: 14px;
-    padding: 22px 20px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
-}
-
-.review-card__stars {
-    font-size: 18px;
-    color: #ffb527;
-    letter-spacing: 1px;
-}
-
-.review-card__text {
-    font-family: "Inter", sans-serif;
-    font-size: 14px;
-    line-height: 1.6;
-    color: #3c4a42;
-    margin: 0;
-    flex: 1;
-}
-
-.review-card__author {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 4px;
-}
-
-.review-card__avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-    border: 2px solid #e8f5ef;
-}
-
-.review-card__info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.review-card__name {
-    font-family: "Nunito", sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    color: #00210c;
-}
-
-.review-card__location {
-    font-family: "Inter", sans-serif;
-    font-size: 12px;
-    color: #7a9080;
-}
-
 @media only screen and (max-width: 768px) {
     .reviews__inner {
         padding: 24px 16px 48px;
     }
-
-    .reviews__grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
 }
 
 @media only screen and (max-width: 480px) {
-    .reviews__grid {
-        grid-template-columns: 1fr;
-    }
     .reviews__inner {
         padding: 24px 16px 48px;
     }
 }
 
-.tour-guides-wrap {
-    background: #ffffff;
-    padding: var(--home-section-y) 0;
-    width: 100%;
-}
-
-.guide-card {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    background: #ffffff;
-    border: 1px solid var(--ui-line);
-    border-radius: 14px;
-}
-
-.guide-card__photo {
-    position: relative;
-    aspect-ratio: 4 / 3;
-    border-radius: 13px 13px 0 0;
-    background: var(--pub-green-pale);
-    overflow: hidden;
-}
-
-.guide-card__photo img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.guide-card__lang {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    max-width: calc(100% - 20px);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    box-sizing: border-box;
-    background: rgba(0, 107, 50, 0.9);
-    color: #ffffff;
-    font-family: "Inter", sans-serif;
-    font-size: var(--fs-xs);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    padding: 5px 10px;
-    border-radius: 20px;
-    line-height: 1.2;
-}
-
-.guide-card__body {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex: 1;
-    min-width: 0;
-    padding: 14px 16px 16px;
-}
-
-.guide-card__name {
-    margin: 0;
-    min-height: 1.25em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-family: "Nunito", sans-serif;
-    font-weight: 800;
-    font-size: 17px;
-    line-height: 1.25;
-    color: #00210c;
-}
-
-.guide-card__specialty {
-    display: block;
-    min-height: 16px;
-    font-family: "Inter", sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 16px;
-    color: #006b32;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-}
-
-.guide-card__desc {
-    margin: 4px 0 0;
-    min-height: calc(1.6em * 3);
-    font-family: "Inter", sans-serif;
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--ui-text-secondary);
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-
 .faq {
-    padding: clamp(48px, 6vw, 88px) 0 clamp(40px, 5vw, 72px);
+    padding: calc(var(--band-y) + var(--torn-h)) 0 var(--band-y);
     background: #f4f9f6;
 }
 
@@ -1586,24 +791,26 @@ div.restaurant a:active {
 .faq__kicker {
     font-family: "Caveat", cursive;
     font-size: var(--kicker-size);
-    color: #2d8a54;
+    font-weight: 600;
+    color: #006b32;
     display: block;
     line-height: 1.1;
 }
 
 .faq__title {
     font-family: "Nunito", sans-serif;
-    font-weight: 900;
+    font-weight: var(--fw-heading);
     font-size: var(--section-title-size);
     color: #00210c;
     margin: 0;
-    line-height: 1.15;
+    letter-spacing: -0.01em;
+    line-height: var(--lh-h2);
 }
 
 .faq__lede {
     font-family: "Inter", sans-serif;
-    font-size: 15px;
-    line-height: 1.65;
+    font-size: clamp(14px, 1.5vw, 16px);
+    line-height: 1.55;
     color: #5c6670;
     margin: 0;
 }
@@ -1851,18 +1058,20 @@ div.restaurant a:active {
 .contact-section__kicker {
     font-family: "Caveat", cursive;
     font-size: var(--kicker-size);
-    color: #2d8a54;
+    font-weight: 600;
+    color: #006b32;
     display: block;
     line-height: 1.1;
 }
 
 .contact-section__title {
     font-family: "Nunito", sans-serif;
-    font-weight: 900;
+    font-weight: var(--fw-heading);
     font-size: var(--section-title-size);
     color: #00210c;
     margin: 0;
-    line-height: 1.15;
+    letter-spacing: -0.01em;
+    line-height: var(--lh-h2);
 }
 
 .contact-section__desc {
@@ -2061,8 +1270,8 @@ div.restaurant a:active {
         grid-column: 1;
         grid-row: 1;
         position: static;
-        align-items: center;
-        text-align: center;
+        align-items: flex-start;
+        text-align: left;
         margin-bottom: 12px;
     }
 
@@ -2114,7 +1323,6 @@ div.restaurant a:active {
     }
 }
 /* ── Números tabulares ── */
-.pub-event-card__date strong,
 .transport-card__badge,
 .airport-card__dist {
     font-variant-numeric: tabular-nums;
@@ -2122,4 +1330,10 @@ div.restaurant a:active {
 
 .reviews__inner > .ui-state {
     margin-bottom: 32px;
+}
+
+@media (max-width: 768px) {
+    div.paper {
+        display: none;
+    }
 }

@@ -1,0 +1,291 @@
+/* ── Pontos turísticos da home: filtros + cards com foto em cima e texto embaixo ── */
+
+.pts-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 clamp(20px, 2.4vw, 32px);
+}
+
+.pts-filters .ui-chip {
+    height: 40px;
+    padding: 0 18px;
+    font-weight: 600;
+    color: #00210c;
+}
+
+.pts-filters .ui-chip--on {
+    border-color: #003016;
+    background: #003016;
+    color: #ffffff;
+}
+
+.pts-filters .ui-chip--on .ui-chip__count {
+    color: rgba(255, 255, 255, 0.78);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .pts-filters .ui-chip--on:hover {
+        background: #004a22;
+    }
+}
+
+.pts-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(16px, 2vw, 24px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pts-grid > li {
+    min-width: 0;
+    animation: pts-in 240ms var(--ease-out) backwards;
+}
+
+.pts-grid > li:nth-child(2) { animation-delay: 40ms; }
+.pts-grid > li:nth-child(3) { animation-delay: 80ms; }
+.pts-grid > li:nth-child(4) { animation-delay: 120ms; }
+
+@keyframes pts-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+}
+
+.pts-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+}
+
+.pts-card__media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #dcebe2;
+    box-shadow: 0 2px 10px rgba(0, 33, 12, 0.08);
+}
+
+.pts-card__img,
+.pts-card__placeholder {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.pts-card__img {
+    object-fit: cover;
+    transition: transform 300ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .pts-card:hover .pts-card__img {
+        transform: scale(1.04);
+    }
+}
+
+.pts-card__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, var(--pub-green-mid) 0%, var(--pub-green) 45%, var(--pub-green-dark) 100%);
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.pts-card__placeholder .ui-icon {
+    font-size: 64px;
+    font-variation-settings: "FILL" 0, "wght" 300;
+}
+
+.pts-card__tag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 1;
+}
+
+.pts-card__fav {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 3;
+}
+
+.pts-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.pts-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    line-height: 1.3;
+    color: #5c6670;
+}
+
+.pts-card__meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pts-card__meta-item + .pts-card__meta-item::before {
+    content: "";
+    width: 3px;
+    height: 3px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.6;
+}
+
+.pts-card__meta .ui-icon {
+    font-size: 16px;
+}
+
+.pts-card__title {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-family: "Nunito", sans-serif;
+    font-weight: 800;
+    font-size: clamp(19px, 1.8vw, 22px);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #00210c;
+}
+
+.pts-card__link {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* O link do título cobre o card todo; o favorito fica acima (z-index 3). */
+.pts-card__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: 16px;
+}
+
+.pts-card__link:focus-visible {
+    outline: none;
+}
+
+.pts-card__link:focus-visible::after {
+    outline: 3px solid #2d8a54;
+    outline-offset: 3px;
+}
+
+.pts-card__desc {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #5c6670;
+}
+
+.pts-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    font-family: "Nunito", sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: #003016;
+}
+
+.pts-card__cta .ui-icon {
+    font-size: 18px;
+    transition: transform var(--dur-press) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .pts-card:hover .pts-card__cta .ui-icon {
+        transform: translateX(3px);
+    }
+}
+
+.pts-card--skeleton .pts-card__skeleton-media {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+}
+
+/* Tablet: 2 colunas */
+@media (max-width: 1099px) and (min-width: 769px) {
+    .pts-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Celular: carrossel com o próximo card aparecendo, botão "ver todos" embaixo */
+@media (max-width: 768px) {
+    .pts-filters {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        margin-inline: calc(var(--home-gutter) * -1);
+        padding-inline: var(--home-gutter);
+        scroll-padding-inline: var(--home-gutter);
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .pts-filters::-webkit-scrollbar {
+        display: none;
+    }
+
+    .pts-grid {
+        display: flex;
+        gap: 14px;
+        overflow-x: auto;
+        margin-inline: calc(var(--home-gutter) * -1);
+        padding-inline: var(--home-gutter);
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline: var(--home-gutter);
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .pts-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .pts-grid > li {
+        flex: 0 0 min(76%, 300px);
+        scroll-snap-align: start;
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pts-grid > li {
+        animation: none;
+    }
+}
