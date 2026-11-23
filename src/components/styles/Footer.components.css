@@ -255,7 +255,7 @@
     height: 46px;
     padding: 0 24px;
     border-radius: 50px;
-    background: #f4b928;
+    background: #f2c14e;
     color: #1a1200;
     font-family: "Inter", sans-serif;
     font-size: 15px;
@@ -276,7 +276,7 @@
 
 @media (hover: hover) and (pointer: fine) {
     .site-footer__business-btn:hover {
-        background: #ffc93f;
+        background: #ffd36b;
     }
 
     .site-footer__business-btn:hover .ui-icon {

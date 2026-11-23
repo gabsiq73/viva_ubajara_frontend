@@ -18,7 +18,7 @@
     min-height: 500px;
     border-radius: 24px;
     overflow: hidden;
-    background: #0b6b3a;
+    background: #006b32;
 }
 
 .tst__mark {
@@ -89,7 +89,7 @@
     border-radius: 50%;
     object-fit: cover;
     background: #dfe9e2;
-    color: #0b6b3a;
+    color: #006b32;
 }
 
 .tst__avatar {

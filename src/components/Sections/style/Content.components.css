@@ -602,8 +602,8 @@ div.news > * {
 .pub-landing-blocks {
     display: flex;
     flex-direction: column;
-    gap: calc(var(--home-section-y) * 1.5);
-    padding: calc(var(--home-section-y) + var(--torn-h)) 0 var(--home-section-y);
+    gap: var(--band-y);
+    padding: calc(var(--band-y) + var(--torn-h)) 0 var(--band-y);
     box-sizing: border-box;
     background: #f4f9f6;
     width: 100%;
@@ -738,8 +738,8 @@ div.news > * {
 }
 
 .reviews {
-    background: #002f14;
-    padding: clamp(64px, 8vw, 112px) 0;
+    background: #003016;
+    padding: var(--band-y) 0;
 }
 
 .reviews__inner {
@@ -762,7 +762,7 @@ div.news > * {
 }
 
 .faq {
-    padding: calc(clamp(48px, 6vw, 88px) + var(--torn-h)) 0 clamp(40px, 5vw, 72px);
+    padding: calc(var(--band-y) + var(--torn-h)) 0 var(--band-y);
     background: #f4f9f6;
 }
 
@@ -791,24 +791,26 @@ div.news > * {
 .faq__kicker {
     font-family: "Caveat", cursive;
     font-size: var(--kicker-size);
-    color: #2d8a54;
+    font-weight: 600;
+    color: #006b32;
     display: block;
     line-height: 1.1;
 }
 
 .faq__title {
     font-family: "Nunito", sans-serif;
-    font-weight: 900;
+    font-weight: var(--fw-heading);
     font-size: var(--section-title-size);
     color: #00210c;
     margin: 0;
-    line-height: 1.15;
+    letter-spacing: -0.01em;
+    line-height: var(--lh-h2);
 }
 
 .faq__lede {
     font-family: "Inter", sans-serif;
-    font-size: 15px;
-    line-height: 1.65;
+    font-size: clamp(14px, 1.5vw, 16px);
+    line-height: 1.55;
     color: #5c6670;
     margin: 0;
 }
@@ -1056,18 +1058,20 @@ div.news > * {
 .contact-section__kicker {
     font-family: "Caveat", cursive;
     font-size: var(--kicker-size);
-    color: #2d8a54;
+    font-weight: 600;
+    color: #006b32;
     display: block;
     line-height: 1.1;
 }
 
 .contact-section__title {
     font-family: "Nunito", sans-serif;
-    font-weight: 900;
+    font-weight: var(--fw-heading);
     font-size: var(--section-title-size);
     color: #00210c;
     margin: 0;
-    line-height: 1.15;
+    letter-spacing: -0.01em;
+    line-height: var(--lh-h2);
 }
 
 .contact-section__desc {
@@ -1266,8 +1270,8 @@ div.news > * {
         grid-column: 1;
         grid-row: 1;
         position: static;
-        align-items: center;
-        text-align: center;
+        align-items: flex-start;
+        text-align: left;
         margin-bottom: 12px;
     }
 

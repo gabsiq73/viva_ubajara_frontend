@@ -9,7 +9,7 @@
 .arrival__inner {
     max-width: 1200px;
     margin: 0 auto;
-    padding: calc(var(--home-section-y) * 1.5) var(--home-gutter);
+    padding: var(--band-y) var(--home-gutter);
     box-sizing: border-box;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -50,7 +50,7 @@
     left: 21px;
     top: 48px;
     bottom: -16px;
-    border-left: 2px dashed rgba(244, 185, 40, 0.45);
+    border-left: 2px dashed rgba(242, 193, 78, 0.45);
 }
 
 .arrival__step-icon {
@@ -62,7 +62,7 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: #f4b928;
+    background: #f2c14e;
     color: #1a1200;
 }
 
@@ -100,7 +100,7 @@
     font-family: "Inter", sans-serif;
     font-size: 12.5px;
     font-weight: 700;
-    color: #f4b928;
+    color: #f2c14e;
 }
 
 .arrival__card-desc {
@@ -332,7 +332,7 @@
     }
 
     .arrival__airports-title {
-        color: #f4b928;
+        color: #f2c14e;
     }
 
     .arrival__map-link--text {
@@ -356,7 +356,7 @@
         height: 52px;
         margin-top: 20px;
         border-radius: 50px;
-        background: #f4b928;
+        background: #f2c14e;
         color: #1a1200;
         font-size: 16px;
     }

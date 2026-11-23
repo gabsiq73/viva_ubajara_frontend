@@ -719,7 +719,7 @@ export default function Content() {
 
                 {/* ── Depoimentos ── */}
                 <div className="reviews-block torn-host">
-                    <TornDivider edge="top" fill="#002f14" />
+                    <TornDivider edge="top" fill="#003016" />
                     <section className="reviews" aria-labelledby="reviews-title">
                         <div className="reviews__inner">
                             <SectionHeader
@@ -745,7 +745,7 @@ export default function Content() {
                             )}
                         </div>
                     </section>
-                    <TornDivider edge="bottom" fill="#002f14" />
+                    <TornDivider edge="bottom" fill="#003016" />
                 </div>
 
                 {/* ── FAQ ── */}

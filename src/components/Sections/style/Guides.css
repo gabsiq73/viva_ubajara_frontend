@@ -3,7 +3,7 @@
 section.tour-guides {
     max-width: none;
     margin: 0;
-    padding: calc(var(--home-section-y) * 1.5) 0;
+    padding: var(--band-y) 0;
     background: #f3f7f4;
 }
 
@@ -101,7 +101,7 @@ section.tour-guides {
     padding: 0 10px;
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.95);
-    color: #0f2a1a;
+    color: #00210c;
     font-family: "Inter", sans-serif;
     font-size: 12px;
     font-weight: 700;
@@ -109,7 +109,7 @@ section.tour-guides {
 
 .guide-card__langs .ui-icon {
     font-size: 15px;
-    color: #0b6b3a;
+    color: #006b32;
 }
 
 .guide-card__body {
@@ -132,7 +132,7 @@ section.tour-guides {
     font-size: 21px;
     font-weight: 800;
     line-height: 1.2;
-    color: #0f2a1a;
+    color: #00210c;
 }
 
 .guide-card__role {
@@ -140,11 +140,11 @@ section.tour-guides {
     align-items: center;
     gap: 6px;
     font-family: "Inter", sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 800;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #0b6b3a;
+    color: #006b32;
 }
 
 .guide-card__role .ui-icon {
@@ -161,7 +161,7 @@ section.tour-guides {
     font-family: "Inter", sans-serif;
     font-size: 14px;
     line-height: 1.55;
-    color: #4f6357;
+    color: #5c6670;
 }
 
 .guide-card__foot {
@@ -173,7 +173,7 @@ section.tour-guides {
     margin-top: auto;
     padding-top: 14px;
     border-top: 1px solid #e9f0eb;
-    color: #0b6b3a;
+    color: #006b32;
     font-family: "Inter", sans-serif;
     font-size: 14px;
     font-weight: 700;
@@ -197,7 +197,7 @@ section.tour-guides {
 
 @media (hover: hover) and (pointer: fine) {
     .guide-card__foot:hover .guide-card__go {
-        background: #0b6b3a;
+        background: #006b32;
         color: #ffffff;
     }
 }

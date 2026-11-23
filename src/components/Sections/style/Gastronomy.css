@@ -6,7 +6,7 @@
     --gastro-gold-text: #ffe3a3;
     max-width: 1200px;
     margin: 0 auto;
-    padding: clamp(56px, 8vw, 112px) var(--home-gutter);
+    padding: var(--band-y) var(--home-gutter);
     box-sizing: border-box;
     display: grid;
     grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
@@ -97,7 +97,7 @@
     padding: 0 16px;
     border-radius: 19px;
     background: #ffffff;
-    color: #0f2a1a;
+    color: #00210c;
     font-family: "Inter", sans-serif;
     font-size: 13px;
     font-weight: 800;
@@ -130,7 +130,7 @@
     border: 0;
     border-radius: 50%;
     background: #ffffff;
-    color: #0f2a1a;
+    color: #00210c;
     cursor: pointer;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
     transition: background-color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
@@ -291,7 +291,7 @@
     padding: 0 28px;
     border-radius: 28px;
     background: #ffffff;
-    color: #0b6b3a;
+    color: #006b32;
     font-family: "Inter", sans-serif;
     font-size: 16px;
     font-weight: 800;
