@@ -1490,13 +1490,71 @@
 @media (max-width: 639px) {
     .ui-point-grid:not(.ui-point-grid--3),
     .ui-point-grid--3 {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 16px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
     }
 
     .ui-point-grid:not(.ui-point-grid--3) .ui-point,
     .ui-point-grid--3 .ui-point {
-        max-height: 420px;
+        aspect-ratio: 3 / 4;
+        max-height: none;
+        border-radius: 12px;
+    }
+
+    .ui-point__link::after {
+        border-radius: 12px;
+    }
+
+    .ui-point__tag {
+        top: 8px;
+        left: 8px;
+    }
+
+    .ui-point__body {
+        gap: 6px;
+        padding: 0 12px 12px;
+    }
+
+    .ui-point__title {
+        font-size: 15px;
+        line-height: 1.2;
+    }
+
+    .ui-point__desc {
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .ui-point__foot {
+        gap: 6px;
+        min-height: 24px;
+        margin-top: 2px;
+    }
+
+    .ui-point__chips {
+        gap: 4px;
+    }
+
+    .ui-point__chip {
+        height: 24px;
+        padding: 0 8px;
+        font-size: 11px;
+    }
+
+    .ui-point__chip .ui-icon {
+        font-size: 13px;
+    }
+
+    .ui-point__cta {
+        font-size: 0;
+    }
+
+    .ui-point__cta .ui-icon {
+        font-size: 18px;
+    }
+
+    .ui-point__placeholder .ui-icon {
+        font-size: 48px;
     }
 }
 
