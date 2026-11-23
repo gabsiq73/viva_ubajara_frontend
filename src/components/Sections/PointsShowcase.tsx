@@ -161,7 +161,7 @@ export default function PointsShowcase({ items, loading, fallback, favoriteIds, 
                     </li>
                 ))}
             </ul>
-            <Link to={moreTo} className="sec-head__cta pts-more">
+            <Link to={moreTo} className="sec-head__cta sec-more">
                 {moreLabel}
                 <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
             </Link>

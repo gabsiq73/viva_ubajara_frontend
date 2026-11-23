@@ -11,6 +11,8 @@ interface EstablishmentCardProps {
     view?: "grid" | "list";
     favorite: boolean;
     onToggleFavorite: (item: Establishment) => void;
+    /** "showcase": versão da home, com endereço, preço em destaque e botão de seta. */
+    variant?: "default" | "showcase";
 }
 
 function Media({ item }: { item: Establishment }) {
@@ -24,7 +26,7 @@ function Media({ item }: { item: Establishment }) {
     );
 }
 
-export default function EstablishmentCard({ item, view = "grid", favorite, onToggleFavorite }: EstablishmentCardProps) {
+export default function EstablishmentCard({ item, view = "grid", favorite, onToggleFavorite, variant = "default" }: EstablishmentCardProps) {
     const detail = item.type === "Restaurante" ? item.cuisine : roomsLabel(item.numOfRooms);
     const path = establishmentPath(item);
     const fav = (
@@ -86,6 +88,51 @@ export default function EstablishmentCard({ item, view = "grid", favorite, onTog
 
     const subtitle = [detail, item.neighborhood].filter(Boolean).join(" · ");
     const price = shortPrice(item.avgPrice);
+
+    if (variant === "showcase") {
+        const place = item.address || item.neighborhood;
+        const priceParts = price.match(/^(.*?)(\s\/\s.+)$/);
+        return (
+            <article className="ui-card ui-card--showcase">
+                <div className="ui-card__media">
+                    <Media item={item} />
+                    <Badge variant="tag" className="ui-card__tag">
+                        {item.type}
+                    </Badge>
+                    {fav}
+                </div>
+                <div className="ui-card__body">
+                    <div className="ui-card__head">
+                        <h3 className="ui-card__name">
+                            <Link to={path} className="ui-card__link" title={item.name}>
+                                {item.name}
+                            </Link>
+                        </h3>
+                        {item.rating !== null && <Rating value={item.rating} count={item.reviewCount} />}
+                    </div>
+                    {detail && <p className="ui-card__cuisine" title={detail}>{detail}</p>}
+                    {place && (
+                        <p className="ui-card__place" title={place}>
+                            <Icon name="location_on" />
+                            <span>{place}</span>
+                        </p>
+                    )}
+                    <div className="ui-card__foot">
+                        {price ? (
+                            <p className="ui-card__price-line" title={price}>
+                                <strong>{priceParts ? priceParts[1] : price}</strong>
+                                {priceParts && <span>{priceParts[2]}</span>}
+                            </p>
+                        ) : <span />}
+                        <span className="ui-card__go" aria-hidden="true">
+                            <Icon name="arrow_forward" />
+                        </span>
+                    </div>
+                </div>
+            </article>
+        );
+    }
+
     return (
         <article className="ui-card">
             <div className="ui-card__media">

@@ -237,10 +237,6 @@
     aspect-ratio: 4 / 5;
 }
 
-.pts-more {
-    display: none;
-}
-
 /* Tablet: 2 colunas */
 @media (max-width: 1099px) and (min-width: 769px) {
     .pts-grid {
@@ -286,13 +282,6 @@
         scroll-snap-align: start;
     }
 
-    .pts-more {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        margin-top: 24px;
-        min-height: 52px;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {

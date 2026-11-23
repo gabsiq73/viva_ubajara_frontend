@@ -1764,3 +1764,124 @@
 .ui-point__chip {
     font-variant-numeric: tabular-nums;
 }
+
+/* ── Card de estabelecimento (versão da home) ── */
+.ui-card--showcase {
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0, 33, 12, 0.06);
+}
+
+.ui-card--showcase .ui-card__media {
+    border-radius: 15px 15px 0 0;
+}
+
+.ui-card--showcase .ui-card__body {
+    flex: 1;
+    gap: 6px;
+    padding: 16px 18px 18px;
+}
+
+.ui-card--showcase .ui-card__name {
+    font-weight: 800;
+    font-size: 18px;
+}
+
+.ui-card__cuisine {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: "Inter", sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--pub-green);
+}
+
+.ui-card__place {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    color: var(--ui-text-secondary);
+}
+
+.ui-card__place .ui-icon {
+    flex-shrink: 0;
+    font-size: 16px;
+}
+
+.ui-card__place span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ui-card__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid var(--ui-line);
+}
+
+.ui-card--showcase .ui-card__body > .ui-card__place + .ui-card__foot,
+.ui-card--showcase .ui-card__body > .ui-card__cuisine + .ui-card__foot,
+.ui-card--showcase .ui-card__head + .ui-card__foot {
+    margin-top: 10px;
+}
+
+.ui-card--showcase .ui-card__body {
+    justify-content: flex-start;
+}
+
+.ui-card--showcase .ui-card__foot {
+    margin-top: auto;
+}
+
+.ui-card__price-line {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    color: var(--ui-text-secondary);
+}
+
+.ui-card__price-line strong {
+    font-family: "Nunito", sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--pub-text);
+}
+
+.ui-card__go {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--pub-green-pale);
+    color: var(--pub-green);
+    transition: background-color var(--dur-hover) ease, color var(--dur-hover) ease;
+}
+
+.ui-card__go .ui-icon {
+    font-size: 18px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ui-card--showcase:hover .ui-card__go {
+        background: var(--pub-green);
+        color: #ffffff;
+    }
+}

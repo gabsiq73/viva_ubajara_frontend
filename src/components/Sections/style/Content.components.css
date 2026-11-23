@@ -141,6 +141,21 @@ body {
     }
 }
 
+/* Botão "ver todos" no fim da seção: só no celular */
+.sec-more {
+    display: none;
+}
+
+@media only screen and (max-width: 768px) {
+    .sec-more {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        min-height: 52px;
+        margin-top: 24px;
+    }
+}
+
 @keyframes slideUpFade {
     from {
         opacity: 0;
@@ -1116,20 +1131,63 @@ div.restaurant a:active {
 }
 
 @media only screen and (max-width: 560px) {
-    .pub-guide__grid,
     .pub-events__grid,
     .tour-guides__grid {
         grid-template-columns: minmax(0, 1fr);
     }
 
-    .pub-guide__grid > :nth-child(n + 5) {
+    .pub-event-card__media,
+    .guide-card__photo {
+        aspect-ratio: 16 / 10;
+    }
+}
+
+/* Celular: o guia vira carrossel, com o próximo card aparecendo */
+@media only screen and (max-width: 768px) {
+    .pub-guide__grid {
+        display: flex;
+        gap: 14px;
+        overflow-x: auto;
+        margin-inline: calc(var(--home-gutter) * -1);
+        padding: 4px var(--home-gutter) 6px;
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline: var(--home-gutter);
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .pub-guide__grid::-webkit-scrollbar {
         display: none;
     }
 
-    .pub-event-card__media,
-    .guide-card__photo,
-    .pub-guide__grid .ui-card__media {
-        aspect-ratio: 16 / 10;
+    .pub-guide__grid > * {
+        flex: 0 0 min(76%, 300px);
+        scroll-snap-align: start;
+    }
+}
+
+/* Guia: chips verdes preenchidos quando selecionados */
+.pub-guide__filters .ui-chip {
+    height: 40px;
+    padding: 0 16px;
+    font-weight: 600;
+    color: #00210c;
+}
+
+.pub-guide__filters .ui-chip--on {
+    border-color: #006b32;
+    background: #006b32;
+    color: #ffffff;
+}
+
+.pub-guide__filters .ui-chip--on .ui-chip__count {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .pub-guide__filters .ui-chip--on:hover {
+        background: #005a2a;
     }
 }
 

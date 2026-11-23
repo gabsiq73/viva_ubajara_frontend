@@ -35,10 +35,12 @@ import PointsShowcase from "./PointsShowcase";
 import { Skeleton, EstablishmentCardSkeleton } from "../ui/Skeleton";
 import {
     ESTABLISHMENT_TYPES,
+    TYPE_ICONS,
     mapHostPoint,
     mapRestaurant,
     toFavoriteItem,
     type Establishment,
+    type EstablishmentType,
 } from "../../utils/establishments";
 import { loadFavorites, toggleFavorite } from "../../utils/favorites";
 import "../ui/ui.css";
@@ -256,6 +258,13 @@ function SectionState({ failed, emptyTitle, emptyIcon, emptyVariant = "empty", o
 }
 
 const PUB_LIMIT = 8;
+const PUB_FILTER_LABELS: Record<string, string> = {
+    Todos: "Todos",
+    Restaurante: "Restaurantes",
+    Hotel: "Hotéis",
+    Pousada: "Pousadas",
+    Hostel: "Hostels",
+};
 const GRID_REVEAL_MS = 900;
 
 function pickPubItems(items: Establishment[], filter: string): Establishment[] {
@@ -578,6 +587,7 @@ export default function Content() {
                             title="Guia de Estabelecimentos"
                             subtitle="Os melhores lugares para comer, dormir e viver momentos inesquecíveis em nossa cidade."
                             cta={{ to: "/estabelecimentos", label: "Ver todos os estabelecimentos" }}
+                            ctaDesktopOnly
                         />
                         {loading ? (
                             <>
@@ -598,7 +608,9 @@ export default function Content() {
                                     {pubCategories.map((label) => (
                                         <FilterChip
                                             key={label}
-                                            label={label}
+                                            label={PUB_FILTER_LABELS[label] ?? label}
+                                            icon={label === "Todos" ? "grid_view" : TYPE_ICONS[label as EstablishmentType]}
+                                            count={label === "Todos" ? pubItems.length : pubItems.filter((i) => i.type === label).length}
                                             selected={pubGuideFilter === label}
                                             onClick={() => setPubGuideFilter(label)}
                                         />
@@ -609,11 +621,16 @@ export default function Content() {
                                         <EstablishmentCard
                                             key={`${item.apiType}-${item.id}`}
                                             item={item}
+                                            variant="showcase"
                                             favorite={favoriteIds.has(item.id)}
                                             onToggleFavorite={handleToggleFavorite}
                                         />
                                     ))}
                                 </div>
+                                <Link to="/estabelecimentos" className="sec-head__cta sec-more">
+                                    Ver todos
+                                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                                </Link>
                             </>
                         )}
                     </section>
