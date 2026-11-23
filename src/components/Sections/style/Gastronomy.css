@@ -374,8 +374,9 @@
     }
 
     .gastro__tabs {
+        position: relative;
         display: flex;
-        gap: 16px;
+        gap: 14px;
         margin-inline: calc(var(--home-gutter) * -1);
         padding-inline: var(--home-gutter);
         overflow-x: auto;
@@ -387,8 +388,17 @@
     }
 
     .gastro__tab {
-        flex: 0 0 92px;
-        font-size: 13px;
+        flex: 0 0 auto;
+        min-width: 84px;
+        max-width: 132px;
+        gap: 12px;
+        padding-bottom: 4px;
+        font-size: 14px;
+    }
+
+    .gastro__tab-name {
+        display: block;
+        overflow-wrap: anywhere;
     }
 
     .gastro__dish {

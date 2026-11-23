@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import "./style/Gastronomy.css";
 
@@ -48,6 +48,16 @@ export function GastronomyShowcase({ slides, activeIndex, onActiveChange, paused
         const id = window.setTimeout(() => setTrack((t) => ({ ...t, reset: null })), 40);
         return () => window.clearTimeout(id);
     }, [track.reset]);
+
+    // No celular as abas rolam: mantém a aba ativa centralizada (só rola a faixa, nunca a página).
+    const tabsRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const list = tabsRef.current;
+        const tab = list?.children[index] as HTMLElement | undefined;
+        if (!list || !tab || list.scrollWidth <= list.clientWidth) return;
+        const left = tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2;
+        list.scrollTo({ left: Math.max(0, left), behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    }, [index]);
 
     if (n === 0) return null;
 
@@ -114,7 +124,7 @@ export function GastronomyShowcase({ slides, activeIndex, onActiveChange, paused
                 </div>
 
                 {n > 1 && (
-                    <div className="gastro__tabs" role="tablist" aria-label="Pratos" onKeyDown={handleTabsKeyDown}>
+                    <div ref={tabsRef} className="gastro__tabs" role="tablist" aria-label="Pratos" onKeyDown={handleTabsKeyDown}>
                         {slides.map((slide, i) => (
                             <button
                                 key={slide.tag}
