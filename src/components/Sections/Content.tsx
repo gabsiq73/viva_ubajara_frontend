@@ -1,5 +1,6 @@
 import "./style/Content.components.css"
 import "./style/Arrival.css"
+import "./style/Gastronomy.css"
 import { AgendaItem, AgendaSkeleton } from "./AgendaItem";
 import { Link } from "react-router-dom"
 import { useEffect, useState, useMemo, useRef, type KeyboardEvent, type ReactNode } from "react"
@@ -12,7 +13,7 @@ import fazendaAvatar from "./../../assets/images/fazenda-avatar.webp";
 import mercado from "./../../assets/images/mercado.webp";
 import mercadoAvatar from "./../../assets/images/mercado-avatar.webp";
 import museum from "./../../assets/images/museu.webp";
-import { GastronomyCarousel, type GastronomySlide } from "./GastronomyCarousel";
+import { GastronomyShowcase, type GastronomySlide } from "./GastronomyShowcase";
 import { gastronomyItemsService } from "../../admin/services/gastronomyItemsService";
 import { attractionsService } from "../../admin/services/attractionsService";
 import { eventsService } from "../../admin/services/eventsService";
@@ -71,11 +72,24 @@ const IconChegar = () => (
 
 // ── Static fallback gastronomy slides (used when API returns nothing) ──
 const GASTRO_SLIDES_FALLBACK: GastronomySlide[] = [
-    { tag: "Cachaça Artesanal", src: food, alt: "Cachaça artesanal e produtos da roça" },
-    { tag: "Café de Sombra", src: farm, alt: "Cultivo de café em altitude" },
-    { tag: "Comida Caipira", src: mercado, alt: "Mercado e sabores da cozinha regional" },
-    { tag: "Doces Caseiros", src: museum, alt: "Doces e iguarias típicas da região" },
+    { tag: "Cachaça Artesanal", src: food, alt: "Cachaça artesanal e produtos da roça", desc: "Produção artesanal dos alambiques locais, envelhecida em madeira." },
+    { tag: "Café de Sombra", src: farm, alt: "Cultivo de café em altitude", desc: "Cafés especiais cultivados na altitude da serra, com sabor suave e aroma marcante." },
+    { tag: "Comida Caipira", src: mercado, alt: "Mercado e sabores da cozinha regional", desc: "Pratos fartos com temperos da serra, feitos como nas casas da Ibiapaba." },
+    { tag: "Doces Caseiros", src: museum, alt: "Doces e iguarias típicas da região", desc: "Rapadura, doces de leite e de frutas feitos nos engenhos e cozinhas locais." },
 ];
+
+// Descrição do prato para itens vindos da API, que só trazem nome e foto.
+const DISH_DESCRIPTIONS: [RegExp, string][] = [
+    [/panelada/i, "Cozido farto de miúdos com temperos da serra, servido com arroz e farinha."],
+    [/rapadura/i, "Doce de cana feito nos engenhos da Ibiapaba, puro ou com amendoim."],
+    [/peta/i, "Biscoito de polvilho leve e crocante, companheiro do café da tarde."],
+    [/cacha[cç]a/i, "Produção artesanal dos alambiques locais, envelhecida em madeira."],
+    [/tapioca/i, "Massa de goma fresca com queijo coalho, carne de sol ou doce."],
+    [/beiju/i, "Tradição das casas de farinha, com coco ralado e açúcar."],
+    [/caf[eé]/i, "Cafés especiais cultivados na altitude da serra, com sabor suave e aroma marcante."],
+    [/doce/i, "Doces caseiros feitos nos engenhos e cozinhas locais."],
+];
+const dishDescription = (name: string) => DISH_DESCRIPTIONS.find(([re]) => re.test(name))?.[1];
 
 const AIRPORTS = [
     { code: "JJD", name: "Aeroporto de Jericoacoara", dist: "165 km" },
@@ -246,6 +260,7 @@ function SectionState({ failed, emptyTitle, emptyIcon, emptyVariant = "empty", o
 }
 
 const PUB_LIMIT = 8;
+const GASTRO_AUTOPLAY_MS = 5000;
 const PUB_FILTER_LABELS: Record<string, string> = {
     Todos: "Todos",
     Restaurante: "Restaurantes",
@@ -324,7 +339,7 @@ export default function Content() {
         gastronomyItemsService.getActive().then((items) => {
             const slides: GastronomySlide[] = items
                 .filter(item => item.imageUrl)
-                .map(item => ({ tag: item.name, src: item.imageUrl!, alt: item.name }));
+                .map(item => ({ tag: item.name, src: item.imageUrl!, alt: item.name, desc: dishDescription(item.name) }));
             if (slides.length > 0) setGastroSlides(slides);
         }).catch(() => {});
     }, []);
@@ -369,7 +384,7 @@ export default function Content() {
         if (gastroSlides.length <= 1 || gastroPaused) return;
         const id = window.setInterval(() => {
             setGastroIndex((i) => (i + 1) % gastroSlides.length);
-        }, 4500);
+        }, GASTRO_AUTOPLAY_MS);
         return () => window.clearInterval(id);
     }, [gastroSlides, gastroPaused, gastroIndex]);
 
@@ -521,47 +536,33 @@ export default function Content() {
 
                 {/* ── Gastronomia ── */}
                 <div className="top-n torn-host">
-                    <TornDivider edge="top" fill="#c58b24" />
+                    <TornDivider edge="top" fill="#a87219" />
                     <div className="news">
                         <div
-                            className="news-inner"
                             onPointerEnter={(e) => { if (e.pointerType === "mouse") setGastroHover(true); }}
                             onPointerLeave={(e) => { if (e.pointerType === "mouse") setGastroHover(false); }}
                             onFocus={() => setGastroFocus(true)}
                             onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setGastroFocus(false); }}
                         >
-                            <div className="caixa">
-                                <GastronomyCarousel slides={gastroSlides} activeIndex={gastroIndex} onActiveChange={setGastroIndex} />
-                            </div>
-                            <div className="text-n">
-                                <span className="text-n__kicker">Sabores da Ibiapaba</span>
-                                <h2 className="text-n__title">Gastronomia Regional</h2>
-                                <div className="protect">
-                                    <ul>
-                                        {gastroSlides.map((slide, i) => (
-                                            <li key={slide.tag}>
-                                                <button
-                                                    type="button"
-                                                    className={`protect-chip${i === gastroIndex ? " is-active" : ""}`}
-                                                    onClick={() => setGastroIndex(i)}
-                                                    aria-pressed={i === gastroIndex}
-                                                >
-                                                    {slide.tag}
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                                <div className="desc">
-                                    <p>A altitude de Ubajara proporciona um clima perfeito para o cultivo de cafés especiais e a produção de iguarias únicas que você só encontra aqui. Delicie-se com o melhor tempero da serra.</p>
-                                </div>
-                                <div className="restaurant">
-                                    <Link to="/estabelecimentos?tipo=Restaurante">Ver Restaurantes</Link>
-                                </div>
-                            </div>
+                            <GastronomyShowcase
+                                slides={gastroSlides}
+                                activeIndex={gastroIndex}
+                                onActiveChange={setGastroIndex}
+                                paused={gastroPaused}
+                                autoplayMs={GASTRO_AUTOPLAY_MS}
+                                header={
+                                    <SectionHeader
+                                        id="gastro-title"
+                                        kicker="Sabores da Ibiapaba"
+                                        title="Gastronomia Regional"
+                                        subtitle="A altitude de Ubajara favorece cafés especiais e iguarias que você só encontra aqui."
+                                        onDark
+                                    />
+                                }
+                            />
                         </div>
                     </div>
-                    <TornDivider edge="bottom" fill="#c58b24" />
+                    <TornDivider edge="bottom" fill="#a87219" />
                 </div>
 
                 {/* ── Guia + Eventos ── */}

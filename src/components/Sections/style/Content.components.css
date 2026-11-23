@@ -478,8 +478,7 @@ div.news {
     margin-right: 0;
     margin-top: 0;
     margin-bottom: 0;
-    background: #C58B24;
-    background: linear-gradient(to bottom, #c58b24 0%, #a97318 40%, #9e6c14 60%, #c58b24 100%);
+    background: #a87219;
     padding: 0;
     box-sizing: border-box;
     position: relative;
@@ -500,183 +499,11 @@ div.news > * {
     z-index: 1;
 }
 
-div.news-inner {
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: clamp(36px, 5vw, 60px) var(--home-gutter) clamp(60px, 8vw, 100px);
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    gap: clamp(32px, 5vw, 64px);
-    align-items: center;
-    box-sizing: border-box;
-}
-
-div.caixa {
-    grid-column: 1;
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    border: none;
-    background: transparent;
-}
-
-div.text-n {
-    grid-column: 2;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-}
-
-div.text-n .text-n__kicker {
-    display: block;
-    font-family: "Caveat", cursive;
-    font-weight: 600;
-    font-size: var(--kicker-size);
-    line-height: 1.1;
-    color: rgba(255, 235, 160, 0.92);
-    margin: 0;
-}
-
-div.text-n .text-n__title {
-    font-family: "Nunito", sans-serif;
-    width: auto;
-    max-width: 100%;
-    height: auto;
-    font-weight: 900;
-    font-style: normal;
-    font-size: var(--section-title-size);
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-    color: #FFFFFF;
-    margin: 6px 0 0;
-    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.25);
-}
-
-div.protect ul {
-    display: flex;
-    list-style: none;
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    min-height: 0;
-    flex-wrap: wrap;
-    gap: 8px 10px;
-    margin: 16px 0 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-div.protect ul>li {
-    width: auto;
-    min-width: 0;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    border: none;
-    background: transparent;
-}
-
-div.protect .protect-chip {
-    display: block;
-    width: 100%;
-    cursor: pointer;
-    font: inherit;
-    border-radius: 9999px;
-    border: solid 1px #FFFFFF33;
-    padding: 8px 16px;
-    font-size: 14px;
-    line-height: 20px;
-    font-family: "Inter", sans-serif;
-    color: #FFFFFF;
-    font-weight: 500;
-    text-align: center;
-    background: #FFFFFF33;
-    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform var(--dur-press) var(--ease-out);
-}
-
-div.protect .protect-chip:active {
-    transform: scale(0.97);
-}
-
-div.protect .protect-chip.is-active {
-    background: #ffffff;
-    color: #006B32;
-    border-color: #ffffff;
+@media (hover: hover) and (pointer: fine) {
 }
 
 @media (hover: hover) and (pointer: fine) {
-    div.protect .protect-chip:hover:not(.is-active) {
-        background: rgba(255, 255, 255, 0.45);
-    }
 }
-
-div.desc p {
-    font-family: "Inter", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-    font-size: 18px;
-    line-height: 1.55;
-    vertical-align: middle;
-    color: #EDFFF2;
-}
-
-div.desc {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    min-height: 0;
-    padding: 20px 0 8px;
-}
-
-div.restaurant {
-    width: auto;
-    height: auto;
-    margin-top: 8px;
-    padding: 0;
-    border-radius: 0;
-    background-color: transparent;
-}
-
-div.restaurant a {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: auto;
-    height: auto;
-    margin: 0;
-    position: static;
-    top: auto;
-    padding: 12px 28px;
-    border-radius: 50px;
-    background-color: transparent;
-    border: 1.5px solid #ffffff;
-    box-shadow: none;
-    text-decoration: none;
-    font-family: "Inter", sans-serif;
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 1.25;
-    letter-spacing: 0.3px;
-    color: #ffffff;
-    transition: background-color 0.25s ease, color 0.25s ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    div.restaurant a:hover {
-        background-color: #ffffff;
-        color: #006B32;
-    }
-}
-
-div.restaurant a:active {
-    background-color: #ffffff;
-    color: #006B32;
-}
-
 
 @media only screen and (max-width: 1024px) {
     ul.list-cards {
@@ -694,13 +521,6 @@ div.restaurant a:active {
 }
 
 @media only screen and (max-width: 768px) {
-
-    div.news-inner {
-        grid-template-columns: 1fr;
-        height: auto;
-        padding: 32px var(--home-gutter) 44px;
-        gap: 28px;
-    }
 
     ul.list-cards {
         gap: 12px;
@@ -743,81 +563,6 @@ div.restaurant a:active {
     .point {
         padding: 40px 0 calc(var(--home-section-y) + var(--torn-h));
         box-sizing: border-box;
-    }
-
-    div.text-n {
-        grid-column: 1;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        width: 100%;
-        margin: 0;
-    }
-
-    div.text-n .text-n__kicker,
-    div.text-n .text-n__title {
-        width: 100%;
-        text-align: center;
-    }
-
-    div.text-n .text-n__title {
-        margin-bottom: 12px;
-    }
-
-    div.caixa {
-        grid-column: 1;
-        width: 100%;
-        max-width: min(420px, 100%);
-        height: auto;
-        margin: 0 auto;
-    }
-
-    div.protect {
-        width: 100%;
-        justify-content: center;
-    }
-
-    div.protect ul {
-        width: 100%;
-        height: auto;
-        justify-content: center;
-    }
-
-    div.protect ul > li {
-        margin: 0;
-    }
-
-    div.protect .protect-chip {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 44px;
-        font-size: 13px;
-        padding: 0 16px;
-    }
-
-    div.desc {
-        width: 100%;
-        height: auto;
-        padding: 12px 0 4px;
-    }
-
-    div.desc p {
-        font-size: 14px;
-        text-align: center;
-    }
-
-    div.restaurant {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        margin-top: 12px;
-    }
-
-    div.restaurant a {
-        min-height: 44px;
-        padding: 0 24px;
-        font-size: 14px;
     }
 
 }
@@ -908,7 +653,6 @@ div.restaurant a:active {
     height: 100%;
 }
 
-
 @media only screen and (max-width: 1024px) {
     .pub-guide__grid,
     .pub-events__grid,
@@ -992,7 +736,6 @@ div.restaurant a:active {
         background: #005a2a;
     }
 }
-
 
 .reviews {
     background: #002a27;
@@ -1190,7 +933,6 @@ div.restaurant a:active {
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
-
 
 .faq {
     padding: calc(clamp(48px, 6vw, 88px) + var(--torn-h)) 0 clamp(40px, 5vw, 72px);
