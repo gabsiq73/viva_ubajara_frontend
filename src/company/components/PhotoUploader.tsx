@@ -1,9 +1,17 @@
 import { useRef, useState, type ChangeEvent, type DragEvent } from 'react';
 import Icon from '../../components/ui/Icon';
 import Badge from '../../components/ui/Badge';
+import { useBrokenImage } from '../../hooks/useBrokenImage';
 import { formatFileSize } from '../utils/fields';
 import { MAX_PHOTOS, type PendingPhoto } from '../utils/photos';
 import type { PhotoResponse } from '../../admin/types';
+
+function SentPhoto({ photo }: { photo: PhotoResponse }) {
+  const image = useBrokenImage(photo.url);
+  return image.show
+    ? <img src={photo.url} alt={photo.description || 'Foto do estabelecimento'} onError={image.onError} />
+    : <span className="company-photo-item__broken"><Icon name="photo" /><span>Imagem indisponível</span></span>;
+}
 
 interface PhotoUploaderProps {
   existing: PhotoResponse[];
@@ -122,7 +130,7 @@ export function PhotoUploader({ existing, pending, disabled, progress, uploadErr
             {existing.map((photo) => (
               <li className="company-photo-item company-photo-item--sent" key={photo.id}>
                 <div className="company-photo-item__media">
-                  <img src={photo.url} alt={photo.description || 'Foto do estabelecimento'} />
+                  <SentPhoto photo={photo} />
                 </div>
                 <div className="company-photo-item__meta">
                   <span>{photo.description || 'Foto do estabelecimento'}</span>

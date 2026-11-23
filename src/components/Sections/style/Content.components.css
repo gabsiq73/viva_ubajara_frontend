@@ -72,7 +72,11 @@ body {
     color: #006b32;
     text-decoration: none;
     white-space: nowrap;
-    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform var(--dur-press) var(--ease-out);
+}
+
+.sec-head__cta:active {
+    transform: scale(0.97);
 }
 
 .sec-head__cta .material-symbols-outlined {
@@ -81,13 +85,15 @@ body {
     transition: transform 0.2s ease;
 }
 
-.sec-head__cta:hover {
-    background: #e8f5ef;
-    border-color: #006b32;
-}
+@media (hover: hover) and (pointer: fine) {
+    .sec-head__cta:hover {
+        background: #e8f5ef;
+        border-color: #006b32;
+    }
 
-.sec-head__cta:hover .material-symbols-outlined {
-    transform: translateX(3px);
+    .sec-head__cta:hover .material-symbols-outlined {
+        transform: translateX(3px);
+    }
 }
 
 .sec-head__cta:focus-visible {
@@ -112,9 +118,11 @@ body {
     border-color: rgba(255, 255, 255, 0.5);
 }
 
-.sec-head--on-dark .sec-head__cta:hover {
-    background: rgba(255, 255, 255, 0.14);
-    border-color: #ffffff;
+@media (hover: hover) and (pointer: fine) {
+    .sec-head--on-dark .sec-head__cta:hover {
+        background: rgba(255, 255, 255, 0.14);
+        border-color: #ffffff;
+    }
 }
 
 .sec-head--on-dark .sec-head__cta:focus-visible {
@@ -132,7 +140,7 @@ body {
 @keyframes slideUpFade {
     from {
         opacity: 0;
-        transform: translateY(40px);
+        transform: translateY(16px);
     }
 
     to {
@@ -144,8 +152,8 @@ body {
 .reveal {
     opacity: 0;
     transform: translateY(28px);
-    transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-                transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: opacity 0.55s var(--ease-out),
+                transform 0.55s var(--ease-out);
 }
 
 .reveal.is-visible {
@@ -159,7 +167,7 @@ body {
 @keyframes grid-reveal-up {
     from {
         opacity: 0;
-        transform: translateY(28px);
+        transform: translateY(var(--reveal-y, 16px));
     }
 }
 
@@ -169,16 +177,23 @@ body {
 
 .grid-reveal.is-visible > * {
     opacity: 1;
-    animation: grid-reveal-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation: grid-reveal-up 400ms var(--ease-out) backwards;
 }
 
-.grid-reveal.is-visible > *:nth-child(2) { animation-delay: 0.09s; }
-.grid-reveal.is-visible > *:nth-child(3) { animation-delay: 0.18s; }
-.grid-reveal.is-visible > *:nth-child(4) { animation-delay: 0.27s; }
-.grid-reveal.is-visible > *:nth-child(5) { animation-delay: 0.09s; }
-.grid-reveal.is-visible > *:nth-child(6) { animation-delay: 0.18s; }
-.grid-reveal.is-visible > *:nth-child(7) { animation-delay: 0.27s; }
-.grid-reveal.is-visible > *:nth-child(8) { animation-delay: 0.36s; }
+.grid-reveal.is-visible > *:nth-child(2) { animation-delay: 50ms; }
+.grid-reveal.is-visible > *:nth-child(3) { animation-delay: 100ms; }
+.grid-reveal.is-visible > *:nth-child(4) { animation-delay: 150ms; }
+.grid-reveal.is-visible > *:nth-child(5) { animation-delay: 50ms; }
+.grid-reveal.is-visible > *:nth-child(6) { animation-delay: 100ms; }
+.grid-reveal.is-visible > *:nth-child(7) { animation-delay: 150ms; }
+.grid-reveal.is-visible > *:nth-child(8) { animation-delay: 200ms; }
+
+/* Já revelada (ex.: troca de chip do guia): itens novos só fazem fade curto, sem deslocamento nem escalonamento. */
+.grid-reveal.is-visible.has-revealed > *:nth-child(n) {
+    --reveal-y: 0px;
+    animation-duration: 150ms;
+    animation-delay: 0s;
+}
 
 @media (prefers-reduced-motion: reduce) {
     .reveal, .grid-reveal > * {
@@ -194,8 +209,7 @@ body {
 
     ul.list-cards li:hover,
     .transport-card:hover,
-    .airport-card:hover,
-    .contact-section__submit:hover {
+    .airport-card:hover {
         transform: none;
     }
 
@@ -206,18 +220,12 @@ body {
     }
 }
 
-/* ── Skeleton shimmer ───────────────────────────────────────────────────── */
-
-@keyframes skel-shimmer {
-    0%   { background-position: -800px 0; }
-    100% { background-position:  800px 0; }
-}
+/* ── Skeleton ───────────────────────────────────────────────────────────── */
 
 .skel {
     display: block;
-    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
-    background-size: 1600px 100%;
-    animation: skel-shimmer 1.5s infinite linear;
+    background: #e5e7eb;
+    animation: ui-pulse 1.4s ease-in-out infinite;
     border-radius: 6px;
 }
 
@@ -316,19 +324,20 @@ ul.list-cards li {
     top: -120px;
     overflow: hidden;
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
-    animation: slideUpFade 0.6s ease backwards;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: slideUpFade 400ms var(--ease-out) backwards;
+    transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
 }
 
-ul.list-cards li:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.32);
+@media (hover: hover) and (pointer: fine) {
+    ul.list-cards li:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.32);
+    }
 }
 
-ul.list-cards li:nth-child(1) { animation-delay: 0.1s; }
-ul.list-cards li:nth-child(2) { animation-delay: 0.2s; }
-ul.list-cards li:nth-child(3) { animation-delay: 0.3s; }
-ul.list-cards li:nth-child(4) { animation-delay: 0.4s; }
+ul.list-cards li:nth-child(2) { animation-delay: 50ms; }
+ul.list-cards li:nth-child(3) { animation-delay: 100ms; }
+ul.list-cards li:nth-child(4) { animation-delay: 150ms; }
 
 .info-card__link {
     display: flex;
@@ -367,8 +376,10 @@ ul.list-cards li:nth-child(4) { animation-delay: 0.4s; }
     height: 26px;
 }
 
-ul.list-cards li:hover .info-card__icon {
-    opacity: 1;
+@media (hover: hover) and (pointer: fine) {
+    ul.list-cards li:hover .info-card__icon {
+        opacity: 1;
+    }
 }
 
 .info-card__content {
@@ -410,9 +421,11 @@ ul.list-cards li:hover .info-card__icon {
     flex-shrink: 0;
 }
 
-ul.list-cards li:hover .info-card__arrow {
-    background: rgba(255, 255, 255, 0.35);
-    transform: translateX(3px);
+@media (hover: hover) and (pointer: fine) {
+    ul.list-cards li:hover .info-card__arrow {
+        background: rgba(255, 255, 255, 0.35);
+        transform: translateX(3px);
+    }
 }
 
 ul.list-cards li#fazer  { background: linear-gradient(145deg, #4D6AE7, #3651c7); }
@@ -563,7 +576,11 @@ div.protect .protect-chip {
     font-weight: 500;
     text-align: center;
     background: #FFFFFF33;
-    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform var(--dur-press) var(--ease-out);
+}
+
+div.protect .protect-chip:active {
+    transform: scale(0.97);
 }
 
 div.protect .protect-chip.is-active {
@@ -572,8 +589,10 @@ div.protect .protect-chip.is-active {
     border-color: #ffffff;
 }
 
-div.protect .protect-chip:hover:not(.is-active) {
-    background: rgba(255, 255, 255, 0.45);
+@media (hover: hover) and (pointer: fine) {
+    div.protect .protect-chip:hover:not(.is-active) {
+        background: rgba(255, 255, 255, 0.45);
+    }
 }
 
 div.desc p {
@@ -627,9 +646,11 @@ div.restaurant a {
     transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-div.restaurant a:hover {
-    background-color: #ffffff;
-    color: #006B32;
+@media (hover: hover) and (pointer: fine) {
+    div.restaurant a:hover {
+        background-color: #ffffff;
+        color: #006B32;
+    }
 }
 
 div.restaurant a:active {
@@ -881,9 +902,11 @@ div.restaurant a:active {
     transition: box-shadow var(--pub-transition), border-color var(--pub-transition);
 }
 
-.pub-event-card:not(.pub-event-card--skeleton):hover {
-    border-color: var(--ui-line-strong);
-    box-shadow: var(--ui-card-shadow-hover);
+@media (hover: hover) and (pointer: fine) {
+    .pub-event-card:not(.pub-event-card--skeleton):hover {
+        border-color: var(--ui-line-strong);
+        box-shadow: var(--ui-card-shadow-hover);
+    }
 }
 
 .pub-event-card__media {
@@ -905,11 +928,13 @@ div.restaurant a:active {
 }
 
 .pub-event-card__media img {
-    transition: transform 0.4s ease;
+    transition: transform 250ms var(--ease-out);
 }
 
-.pub-event-card:hover .pub-event-card__media img {
-    transform: scale(1.05);
+@media (hover: hover) and (pointer: fine) {
+    .pub-event-card:hover .pub-event-card__media img {
+        transform: scale(1.05);
+    }
 }
 
 .pub-event-card__date {
@@ -966,8 +991,10 @@ div.restaurant a:active {
     transition: color 0.2s ease;
 }
 
-.pub-event-card:hover .pub-event-card__title {
-    color: #006b32;
+@media (hover: hover) and (pointer: fine) {
+    .pub-event-card:hover .pub-event-card__title {
+        color: #006b32;
+    }
 }
 
 .pub-event-card__link {
@@ -1047,16 +1074,18 @@ div.restaurant a:active {
     font-size: 14px;
     font-weight: 700;
     color: #006b32;
-    transition: gap 0.2s ease;
 }
 
 .pub-event-card__cta .material-symbols-outlined {
     font-size: 16px;
     font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 20;
+    transition: transform var(--dur-press) var(--ease-out);
 }
 
-.pub-event-card:hover .pub-event-card__cta {
-    gap: 8px;
+@media (hover: hover) and (pointer: fine) {
+    .pub-event-card:hover .pub-event-card__cta .material-symbols-outlined {
+        transform: translateX(3px);
+    }
 }
 
 @media only screen and (max-width: 1024px) {
@@ -1171,12 +1200,14 @@ div.restaurant a:active {
     flex-direction: column;
     gap: 14px;
     border-top: 4px solid transparent;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
 }
 
-.transport-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 52px rgba(0, 33, 12, 0.15);
+@media (hover: hover) and (pointer: fine) {
+    .transport-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 52px rgba(0, 33, 12, 0.15);
+    }
 }
 
 .transport-card--air { border-top-color: #304fcd; }
@@ -1266,12 +1297,14 @@ div.restaurant a:active {
     flex-direction: column;
     gap: 4px;
     border: 1px solid #d8ede2;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
 }
 
-.airport-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 107, 50, 0.12);
+@media (hover: hover) and (pointer: fine) {
+    .airport-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 107, 50, 0.12);
+    }
 }
 
 .airport-card__code {
@@ -1590,8 +1623,10 @@ div.restaurant a:active {
     transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.faq__item:hover {
-    border-color: #b7d8c5;
+@media (hover: hover) and (pointer: fine) {
+    .faq__item:hover {
+        border-color: #b7d8c5;
+    }
 }
 
 .faq__item--open {
@@ -1623,12 +1658,21 @@ div.restaurant a:active {
     line-height: 1.35;
     color: #00210c;
     text-align: left;
-    transition: color 0.2s ease;
+    transition: color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
 }
 
-.faq__question:hover,
+.faq__question:active {
+    transform: scale(0.98);
+}
+
 .faq__item--open .faq__question {
     color: #006b32;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .faq__question:hover {
+        color: #006b32;
+    }
 }
 
 .faq__question:focus-visible {
@@ -1646,7 +1690,7 @@ div.restaurant a:active {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.28s ease, background-color 0.25s ease, color 0.25s ease;
+    transition: transform 250ms var(--ease-out), background-color 250ms ease, color 250ms ease;
 }
 
 .faq__icon .material-symbols-outlined {
@@ -1662,7 +1706,7 @@ div.restaurant a:active {
 .faq__answer {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows 0.28s ease;
+    transition: grid-template-rows 250ms var(--ease-out);
     overflow: hidden;
 }
 
@@ -1678,7 +1722,7 @@ div.restaurant a:active {
 .faq__answer-body {
     padding: 0 20px 20px;
     opacity: 0;
-    transition: opacity 0.25s ease;
+    transition: opacity 150ms ease;
 }
 
 .faq__item--open .faq__answer-body {
@@ -1705,8 +1749,10 @@ div.restaurant a:active {
     border-radius: 4px;
 }
 
-.faq__link:hover {
-    color: #003016;
+@media (hover: hover) and (pointer: fine) {
+    .faq__link:hover {
+        color: #003016;
+    }
 }
 
 .faq__link:focus-visible {
@@ -1762,27 +1808,22 @@ div.restaurant a:active {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s ease;
+    transition: background-color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
 }
 
-.faq__more-btn:hover {
-    background: #e8f5ef;
+.faq__more-btn:active {
+    transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .faq__more-btn:hover {
+        background: #e8f5ef;
+    }
 }
 
 .faq__more-btn:focus-visible {
     outline: 2px solid #f3c66b;
     outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .faq__item,
-    .faq__question,
-    .faq__icon,
-    .faq__answer,
-    .faq__answer-body,
-    .faq__more-btn {
-        transition: none;
-    }
 }
 
 .contact-section {
@@ -1967,16 +2008,17 @@ div.restaurant a:active {
     border: none;
     cursor: pointer;
     width: 100%;
-    transition: background 0.2s ease, transform 0.2s ease;
+    transition: background 0.2s ease, transform var(--dur-press) var(--ease-out);
 }
 
-.contact-section__submit:hover {
-    background: #006b32;
-    transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+    .contact-section__submit:hover {
+        background: #006b32;
+    }
 }
 
 .contact-section__submit:active {
-    transform: translateY(0);
+    transform: scale(0.97);
 }
 
 .contact-section__submit:disabled {

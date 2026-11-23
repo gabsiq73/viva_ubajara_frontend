@@ -207,7 +207,7 @@ export function AttractionFormPage() {
                         fontSize: 13,
                         fontWeight: selected ? 600 : 400,
                         cursor: 'pointer',
-                        transition: 'all 0.15s',
+                        transition: 'background-color 150ms ease, border-color 150ms ease, color 150ms ease',
                       }}
                     >
                       {selected ? '✓ ' : ''}{spot.name}

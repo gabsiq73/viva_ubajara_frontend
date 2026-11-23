@@ -205,13 +205,19 @@
     color: #4a5c51;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+    transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform var(--dur-press) var(--ease-out);
 }
 
-.ev-pill:hover:not(.is-active) {
-    background: #fdf4e6;
-    border-color: #a66b1f;
-    color: #a66b1f;
+@media (hover: hover) and (pointer: fine) {
+    .ev-pill:hover:not(.is-active) {
+        background: #fdf4e6;
+        border-color: #a66b1f;
+        color: #a66b1f;
+    }
+}
+
+.ev-pill:active {
+    transform: scale(0.96);
 }
 
 .ev-pill.is-active {
@@ -240,9 +246,11 @@
     margin-top: 8px;
 }
 
-.ev-sidebar__clear:hover {
-    background: #ffe8e4;
-    border-color: #e05040;
+@media (hover: hover) and (pointer: fine) {
+    .ev-sidebar__clear:hover {
+        background: #ffe8e4;
+        border-color: #e05040;
+    }
 }
 
 .ev-sidebar__clear .material-symbols-outlined {
@@ -340,12 +348,14 @@
     border: 1px solid #e4ede8;
     display: flex;
     flex-direction: column;
-    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
 }
 
-.ev-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 16px 40px rgba(0, 48, 22, 0.11);
+@media (hover: hover) and (pointer: fine) {
+    .ev-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 40px rgba(0, 48, 22, 0.11);
+    }
 }
 
 /* Card image */
@@ -361,15 +371,17 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s ease;
+    transition: transform 250ms var(--ease-out);
 }
 
 .ev-card__img--placeholder {
     background: #f0f7f3;
 }
 
-.ev-card:hover .ev-card__img {
-    transform: scale(1.05);
+@media (hover: hover) and (pointer: fine) {
+    .ev-card:hover .ev-card__img {
+        transform: scale(1.05);
+    }
 }
 
 /* Category badge */
@@ -484,8 +496,10 @@
     border-radius: 16px;
 }
 
-.ev-card:hover .ev-card__title {
-    color: #006b32;
+@media (hover: hover) and (pointer: fine) {
+    .ev-card:hover .ev-card__title {
+        color: #006b32;
+    }
 }
 
 .ev-card__desc {
@@ -555,7 +569,6 @@
     color: #6b3200;
     text-decoration: none;
     white-space: nowrap;
-    transition: gap 0.2s ease;
 }
 
 .ev-card__register {
@@ -579,8 +592,10 @@
     font-size: 14px;
 }
 
-.ev-card__register:hover {
-    text-decoration: underline;
+@media (hover: hover) and (pointer: fine) {
+    .ev-card__register:hover {
+        text-decoration: underline;
+    }
 }
 
 .ev-card__register:focus-visible {
@@ -592,11 +607,12 @@
 .ev-card__cta .material-symbols-outlined {
     font-size: 14px;
     font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 20;
-    transition: transform 0.2s ease;
+    transition: transform var(--dur-press) var(--ease-out);
 }
 
-.ev-card:hover .ev-card__cta { gap: 7px; }
-.ev-card:hover .ev-card__cta .material-symbols-outlined { transform: translateX(3px); }
+@media (hover: hover) and (pointer: fine) {
+    .ev-card:hover .ev-card__cta .material-symbols-outlined { transform: translateX(3px); }
+}
 
 /* ── Empty state ── */
 .ev-empty {
@@ -634,8 +650,10 @@
     transition: background 0.2s ease;
 }
 
-.ev-empty__reset:hover {
-    background: #a66b1f;
+@media (hover: hover) and (pointer: fine) {
+    .ev-empty__reset:hover {
+        background: #a66b1f;
+    }
 }
 
 /* ── Responsive ── */
@@ -688,9 +706,11 @@
         transition: background 0.2s ease, border-color 0.2s ease;
     }
 
-    .ev-filter-toggle:hover {
-        background: #fdf4e6;
-        border-color: #a66b1f;
+    @media (hover: hover) and (pointer: fine) {
+        .ev-filter-toggle:hover {
+            background: #fdf4e6;
+            border-color: #a66b1f;
+        }
     }
 
     .ev-filter-toggle .material-symbols-outlined:first-child {
@@ -713,15 +733,42 @@
         margin-left: auto;
         font-size: 20px;
         color: #7a9080;
+        transition: transform 200ms var(--ease-out);
     }
 
-    /* Sidebar: collapsed by default on mobile (display:none tira os controles do foco e do leitor de tela) */
+    .ev-filter-toggle[aria-expanded="true"] .ev-toggle-arrow {
+        transform: rotate(180deg);
+    }
+
+    /* Sidebar recolhida no mobile: visibility atrasada tira os controles do foco e do leitor de tela só depois do fechamento.
+       Altura via grid-template-rows (exceção deliberada: altura automática); a margem negativa cancela o gap do .ev-body. */
     .ev-sidebar {
-        display: none;
+        display: grid;
+        grid-template-rows: 0fr;
+        margin-bottom: -12px;
+        padding: 0;
+        border: 0;
+        background: none;
+        visibility: hidden;
+        transition: grid-template-rows 250ms var(--ease-out), margin-bottom 250ms var(--ease-out), visibility 0s linear 250ms;
     }
 
     .ev-sidebar.is-open {
-        display: block;
+        grid-template-rows: 1fr;
+        margin-bottom: 0;
+        visibility: visible;
+        transition-delay: 0s;
+    }
+
+    .ev-sidebar__clip {
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .ev-sidebar__box {
+        background: #ffffff;
+        border: 1px solid #e4ede8;
+        border-radius: 16px;
         padding: 24px;
     }
 
@@ -749,16 +796,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .ev-card,
-    .ev-card__img,
-    .ev-card__cta .material-symbols-outlined,
-    .ev-pill,
-    .ev-sidebar__clear,
-    .ev-empty__reset,
-    .ev-filter-toggle {
-        transition: none;
-    }
-
     .ev-card:hover,
     .ev-card:hover .ev-card__img,
     .ev-card:hover .ev-card__cta .material-symbols-outlined {

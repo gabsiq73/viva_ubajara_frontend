@@ -29,6 +29,7 @@
     font-family: "Inter", sans-serif;
     font-size: 15px;
     color: var(--ui-text-secondary);
+    animation: ui-fade-in 200ms var(--ease-out);
 }
 
 .pg-spinner {
@@ -40,9 +41,11 @@
     animation: pg-spin 0.8s linear infinite;
 }
 
+/* Atraso de 200ms: carregamentos rápidos não chegam a mostrar o spinner. */
 .pg-loading--page {
     min-height: 100vh;
     padding-top: 48px;
+    animation: ui-fade-in 150ms var(--ease-out) 200ms both;
 }
 
 .pg-fullscreen {
@@ -57,6 +60,7 @@
 
 .pg-fullscreen > .ui-state {
     max-width: 560px;
+    animation: ui-fade-in 200ms var(--ease-out);
 }
 
 .pg-state {

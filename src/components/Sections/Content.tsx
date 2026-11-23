@@ -256,6 +256,7 @@ function SectionState({ failed, emptyTitle, emptyIcon, emptyVariant = "empty", o
 }
 
 const PUB_LIMIT = 8;
+const GRID_REVEAL_MS = 900;
 
 function pickPubItems(items: Establishment[], filter: string): Establishment[] {
     if (filter !== "Todos") return items.filter((i) => i.type === filter).slice(0, PUB_LIMIT);
@@ -374,16 +375,26 @@ export default function Content() {
     }, [gastroSlides, gastroPaused, gastroIndex]);
 
     useEffect(() => {
+        const timers: number[] = [];
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach(({ target, isIntersecting }) => {
-                    if (isIntersecting) { target.classList.add("is-visible"); observer.unobserve(target); }
+                    if (!isIntersecting) return;
+                    target.classList.add("is-visible");
+                    observer.unobserve(target);
+                    // Depois da primeira revelação a grade troca de itens só com fade curto, sem escalonar de novo.
+                    if (target.classList.contains("grid-reveal")) {
+                        timers.push(window.setTimeout(() => target.classList.add("has-revealed"), GRID_REVEAL_MS));
+                    }
                 });
             },
             { threshold: 0.1, rootMargin: "0px 0px -48px 0px" }
         );
         document.querySelectorAll(".reveal, .grid-reveal").forEach((el) => observer.observe(el));
-        return () => observer.disconnect();
+        return () => {
+            observer.disconnect();
+            timers.forEach((id) => window.clearTimeout(id));
+        };
     }, [loading]);
 
     const pubCategories = useMemo(() => {
@@ -577,7 +588,7 @@ export default function Content() {
                                         />
                                     ))}
                                 </div>
-                                <div className="pub-guide__grid reveal grid-reveal">
+                                <div className="pub-guide__grid grid-reveal">
                                     {filteredPub.map((item) => (
                                         <EstablishmentCard
                                             key={`${item.apiType}-${item.id}`}
@@ -607,7 +618,7 @@ export default function Content() {
                         ) : failed.events || homeEvents.length === 0 ? (
                             <SectionState failed={failed.events} emptyTitle="Nenhum evento agendado por enquanto." emptyIcon="event" onRetry={retryLoad} />
                         ) : (
-                            <div className="pub-events__grid reveal grid-reveal">
+                            <div className="pub-events__grid grid-reveal">
                                 {homeEvents.map((ev) => {
                                     const d = parseDate(ev.startDateTime);
                                     const valid = !isNaN(d.getTime());
@@ -668,7 +679,7 @@ export default function Content() {
                         ) : failed.guides || homeGuides.length === 0 ? (
                             <SectionState failed={failed.guides} emptyTitle="Nenhum guia cadastrado por enquanto." emptyIcon="hiking" onRetry={retryLoad} />
                         ) : (
-                            <div className="tour-guides__grid reveal grid-reveal">
+                            <div className="tour-guides__grid grid-reveal">
                                 {homeGuides.map((guide) => (
                                     <article key={guide.id} className="guide-card">
                                         <div className="guide-card__photo">
@@ -705,7 +716,7 @@ export default function Content() {
                     </div>
                     <div className="como-chegar__body">
                         <div className="como-chegar__body-inner">
-                            <div className="como-chegar__transport reveal grid-reveal">
+                            <div className="como-chegar__transport grid-reveal">
                                 <div className="transport-card transport-card--air">
                                     <div className="transport-card__icon-wrap"><span className="material-symbols-outlined" aria-hidden="true">flight</span></div>
                                     <div className="transport-card__content">
@@ -733,7 +744,7 @@ export default function Content() {
                             </div>
                             <div className="como-chegar__airports-section">
                                 <h3 className="como-chegar__airports-title reveal">Aeroportos mais próximos</h3>
-                                <div className="como-chegar__airports reveal grid-reveal">
+                                <div className="como-chegar__airports grid-reveal">
                                     {AIRPORTS.map((ap) => (
                                         <div key={ap.code} className="airport-card">
                                             <span className="airport-card__code">{ap.code}</span>
@@ -767,7 +778,7 @@ export default function Content() {
                             ) : failed.reviews || homeReviews.length === 0 ? (
                                 <SectionState failed={failed.reviews} emptyTitle="Ainda não há depoimentos publicados." emptyIcon="rate_review" emptyVariant="notice" onRetry={retryLoad} />
                             ) : (
-                                <div className="reviews__grid reveal grid-reveal">
+                                <div className="reviews__grid grid-reveal">
                                     {homeReviews.map((r, i) => (
                                         <article key={r.id} className="review-card">
                                             <div className="review-card__stars" role="img" aria-label={`${r.rating} de 5 estrelas`}>

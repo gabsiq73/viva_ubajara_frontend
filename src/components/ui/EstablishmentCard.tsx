@@ -3,6 +3,7 @@ import Badge from "./Badge";
 import FavoriteButton from "./FavoriteButton";
 import Icon from "./Icon";
 import Rating from "./Rating";
+import { useBrokenImage } from "../../hooks/useBrokenImage";
 import { TYPE_ICONS, establishmentPath, roomsLabel, shortPrice, type Establishment } from "../../utils/establishments";
 
 interface EstablishmentCardProps {
@@ -13,8 +14,9 @@ interface EstablishmentCardProps {
 }
 
 function Media({ item }: { item: Establishment }) {
-    return item.photo ? (
-        <img src={item.photo} alt="" className="ui-card__img" width={640} height={400} loading="lazy" decoding="async" />
+    const image = useBrokenImage(item.photo);
+    return image.show ? (
+        <img src={item.photo} alt="" className="ui-card__img" width={640} height={400} loading="lazy" decoding="async" onError={image.onError} />
     ) : (
         <div className="ui-card__placeholder" aria-hidden="true">
             <Icon name={TYPE_ICONS[item.type]} />
@@ -44,7 +46,7 @@ export default function EstablishmentCard({ item, view = "grid", favorite, onTog
                 <div className="ui-card__main">
                     <p className="ui-card__eyebrow">{[item.type, detail].filter(Boolean).join(" · ")}</p>
                     <h3 className="ui-card__title">
-                        <Link to={path} className="ui-card__link">
+                        <Link to={path} className="ui-card__link" title={item.name}>
                             {item.name}
                         </Link>
                     </h3>
@@ -60,20 +62,20 @@ export default function EstablishmentCard({ item, view = "grid", favorite, onTog
                         {item.address && (
                             <span className="ui-card__meta-item">
                                 <Icon name="location_on" />
-                                {item.address}
+                                <span className="ui-card__meta-text">{item.address}</span>
                             </span>
                         )}
                         {item.openingHours && (
                             <span className="ui-card__meta-item">
                                 <Icon name="schedule" />
-                                {item.openingHours}
+                                <span className="ui-card__meta-text">{item.openingHours}</span>
                             </span>
                         )}
                     </div>
                 </div>
                 <div className="ui-card__aside">
                     {fav}
-                    {item.avgPrice && <span className="ui-card__price-full">{item.avgPrice}</span>}
+                    {item.avgPrice && <span className="ui-card__price-full" title={item.avgPrice}>{item.avgPrice}</span>}
                     <span className="ui-card__cta" aria-hidden="true">
                         Ver detalhes
                     </span>
@@ -96,14 +98,22 @@ export default function EstablishmentCard({ item, view = "grid", favorite, onTog
             <div className="ui-card__body">
                 <div className="ui-card__head">
                     <h3 className="ui-card__name">
-                        <Link to={path} className="ui-card__link">
+                        <Link to={path} className="ui-card__link" title={item.name}>
                             {item.name}
                         </Link>
                     </h3>
                     {item.rating !== null && <Rating value={item.rating} count={item.reviewCount} />}
                 </div>
-                {subtitle && <p className="ui-card__sub">{subtitle}</p>}
-                {price && <p className="ui-card__price">{price}</p>}
+                {subtitle && (
+                    <p className="ui-card__sub" title={subtitle}>
+                        {subtitle}
+                    </p>
+                )}
+                {price && (
+                    <p className="ui-card__price" title={price}>
+                        {price}
+                    </p>
+                )}
             </div>
         </article>
     );

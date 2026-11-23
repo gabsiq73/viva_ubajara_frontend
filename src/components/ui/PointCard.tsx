@@ -2,19 +2,21 @@ import { Link } from "react-router-dom";
 import Badge from "./Badge";
 import Icon from "./Icon";
 import type { AttractionResponse } from "../../admin/types";
-import { formatRating, reviewsLabel } from "../../utils/rating";
+import { useBrokenImage } from "../../hooks/useBrokenImage";
+import { formatCount, formatRating, reviewsLabel } from "../../utils/rating";
 import { ATTRACTION_CATEGORY_ICONS, ATTRACTION_CATEGORY_LABELS } from "../../utils/attractionCategories";
 
 
 export default function PointCard({ item }: { item: AttractionResponse }) {
     const photo = item.photos?.[0]?.url;
+    const image = useBrokenImage(photo);
     const reviewCount = item.reviewCount ?? 0;
     const hasRating = reviewCount > 0 && item.averageRating != null;
     return (
         <article className="ui-point">
             <div className="ui-point__media">
-                {photo ? (
-                    <img src={photo} alt="" className="ui-point__img" width={400} height={480} loading="lazy" decoding="async" />
+                {image.show ? (
+                    <img src={photo} alt="" className="ui-point__img" width={400} height={480} loading="lazy" decoding="async" onError={image.onError} />
                 ) : (
                     <div className="ui-point__placeholder" aria-hidden="true">
                         <Icon name={ATTRACTION_CATEGORY_ICONS[item.category] ?? "landscape"} />
@@ -27,13 +29,13 @@ export default function PointCard({ item }: { item: AttractionResponse }) {
             </Badge>
             <div className="ui-point__body">
                 <h3 className="ui-point__title">
-                    <Link to={`/pontos/${item.id}`} className="ui-point__link">
+                    <Link to={`/pontos/${item.id}`} className="ui-point__link" title={item.name}>
                         {item.name}
                     </Link>
                 </h3>
-                <p className="ui-point__desc">{item.shortDescription ?? item.description}</p>
+                <p className="ui-point__desc">{item.shortDescription || item.description}</p>
                 <div className="ui-point__foot">
-                    {(item.averageVisitDuration != null || hasRating) && (
+                    {(!!item.averageVisitDuration || hasRating) && (
                         <div className="ui-point__chips">
                             {hasRating && (
                                 <span
@@ -42,13 +44,13 @@ export default function PointCard({ item }: { item: AttractionResponse }) {
                                     aria-label={`Nota ${formatRating(item.averageRating!)} de 5, ${reviewsLabel(reviewCount)}`}
                                 >
                                     <Icon name="star" filled />
-                                    {formatRating(item.averageRating!)}&nbsp;({reviewCount})
+                                    {formatRating(item.averageRating!)}&nbsp;({formatCount(reviewCount)})
                                 </span>
                             )}
-                            {item.averageVisitDuration != null && (
+                            {!!item.averageVisitDuration && (
                                 <span className="ui-point__chip">
                                     <Icon name="schedule" />
-                                    {item.averageVisitDuration}&nbsp;min
+                                    {formatCount(item.averageVisitDuration)}&nbsp;min
                                 </span>
                             )}
                         </div>

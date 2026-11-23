@@ -12,6 +12,7 @@ import SiteSearchForm from "./layout/SiteSearchForm";
 import UserMenu from "./layout/UserMenu";
 import { useFavoritesCount } from "./layout/useFavoritesCount";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { useActivationPop } from "../hooks/useActivationPop";
 
 const SCROLL_THRESHOLD = 80;
 
@@ -24,6 +25,7 @@ export default function Header({ solid = false }: HeaderProps): JSX.Element {
     const location = useLocation();
     const { isAuthenticated } = useAuth();
     const favoritesCount = useFavoritesCount();
+    const dotPop = useActivationPop(favoritesCount > 0);
     const isDesktop = useMediaQuery("(min-width: 1024px)");
     const menuId = useId();
     const searchPanelId = useId();
@@ -124,7 +126,13 @@ export default function Header({ solid = false }: HeaderProps): JSX.Element {
                             </button>
                             <Link to="/dashboard?tab=favorites" className="site-header__icon-btn" aria-label={favoritesLabel}>
                                 <Icon name="favorite" />
-                                {favoritesCount > 0 && <span className="site-header__dot" aria-hidden="true" />}
+                                {favoritesCount > 0 && (
+                                    <span
+                                        className={`site-header__dot${dotPop.popping ? " site-header__dot--in" : ""}`}
+                                        onAnimationEnd={dotPop.onAnimationEnd}
+                                        aria-hidden="true"
+                                    />
+                                )}
                             </Link>
                             {isAuthenticated ? (
                                 <UserMenu />

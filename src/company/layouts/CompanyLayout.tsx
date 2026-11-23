@@ -84,11 +84,9 @@ function CompanyShell() {
         <span className="company-topbar__title">Painel do parceiro</span>
       </header>
 
+      {isMobile && <div className="company-backdrop" data-open={drawerOpen} onClick={closeDrawer} aria-hidden="true" />}
       {drawerOpen && (
-        <>
-          <div className="company-backdrop" onClick={closeDrawer} aria-hidden="true" />
-          <DrawerBehavior panelRef={drawerRef} initialFocusRef={closeButtonRef} returnFocusRef={menuButtonRef} onClose={closeDrawer} />
-        </>
+        <DrawerBehavior panelRef={drawerRef} initialFocusRef={closeButtonRef} returnFocusRef={menuButtonRef} onClose={closeDrawer} />
       )}
 
       <aside
@@ -133,8 +131,8 @@ function CompanyShell() {
         <div className="company-sidebar__account">
           <div className="company-avatar" aria-hidden="true">{initials}</div>
           <div className="company-account-copy">
-            <strong>{user?.name || 'Conta empresarial'}</strong>
-            <small>{user?.email}</small>
+            <strong title={user?.name}>{user?.name || 'Conta empresarial'}</strong>
+            <small title={user?.email}>{user?.email}</small>
           </div>
         </div>
 

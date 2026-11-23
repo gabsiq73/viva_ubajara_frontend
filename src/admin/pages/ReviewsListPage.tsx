@@ -5,6 +5,7 @@ import { useUrlListState } from '../hooks/useUrlListState';
 import { reviewsService } from '../services/reviewsService';
 import { useToast } from '../components/Toast';
 import { DataTable, Pagination } from '../components/DataTable';
+import { countLabel } from '../utils/countLabel';
 import { ConfirmModal } from '../components/Modal';
 import { formatClaimDate } from '../../utils/claims';
 import type { ApprovalStatus, ReviewAdminResponse, ReviewSpotType } from '../types';
@@ -154,7 +155,7 @@ export function ReviewsListPage() {
       accessor: (r: ReviewAdminResponse): ReactNode => (
         <div>
           <div style={{ fontWeight: 500 }}>{r.author.name}</div>
-          <div style={{ fontSize: 12, color: 'var(--adm-text-muted)', overflowWrap: 'break-word' }}>{r.author.email}</div>
+          <div style={{ fontSize: 12, color: 'var(--adm-text-muted)', overflowWrap: 'anywhere' }}>{r.author.email}</div>
         </div>
       ),
     },
@@ -228,7 +229,7 @@ export function ReviewsListPage() {
       <div className="adm-page-header">
         <h2 className="adm-page-title">
           Avaliações
-          <span>{totalElements} {totalElements === 1 ? 'registro' : 'registros'}</span>
+          <span>{countLabel(totalElements, 'registro', 'registros')}</span>
         </h2>
       </div>
 

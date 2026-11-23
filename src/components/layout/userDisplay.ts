@@ -11,3 +11,16 @@ export function getInitials(name: string): string {
         : Array.from(parts[0]).slice(0, 2).join("");
     return letters.toUpperCase();
 }
+
+const NAME_SUFFIX = /^(jr|sr|ii|iii|iv|junior|júnior)\.?$/i;
+
+/** Iniciais das duas primeiras palavras do nome; ignora emoji/pontuação soltos e sufixos (Jr, III) e devolve "" quando não sobra letra. */
+export function reviewerInitials(name: string): string {
+    return name
+        .split(/\s+/)
+        .filter((word, i) => /[\p{L}\p{N}]/u.test(word) && (i === 0 || !NAME_SUFFIX.test(word)))
+        .slice(0, 2)
+        .map((word) => Array.from(word.replace(/^[^\p{L}\p{N}]+/u, ""))[0])
+        .join("")
+        .toUpperCase();
+}

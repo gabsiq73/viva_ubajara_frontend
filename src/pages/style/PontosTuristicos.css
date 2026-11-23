@@ -137,10 +137,12 @@
   transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
 }
 
-.ptl-filter-btn:hover:not(.is-active) {
-  background: #f0f7f3;
-  border-color: #006b32;
-  color: #006b32;
+@media (hover: hover) and (pointer: fine) {
+  .ptl-filter-btn:hover:not(.is-active) {
+    background: #f0f7f3;
+    border-color: #006b32;
+    color: #006b32;
+  }
 }
 
 .ptl-filter-btn.is-active {
@@ -257,8 +259,10 @@
   transition: background 0.2s ease;
 }
 
-.ptl-empty__reset:hover {
-  background: #006b32;
+@media (hover: hover) and (pointer: fine) {
+  .ptl-empty__reset:hover {
+    background: #006b32;
+  }
 }
 
 /* ── CTA section ── */
@@ -309,13 +313,15 @@
   border: 2px solid #ffffff;
   background: #ffffff;
   color: #003016;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform var(--dur-press) var(--ease-out);
 }
 
-.ptl-cta__btn:hover {
-  background: #d4eadb;
-  border-color: #d4eadb;
-  transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+  .ptl-cta__btn:hover {
+    background: #d4eadb;
+    border-color: #d4eadb;
+    transform: translateY(-2px);
+  }
 }
 
 .ptl-cta__btn--outline {
@@ -324,10 +330,16 @@
   border-color: rgba(255, 255, 255, 0.45);
 }
 
-.ptl-cta__btn--outline:hover {
-  background: rgba(255, 255, 255, 0.10);
-  border-color: rgba(255, 255, 255, 0.80);
-  color: #ffffff;
+@media (hover: hover) and (pointer: fine) {
+  .ptl-cta__btn--outline:hover {
+    background: rgba(255, 255, 255, 0.10);
+    border-color: rgba(255, 255, 255, 0.80);
+    color: #ffffff;
+  }
+}
+
+.ptl-cta__btn:active {
+  transform: scale(0.97);
 }
 
 /* ── Stats section ── */
@@ -417,11 +429,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ptl-search__input,
-  .ptl-cta__btn {
-    transition: none;
-  }
-
   .ptl-cta__btn:hover {
     transform: none;
   }

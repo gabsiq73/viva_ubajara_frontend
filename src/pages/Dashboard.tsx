@@ -10,6 +10,7 @@ import { ConfirmDialog } from "../company/components/ConfirmDialog";
 import { useAuth } from "../admin/hooks/useAuth";
 import { usersService } from "../admin/services/usersService";
 import { testimonialsService } from "../admin/services/testimonialsService";
+import { useBrokenImage } from "../hooks/useBrokenImage";
 import { formatMediumDate, parseIsoDate, toIsoDate } from "../utils/dates";
 import { loadFavorites, toggleFavorite, type FavoriteItem } from "../utils/favorites";
 import { getRoleLabel } from "../utils/roles";
@@ -93,6 +94,13 @@ const TABS = [
 
 type Tab = (typeof TABS)[number]["key"];
 
+function FavoriteThumb({ photo }: { photo?: string }) {
+  const image = useBrokenImage(photo);
+  return image.show
+    ? <img src={photo} alt="" width={400} height={160} loading="lazy" decoding="async" onError={image.onError} />
+    : <div className="dash-fav-card__img-placeholder" />;
+}
+
 function parseTab(raw: string | null): Tab {
   return TABS.find((t) => t.key === raw)?.key ?? "favorites";
 }
@@ -123,6 +131,7 @@ export default function Dashboard() {
 
   // Photo upload
   const [currentPhoto, setCurrentPhoto] = useState<string | null>(user?.photo ?? null);
+  const avatarImage = useBrokenImage(currentPhoto);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photoNotice, setPhotoNotice] = useState<PhotoNotice>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -330,7 +339,7 @@ export default function Dashboard() {
   if (!isAuthenticated || !user) return null;
 
   const displayName = [firstName, lastName].filter(Boolean).join(" ") || user.name || user.email?.split("@")[0] || "";
-  const initials = displayName.slice(0, 2).toUpperCase();
+  const initials = Array.from(displayName).slice(0, 2).join("").toUpperCase();
   const roleLabel = getRoleLabel(user.role);
   const favCount = favorites.length;
   const msgCount = messages.length;
@@ -346,8 +355,8 @@ export default function Dashboard() {
             {/* Avatar with photo upload */}
             <div className="dash-avatar-wrap">
               <div className="dash-profile-avatar">
-                {currentPhoto
-                  ? <img src={currentPhoto} alt="" width={88} height={88} fetchPriority="high" decoding="async" />
+                {avatarImage.show
+                  ? <img src={currentPhoto!} alt="" width={88} height={88} fetchPriority="high" decoding="async" onError={avatarImage.onError} />
                   : <span aria-hidden="true">{initials}</span>
                 }
               </div>
@@ -481,14 +490,11 @@ export default function Dashboard() {
                       {favorites.map((fav) => (
                         <li key={fav.id} className="dash-fav-card">
                           <Link to={fav.path} className="dash-fav-card__img-wrap" tabIndex={-1} aria-hidden="true">
-                            {fav.photo
-                              ? <img src={fav.photo} alt="" width={400} height={160} loading="lazy" decoding="async" />
-                              : <div className="dash-fav-card__img-placeholder" />
-                            }
+                            <FavoriteThumb photo={fav.photo} />
                           </Link>
                           <div className="dash-fav-card__body">
                             <span className="dash-fav-card__type">{TYPE_LABELS[fav.type] ?? fav.type}</span>
-                            <Link to={fav.path} className="dash-fav-card__name">{fav.name}</Link>
+                            <Link to={fav.path} className="dash-fav-card__name" title={fav.name}>{fav.name}</Link>
                             {fav.shortDescription && (
                               <p className="dash-fav-card__desc">{fav.shortDescription}</p>
                             )}

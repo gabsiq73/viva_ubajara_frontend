@@ -1,6 +1,14 @@
-/* Altura do header fixo, para páginas com elementos sticky/offset. */
+/* Altura do header fixo, para páginas com elementos sticky/offset. Registrada para
+   transicionar junto com a altura do header, sem saltar antes dele terminar. */
+@property --site-header-h {
+    syntax: "<length>";
+    inherits: true;
+    initial-value: 84px;
+}
+
 :root {
     --site-header-h: 84px;
+    transition: --site-header-h 250ms var(--ease-out);
 }
 
 :root:has(.site-header.is-solid) {
@@ -14,7 +22,7 @@
 }
 
 .site-header {
-    --site-ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --site-ease: var(--ease-out);
     --site-logo-color: #ffffff;
     --site-logo-h: 52px;
     position: fixed;
@@ -135,21 +143,35 @@
     justify-content: center;
     cursor: pointer;
     text-decoration: none;
-    transition: background 250ms var(--site-ease);
+    transition: background-color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
+}
+
+.site-header__icon-btn:active {
+    transform: scale(0.96);
 }
 
 .site-header__icon-btn .ui-icon {
     font-size: 22px;
 }
 
-.site-header__icon-btn:hover,
 .site-header__icon-btn[aria-expanded="true"] {
     background: rgba(255, 255, 255, 0.14);
 }
 
-.site-header.is-solid .site-header__icon-btn:hover,
+@media (hover: hover) and (pointer: fine) {
+    .site-header__icon-btn:hover {
+        background: rgba(255, 255, 255, 0.14);
+    }
+}
+
 .site-header.is-solid .site-header__icon-btn[aria-expanded="true"] {
     background: #f0f7f3;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .site-header.is-solid .site-header__icon-btn:hover {
+        background: #f0f7f3;
+    }
 }
 
 .site-header__icon-btn:focus-visible {
@@ -169,6 +191,17 @@
     height: 9px;
     border-radius: 50%;
     background: #f3c66b;
+}
+
+.site-header__dot--in {
+    animation: site-header-dot-in 160ms var(--ease-out);
+}
+
+@keyframes site-header-dot-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
 }
 
 .site-header.is-solid .site-header__dot {
@@ -193,15 +226,21 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    transition: background 250ms var(--site-ease), color 250ms var(--site-ease), height 250ms var(--site-ease);
+    transition: background-color var(--dur-hover) ease, color var(--dur-hover) ease, height 250ms var(--site-ease), transform var(--dur-press) var(--ease-out);
+}
+
+.site-header__login:active {
+    transform: scale(0.97);
 }
 
 .site-header__login .ui-icon {
     font-size: 18px;
 }
 
-.site-header__login:hover {
-    background: #e8f5ef;
+@media (hover: hover) and (pointer: fine) {
+    .site-header__login:hover {
+        background: #e8f5ef;
+    }
 }
 
 .site-header__login:focus-visible {
@@ -215,8 +254,10 @@
     color: #ffffff;
 }
 
-.site-header.is-solid .site-header__login:hover {
-    background: #004a22;
+@media (hover: hover) and (pointer: fine) {
+    .site-header.is-solid .site-header__login:hover {
+        background: #004a22;
+    }
 }
 
 .site-header.is-solid .site-header__login:focus-visible {
@@ -281,14 +322,24 @@
     border-color: #c8ddd0;
 }
 
-.site-user__button:hover .site-avatar,
 .site-user__button[aria-expanded="true"] .site-avatar {
     border-color: #ffffff;
 }
 
-.site-header.is-solid .site-user__button:hover .site-avatar,
+@media (hover: hover) and (pointer: fine) {
+    .site-user__button:hover .site-avatar {
+        border-color: #ffffff;
+    }
+}
+
 .site-header.is-solid .site-user__button[aria-expanded="true"] .site-avatar {
     border-color: #006b32;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .site-header.is-solid .site-user__button:hover .site-avatar {
+        border-color: #006b32;
+    }
 }
 
 .site-user__button:focus-visible {
@@ -305,6 +356,7 @@
     top: calc(100% + 8px);
     right: 0;
     min-width: 248px;
+    max-width: min(360px, calc(100vw - 32px));
     padding: 8px;
     box-sizing: border-box;
     border-radius: 16px;
@@ -376,10 +428,15 @@
     color: #006b32;
 }
 
-.site-user__item:hover,
 .site-user__item:focus-visible {
     background: #e8f5ef;
     outline: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .site-user__item:hover {
+        background: #e8f5ef;
+    }
 }
 
 .site-user__item:focus-visible {
@@ -391,9 +448,14 @@
     color: #b42323;
 }
 
-.site-user__item--danger:hover,
 .site-user__item--danger:focus-visible {
     background: #fcebeb;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .site-user__item--danger:hover {
+        background: #fcebeb;
+    }
 }
 
 .site-user__item--danger:focus-visible {
@@ -488,10 +550,17 @@
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
+    transition: background-color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
 }
 
-.site-search__submit:hover {
-    background: #005a2a;
+.site-search__submit:active {
+    transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .site-search__submit:hover {
+        background: #005a2a;
+    }
 }
 
 .site-search__submit:focus-visible {
@@ -545,7 +614,19 @@
     color: #ffffff;
     --site-logo-color: #ffffff;
     --site-logo-h: 36px;
-    animation: site-menu-in 200ms var(--site-ease);
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transition: opacity 150ms var(--ease-out), clip-path 150ms var(--ease-out);
+}
+
+.site-menu[data-state="open"] {
+    opacity: 1;
+    clip-path: inset(0);
+    transition-duration: 220ms;
+}
+
+.site-menu[data-state="closed"] {
+    pointer-events: none;
 }
 
 .site-menu:focus {
@@ -554,11 +635,6 @@
 
 .site-menu[hidden] {
     display: none;
-}
-
-@keyframes site-menu-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
 }
 
 .site-menu__bar {
@@ -575,8 +651,10 @@
     font-size: 26px;
 }
 
-.site-header.is-solid .site-menu .site-header__icon-btn:hover {
-    background: rgba(255, 255, 255, 0.14);
+@media (hover: hover) and (pointer: fine) {
+    .site-header.is-solid .site-menu .site-header__icon-btn:hover {
+        background: rgba(255, 255, 255, 0.14);
+    }
 }
 
 .site-header.is-solid .site-menu .site-header__icon-btn:focus-visible,
@@ -725,8 +803,12 @@
     .site-user__popover,
     .site-header__search-panel,
     .site-menu {
-        transition: none;
         animation: none;
+    }
+
+    .site-menu,
+    .site-menu[data-state="open"] {
+        clip-path: none;
     }
 }
 

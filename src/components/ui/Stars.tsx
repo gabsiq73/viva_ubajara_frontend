@@ -89,7 +89,7 @@ export function StarPicker({ value, onChange, labelledBy, describedBy, invalid, 
           tabIndex={value === s || (value === 0 && s === 1) ? 0 : -1}
           className={`ui-star-picker__btn${active >= s ? " filled" : ""}`}
           onClick={() => onChange(s as StarValue)}
-          onMouseEnter={() => setHovered(s)}
+          onPointerEnter={(e) => { if (e.pointerType === "mouse") setHovered(s); }}
           onMouseLeave={() => setHovered(0)}
           disabled={disabled}
           aria-label={`${s} estrela${s > 1 ? "s" : ""}`}

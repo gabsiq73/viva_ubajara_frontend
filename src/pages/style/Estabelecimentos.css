@@ -256,6 +256,25 @@
     gap: 12px;
 }
 
+/* Cancela o gap do painel; o padding do inner devolve o espaço (e a folga dos anéis de foco, cortados pelo overflow). */
+.estab-panel__collapse {
+    margin-top: -28px;
+    margin-bottom: -6px;
+}
+
+.estab-panel__collapse .ui-collapse__inner {
+    margin-inline: -6px;
+    padding: 28px 6px 6px;
+}
+
+.estab-panel--sheet .estab-panel__collapse {
+    margin-top: -24px;
+}
+
+.estab-panel--sheet .estab-panel__collapse .ui-collapse__inner {
+    padding-top: 24px;
+}
+
 .estab-panel__group--section {
     padding-top: 24px;
     border-top: 1px solid var(--pub-border);
@@ -304,11 +323,17 @@
     font-weight: 500;
     text-align: left;
     cursor: pointer;
-    transition: background 0.16s ease;
+    transition: background 0.16s ease, transform var(--dur-press) var(--ease-out);
 }
 
-.estab-type:hover {
-    background: var(--pub-green-pale);
+@media (hover: hover) and (pointer: fine) {
+    .estab-type:hover {
+        background: var(--pub-green-pale);
+    }
+}
+
+.estab-type:active {
+    transform: scale(0.98);
 }
 
 .estab-type .ui-icon {
@@ -329,7 +354,6 @@
 .estab-type--on:hover {
     background: var(--pub-green-dim);
     color: var(--pub-green);
-    font-weight: 600;
 }
 
 .estab-panel--sheet {
@@ -439,6 +463,11 @@
     background: transparent;
     color: var(--pub-text);
     cursor: pointer;
+    transition: transform var(--dur-press) var(--ease-out);
+}
+
+.estab-view__btn:active {
+    transform: scale(0.96);
 }
 
 .estab-view__btn--on {
@@ -469,6 +498,68 @@
     text-decoration: underline;
     text-underline-offset: 3px;
     cursor: pointer;
+}
+
+/* Escalonamento só na primeira carga; qualquer re-filtro troca a grade com um fade curto. */
+.estab-motion--stagger > * {
+    animation: estab-card-in 400ms var(--ease-out) backwards;
+}
+
+.estab-motion--stagger > :nth-child(2) { animation-delay: 40ms; }
+.estab-motion--stagger > :nth-child(3) { animation-delay: 80ms; }
+.estab-motion--stagger > :nth-child(4) { animation-delay: 120ms; }
+.estab-motion--stagger > :nth-child(5) { animation-delay: 160ms; }
+.estab-motion--stagger > :nth-child(n + 6) { animation-delay: 200ms; }
+
+.estab-motion--fade {
+    animation: estab-fade-in 150ms var(--ease-out);
+}
+
+@keyframes estab-card-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+}
+
+@keyframes estab-fade-in {
+    from {
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .estab-motion--stagger > * {
+        animation-name: estab-fade-in;
+    }
+}
+
+.estab-applied-collapse {
+    margin-top: -20px;
+    margin-bottom: -4px;
+}
+
+/* O padding mantém o gap do flex e a área de toque ampliada dos chips (que o overflow do Collapse cortaria). */
+.estab-applied-collapse .ui-collapse__inner {
+    padding: 20px 0 4px;
+}
+
+.estab-applied .ui-applied {
+    animation: estab-chip-in 160ms var(--ease-out) backwards;
+    transform-origin: left center;
+}
+
+@keyframes estab-chip-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .estab-applied .ui-applied {
+        animation-name: estab-fade-in;
+    }
 }
 
 .estab-grid {

@@ -9,7 +9,9 @@
 .company-claim__note--danger { color: #8f2d2d; }
 .company-claim__actions { display: flex; flex-shrink: 0; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 16px; }
 .company-claim__link { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; font-size: 15px; font-weight: 600; color: var(--pub-green); text-decoration: none; }
-.company-claim__link:hover { text-decoration: underline; }
+@media (hover: hover) and (pointer: fine) {
+  .company-claim__link:hover { text-decoration: underline; }
+}
 .company-claim__link .ui-icon { font-size: 18px; }
 .company-claim__link:focus-visible { outline: 3px solid var(--pub-green-mid); outline-offset: 2px; border-radius: 6px; }
 

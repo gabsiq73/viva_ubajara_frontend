@@ -1,4 +1,5 @@
-import { useId, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
+import { usePresence } from "../../utils/usePresence";
 import Icon from "./Icon";
 import "./field.css";
 
@@ -27,6 +28,9 @@ export default function Field({ label, hint, error, required, optional, counter,
     const hintId = `${uid}-hint`;
     const errorId = `${uid}-error`;
     const describedBy = [error ? errorId : null, hint ? hintId : null].filter(Boolean).join(" ");
+    const [lastError, setLastError] = useState(error);
+    if (error && error !== lastError) setLastError(error);
+    const presence = usePresence(!!error, 160);
     const counterState = counter ? (counter.current >= counter.max ? "full" : counter.current >= counter.max * 0.9 ? "near" : "") : "";
 
     const control: FieldControlProps = { id };
@@ -54,17 +58,19 @@ export default function Field({ label, hint, error, required, optional, counter,
                 )}
             </div>
             {children(control)}
-            {error && (
-                <p id={errorId} className="ui-field__error">
-                    <Icon name="error" filled />
-                    <span>{error}</span>
-                </p>
-            )}
             {hint && (
                 <p id={hintId} className="ui-field__hint">
                     {hint}
                 </p>
             )}
+            <div className="ui-field__error-slot">
+                {presence.mounted && (
+                    <p id={error ? errorId : undefined} className="ui-field__error" data-state={presence.state}>
+                        <Icon name="error" filled />
+                        <span>{error ?? lastError}</span>
+                    </p>
+                )}
+            </div>
         </div>
     );
 }

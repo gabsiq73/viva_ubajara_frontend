@@ -20,8 +20,10 @@
     cursor: pointer;
 }
 
-.company-menu-form__close:hover {
-    background: var(--pub-green-dim);
+@media (hover: hover) and (pointer: fine) {
+    .company-menu-form__close:hover {
+        background: var(--pub-green-dim);
+    }
 }
 
 .company-menu-form__close:focus-visible,
@@ -64,6 +66,7 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
+    overflow: hidden;
     background: var(--pub-green-pale);
     color: var(--pub-green-mid);
     font-size: 13px;
@@ -126,12 +129,18 @@
     background: var(--ui-danger-bg);
     color: #b83a3a;
     cursor: pointer;
-    transition: background var(--pub-transition), color var(--pub-transition);
+    transition: background var(--pub-transition), color var(--pub-transition), transform var(--dur-press) var(--ease-out);
 }
 
-.company-menu-card__delete:hover {
-    background: var(--ui-danger);
-    color: #ffffff;
+.company-menu-card__delete:active {
+    transform: scale(0.96);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .company-menu-card__delete:hover {
+        background: var(--ui-danger);
+        color: #ffffff;
+    }
 }
 
 .company-menu-note {

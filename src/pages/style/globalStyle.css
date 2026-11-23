@@ -74,7 +74,16 @@ textarea {
     --pub-shadow:     0 6px 24px rgba(0, 33, 12, 0.08);
     --pub-shadow-md:  0 12px 36px rgba(0, 33, 12, 0.11);
     --pub-shadow-lg:  0 20px 56px rgba(0, 33, 12, 0.15);
-    --pub-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --pub-transition: var(--dur-pop) var(--ease-out);
+
+    /* ── Movimento ── */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+    --dur-press: 160ms;
+    --dur-hover: 150ms;
+    --dur-pop: 200ms;
+    --dur-sheet: 300ms;
 
     /* ── Famílias ── */
     --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -196,41 +205,49 @@ textarea {
 }
 
 /* ── Image loading ── */
-@keyframes img-shimmer {
-    0%   { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-@keyframes img-fadein {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+@keyframes ui-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.55; }
 }
 
-img {
-    animation: img-fadein 0.35s ease both;
+@keyframes ui-fade-in {
+    from { opacity: 0; }
+}
+
+/* Pop curto de confirmação (favoritar); só ao ativar, via useActivationPop. */
+@keyframes ui-pop {
+    50% { transform: scale(1.12); }
+}
+
+/* Só opacity (sem translate) e só em navegação cliente: o carregamento inicial não atrasa o LCP. */
+.route-fade {
+    animation: ui-fade-in 150ms var(--ease-out);
 }
 
 /* Skeleton placeholder for image containers before src loads */
 .evd-rel-card__img--placeholder {
-    background: linear-gradient(90deg, #e8f0eb 25%, #d4e4d9 50%, #e8f0eb 75%);
-    background-size: 200% 100%;
-    animation: img-shimmer 1.4s ease-in-out infinite !important;
+    background: #e2ece6;
+    animation: ui-pulse 1.4s ease-in-out infinite !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    img,
-    .evd-rel-card__img--placeholder {
-        animation: none !important;
-    }
-
     *,
     *::before,
     *::after {
-        transition-duration: 0.01ms !important;
-        transition-delay: 0s !important;
-        animation-duration: 0.01ms !important;
-        animation-delay: 0s !important;
-        animation-iteration-count: 1 !important;
         scroll-behavior: auto !important;
+        animation-iteration-count: 1 !important;
+        transition-property: color, background-color, border-color, opacity, box-shadow, visibility !important;
+        transition-duration: 150ms !important;
+        transition-delay: 0s !important;
+        animation-delay: 0s !important;
+    }
+
+    /* Entradas por keyframe de movimento viram só fade. */
+    [class*="slide"],
+    [class*="pop-in"],
+    [class*="reveal"] {
+        animation-name: rm-fade !important;
+        animation-duration: 200ms !important;
     }
 
     /* Spinners seguem girando, devagar: parados, o carregamento pareceria travado. */
@@ -238,6 +255,23 @@ img {
         animation-duration: 2.4s !important;
         animation-iteration-count: infinite !important;
     }
+
+    .evd-rel-card__img--placeholder {
+        animation: none !important;
+    }
+
+    .is-popping,
+    .adm-upload-zone.drag-over,
+    .company-photo-drop.is-dragging,
+    .adm-upload-zone.drag-over .adm-upload-zone__icon-wrap,
+    .company-photo-drop.is-dragging .company-photo-drop__icon {
+        animation: none !important;
+        transform: none !important;
+    }
+}
+
+@keyframes rm-fade {
+    from { opacity: 0; }
 }
 
 /*Responsive*/

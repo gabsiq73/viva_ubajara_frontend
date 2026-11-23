@@ -8,8 +8,14 @@ export const RATING_LABELS: Record<number, string> = {
 
 export const averageFormat = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
+export const countFormat = new Intl.NumberFormat("pt-BR");
+
+export function formatCount(count: number): string {
+  return countFormat.format(count);
+}
+
 export function reviewsLabel(count: number): string {
-  return `${count} ${count === 1 ? "avaliação" : "avaliações"}`;
+  return `${formatCount(count)} ${count === 1 ? "avaliação" : "avaliações"}`;
 }
 
 export function formatRating(value: number): string {

@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import PageHero from "../components/ui/PageHero";
 import Field from "../components/ui/Field";
 import Icon from "../components/ui/Icon";
+import Collapse from "../components/ui/Collapse";
 import StateBlock from "../components/ui/StateBlock";
 import { Button } from "../components/ui/Button";
 import { useAuth } from "../admin/hooks/useAuth";
@@ -245,12 +246,12 @@ export default function CadastroEmpresa() {
                                 </div>
                             )}
 
-                            {error && (
+                            <Collapse open={!!error}>
                                 <div ref={alertRef} tabIndex={-1} className="ce-alert" role="alert">
                                     <Icon name="error" filled />
                                     <span>{error}</span>
                                 </div>
-                            )}
+                            </Collapse>
 
                             <form ref={formRef} className="ce-form" onSubmit={handleSubmit} noValidate>
                                 {!activationMode && (

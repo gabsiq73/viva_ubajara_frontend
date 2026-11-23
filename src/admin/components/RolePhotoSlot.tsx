@@ -107,8 +107,8 @@ export function RolePhotoSlot({
       {hint && <span className="adm-field__hint">{hint}</span>}
 
       {currentUrl ? (
-        <div className="adm-role-slot__preview">
-          <img src={currentUrl} alt={label} className="adm-role-slot__img" />
+        <div className={`adm-role-slot__preview${uploading ? ' adm-role-slot__preview--busy' : ''}`}>
+          <img key={currentUrl} src={currentUrl} alt={label} className="adm-role-slot__img" />
           <div className="adm-role-slot__actions">
             <button
               type="button"
@@ -117,7 +117,7 @@ export function RolePhotoSlot({
               disabled={isBusy}
             >
               {uploading
-                ? <Loader size={13} aria-hidden="true" style={{ animation: 'adm-spin 0.6s linear infinite' }} />
+                ? <Loader size={13} aria-hidden="true" className="adm-spin" />
                 : <RefreshCw size={13} aria-hidden="true" />}
               Trocar
             </button>
@@ -128,7 +128,7 @@ export function RolePhotoSlot({
               disabled={isBusy}
             >
               {deleting
-                ? <Loader size={13} aria-hidden="true" style={{ animation: 'adm-spin 0.6s linear infinite' }} />
+                ? <Loader size={13} aria-hidden="true" className="adm-spin" />
                 : <Trash2 size={13} aria-hidden="true" />}
               Remover
             </button>

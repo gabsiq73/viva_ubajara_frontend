@@ -53,10 +53,12 @@
     transition: border-color var(--pub-transition), box-shadow var(--pub-transition), transform var(--pub-transition);
 }
 
-.company-type-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--pub-green);
-    box-shadow: var(--pub-shadow);
+@media (hover: hover) and (pointer: fine) {
+    .company-type-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--pub-green);
+        box-shadow: var(--pub-shadow);
+    }
 }
 
 .company-type-card:focus-visible {
@@ -135,13 +137,24 @@
     font-family: "Inter", sans-serif;
     text-align: center;
     cursor: pointer;
-    transition: background var(--pub-transition), border-color var(--pub-transition);
+    transition: background var(--pub-transition), border-color var(--pub-transition), transform 160ms var(--ease-out);
 }
 
-.company-photo-drop:hover:not(:disabled),
 .company-photo-drop.is-dragging {
     border-color: var(--pub-green);
     background: var(--pub-green-dim);
+    transform: scale(1.01);
+}
+
+.company-photo-drop.is-dragging .company-photo-drop__icon {
+    transform: translateY(-2px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .company-photo-drop:hover:not(:disabled) {
+        border-color: var(--pub-green);
+        background: var(--pub-green-dim);
+    }
 }
 
 .company-photo-drop:focus-visible {
@@ -163,6 +176,7 @@
     background: #ffffff;
     color: var(--pub-green);
     box-shadow: var(--pub-shadow-sm);
+    transition: transform 160ms var(--ease-out);
 }
 
 .company-photo-drop__icon .ui-icon {
@@ -204,12 +218,13 @@
 .company-progress progress::-webkit-progress-value {
     border-radius: 50px;
     background: var(--pub-green);
-    transition: width 0.3s ease;
+    transition: width 300ms var(--ease-out);
 }
 
 .company-progress progress::-moz-progress-bar {
     border-radius: 50px;
     background: var(--pub-green);
+    transition: width 300ms var(--ease-out);
 }
 
 .company-photo-group {
@@ -247,6 +262,7 @@
 .company-photo-item__media {
     position: relative;
     aspect-ratio: 4 / 3;
+    overflow: hidden;
     background: var(--pub-green-pale);
 }
 
@@ -255,6 +271,18 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.company-photo-item__broken {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    height: 100%;
+    font-size: 12px;
+    color: var(--ui-text-secondary);
 }
 
 .company-photo-item__cover {
@@ -299,6 +327,11 @@
     background: none;
     color: var(--ui-text-secondary);
     cursor: pointer;
+    transition: background-color var(--dur-hover) ease, color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
+}
+
+.company-photo-item__actions button:active:not(:disabled) {
+    transform: scale(0.96);
 }
 
 .company-photo-item__actions button.is-danger {
@@ -306,14 +339,16 @@
     color: #b83a3a;
 }
 
-.company-photo-item__actions button:hover:not(:disabled) {
-    background: var(--pub-green-dim);
-    color: var(--pub-green);
-}
+@media (hover: hover) and (pointer: fine) {
+    .company-photo-item__actions button:hover:not(:disabled) {
+        background: var(--pub-green-dim);
+        color: var(--pub-green);
+    }
 
-.company-photo-item__actions button.is-danger:hover:not(:disabled) {
-    background: var(--ui-danger-bg);
-    color: #b83a3a;
+    .company-photo-item__actions button.is-danger:hover:not(:disabled) {
+        background: var(--ui-danger-bg);
+        color: #b83a3a;
+    }
 }
 
 .company-photo-item__actions button:disabled {
@@ -420,11 +455,5 @@
 @media (prefers-reduced-motion: reduce) {
     .company-type-card:hover {
         transform: none;
-    }
-
-    .company-type-card,
-    .company-photo-drop,
-    .company-progress progress::-webkit-progress-value {
-        transition: none;
     }
 }

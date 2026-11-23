@@ -6,9 +6,22 @@ import { ConfirmModal } from '../components/Modal';
 import { RemovePhotoDialog } from '../components/RemovePhotoDialog';
 import { FormInput, FormToggle } from '../components/FormField';
 import { Plus, Pencil, Trash2, Upload, X } from 'lucide-react';
+import { countLabel } from '../utils/countLabel';
+import { useBrokenImage } from '../../hooks/useBrokenImage';
 import type { GastronomyItemResponse, GastronomyItemRequest } from '../types';
 
 const EMPTY: GastronomyItemRequest = { name: '', displayOrder: undefined, active: true };
+
+function ItemImage({ url, name }: { url?: string | null; name: string }) {
+  const image = useBrokenImage(url);
+  return image.show ? (
+    <img src={url!} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={image.onError} />
+  ) : (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--adm-text-muted)', fontSize: 13 }}>
+      Sem imagem
+    </div>
+  );
+}
 
 export function GastronomyItemsPage() {
   const { showToast } = useToast();
@@ -108,7 +121,7 @@ export function GastronomyItemsPage() {
   return (
     <div>
       <div className="adm-page-header">
-        <h2 className="adm-page-title">Gastronomia <span>{items.length} itens</span></h2>
+        <h2 className="adm-page-title">Gastronomia <span>{countLabel(items.length, 'item', 'itens')}</span></h2>
         <button className="adm-btn adm-btn--primary" onClick={openNew}><Plus size={16} aria-hidden="true" /> Novo Item</button>
       </div>
 
@@ -143,13 +156,7 @@ export function GastronomyItemsPage() {
               {items.map((item) => (
                 <div key={item.id} style={{ border: '1px solid var(--adm-border)', borderRadius: 8, overflow: 'hidden', background: '#fff' }}>
                   <div style={{ position: 'relative', aspectRatio: '4/3', background: '#f5f5f5' }}>
-                    {item.imageUrl ? (
-                      <img src={item.imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--adm-text-muted)', fontSize: 13 }}>
-                        Sem imagem
-                      </div>
-                    )}
+                    <ItemImage url={item.imageUrl} name={item.name} />
                     {uploadingId === item.id && (
                       <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Spinner size="sm" />

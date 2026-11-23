@@ -24,6 +24,11 @@
     overflow: hidden;
     background: #e4ede8;
     cursor: pointer;
+    transition: transform var(--dur-press) var(--ease-out);
+}
+
+.ui-photo-gallery__item:active {
+    transform: scale(0.98);
 }
 
 .ui-photo-gallery__item:focus-visible {
@@ -38,7 +43,7 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
-    transition: transform 0.45s ease;
+    transition: transform 300ms var(--ease-out);
 }
 
 .ui-photo-gallery__more {
@@ -123,10 +128,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .ui-photo-gallery__item img {
-        transition: none;
-    }
-
     .ui-photo-gallery__item:hover img {
         transform: none;
     }

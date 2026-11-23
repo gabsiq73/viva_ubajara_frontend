@@ -1,9 +1,10 @@
-import type { JSX } from 'react';
+import type { CSSProperties, JSX } from 'react';
 import { useState, useEffect, useRef, useId } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Icon from "../components/ui/Icon";
+import Collapse from "../components/ui/Collapse";
 import StateBlock from "../components/ui/StateBlock";
 import { Button } from "../components/ui/Button";
 import { Stars, StarPicker, type StarValue } from "../components/ui/Stars";
@@ -11,9 +12,12 @@ import { useAuth } from "../admin/hooks/useAuth";
 import { testimonialsService } from "../admin/services/testimonialsService";
 import { pageConfigService } from "../admin/services/pageConfigService";
 import type { TestimonialResponse } from "../admin/types";
+import { useBrokenImage } from "../hooks/useBrokenImage";
+import { reviewerInitials } from "../components/layout/userDisplay";
 import { formatLongDate, parseIsoDate, toIsoDate } from "../utils/dates";
-import { RATING_LABELS, averageFormat, reviewsLabel } from "../utils/rating";
+import { RATING_LABELS, averageFormat, formatCount, reviewsLabel } from "../utils/rating";
 import { useAsyncData } from "../utils/useAsyncData";
+import { usePresence } from "../utils/usePresence";
 import { useDocumentTitle } from "../utils/useDocumentTitle";
 import "../components/ui/ui.css";
 import "./style/Depoimentos.css";
@@ -25,20 +29,21 @@ function parseRating(raw: string | null): 0 | StarValue {
 
 // ─── Card de depoimento ────────────────────────────────────────────────────
 function TestimonialCard({ t }: { t: TestimonialResponse }) {
-  const initials = t.userName.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+  const initials = reviewerInitials(t.userName);
+  const photo = useBrokenImage(t.userPhoto);
   const date = parseIsoDate(t.createdDate);
 
   return (
     <article className="dep-card">
       <div className="dep-card__top">
         <div className="dep-card__avatar">
-          {t.userPhoto
-            ? <img src={t.userPhoto} alt="" width={44} height={44} loading="lazy" decoding="async" />
-            : <span aria-hidden="true">{initials}</span>
+          {photo.show
+            ? <img src={t.userPhoto} alt="" width={44} height={44} loading="lazy" decoding="async" onError={photo.onError} />
+            : <span aria-hidden="true">{initials || <Icon name="person" />}</span>
           }
         </div>
         <div className="dep-card__meta">
-          <strong className="dep-card__name">{t.userName}</strong>
+          <strong className="dep-card__name" title={t.userName}>{t.userName}</strong>
         </div>
         <Stars value={t.rating} size={15} />
       </div>
@@ -95,6 +100,7 @@ export default function Depoimentos(): JSX.Element {
   const all = testimonials.status === "ready" ? [...published, ...testimonials.data] : [];
   const filtered = filter === 0 ? all : all.filter((t) => t.rating === filter);
 
+  const bars = usePresence(all.length > 0, 0);
   const avgRating = all.length ? all.reduce((s, t) => s + t.rating, 0) / all.length : 0;
 
   const countByRating = [5, 4, 3, 2, 1].map((star) => ({
@@ -161,8 +167,8 @@ export default function Depoimentos(): JSX.Element {
               <span className="dep-summary__total">{reviewsLabel(all.length)}</span>
             </div>
 
-            <div className="dep-summary__bars" role="group" aria-label="Filtrar por nota">
-              {countByRating.map(({ star, count }) => (
+            <div className="dep-summary__bars" role="group" aria-label="Filtrar por nota" data-state={bars.state}>
+              {countByRating.map(({ star, count }, index) => (
                 <button
                   key={star}
                   type="button"
@@ -175,10 +181,10 @@ export default function Depoimentos(): JSX.Element {
                   <div className="dep-summary__bar-track" aria-hidden="true">
                     <div
                       className="dep-summary__bar-fill"
-                      style={{ width: `${(count / all.length) * 100}%` }}
+                      style={{ "--p": count / all.length, "--i": index } as CSSProperties}
                     />
                   </div>
-                  <span className="dep-summary__bar-count" aria-hidden="true">{count}</span>
+                  <span className="dep-summary__bar-count" aria-hidden="true">{formatCount(count)}</span>
                 </button>
               ))}
             </div>
@@ -240,12 +246,12 @@ export default function Depoimentos(): JSX.Element {
             </h2>
             <p className="dep-form-section__sub">Sua experiência ajuda outros visitantes a se planejar.</p>
 
-            {submitSuccess && (
+            <Collapse open={submitSuccess} className="dep-alert-collapse">
               <div className="dep-alert dep-alert--success" role="status">
                 <Icon name="check_circle" />
                 Obrigado! Seu depoimento foi enviado e aguarda aprovação.
               </div>
-            )}
+            </Collapse>
 
             <form className="dep-form" onSubmit={handleSubmit} noValidate>
               <div className="dep-form__rating-wrap">
@@ -264,7 +270,9 @@ export default function Depoimentos(): JSX.Element {
                     <span className="dep-form__rating-label" aria-live="polite">{RATING_LABELS[rating]}</span>
                   )}
                 </div>
-                {ratingError && <p id={ratingErrorId} className="dep-form__error">{ratingError}</p>}
+                <Collapse open={!!ratingError}>
+                  <p id={ratingErrorId} className="dep-form__error">{ratingError}</p>
+                </Collapse>
               </div>
 
               <div className="dep-form__field">
@@ -285,15 +293,17 @@ export default function Depoimentos(): JSX.Element {
                   aria-describedby={commentError ? commentErrorId : undefined}
                 />
                 <span className="dep-form__char-count">{comment.length}/600</span>
-                {commentError && <p id={commentErrorId} className="dep-form__error">{commentError}</p>}
+                <Collapse open={!!commentError}>
+                  <p id={commentErrorId} className="dep-form__error">{commentError}</p>
+                </Collapse>
               </div>
 
-              {submitError && (
+              <Collapse open={!!submitError} className="dep-form__alert">
                 <div className="dep-alert dep-alert--error" role="alert">
                   <Icon name="error" />
                   {submitError}
                 </div>
-              )}
+              </Collapse>
 
               <button type="submit" className="dep-form__submit" disabled={submitting}>
                 {submitting

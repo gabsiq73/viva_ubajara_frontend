@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { FilterChip } from "../ui/Chip";
+import Collapse from "../ui/Collapse";
 import Icon from "../ui/Icon";
 import SearchField from "../ui/SearchField";
 import Toggle from "../ui/Toggle";
@@ -96,7 +97,7 @@ export default function FiltersPanel({
                 )}
             </div>
 
-            {showRestaurantFilters && (
+            <Collapse open={showRestaurantFilters} className="estab-panel__collapse">
                 <div className="estab-panel__group estab-panel__group--section" role="group" aria-labelledby={`${uid}-rest`}>
                     <span id={`${uid}-rest`} className="estab-panel__label">{isSheet ? "Culinária" : "Restaurantes"}</span>
                     {cuisineOptions.length > 0 && (
@@ -132,9 +133,9 @@ export default function FiltersPanel({
                         onChange={(checked) => onChange({ avaliacao: checked })}
                     />
                 </div>
-            )}
+            </Collapse>
 
-            {showLodgingFilters && (
+            <Collapse open={showLodgingFilters} className="estab-panel__collapse">
                 <div className="estab-panel__group estab-panel__group--section" role="group" aria-labelledby={`${uid}-hosp`}>
                     <span id={`${uid}-hosp`} className="estab-panel__label">Hospedagem</span>
                     <span className="estab-panel__sublabel">Nº de quartos</span>
@@ -156,7 +157,7 @@ export default function FiltersPanel({
                         onChange={(checked) => onChange({ online: checked })}
                     />
                 </div>
-            )}
+            </Collapse>
         </div>
     );
 }

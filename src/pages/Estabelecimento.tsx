@@ -76,10 +76,12 @@ function scrollToSection(id: string) {
 function DetailView({ detail }: { detail: EstablishmentDetail }) {
     const isMobile = useMediaQuery("(max-width: 768px)");
     const [nearby, setNearby] = useState<Establishment[]>([]);
+    const [nearbyLoading, setNearbyLoading] = useState(true);
     const [favoriteIds, setFavoriteIds] = useState<Set<string>>(() => new Set(loadFavorites().map((f) => f.id)));
     const [galleryIndex, setGalleryIndex] = useState<number | null>(null);
     const [sheetOpen, setSheetOpen] = useState(false);
     const [toast, setToast] = useState("");
+    const [toastVisible, setToastVisible] = useState(false);
     const openerRef = useRef<HTMLElement | null>(null);
     const toastTimer = useRef<number | undefined>(undefined);
 
@@ -91,7 +93,10 @@ function DetailView({ detail }: { detail: EstablishmentDetail }) {
             .then((items) => {
                 if (!cancelled) setNearby(items);
             })
-            .catch(() => undefined);
+            .catch(() => undefined)
+            .then(() => {
+                if (!cancelled) setNearbyLoading(false);
+            });
         return () => {
             cancelled = true;
         };
@@ -129,8 +134,9 @@ function DetailView({ detail }: { detail: EstablishmentDetail }) {
 
     function showToast(message: string) {
         setToast(message);
+        setToastVisible(true);
         window.clearTimeout(toastTimer.current);
-        toastTimer.current = window.setTimeout(() => setToast(""), TOAST_MS);
+        toastTimer.current = window.setTimeout(() => setToastVisible(false), TOAST_MS);
     }
 
     async function handleShare() {
@@ -184,8 +190,9 @@ function DetailView({ detail }: { detail: EstablishmentDetail }) {
                 </div>
             </div>
 
-            {nearby.length > 0 && (
+            {(nearbyLoading || nearby.length > 0) && (
                 <NearbySection
+                    loading={nearbyLoading}
                     items={nearby}
                     lodging={detail.apiType === "hostpoint"}
                     favoriteIds={favoriteIds}
@@ -197,28 +204,28 @@ function DetailView({ detail }: { detail: EstablishmentDetail }) {
 
             {isMobile && <BottomBar detail={detail} onOpenSheet={openSheet} />}
 
-            {galleryIndex !== null && (
-                <PhotoLightbox
-                    title={detail.name}
-                    photos={detail.photos}
-                    index={galleryIndex}
-                    onIndexChange={setGalleryIndex}
-                    onClose={() => setGalleryIndex(null)}
-                    returnFocusRef={openerRef}
-                />
-            )}
+            <PhotoLightbox
+                title={detail.name}
+                photos={detail.photos}
+                index={galleryIndex}
+                onIndexChange={setGalleryIndex}
+                onClose={() => setGalleryIndex(null)}
+                returnFocusRef={openerRef}
+            />
 
-            {sheetOpen && (
-                <DirectionsSheet
-                    address={detail.address}
-                    links={links}
-                    onClose={() => setSheetOpen(false)}
-                    returnFocusRef={openerRef}
-                />
-            )}
+            <DirectionsSheet
+                open={sheetOpen}
+                address={detail.address}
+                links={links}
+                onClose={() => setSheetOpen(false)}
+                returnFocusRef={openerRef}
+            />
 
-            <div className={`estd-toast${toast ? " estd-toast--on" : ""}`} role="status" aria-live="polite">
+            <div className={`estd-toast${toastVisible ? " estd-toast--on" : ""}`} aria-hidden="true">
                 {toast}
+            </div>
+            <div className="ui-sr-only" role="status" aria-live="polite">
+                {toastVisible ? toast : ""}
             </div>
         </>
     );

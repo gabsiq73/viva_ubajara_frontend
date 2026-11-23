@@ -17,7 +17,7 @@ export default function Breadcrumb({ prefix, items }: { prefix: "evd" | "pt"; it
                                 {item.label}
                             </Link>
                         ) : (
-                            <span className={`${prefix}-breadcrumb__current`} aria-current="page">
+                            <span className={`${prefix}-breadcrumb__current`} aria-current="page" title={item.label}>
                                 {item.label}
                             </span>
                         )}

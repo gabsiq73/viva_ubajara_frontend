@@ -63,7 +63,7 @@ export function PhotoManager({ entityPath, entityId, initialPhotos, title }: Pro
           disabled={uploading}
           style={{ display: 'flex', alignItems: 'center', gap: 6 }}
         >
-          {uploading ? <Loader size={16} aria-hidden="true" style={{ animation: 'adm-spin 0.6s linear infinite' }} /> : <ImagePlus size={16} aria-hidden="true" />}
+          {uploading ? <Loader size={16} aria-hidden="true" className="adm-spin" /> : <ImagePlus size={16} aria-hidden="true" />}
           {uploading ? 'Enviando…' : 'Adicionar Foto'}
         </button>
         <input
@@ -106,7 +106,7 @@ export function PhotoManager({ entityPath, entityId, initialPhotos, title }: Pro
                 }}
               >
                 {deletingId === photo.id
-                  ? <Loader size={14} aria-hidden="true" style={{ animation: 'adm-spin 0.6s linear infinite' }} />
+                  ? <Loader size={14} aria-hidden="true" className="adm-spin" />
                   : <Trash2 size={14} aria-hidden="true" />
                 }
               </button>

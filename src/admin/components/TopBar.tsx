@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Menu, LogOut } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useGuardedNavigate } from '../hooks/useGuardedNavigate';
+import { useBrokenImage } from '../../hooks/useBrokenImage';
+import { reviewerInitials } from '../../components/layout/userDisplay';
 import { useUnsavedGuard } from '../../company/components/unsavedGuardContext';
 
 interface TopBarProps {
@@ -24,9 +26,9 @@ export function TopBar({ title, onMenuToggle, menuButtonRef, menuOpen, menuContr
     navigate('/admin/login');
   });
 
-  const initials = user?.name
-    ? user.name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
-    : (user?.email ? user.email.split('@')[0].slice(0, 2).toUpperCase() : '?');
+  const photo = useBrokenImage(user?.photo);
+  const initials = (user?.name && reviewerInitials(user.name))
+    || (user?.email ? user.email.split('@')[0].slice(0, 2).toUpperCase() : '?');
 
   return (
     <header className="adm-topbar">
@@ -63,8 +65,8 @@ export function TopBar({ title, onMenuToggle, menuButtonRef, menuOpen, menuContr
               title="Meu perfil"
               style={{ overflow: 'hidden' }}
             >
-              {user.photo
-                ? <img src={user.photo} alt="Foto de perfil" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              {photo.show
+                ? <img src={user.photo} alt="Foto de perfil" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={photo.onError} />
                 : initials
               }
             </div>

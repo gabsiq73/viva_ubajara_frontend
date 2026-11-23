@@ -1,14 +1,18 @@
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../admin/hooks/useAuth";
 import { reviewsService } from "../../admin/services/reviewsService";
 import type { ApprovalStatus, PageResponse, ReviewResponse, ReviewSummary } from "../../admin/types";
+import { useBrokenImage } from "../../hooks/useBrokenImage";
+import { reviewerInitials } from "../layout/userDisplay";
 import { claimErrorMessage } from "../../utils/claims";
 import { formatLongDate, parseIsoDate, toIsoDate } from "../../utils/dates";
-import { RATING_LABELS, formatRating, reviewsLabel } from "../../utils/rating";
+import { RATING_LABELS, formatCount, formatRating, reviewsLabel } from "../../utils/rating";
 import { saveReturnTo } from "../../utils/returnTo";
 import { useAsyncData } from "../../utils/useAsyncData";
+import { usePresence } from "../../utils/usePresence";
 import { Button } from "../ui/Button";
+import Collapse from "../ui/Collapse";
 import Field from "../ui/Field";
 import Icon from "../ui/Icon";
 import { Skeleton } from "../ui/Skeleton";
@@ -36,20 +40,21 @@ interface ReviewsSectionProps {
 }
 
 function ReviewCard({ review }: { review: ReviewResponse }) {
-    const initials = review.authorName.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+    const initials = reviewerInitials(review.authorName);
+    const photo = useBrokenImage(review.authorPhoto);
     const date = parseIsoDate(review.createdDate);
     return (
         <article className="rv-card">
             <div className="rv-card__top">
                 <div className="rv-card__avatar">
-                    {review.authorPhoto ? (
-                        <img src={review.authorPhoto} alt="" width={40} height={40} loading="lazy" decoding="async" />
+                    {photo.show ? (
+                        <img src={review.authorPhoto!} alt="" width={40} height={40} loading="lazy" decoding="async" onError={photo.onError} />
                     ) : (
-                        <span aria-hidden="true">{initials}</span>
+                        <span aria-hidden="true">{initials || <Icon name="person" />}</span>
                     )}
                 </div>
                 <div className="rv-card__meta">
-                    <strong className="rv-card__name">{review.authorName}</strong>
+                    <strong className="rv-card__name" title={review.authorName}>{review.authorName}</strong>
                     {date && (
                         <time className="rv-card__date" dateTime={toIsoDate(date)}>
                             {formatLongDate(date)}
@@ -65,6 +70,7 @@ function ReviewCard({ review }: { review: ReviewResponse }) {
 
 function Summary({ summary }: { summary: ReviewSummary }) {
     const average = summary.average ?? 0;
+    const { state } = usePresence(true, 0);
     return (
         <div className="rv-summary">
             <div className="rv-summary__score">
@@ -72,16 +78,16 @@ function Summary({ summary }: { summary: ReviewSummary }) {
                 <Stars value={Math.round(average)} size={20} />
                 <span className="rv-summary__total">{reviewsLabel(summary.count)}</span>
             </div>
-            <ul className="rv-summary__bars" aria-label="Distribuição das notas">
-                {[5, 4, 3, 2, 1].map((star) => {
+            <ul className="rv-summary__bars" aria-label="Distribuição das notas" data-state={state}>
+                {[5, 4, 3, 2, 1].map((star, index) => {
                     const count = summary.distribution?.[String(star)] ?? 0;
                     return (
                         <li key={star} className="rv-summary__row" aria-label={`${star} ${star === 1 ? "estrela" : "estrelas"}: ${reviewsLabel(count)}`}>
                             <span className="rv-summary__label" aria-hidden="true">{star} ★</span>
                             <span className="rv-summary__track" aria-hidden="true">
-                                <span className="rv-summary__fill" style={{ width: `${summary.count ? (count / summary.count) * 100 : 0}%` }} />
+                                <span className="rv-summary__fill" style={{ "--p": summary.count ? count / summary.count : 0, "--i": index } as CSSProperties} />
                             </span>
-                            <span className="rv-summary__count" aria-hidden="true">{count}</span>
+                            <span className="rv-summary__count" aria-hidden="true">{formatCount(count)}</span>
                         </li>
                     );
                 })}
@@ -97,6 +103,7 @@ function ReviewList({ spotId, first }: { spotId: string; first: PageResponse<Rev
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
     const [focusId, setFocusId] = useState<string | null>(null);
+    const [freshFrom, setFreshFrom] = useState<number | null>(null);
     const focusRef = useRef<HTMLLIElement | null>(null);
 
     useEffect(() => {
@@ -110,6 +117,7 @@ function ReviewList({ spotId, first }: { spotId: string; first: PageResponse<Rev
             const next = await reviewsService.listBySpot(spotId, page + 1, PAGE_SIZE);
             const known = new Set(items.map((r) => r.id));
             const fresh = next.content.filter((r) => !known.has(r.id));
+            setFreshFrom(items.length);
             setItems([...items, ...fresh]);
             setPage(next.number);
             setLast(next.last);
@@ -124,26 +132,28 @@ function ReviewList({ spotId, first }: { spotId: string; first: PageResponse<Rev
     return (
         <>
             <ul className="rv-list">
-                {items.map((review) => (
+                {items.map((review, index) => (
                     <li
                         key={review.id}
                         ref={review.id === focusId ? focusRef : undefined}
                         tabIndex={review.id === focusId ? -1 : undefined}
-                        className="rv-list__item"
+                        className={`rv-list__item${freshFrom !== null && index >= freshFrom ? " rv-list__item--new" : ""}`}
+                        style={freshFrom !== null && index >= freshFrom ? ({ "--i": index - freshFrom } as CSSProperties) : undefined}
                     >
                         <ReviewCard review={review} />
                     </li>
                 ))}
             </ul>
-            {error && (
+            <Collapse open={error}>
                 <p className="rv-inline-error" role="alert">
                     Não foi possível carregar mais avaliações. Tente de novo.
                 </p>
-            )}
+            </Collapse>
             {!last && (
                 <div className="rv-more">
                     <Button variant="outline" icon={loading ? undefined : "expand_more"} onClick={loadMore} disabled={loading} aria-busy={loading}>
-                        {loading ? "Carregando…" : "Ver mais avaliações"}
+                        {loading && <span className="rv-spinner" aria-hidden="true" />}
+                        Ver mais avaliações
                     </Button>
                 </div>
             )}
@@ -259,7 +269,7 @@ function Composer({ spotId, spotName, onSaved }: { spotId: string; spotName: str
 
     if (!showForm && current) {
         return (
-            <div className="rv-form-card">
+            <div className={`rv-form-card${justSent ? " rv-form-card--sent" : ""}`}>
                 {justSent && (
                     <div className="rv-alert rv-alert--success" role="status">
                         <Icon name="check_circle" />
@@ -317,12 +327,12 @@ function Composer({ spotId, spotName, onSaved }: { spotId: string; spotName: str
                         </span>
                     )}
                 </div>
-                {ratingError && (
+                <Collapse open={!!ratingError}>
                     <p id={ratingErrorId} className="ui-field__error">
                         <Icon name="error" filled />
                         <span>{ratingError}</span>
                     </p>
-                )}
+                </Collapse>
             </div>
 
             <Field label="Seu comentário" optional error={commentError ?? undefined} counter={{ current: comment.length, max: COMMENT_MAX }}>
@@ -346,16 +356,17 @@ function Composer({ spotId, spotName, onSaved }: { spotId: string; spotName: str
                 )}
             </Field>
 
-            {submitError && (
+            <Collapse open={!!submitError} className="rv-form__alert">
                 <div className="rv-alert rv-alert--error" role="alert">
                     <Icon name="error" />
                     <span>{submitError}</span>
                 </div>
-            )}
+            </Collapse>
 
             <div className="rv-form__actions">
                 <Button type="submit" icon={submitting ? undefined : "send"} disabled={submitting} aria-busy={submitting}>
-                    {submitting ? "Enviando…" : current ? "Salvar avaliação" : "Enviar avaliação"}
+                    {submitting && <span className="rv-spinner" aria-hidden="true" />}
+                    {current ? "Salvar avaliação" : "Enviar avaliação"}
                 </Button>
                 {current && (
                     <Button variant="outline" onClick={cancelEditing} disabled={submitting}>

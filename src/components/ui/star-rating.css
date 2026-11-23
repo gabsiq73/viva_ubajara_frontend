@@ -15,7 +15,7 @@
   cursor: pointer;
   color: #e5e7eb;
   padding: 2px;
-  transition: color 0.12s, transform 0.12s;
+  transition: color 120ms ease, transform var(--dur-press) var(--ease-out);
   display: flex;
   align-items: center;
 }
@@ -24,8 +24,20 @@
   color: #FFB527;
 }
 
-.ui-star-picker__btn:hover {
-  transform: scale(1.15);
+/* Escalonamento só na cor, para a seleção "acender" da primeira à última estrela; o transform não espera. */
+.ui-star-picker__btn:nth-child(2) { transition-delay: 30ms, 0s; }
+.ui-star-picker__btn:nth-child(3) { transition-delay: 60ms, 0s; }
+.ui-star-picker__btn:nth-child(4) { transition-delay: 90ms, 0s; }
+.ui-star-picker__btn:nth-child(5) { transition-delay: 120ms, 0s; }
+
+@media (hover: hover) and (pointer: fine) {
+  .ui-star-picker__btn:hover {
+    transform: scale(1.15);
+  }
+}
+
+.ui-star-picker__btn:active {
+  transform: scale(0.95);
 }
 
 .ui-star-picker__btn:focus-visible {
@@ -34,10 +46,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ui-star-picker__btn {
-    transition: none;
-  }
-
   .ui-star-picker__btn:hover {
     transform: none;
   }

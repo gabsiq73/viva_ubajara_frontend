@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Icon from "../components/ui/Icon";
+import Collapse from "../components/ui/Collapse";
 import heroImg from "../assets/images/capa-pagina.webp";
 import { contactMessagesService } from "../admin/services/contactMessagesService";
 import { mailHref, telHref } from "../utils/establishmentDetail";
@@ -181,12 +182,12 @@ export default function Contato(): JSX.Element {
                     </div>
 
                     <div className="contact-section__form-wrap">
-                        {success && (
+                        <Collapse open={success}>
                             <div className="contact-section__alert contact-section__alert--success" role="status">
                                 <Icon name="check_circle" />
                                 Mensagem enviada com sucesso! Retornaremos em breve.
                             </div>
-                        )}
+                        </Collapse>
                         <form className="contact-section__form" onSubmit={handleSubmit} noValidate>
                             <div className="contact-section__field">
                                 <label htmlFor="ct-name" className="contact-section__label">Nome Completo</label>
@@ -205,7 +206,9 @@ export default function Contato(): JSX.Element {
                                     aria-invalid={fieldErrors.name ? true : undefined}
                                     aria-describedby={fieldErrors.name ? "ct-name-error" : undefined}
                                 />
-                                {fieldErrors.name && <p id="ct-name-error" className="ct-field-error">{fieldErrors.name}</p>}
+                                <Collapse open={!!fieldErrors.name} className="ct-error-collapse">
+                                    <p id="ct-name-error" className="ct-field-error">{fieldErrors.name}</p>
+                                </Collapse>
                             </div>
                             <div className="contact-section__field">
                                 <label htmlFor="ct-email" className="contact-section__label">E-mail</label>
@@ -225,7 +228,9 @@ export default function Contato(): JSX.Element {
                                     aria-invalid={fieldErrors.email ? true : undefined}
                                     aria-describedby={fieldErrors.email ? "ct-email-error" : undefined}
                                 />
-                                {fieldErrors.email && <p id="ct-email-error" className="ct-field-error">{fieldErrors.email}</p>}
+                                <Collapse open={!!fieldErrors.email} className="ct-error-collapse">
+                                    <p id="ct-email-error" className="ct-field-error">{fieldErrors.email}</p>
+                                </Collapse>
                             </div>
                             <div className="contact-section__field">
                                 <label htmlFor="ct-subject" className="contact-section__label">Assunto</label>
@@ -259,14 +264,16 @@ export default function Contato(): JSX.Element {
                                     aria-invalid={fieldErrors.message ? true : undefined}
                                     aria-describedby={fieldErrors.message ? "ct-msg-error" : undefined}
                                 />
-                                {fieldErrors.message && <p id="ct-msg-error" className="ct-field-error">{fieldErrors.message}</p>}
+                                <Collapse open={!!fieldErrors.message} className="ct-error-collapse">
+                                    <p id="ct-msg-error" className="ct-field-error">{fieldErrors.message}</p>
+                                </Collapse>
                             </div>
-                            {error && (
+                            <Collapse open={!!error} className="ct-alert-collapse">
                                 <div className="contact-section__alert contact-section__alert--error" role="alert">
                                     <Icon name="error" />
                                     {error}
                                 </div>
-                            )}
+                            </Collapse>
                             <button type="submit" className="contact-section__submit" disabled={submitting}>
                                 {submitting ? "Enviando…" : "Enviar Mensagem"}
                             </button>

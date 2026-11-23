@@ -108,7 +108,7 @@ function FooterGroup({ group, accordion, open, onToggle, className }: FooterGrou
                         onClick={() => onToggle(group.id)}
                     >
                         {group.title}
-                        <Icon name={open ? "remove" : "add"} />
+                        <Icon name="add" />
                     </button>
                 ) : (
                     group.title

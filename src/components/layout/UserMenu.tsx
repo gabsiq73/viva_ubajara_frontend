@@ -98,7 +98,7 @@ export default function UserMenu() {
                     <div className="site-user__profile">
                         <UserAvatar photo={user.photo} name={displayName} className="site-avatar--lg" />
                         <div className="site-user__info">
-                            <strong>{displayName}</strong>
+                            <strong title={displayName}>{displayName}</strong>
                             <span>{getRoleLabel(user.role)}</span>
                         </div>
                     </div>
