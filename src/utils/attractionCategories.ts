@@ -17,3 +17,12 @@ export const ATTRACTION_CATEGORY_ICONS: Record<AttractionCategory, string> = {
     ROUTE: "hiking",
     MARKET: "storefront",
 };
+
+export const ATTRACTION_CATEGORY_PLURALS: Record<AttractionCategory, string> = {
+    PARK: "Parques",
+    WATERFALL: "Cachoeiras",
+    MUSEUM: "Museus",
+    FARM: "Fazendas",
+    ROUTE: "Rotas",
+    MARKET: "Mercados",
+};

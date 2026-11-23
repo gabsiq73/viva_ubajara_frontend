@@ -31,8 +31,8 @@ import TornDivider from "../ui/TornDivider";
 import { FilterChip } from "../ui/Chip";
 import StateBlock from "../ui/StateBlock";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
-import PointCard from "../ui/PointCard";
-import { Skeleton, EstablishmentCardSkeleton, PointCardSkeleton } from "../ui/Skeleton";
+import PointsShowcase from "./PointsShowcase";
+import { Skeleton, EstablishmentCardSkeleton } from "../ui/Skeleton";
 import {
     ESTABLISHMENT_TYPES,
     mapHostPoint,
@@ -277,11 +277,13 @@ interface SectionHeaderProps {
     subtitle?: string;
     cta?: { to: string; label: string; text?: string };
     onDark?: boolean;
+    /** Esconde o botão do cabeçalho no celular (a seção mostra o seu próprio no fim). */
+    ctaDesktopOnly?: boolean;
 }
 
-function SectionHeader({ id, kicker, title, subtitle, cta, onDark }: SectionHeaderProps) {
+function SectionHeader({ id, kicker, title, subtitle, cta, onDark, ctaDesktopOnly }: SectionHeaderProps) {
     return (
-        <header className={`sec-head reveal${onDark ? " sec-head--on-dark" : ""}`}>
+        <header className={`sec-head reveal${onDark ? " sec-head--on-dark" : ""}${ctaDesktopOnly ? " sec-head--cta-desktop" : ""}`}>
             <div className="sec-head__text">
                 <span className="sec-head__kicker">{kicker}</span>
                 <h2 id={id} className="sec-head__title">{title}</h2>
@@ -404,6 +406,23 @@ export default function Content() {
 
     const filteredPub = useMemo(() => pickPubItems(pubItems, pubGuideFilter), [pubItems, pubGuideFilter]);
 
+    const handleTogglePointFavorite = (item: AttractionResponse) => {
+        const nowFavorite = toggleFavorite({
+            id: item.id,
+            name: item.name,
+            type: "attraction",
+            photo: item.photos?.[0]?.url,
+            shortDescription: item.shortDescription || item.description?.slice(0, 100),
+            path: `/pontos/${item.id}`,
+        });
+        setFavoriteIds((prev) => {
+            const next = new Set(prev);
+            if (nowFavorite) next.add(item.id);
+            else next.delete(item.id);
+            return next;
+        });
+    };
+
     const handleToggleFavorite = (item: Establishment) => {
         const nowFavorite = toggleFavorite(toFavoriteItem(item));
         setFavoriteIds((prev) => {
@@ -488,21 +507,18 @@ export default function Content() {
                             kicker="Experiências Únicas"
                             title="Pontos Turísticos"
                             subtitle="Cachoeiras, trilhas, fazendas e mercados para viver a serra de perto."
-                            cta={{ to: "/pontos-turisticos", label: "Ver todos os pontos turísticos" }}
+                            cta={{ to: "/pontos-turisticos", label: "Ver todos os pontos turísticos", text: "Ver todos os pontos" }}
+                            ctaDesktopOnly
                         />
-                        {loading ? (
-                            <ul className="ui-point-grid" aria-hidden="true">
-                                {Array.from({ length: 4 }).map((_, i) => <li key={i}><PointCardSkeleton /></li>)}
-                            </ul>
-                        ) : failed.attractions || attractions.length === 0 ? (
-                            <SectionState failed={failed.attractions} emptyTitle="Nenhum ponto turístico cadastrado por enquanto." emptyIcon="landscape" onRetry={retryLoad} />
-                        ) : (
-                            <ul className="ui-point-grid grid-reveal">
-                                {attractions.map((pt) => (
-                                    <li key={pt.id}><PointCard item={pt} /></li>
-                                ))}
-                            </ul>
-                        )}
+                        <PointsShowcase
+                            items={failed.attractions ? [] : attractions}
+                            loading={loading}
+                            favoriteIds={favoriteIds}
+                            onToggleFavorite={handleTogglePointFavorite}
+                            moreTo="/pontos-turisticos"
+                            moreLabel="Ver todos os pontos"
+                            fallback={<SectionState failed={failed.attractions} emptyTitle="Nenhum ponto turístico cadastrado por enquanto." emptyIcon="landscape" onRetry={retryLoad} />}
+                        />
                     </div>
                 </section>
 

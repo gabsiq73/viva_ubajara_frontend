@@ -135,6 +135,10 @@ body {
         align-items: flex-start;
         gap: 16px;
     }
+
+    .sec-head--cta-desktop .sec-head__cta {
+        display: none;
+    }
 }
 
 @keyframes slideUpFade {
