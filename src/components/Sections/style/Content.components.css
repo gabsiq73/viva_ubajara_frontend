@@ -434,13 +434,13 @@ ul.list-cards li#dormir { background: linear-gradient(145deg, #CD8700, #a96e00);
 ul.list-cards li#chegar { background: linear-gradient(145deg, #005225, #003016); }
 
 .point {
-    padding: 32px 0 var(--home-section-y);
+    padding: clamp(48px, 6vw, 80px) 0 calc(var(--home-section-y) + var(--torn-h));
     width: 100%;
     display: flex;
     justify-content: center;
     position: relative;
     top: 0;
-    margin-top: 8px;
+    margin-top: 0;
     box-sizing: border-box;
 }
 
@@ -722,7 +722,7 @@ div.restaurant a:active {
     }
 
     .point {
-        padding: 18px 0 var(--home-section-y);
+        padding: 40px 0 calc(var(--home-section-y) + var(--torn-h));
         box-sizing: border-box;
     }
 
@@ -839,7 +839,7 @@ div.restaurant a:active {
     display: flex;
     flex-direction: column;
     gap: calc(var(--home-section-y) * 1.5);
-    padding: var(--home-section-y) 0;
+    padding: calc(var(--home-section-y) + var(--torn-h)) 0 var(--home-section-y);
     box-sizing: border-box;
     background: #f4f9f6;
     width: 100%;
@@ -1557,7 +1557,7 @@ div.restaurant a:active {
 
 
 .faq {
-    padding: clamp(48px, 6vw, 88px) 0 clamp(40px, 5vw, 72px);
+    padding: calc(clamp(48px, 6vw, 88px) + var(--torn-h)) 0 clamp(40px, 5vw, 72px);
     background: #f4f9f6;
 }
 
