@@ -39,13 +39,16 @@ export default function Main(){
             >
                 <div className="hero-inner">
                     <h1 className="hero-title">
-                        <span className="hero-title__kicker">Venha conhecer Ubajara e</span>
-                        <span className="hero-title__lead">Tenha uma experiência</span>
-                        <span className="hero-title--gold">
-                            <span className="ui-sr-only">{HERO_WORDS[0]}</span>
-                            <span key={wordIdx} className="hero-rotating-word" aria-hidden="true">
-                                {HERO_WORDS[wordIdx]}
-                            </span>
+                        <span className="hero-title__kicker">Venha conhecer Ubajara</span>
+                        <span className="hero-title__lead">Uma experiência</span>
+                        <span className="hero-title__line">
+                            <span className="hero-title--gold">
+                                <span className="ui-sr-only">{HERO_WORDS[0]}</span>
+                                <span key={wordIdx} className="hero-rotating-word" aria-hidden="true">
+                                    {HERO_WORDS[wordIdx]}
+                                </span>
+                            </span>{" "}
+                            <span className="hero-title__tail">na serra</span>
                         </span>
                     </h1>
                     <p className="hero-subtitle">
