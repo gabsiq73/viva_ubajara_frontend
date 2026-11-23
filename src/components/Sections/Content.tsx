@@ -1,4 +1,5 @@
 import "./style/Content.components.css"
+import "./style/Arrival.css"
 import { Link } from "react-router-dom"
 import { useEffect, useState, useMemo, useRef, type KeyboardEvent, type ReactNode } from "react"
 import paper from "./../../assets/images/paper.webp"
@@ -76,11 +77,21 @@ const GASTRO_SLIDES_FALLBACK: GastronomySlide[] = [
 ];
 
 const AIRPORTS = [
-    { code: "JJD", name: "Aeroporto de Jericoacoara", dist: "165\u00A0km de distância" },
-    { code: "THE", name: "Aeroporto de Teresina", dist: "280\u00A0km de distância" },
-    { code: "FOR", name: "Aeroporto de Fortaleza", dist: "320\u00A0km de distância" },
-    { code: "PHB", name: "Aeroporto de Parnaíba", dist: "190\u00A0km de distância" },
+    { code: "JJD", name: "Aeroporto de Jericoacoara", dist: "165 km" },
+    { code: "PHB", name: "Aeroporto de Parnaíba", dist: "190 km" },
+    { code: "THE", name: "Aeroporto de Teresina", dist: "280 km" },
+    { code: "FOR", name: "Aeroporto de Fortaleza", dist: "320 km" },
 ];
+
+const ARRIVAL_STEPS = [
+    { icon: "flight", title: "De avião", badge: "a partir de 165 km", desc: "Voe para os aeroportos mais próximos e complete a viagem por terra em menos de 3 horas de carro." },
+    { icon: "directions_bus", title: "De ônibus", badge: "~6h de Fortaleza", desc: "Linhas regulares com saída de Fortaleza, Teresina e outras cidades da região." },
+    { icon: "directions_car", title: "De carro", badge: "~5h de Fortaleza", desc: "Pela BR-222 e CE-187. Estrada asfaltada, sinalizada e com belas paisagens da serra." },
+];
+
+// Mapa da região (Ubajara e aeroportos) sem chave de API; o botão abre o mapa completo.
+const REGION_MAP_EMBED = "https://www.openstreetmap.org/export/embed.html?bbox=-43.3%2C-5.6%2C-38.0%2C-2.4&layer=mapnik&marker=-3.8567%2C-40.9217";
+const UBAJARA_MAPS_URL = "https://www.google.com/maps/search/?api=1&query=Parque+Nacional+de+Ubajara";
 
 interface FaqItem {
     id: string;
@@ -734,58 +745,74 @@ export default function Content() {
                 </div>
 
                 {/* ── Como Chegar ── */}
-                <section className="como-chegar" aria-labelledby="como-chegar-title">
-                    <div className="como-chegar__banner" style={{ backgroundImage: `url(${park})` }}>
-                        <div className="como-chegar__banner-inner">
+                <section className="arrival" aria-labelledby="como-chegar-title">
+                    <div className="arrival__inner">
+                        <div className="arrival__main">
                             <SectionHeader
                                 id="como-chegar-title"
                                 kicker="Planejando sua visita"
                                 title="Como Chegar"
-                                subtitle="Ubajara fica na Serra da Ibiapaba, acessível por diversas rotas aéreas e terrestres. Escolha seu ponto de partida e venha viver essa experiência única."
-                                cta={{ to: "/como-chegar", label: "Encontrar rotas até Ubajara", text: "Encontrar rotas" }}
+                                subtitle="Ubajara fica na Serra da Ibiapaba, acessível por rotas aéreas e terrestres. Escolha seu ponto de partida."
                                 onDark
                             />
-                        </div>
-                    </div>
-                    <div className="como-chegar__body">
-                        <div className="como-chegar__body-inner">
-                            <div className="como-chegar__transport grid-reveal">
-                                <div className="transport-card transport-card--air">
-                                    <div className="transport-card__icon-wrap"><span className="material-symbols-outlined" aria-hidden="true">flight</span></div>
-                                    <div className="transport-card__content">
-                                        <h3 className="transport-card__title">De Avião</h3>
-                                        <p className="transport-card__desc">Voe para os aeroportos mais próximos e complete a viagem por terra em menos de 3 horas de carro.</p>
-                                    </div>
-                                    <span className="transport-card__badge">A partir de 165&nbsp;km</span>
-                                </div>
-                                <div className="transport-card transport-card--bus">
-                                    <div className="transport-card__icon-wrap"><span className="material-symbols-outlined" aria-hidden="true">directions_bus</span></div>
-                                    <div className="transport-card__content">
-                                        <h3 className="transport-card__title">De Ônibus</h3>
-                                        <p className="transport-card__desc">Linhas regulares com saída de Fortaleza, Teresina e outras cidades da região.</p>
-                                    </div>
-                                    <span className="transport-card__badge">~6h de Fortaleza</span>
-                                </div>
-                                <div className="transport-card transport-card--car">
-                                    <div className="transport-card__icon-wrap"><span className="material-symbols-outlined" aria-hidden="true">directions_car</span></div>
-                                    <div className="transport-card__content">
-                                        <h3 className="transport-card__title">De Carro</h3>
-                                        <p className="transport-card__desc">Pela BR-222 e CE-187. Estrada totalmente asfaltada, sinalizada e com belas paisagens da serra.</p>
-                                    </div>
-                                    <span className="transport-card__badge">~5h de Fortaleza</span>
-                                </div>
-                            </div>
-                            <div className="como-chegar__airports-section">
-                                <h3 className="como-chegar__airports-title reveal">Aeroportos mais próximos</h3>
-                                <div className="como-chegar__airports grid-reveal">
-                                    {AIRPORTS.map((ap) => (
-                                        <div key={ap.code} className="airport-card">
-                                            <span className="airport-card__code">{ap.code}</span>
-                                            <p className="airport-card__name">{ap.name}</p>
-                                            <p className="airport-card__dist">{ap.dist}</p>
+                            <ol className="arrival__steps grid-reveal">
+                                {ARRIVAL_STEPS.map((step) => (
+                                    <li key={step.title} className="arrival__step">
+                                        <span className="arrival__step-icon" aria-hidden="true">
+                                            <span className="material-symbols-outlined">{step.icon}</span>
+                                        </span>
+                                        <div className="arrival__card">
+                                            <div className="arrival__card-head">
+                                                <h3 className="arrival__card-title">{step.title}</h3>
+                                                <span className="arrival__card-badge">{step.badge}</span>
+                                            </div>
+                                            <p className="arrival__card-desc">{step.desc}</p>
                                         </div>
-                                    ))}
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
+
+                        <div className="arrival__map">
+                            <div className="arrival__map-frame">
+                                <iframe
+                                    className="arrival__map-embed"
+                                    title="Mapa da região: Ubajara e os aeroportos mais próximos"
+                                    src={REGION_MAP_EMBED}
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer"
+                                    tabIndex={-1}
+                                />
+                                <a className="arrival__map-credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap</a>
+                                <span className="arrival__map-pill">
+                                    <span className="material-symbols-outlined" aria-hidden="true">location_on</span>
+                                    Ubajara, CE
+                                </span>
+                            </div>
+                            <div className="arrival__airports">
+                                <div className="arrival__airports-head">
+                                    <h3 className="arrival__airports-title">
+                                        <span className="material-symbols-outlined" aria-hidden="true">flight</span>
+                                        Aeroportos mais próximos
+                                    </h3>
+                                    <a href={UBAJARA_MAPS_URL} className="arrival__map-link arrival__map-link--text" target="_blank" rel="noopener noreferrer">
+                                        Abrir no mapa
+                                        <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                                    </a>
                                 </div>
+                                <ul className="arrival__airport-list grid-reveal">
+                                    {AIRPORTS.map((ap) => (
+                                        <li key={ap.code} className="arrival__airport">
+                                            <span className="arrival__airport-code">{ap.code}</span>
+                                            <p className="arrival__airport-name">{ap.name}</p>
+                                            <p className="arrival__airport-dist">{ap.dist}</p>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <a href={UBAJARA_MAPS_URL} className="arrival__map-link arrival__map-link--button" target="_blank" rel="noopener noreferrer">
+                                    Abrir no mapa
+                                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                                </a>
                             </div>
                         </div>
                     </div>

@@ -1,0 +1,380 @@
+/* ── Como chegar (home): passos à esquerda, mapa e aeroportos à direita ── */
+
+.arrival {
+    background: #003016;
+    color: #ffffff;
+    overflow: hidden;
+}
+
+.arrival__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: calc(var(--home-section-y) * 1.5) var(--home-gutter);
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(32px, 5vw, 72px);
+    align-items: stretch;
+}
+
+.arrival__main {
+    min-width: 0;
+}
+
+.arrival .sec-head {
+    margin-bottom: clamp(24px, 3vw, 36px);
+}
+
+/* ── Passos (linha do tempo) ── */
+.arrival__steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.arrival__step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+
+/* Linha tracejada ligando os ícones */
+.arrival__step:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    left: 21px;
+    top: 48px;
+    bottom: -16px;
+    border-left: 2px dashed rgba(244, 185, 40, 0.45);
+}
+
+.arrival__step-icon {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #f4b928;
+    color: #1a1200;
+}
+
+.arrival__step-icon .material-symbols-outlined {
+    font-size: 22px;
+}
+
+.arrival__card {
+    min-width: 0;
+    padding: 16px 20px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.arrival__card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2px 12px;
+    margin-bottom: 6px;
+}
+
+.arrival__card-title {
+    margin: 0;
+    font-family: "Nunito", sans-serif;
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1.25;
+    color: #ffffff;
+}
+
+.arrival__card-badge {
+    font-family: "Inter", sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #f4b928;
+}
+
+.arrival__card-desc {
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #d4e5da;
+}
+
+/* ── Mapa + aeroportos ── */
+.arrival__map {
+    position: relative;
+    min-width: 0;
+    min-height: 520px;
+    border-radius: 28px;
+    overflow: hidden;
+    background: #17502d;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.arrival__map-frame {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+/* O iframe é maior que o quadro para esconder os controles de zoom e a atribuição dele;
+   a atribuição fica no selo "© OpenStreetMap" do próprio quadro. */
+.arrival__map-embed {
+    position: absolute;
+    top: -90px;
+    left: 0;
+    display: block;
+    width: calc(100% + 80px);
+    height: calc(100% + 130px);
+    border: 0;
+    /* Mapa só ilustrativo: não prende a rolagem da página; o botão abre o mapa completo. */
+    pointer-events: none;
+    filter: saturate(0.85) contrast(0.95);
+}
+
+.arrival__map-pill {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px 8px 10px;
+    border-radius: 50px;
+    background: #ffffff;
+    color: #00210c;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.arrival__map-pill .material-symbols-outlined {
+    font-size: 18px;
+    color: #c58b24;
+}
+
+.arrival__map-credit {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 1;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.88);
+    color: #3d4a42;
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    text-decoration: none;
+}
+
+.arrival__airports {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    padding: 16px 18px 18px;
+    border-radius: 20px;
+    background: #ffffff;
+    color: #00210c;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+}
+
+.arrival__airports-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.arrival__airports-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #006b32;
+}
+
+.arrival__airports-title .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.arrival__map-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "Inter", sans-serif;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-hover) ease;
+}
+
+.arrival__map-link .material-symbols-outlined {
+    font-size: 18px;
+    transition: transform 200ms var(--ease-out);
+}
+
+.arrival__map-link:focus-visible {
+    outline: 3px solid #f3c66b;
+    outline-offset: 3px;
+    border-radius: 8px;
+}
+
+.arrival__map-link--text {
+    font-size: 14px;
+    color: #00210c;
+}
+
+.arrival__map-link--button {
+    display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .arrival__map-link:hover .material-symbols-outlined {
+        transform: translateX(3px);
+    }
+}
+
+.arrival__airport-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.arrival__airport {
+    min-width: 0;
+    padding: 12px 12px 14px;
+    border-radius: 12px;
+    background: #f1f6f3;
+}
+
+.arrival__airport-code {
+    display: block;
+    font-family: "Nunito", sans-serif;
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.1;
+    color: #006b32;
+}
+
+.arrival__airport-name {
+    margin: 6px 0 2px;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    line-height: 1.35;
+    color: #3d4a42;
+}
+
+.arrival__airport-dist {
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #b7791f;
+}
+
+/* ── Tablet / celular ── */
+@media (max-width: 1023px) {
+    .arrival__inner {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 32px;
+    }
+
+    .arrival__map {
+        min-height: 0;
+        overflow: visible;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .arrival__map-frame {
+        position: relative;
+        inset: auto;
+        height: clamp(220px, 52vw, 340px);
+        border-radius: 22px;
+        overflow: hidden;
+        background: #17502d;
+    }
+
+    .arrival__airports {
+        position: static;
+        padding: 24px 0 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        color: #ffffff;
+    }
+
+    .arrival__airports-head {
+        margin-bottom: 14px;
+    }
+
+    .arrival__airports-title {
+        color: #f4b928;
+    }
+
+    .arrival__map-link--text {
+        display: none;
+    }
+
+    .arrival__airport-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .arrival__airport {
+        padding: 14px;
+        background: #f1f6f3;
+    }
+
+    .arrival__map-link--button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 52px;
+        margin-top: 20px;
+        border-radius: 50px;
+        background: #f4b928;
+        color: #1a1200;
+        font-size: 16px;
+    }
+
+    .arrival__map-link--button:active {
+        transform: scale(0.98);
+    }
+}
+
+@media (max-width: 480px) {
+    .arrival__card-head {
+        flex-direction: column;
+        gap: 2px;
+    }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+    .arrival__airport-list {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
