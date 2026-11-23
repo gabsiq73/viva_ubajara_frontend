@@ -1,5 +1,6 @@
 import "./style/Content.components.css"
 import "./style/Arrival.css"
+import { AgendaItem, AgendaSkeleton } from "./AgendaItem";
 import { Link } from "react-router-dom"
 import { useEffect, useState, useMemo, useRef, type KeyboardEvent, type ReactNode } from "react"
 import paper from "./../../assets/images/paper.webp"
@@ -163,30 +164,6 @@ const FAQ_ITEMS: FaqItem[] = [
 ];
 
 // ── Skeleton cards ─────────────────────────────────────────────
-
-const EventSkeleton = () => (
-    <article className="pub-event-card pub-event-card--skeleton" aria-hidden="true">
-        <div className="pub-event-card__media">
-            <Skeleton className="pub-skel-fill" radius={0} />
-        </div>
-        <div className="pub-event-card__body">
-            <div className="pub-event-card__title">
-                <Skeleton width="80%" height={15} />
-                <Skeleton width="55%" height={15} />
-            </div>
-            <div className="pub-event-card__desc">
-                <Skeleton width="100%" height={12} />
-                <Skeleton width="70%" height={12} />
-            </div>
-            <div className="pub-event-card__loc">
-                <Skeleton width="45%" height={13} />
-            </div>
-            <div className="pub-event-card__footer">
-                <Skeleton width={96} height={14} />
-            </div>
-        </div>
-    </article>
-);
 
 const GuideSkeleton = () => (
     <article className="guide-card guide-card--skeleton" aria-hidden="true">
@@ -647,63 +624,48 @@ export default function Content() {
                     </section>
 
                     {/* Eventos */}
-                    <section className="pub-events" aria-labelledby="pub-events-title">
-                        <SectionHeader
-                            id="pub-events-title"
-                            kicker="Experiências Inesquecíveis"
-                            title="Próximos Eventos"
-                            subtitle="Fique por dentro da programação cultural e dos festivais que movimentam a nossa serra."
-                            cta={{ to: "/eventos", label: "Ver todos os eventos" }}
-                        />
-                        {loading ? (
-                            <div className="pub-events__grid">
-                                {Array.from({ length: 4 }).map((_, i) => <EventSkeleton key={i} />)}
-                            </div>
-                        ) : failed.events || homeEvents.length === 0 ? (
-                            <SectionState failed={failed.events} emptyTitle="Nenhum evento agendado por enquanto." emptyIcon="event" onRetry={retryLoad} />
-                        ) : (
-                            <div className="pub-events__grid grid-reveal">
-                                {homeEvents.map((ev) => {
-                                    const d = parseDate(ev.startDateTime);
-                                    const valid = !isNaN(d.getTime());
-                                    const day = valid ? DAY_FORMAT.format(d) : "—";
-                                    const month = valid ? MONTH_FORMAT.format(d).replace(".", "") : "—";
-                                    return (
-                                        <article key={ev.id} className="pub-event-card">
-                                            <div className="pub-event-card__media">
-                                                {ev.photos?.[0]?.url
-                                                    ? <img src={ev.photos[0].url} alt="" width={640} height={480} loading="lazy" decoding="async" />
-                                                    : <div className="pub-event-card__placeholder" aria-hidden="true" />
-                                                }
-                                                <div className="pub-event-card__date" aria-hidden="true">
-                                                    <strong>{day}</strong>
-                                                    <span>{month}</span>
-                                                </div>
-                                            </div>
-                                            <div className="pub-event-card__body">
-                                                <h3 className="pub-event-card__title">
-                                                    <Link to={`/eventos/${ev.id}`} className="pub-event-card__link">
-                                                        {ev.name}
-                                                        {valid && <span className="ui-sr-only">, {DAY_MONTH_LONG_FORMAT.format(d)}</span>}
-                                                    </Link>
-                                                </h3>
-                                                <p className="pub-event-card__desc">{ev.description}</p>
-                                                <div className="pub-event-card__loc">
-                                                    <span className="material-symbols-outlined" aria-hidden="true">location_on</span>
-                                                    <span className="pub-event-card__loc-text">{ev.location}</span>
-                                                </div>
-                                                <div className="pub-event-card__footer">
-                                                    <span className="pub-event-card__cta" aria-hidden="true">
-                                                        Ver evento
-                                                        <span className="material-symbols-outlined">arrow_forward</span>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </article>
-                                    );
-                                })}
-                            </div>
-                        )}
+                    <section className="agenda" aria-labelledby="pub-events-title">
+                        <div className="agenda__inner">
+                            <header className="agenda__head reveal">
+                                <span className="sec-head__kicker">Experiências Inesquecíveis</span>
+                                <h2 id="pub-events-title" className="sec-head__title">Próximos Eventos</h2>
+                                <p className="sec-head__sub">A programação cultural e os festivais que movimentam a serra.</p>
+                                <Link to="/eventos" className="sec-head__cta">
+                                    Ver agenda completa
+                                    <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                                </Link>
+                            </header>
+                            {loading ? (
+                                <ul className="agenda__list" aria-hidden="true">
+                                    {Array.from({ length: 4 }).map((_, i) => <AgendaSkeleton key={i} />)}
+                                </ul>
+                            ) : failed.events || homeEvents.length === 0 ? (
+                                <SectionState failed={failed.events} emptyTitle="Nenhum evento agendado por enquanto." emptyIcon="event" onRetry={retryLoad} />
+                            ) : (
+                                <ul className="agenda__list grid-reveal">
+                                    {homeEvents.map((ev) => {
+                                        const d = parseDate(ev.startDateTime);
+                                        const valid = !isNaN(d.getTime());
+                                        const day = valid ? DAY_FORMAT.format(d) : "—";
+                                        const month = valid ? MONTH_FORMAT.format(d).replace(".", "") : "—";
+                                        return (
+                                            <li key={ev.id}>
+                                                <AgendaItem
+                                                    id={ev.id}
+                                                    name={ev.name}
+                                                    description={ev.description}
+                                                    location={ev.location}
+                                                    photo={ev.photos?.[0]?.url}
+                                                    day={day}
+                                                    month={month}
+                                                    longDate={valid ? DAY_MONTH_LONG_FORMAT.format(d) : undefined}
+                                                />
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            )}
+                        </div>
                     </section>
                 </div>
 
