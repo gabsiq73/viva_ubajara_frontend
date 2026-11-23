@@ -47,8 +47,8 @@ textarea {
 
 :root {
     /* ── Foto do hero ── */
-    --hero-position-desktop: 30% 40%;
-    --hero-position-mobile: center center;
+    --hero-position-desktop: 55% 50%;
+    --hero-position-mobile: 62% center;
 
     /* ── Tokens de marca (site público) ── */
     --pub-green-dark: #003016;

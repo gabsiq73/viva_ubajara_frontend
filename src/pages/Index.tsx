@@ -1,8 +1,7 @@
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import Main from "../components/Main";
-import heroDesktop from "../assets/images/hero-desktop.webp";
-import heroMobile from "../assets/images/hero-mobile.webp";
+import heroImage from "../assets/images/hero-gruta.webp";
 import "./style/globalStyle.css";
 
 export default function Index(){
@@ -10,8 +9,7 @@ export default function Index(){
         <div className="container">
             <div className="hero-bg" aria-hidden="true">
                 <picture>
-                    <source media="(max-width: 480px)" srcSet={heroMobile} />
-                    <img src={heroDesktop} alt="" width={2241} height={1090} fetchPriority="high" decoding="async" />
+                    <img src={heroImage} alt="" width={1024} height={576} fetchPriority="high" decoding="async" />
                 </picture>
             </div>
             <Header/>
