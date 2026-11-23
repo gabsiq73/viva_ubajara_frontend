@@ -2,16 +2,14 @@ import "./style/Content.components.css"
 import "./style/Arrival.css"
 import "./style/Gastronomy.css"
 import { AgendaItem, AgendaSkeleton } from "./AgendaItem";
+import GuidesShowcase from "./GuidesShowcase";
+import { TestimonialsShowcase } from "./TestimonialsShowcase";
 import { Link } from "react-router-dom"
 import { useEffect, useState, useMemo, useRef, type KeyboardEvent, type ReactNode } from "react"
 import paper from "./../../assets/images/paper.webp"
-import park from "./../../assets/images/parque.webp";
 import food from "./../../assets/images/food.webp";
-import cachoeiraAvatar from "./../../assets/images/cachoeira-avatar.webp";
 import farm from "./../../assets/images/fazenda.webp";
-import fazendaAvatar from "./../../assets/images/fazenda-avatar.webp";
 import mercado from "./../../assets/images/mercado.webp";
-import mercadoAvatar from "./../../assets/images/mercado-avatar.webp";
 import museum from "./../../assets/images/museu.webp";
 import { GastronomyShowcase, type GastronomySlide } from "./GastronomyShowcase";
 import { gastronomyItemsService } from "../../admin/services/gastronomyItemsService";
@@ -179,45 +177,6 @@ const FAQ_ITEMS: FaqItem[] = [
 
 // ── Skeleton cards ─────────────────────────────────────────────
 
-const GuideSkeleton = () => (
-    <article className="guide-card guide-card--skeleton" aria-hidden="true">
-        <div className="guide-card__photo">
-            <Skeleton className="pub-skel-fill" radius={0} />
-        </div>
-        <div className="guide-card__body">
-            <div className="guide-card__name">
-                <Skeleton width="60%" height={16} />
-            </div>
-            <div className="guide-card__specialty">
-                <Skeleton width="35%" height={11} />
-            </div>
-            <div className="guide-card__desc">
-                <Skeleton width="100%" height={12} />
-                <Skeleton width="100%" height={12} />
-                <Skeleton width="75%" height={12} />
-            </div>
-        </div>
-    </article>
-);
-
-const ReviewSkeleton = () => (
-    <article className="review-card" aria-hidden="true" style={{ pointerEvents: "none" }}>
-        <div className="skel" style={{ height: 18, width: 100 }} />
-        <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-            <div className="skel" style={{ height: 14, width: "100%" }} />
-            <div className="skel" style={{ height: 14, width: "85%" }} />
-            <div className="skel" style={{ height: 14, width: "70%" }} />
-        </div>
-        <div className="review-card__author">
-            <div className="skel" style={{ width: 42, height: 42, borderRadius: "50%", flexShrink: 0 }} />
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
-                <div className="skel" style={{ height: 14, width: "60%" }} />
-                <div className="skel" style={{ height: 12, width: "40%" }} />
-            </div>
-        </div>
-    </article>
-);
-
 // ── Type helpers ───────────────────────────────────────────────
 const DAY_FORMAT = new Intl.DateTimeFormat("pt-BR", { day: "2-digit" });
 const MONTH_FORMAT = new Intl.DateTimeFormat("pt-BR", { month: "short" });
@@ -310,9 +269,6 @@ function SectionHeader({ id, kicker, title, subtitle, cta, onDark, ctaDesktopOnl
         </header>
     );
 }
-
-// ── Fallback review avatars ───────────────────────────────────
-const FALLBACK_AVATARS = [cachoeiraAvatar, fazendaAvatar, mercadoAvatar];
 
 export default function Content() {
     const [gastroIndex, setGastroIndex] = useState(0);
@@ -670,43 +626,6 @@ export default function Content() {
                     </section>
                 </div>
 
-                {/* ── Guias Turísticos ── */}
-                <div className="tour-guides-wrap">
-                    <section id="guias-de-turismo" className="tour-guides" aria-labelledby="tour-guides-title">
-                        <SectionHeader
-                            id="tour-guides-title"
-                            kicker="Seu passeio em boas mãos"
-                            title="Nossos Guias Turísticos"
-                            subtitle="Conheça os profissionais credenciados que vão transformar sua visita em uma experiência inesquecível."
-                        />
-                        {loading ? (
-                            <div className="tour-guides__grid">
-                                {Array.from({ length: 4 }).map((_, i) => <GuideSkeleton key={i} />)}
-                            </div>
-                        ) : failed.guides || homeGuides.length === 0 ? (
-                            <SectionState failed={failed.guides} emptyTitle="Nenhum guia cadastrado por enquanto." emptyIcon="hiking" onRetry={retryLoad} />
-                        ) : (
-                            <div className="tour-guides__grid grid-reveal">
-                                {homeGuides.map((guide) => (
-                                    <article key={guide.id} className="guide-card">
-                                        <div className="guide-card__photo">
-                                            <img src={guide.photos?.[0]?.url || park} alt={guide.name} width={640} height={480} loading="lazy" decoding="async" />
-                                            {guide.languages && guide.languages.length > 0 && (
-                                                <span className="guide-card__lang">{guide.languages.join(" / ")}</span>
-                                            )}
-                                        </div>
-                                        <div className="guide-card__body">
-                                            <h3 className="guide-card__name" title={guide.name}>{guide.name}</h3>
-                                            <span className="guide-card__specialty">Guia Turístico</span>
-                                            <p className="guide-card__desc">{guide.description}</p>
-                                        </div>
-                                    </article>
-                                ))}
-                            </div>
-                        )}
-                    </section>
-                </div>
-
                 {/* ── Como Chegar ── */}
                 <section className="arrival" aria-labelledby="como-chegar-title">
                     <div className="arrival__inner">
@@ -781,9 +700,26 @@ export default function Content() {
                     </div>
                 </section>
 
+                {/* ── Guias Turísticos ── */}
+                <section id="guias-de-turismo" className="tour-guides" aria-labelledby="tour-guides-title">
+                    <div className="tour-guides__inner">
+                        <SectionHeader
+                            id="tour-guides-title"
+                            kicker="Seu passeio em boas mãos"
+                            title="Nossos Guias Turísticos"
+                            subtitle="Conheça os profissionais credenciados que vão transformar sua visita em uma experiência inesquecível."
+                        />
+                        <GuidesShowcase
+                            guides={failed.guides ? [] : homeGuides}
+                            loading={loading}
+                            fallback={<SectionState failed={failed.guides} emptyTitle="Nenhum guia cadastrado por enquanto." emptyIcon="hiking" onRetry={retryLoad} />}
+                        />
+                    </div>
+                </section>
+
                 {/* ── Depoimentos ── */}
                 <div className="reviews-block torn-host">
-                    <TornDivider edge="top" fill="#002a27" />
+                    <TornDivider edge="top" fill="#002f14" />
                     <section className="reviews" aria-labelledby="reviews-title">
                         <div className="reviews__inner">
                             <SectionHeader
@@ -791,45 +727,25 @@ export default function Content() {
                                 kicker="Quem já visitou recomenda"
                                 title="O que dizem os visitantes"
                                 subtitle="Experiências reais de quem já se encantou com as belezas de Ubajara."
-                                cta={{ to: "/depoimentos", label: "Ver todos os depoimentos" }}
+                                cta={{ to: "/depoimentos", label: "Ver todos os depoimentos", text: "Ver todos" }}
+                                ctaDesktopOnly
                                 onDark
                             />
                             {loading ? (
-                                <div className="reviews__grid">
-                                    {Array.from({ length: 3 }).map((_, i) => <ReviewSkeleton key={i} />)}
+                                <div className="tst-skeleton" aria-hidden="true">
+                                    <Skeleton className="tst-skeleton__card" radius={24} />
                                 </div>
-                            ) : failed.reviews || homeReviews.length === 0 ? (
-                                <SectionState failed={failed.reviews} emptyTitle="Ainda não há depoimentos publicados." emptyIcon="rate_review" emptyVariant="notice" onRetry={retryLoad} />
                             ) : (
-                                <div className="reviews__grid grid-reveal">
-                                    {homeReviews.map((r, i) => (
-                                        <article key={r.id} className="review-card">
-                                            <div className="review-card__stars" role="img" aria-label={`${r.rating} de 5 estrelas`}>
-                                                <span aria-hidden="true">{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</span>
-                                            </div>
-                                            <p className="review-card__text">“{r.comment}”</p>
-                                            <div className="review-card__author">
-                                                <img
-                                                    src={r.userPhoto || FALLBACK_AVATARS[i % FALLBACK_AVATARS.length]}
-                                                    alt={r.userName}
-                                                    className="review-card__avatar"
-                                                    width={42}
-                                                    height={42}
-                                                    loading="lazy"
-                                                    decoding="async"
-                                                />
-                                                <div className="review-card__info">
-                                                    <strong className="review-card__name">{r.userName}</strong>
-                                                    <span className="review-card__location">Visitante</span>
-                                                </div>
-                                            </div>
-                                        </article>
-                                    ))}
-                                </div>
+                                <TestimonialsShowcase
+                                    items={failed.reviews ? [] : homeReviews}
+                                    moreTo="/depoimentos"
+                                    moreLabel="Ver todos os depoimentos"
+                                    fallback={<SectionState failed={failed.reviews} emptyTitle="Ainda não há depoimentos publicados." emptyIcon="rate_review" emptyVariant="notice" onRetry={retryLoad} />}
+                                />
                             )}
                         </div>
                     </section>
-                    <TornDivider edge="bottom" fill="#002a27" />
+                    <TornDivider edge="bottom" fill="#002f14" />
                 </div>
 
                 {/* ── FAQ ── */}

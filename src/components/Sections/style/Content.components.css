@@ -738,8 +738,8 @@ div.news > * {
 }
 
 .reviews {
-    background: #002a27;
-    padding: clamp(48px, 6vw, 80px) 0;
+    background: #002f14;
+    padding: clamp(64px, 8vw, 112px) 0;
 }
 
 .reviews__inner {
@@ -749,189 +749,16 @@ div.news > * {
     box-sizing: border-box;
 }
 
-.reviews__grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    width: 100%;
-}
-
-.review-card {
-    background: #ffffff;
-    border-radius: 14px;
-    padding: 22px 20px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
-}
-
-.review-card__stars {
-    font-size: 18px;
-    color: #ffb527;
-    letter-spacing: 1px;
-}
-
-.review-card__text {
-    font-family: "Inter", sans-serif;
-    font-size: 14px;
-    line-height: 1.6;
-    color: #3c4a42;
-    margin: 0;
-    flex: 1;
-}
-
-.review-card__author {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 4px;
-}
-
-.review-card__avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-    border: 2px solid #e8f5ef;
-}
-
-.review-card__info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.review-card__name {
-    font-family: "Nunito", sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    color: #00210c;
-}
-
-.review-card__location {
-    font-family: "Inter", sans-serif;
-    font-size: 12px;
-    color: #7a9080;
-}
-
 @media only screen and (max-width: 768px) {
     .reviews__inner {
         padding: 24px 16px 48px;
     }
-
-    .reviews__grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
 }
 
 @media only screen and (max-width: 480px) {
-    .reviews__grid {
-        grid-template-columns: 1fr;
-    }
     .reviews__inner {
         padding: 24px 16px 48px;
     }
-}
-
-.tour-guides-wrap {
-    background: #ffffff;
-    padding: var(--home-section-y) 0;
-    width: 100%;
-}
-
-.guide-card {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    background: #ffffff;
-    border: 1px solid var(--ui-line);
-    border-radius: 14px;
-}
-
-.guide-card__photo {
-    position: relative;
-    aspect-ratio: 4 / 3;
-    border-radius: 13px 13px 0 0;
-    background: var(--pub-green-pale);
-    overflow: hidden;
-}
-
-.guide-card__photo img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.guide-card__lang {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    max-width: calc(100% - 20px);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    box-sizing: border-box;
-    background: rgba(0, 107, 50, 0.9);
-    color: #ffffff;
-    font-family: "Inter", sans-serif;
-    font-size: var(--fs-xs);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    padding: 5px 10px;
-    border-radius: 20px;
-    line-height: 1.2;
-}
-
-.guide-card__body {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex: 1;
-    min-width: 0;
-    padding: 14px 16px 16px;
-}
-
-.guide-card__name {
-    margin: 0;
-    min-height: 1.25em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-family: "Nunito", sans-serif;
-    font-weight: 800;
-    font-size: 17px;
-    line-height: 1.25;
-    color: #00210c;
-}
-
-.guide-card__specialty {
-    display: block;
-    min-height: 16px;
-    font-family: "Inter", sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 16px;
-    color: #006b32;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-}
-
-.guide-card__desc {
-    margin: 4px 0 0;
-    min-height: calc(1.6em * 3);
-    font-family: "Inter", sans-serif;
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--ui-text-secondary);
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
 }
 
 .faq {
