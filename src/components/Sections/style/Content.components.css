@@ -2123,3 +2123,9 @@ div.restaurant a:active {
 .reviews__inner > .ui-state {
     margin-bottom: 32px;
 }
+
+@media (max-width: 768px) {
+    div.paper {
+        display: none;
+    }
+}
